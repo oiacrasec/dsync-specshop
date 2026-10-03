@@ -1,4 +1,4 @@
-# Backend — estado após a etapa 1.2
+# Backend — estado após a etapa 2.1
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
 `backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/exceptions.py`,
@@ -63,8 +63,20 @@ e plano da Entrega 1.
   um tipo e campos compatíveis nos apps próprios, inclui proxies/unmanaged,
   ignora terceiros e N:N automáticas. Exceções fechadas users.User/contracts.Contract.
   Check sem SQL; tipos ainda não filtram queries. ADR 0013 registra decisão do
-  usuário: Plan/Contract/Organization em apps/contracts, a criar na etapa 2.1.
-- Próxima etapa: 2.1, Plan, Contract e Organization.
+  usuário: Plan/Contract/Organization em apps/contracts.
+- Etapa 2.1: apps/contracts instalado, gerado por startapp sem Admin. Plan herda
+  SharedModel; Contract é raiz BaseModel; Organization herda ContractScopedModel.
+  Tabelas dsc_plan/contract/organization e migration inicial aplicada localmente.
+  Plan tem name e quatro quotas opcionais: max_organizations, max_storage_bytes,
+  max_integrations, max_operations_per_month. Null = não definido; zero = zero;
+  campos não negativos, sem contadores/enforcement por pedido do usuário.
+  ADR 0014: modalidade pertence à implantação, não a Plan/Contract.
+  Contract tem nome, FK Plan PROTECT, start_date, end_date opcional, licenses >= 1,
+  post_termination_retention_days padrão 90/faixa 0–365. Constraints protegem
+  datas/licenças/retenção no banco. Organization tem name e FK Contract PROTECT.
+  Sem seeds/endpoints novos, quota enforcement/expurgo/contexto ainda pendentes.
+  Docstrings com exemplos práticos; __str__ só usa campo local, sem queries.
+- Próxima etapa: 2.2, vínculo User.contract e regras de licenças/superadmin.
   A etapa 1.1 foi antecipada com aprovação do usuário para usar UUID nos tokens.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em

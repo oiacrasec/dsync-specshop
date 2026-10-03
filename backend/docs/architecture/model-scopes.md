@@ -35,8 +35,8 @@ class StockEntry(OrganizationScopedModel):
         verbose_name = _('entrada de estoque')
 ```
 
-Esse é um exemplo para depois da criação de `Contract` e `Organization` na
-etapa 2.1. Não criar esse model concreto antes dos destinos das relações.
+`Contract` e `Organization` já existem desde a etapa 2.1. O exemplo ilustra
+um futuro model de estoque, que ainda não foi criado.
 
 ## System check
 
@@ -68,6 +68,7 @@ Managers com contexto, validação contrato/organização, restrições de escri
 unicidade híbrida e testes de isolamento entram nas próximas etapas do plano.
 Não tratar `objects` ou `all_objects` como autorização de acesso.
 
-Os tipos abstratos não criam tabelas ou migrations. Na etapa 2.1, `Plan` usará
-`SharedModel`; `Contract` continuará como raiz do tenant e exceção do ADR 0012.
+Os tipos abstratos não criam tabelas ou migrations. Desde a etapa 2.1, `Plan` usa
+`SharedModel`, `Organization` usa `ContractScopedModel` e `Contract` permanece
+como raiz do tenant e exceção do ADR 0012; esses concretos têm migration própria.
 As docstrings dos quatro tipos trazem exemplos das regras de visibilidade alvo.

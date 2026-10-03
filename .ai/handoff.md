@@ -1,28 +1,66 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 19:47
+- **Atualizado em:** 2026-10-03 19:57
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(backend): add model scopes and declaration checks` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(contracts): add plans contracts and organizations` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 1.2 tipos de escopo e system check — ✅ concluída |
-| Próximo passo exato | etapa 2.1: criar apps/contracts com Plan, Contract e Organization, seguindo ADRs 0006/0007/0012/0013 |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.1 |
+| Etapa atual | 2.1 Plan, Contract e Organization — ✅ concluída |
+| Próximo passo exato | etapa 2.2: User.contract e regras de licenças e superadmin sem contrato |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.2 |
+
+## Feito nesta etapa: 2.1
+
+- Usuário autorizou avançar à etapa 2.1.
+- App apps/contracts gerado com django startapp e instalado; sem admin/rotas vazias.
+  Plan SharedModel, Contract raiz BaseModel, Organization ContractScopedModel.
+  Estilo compacto e exemplos práticos nas docstrings; __str__ usa somente nome.
+- Usuário definiu modalidade como característica da implantação, sem campo em
+  Plan/Contract. Depois aprovou somente a tabela para as quatro quotas sugeridas.
+  ADR 0014 registra as decisões e complementa o ADR 0006, sem editar ADR aceito.
+- Plan: nome, max_organizations, max_storage_bytes, max_integrations e
+  max_operations_per_month opcionais. Null = sem limite definido, zero = zero;
+  negativos rejeitados, sem contadores/bloqueios/enforcement nesta etapa.
+- Contract: nome, plano PROTECT, datas de vigência, licenças >= 1 e retenção
+  pós-contrato 90/faixa 0–365. Constraints no banco para datas/licenças/retenção.
+  Organization: nome e contrato obrigatório PROTECT, com índice da FK.
+- Migration contracts.0001_initial revisada e aplicada ao banco local autorizado.
+  Tabelas dsc_plan/contract/organization, sem seeds ou mudanças em registros existentes.
+- 23 testes novos: campos, quotas sem enforcement, null/zero/negativos,
+  validação e constraints mesmo em update direto, obrigatoriedade das FKs,
+  PROTECT na exclusão física, autoria/soft delete e contagem de queries.
+  Validador completo passou com 146 testes, lint, formatação, migrations,
+  checks de desenvolvimento/produção.
+- OWASP: A01/A06 revisados — escopos declarados e constraints, sem API publicada;
+  isolamento entre tenants ainda pendente nas etapas 2.3–2.5, documentado.
+  A02/A05/A08/A10 revisados — configuração mínima, ORM, FK/constraints, sem
+  dados do usuário interpolados, sem exceções engolidas. A03/A04/A07/A09 sem
+  novas dependências, crypto/auth ou logging neste diff. Nenhum achado novo.
+- Performance sem achados: FK contract/plan indexadas, sem índices de quotas
+  sem uso; __str__ local; leitura de relações com select_related constante em
+  1 query para 1/30 organizações (teste). Sem endpoints ou queries em loops.
+- Checklist legal base + CDC: sem cobrança/contratação online ou alteração
+  automática de contratos. Somente configuração, sem quotas aplicadas. Nome de
+  cliente/unidade para identificar o vínculo de prestação de serviço (ADR 0006),
+  minimização sem CPF/CNPJ/contatos. Retenção segue ADR 0007; expurgo/LegalHold,
+  políticas e operação comercial continuam pendentes. Sem UI, dependências,
+  logs pessoais ou envio a terceiros; não equivale a conformidade do produto.
+- Documentação e memória sincronizadas; próxima etapa 2.2 exige confirmação.
 
 ## Feito até aqui
 
-- ADRs 0001–0013 revisados; 0003 continua Proposto para discussão do frontend.
+- ADRs 0001–0014 revisados; 0003 continua Proposto para discussão do frontend.
 - Backend Django 5.2 LTS, sem Admin, sessões ou messages; etapas 0.1/0.2 concluídas.
 - API versionada, handler RFC 9457, request ID e log_filters; logs de conclusão
   apenas para erros (4xx WARNING / 5xx ERROR), por decisão do usuário.
 - Etapa 1.1 antecipada ao JWT por aprovação do usuário: a configuração padrão
   de SimpleJWT usa a PK interna, que o ADR 0007 proíbe expor.
 
-## Feito nesta etapa
+## Etapa 1.2 anterior: escopos
 
 - Usuário autorizou a etapa 1.2 e confirmou apps/contracts para Plan, Contract
   e Organization, com PROTECT nas relações de contexto. Decisão no ADR 0013.
@@ -145,7 +183,7 @@
   migrations iniciais agora que foram aplicadas.
 - Autoria pode ser nula em operações de sistema/bootstrap; bulk/update precisam
   de auditoria explícita do chamador. all_objects não dispensa autorização.
-- Tipos de escopo e checks concluídos; apps/contracts ainda será criado em 2.1.
+- Tipos de escopo, checks e apps/contracts concluídos até 2.1.
   Os tipos não filtram queries: contexto/managers/autorização ainda pendentes.
   Não publicar endpoints de negócio antes das proteções e testes de isolamento.
   Expurgo permanece em entrega própria.

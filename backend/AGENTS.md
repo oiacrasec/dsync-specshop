@@ -69,8 +69,12 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `BaseModel` (ADR 0012). Check `core.E001/E002/E003` exige declaração e campos
   compatíveis, inclusive em proxies/unmanaged. Ver
   [escopos de persistência](docs/architecture/model-scopes.md).
-- `Plan`, `Contract` e `Organization` ficam no futuro `apps/contracts` (etapa 2.1).
-  FKs de contexto usam `PROTECT` (ADR 0013). Os tipos abstratos ainda não
+- `Plan`, `Contract` e `Organization` ficam em `apps/contracts` (etapa 2.1 concluída).
+  Plan guarda nome e quatro quotas opcionais, sem enforcement; modalidade pertence
+  à implantação, sem campo no model (ADR 0014). Licenças e retenção ficam no Contract.
+  Contrato tem constraints de vigência, licenças positivas e retenção máxima 365.
+  Ver [domínio de contratos](../docs/domain/contracts.md).
+  FKs de contexto e plano usam `PROTECT` (ADR 0013). Os tipos abstratos ainda não
   aplicam isolamento de queries; managers/contexto entram nas próximas etapas.
 - Ao personalizar `Meta`, herdar a do tipo escolhido e preservar índices herdados.
 - Os tipos de escopo herdam `apps.core.models.BaseModel`: UUID v7 externo,

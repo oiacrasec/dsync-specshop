@@ -28,7 +28,8 @@ backend/
 │   └── settings/      → base, development, production, testing
 ├── apps/
 │   ├── core/          → BaseModel, tipos de escopo, checks, erros e correlação
-│   └── users/         → usuário customizado
+│   ├── users/         → usuário customizado
+│   └── contracts/     → planos, contratos e organizações
 ├── requirements/      → base, development, production, testing
 ├── static/ templates/ scripts/
 ├── docs/              → architecture, standards, patterns, examples
@@ -80,8 +81,8 @@ Models próprios herdam um dos quatro [tipos de escopo](docs/architecture/model-
 que derivam de `apps.core.models.BaseModel` (ADR 0007). Exceções: `User` e `Contract`
 (ADR 0012). System checks rejeitam escopo ausente, múltiplo ou campos incompatíveis.
 Os tipos ainda não filtram queries por tenant; contexto e autorização seguem pendentes.
-`Plan`, `Contract` e `Organization` serão criados em `apps/contracts` na etapa 2.1,
-com `PROTECT` nas relações de contexto (ADR 0013). O `id`
+`Plan`, `Contract` e `Organization` estão em `apps/contracts`,
+com `PROTECT` nas relações de contexto e plano (ADR 0013). O `id`
 BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o JWT.
 Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relações
 N:N automáticas seguem a tabela de origem.
@@ -101,6 +102,18 @@ preencher autoria e datas de alteração explicitamente nessas operações.
 Soft delete não equivale à eliminação legal dos dados. Expurgo, retenções e
 `LegalHold` permanecem na entrega própria definida no plano; nenhum endpoint de
 exclusão nem rotina de eliminação foi publicado nesta etapa.
+
+## Planos e contratos
+
+Etapa 2.1 concluída: tabelas `dsc_plan`, `dsc_contract` e `dsc_organization`, com
+migration aplicada ao banco local. Ver [campos e regras](../docs/domain/contracts.md).
+O plano tem nome e quotas opcionais de organizações, bytes, integrações e operações
+mensais; somente o schema está pronto, sem contadores ou bloqueios por quota.
+Modalidade é definida pela implantação, sem campo no plano (ADR 0014).
+O contrato guarda vigência, licenças e retenção pós-contrato (90 dias, máximo 365).
+Datas e limites contratuais são protegidos por constraints. A organização pertence
+obrigatoriamente a um contrato. Vínculo do usuário, quotas, contexto e isolamento
+de consultas continuam nas etapas correspondentes; nenhum endpoint novo foi criado.
 
 ## Configuração do PyCharm
 

@@ -30,6 +30,7 @@ um ADR novo que **substitui** o anterior.
 | [0011](0011-endpoint-de-opcoes.md) | Endpoint de opções (autocomplete e seleção) | Aceito |
 | [0012](0012-excecoes-ao-escopo-declarado.md) | Exceções ao escopo declarado (`Contract` e `User`) | Aceito |
 | [0013](0013-dominio-de-contratos-e-relacoes-de-contexto.md) | Domínio de contratos e relações de contexto | Aceito |
+| [0014](0014-modalidade-definida-pela-implantacao.md) | Modalidade definida pela implantação, sem campo no plano | Aceito |
 
 ## Modelo
 

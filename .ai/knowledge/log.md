@@ -1,5 +1,25 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 2.1: planos, contratos e organizações
+
+- App apps/contracts gerado por startapp e instalado, sem Admin/rotas vazias.
+  Plan(SharedModel), Contract(BaseModel), Organization(ContractScopedModel),
+  com exemplos nas docstrings, estilo compacto e tabelas dsc_ automáticas.
+- Usuário esclareceu que modalidade pertence à implantação, sem campo no model
+  (ADR 0014). Aprovou somente preparar a tabela para quotas: organizações,
+  armazenamento em bytes, integrações e operações por mês; campos opcionais
+  não negativos, sem valores padrão, contadores ou enforcement.
+- Contract guarda plano PROTECT, vigência, licenças >= 1 e retenção 90/faixa 0–365;
+  constraints protegem datas/licenças/teto de retenção. Organization guarda nome
+  e contrato obrigatório PROTECT. Sem novos dados de perfil ou endpoints.
+- Migration contracts.0001_initial aplicada localmente com autorização persistente.
+  Validador completo: 146 testes, lint, formatação, migrations e checks passaram.
+  23 testes novos cobrem persistência, limites, constraints, soft delete, PROTECT,
+  escopos e queries constantes 1/30 organizações. Sem registros iniciais cadastrados.
+- Atualizados config/settings/base.py, models/apps/migration/testes do novo app,
+  docs/domain/contracts.md, ADR/índice/plano/overview, backend AGENTS/README,
+  docs de escopos e memória/handoff. Próxima etapa 2.2 depende de confirmação.
+
 ## 2026-10-03 — Etapa 1.2: escopos de persistência
 
 - Criados quatro tipos abstratos derivados de BaseModel, com exemplos práticos

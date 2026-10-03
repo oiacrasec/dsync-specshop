@@ -17,6 +17,8 @@ e só começa após aprovação do usuário.
 | 5 | Por aprovação do usuário, executar **1.1 antes de 0.3**, para que o JWT use o `public_id` do usuário sem expor o ID interno (ADR 0007). Ordem: 0.1 → 0.2 → 1.1 → 0.3 → 1.2 → demais etapas |
 | 6 | Login: usuário aprovou contar somente falhas por conta, limite inicial 5/min e bloqueio temporário; cache compartilhado/atômico, controles de borda, recuperação e MFA administrativa devem ser tratados antes de produção |
 | 7 | Usuário aprovou `apps/contracts` para `Plan`, `Contract` e `Organization`, com `PROTECT` nas FKs de contexto (ADR 0013) |
+| 8 | Modalidade pertence à implantação; não será campo de `Plan` ou `Contract` (ADR 0014) |
+| 9 | Usuário aprovou preparar quatro quotas opcionais em Plan (organizações, armazenamento, integrações e operações mensais), somente schema nesta etapa, sem contadores ou enforcement |
 
 ## Bloco 0 — Fundação
 
@@ -37,7 +39,7 @@ e só começa após aprovação do usuário.
 
 | # | Etapa | ADR | Status |
 |---|---|---|---|
-| 2.1 | `Plan`, `Contract` (vigência, licenças, retenção pós-contrato) e `Organization` | 0006, 0007 | ⬜ |
+| 2.1 | `Plan`, `Contract` (vigência, licenças, retenção pós-contrato) e `Organization` | 0006, 0007, 0013, 0014 | ✅ |
 | 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2 | ⬜ |
 | 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ⬜ |
 | 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ⬜ |
