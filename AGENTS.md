@@ -31,6 +31,7 @@ Princípio central: **código isolado, conhecimento conectado.**
 | `docs/architecture/overview.md` | baseline arquitetural oficial (leia antes de mudanças estruturais) |
 | `docs/domain/`, `docs/api/` | domínio e contratos de API |
 | `docs/adr/` | decisões arquiteturais |
+| `docs/plans/` | planos de entrega, com a situação de cada etapa (`entrega-N-<resumo>.md`) |
 | `.ai/knowledge/` | memória compilada do projeto para IA |
 | `.ai/skills/<nome>/SKILL.md` | procedimentos que agentes devem seguir |
 | `.ai/queries/` | consultas reutilizáveis de investigação |

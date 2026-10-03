@@ -453,6 +453,9 @@ datasync-core/
 │   │   ├── errors.md
 │   │   └── versioning.md
 │   │
+│   ├── plans/
+│   │   └── entrega-1-fundacao-tenancy-rbac.md   → plano da 1ª entrega
+│   │
 │   └── adr/
 │       ├── README.md                                       → índice e modelo
 │       ├── 0001-monorepo.md
