@@ -14,7 +14,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 |---|---|
 | `docs/` (`architecture/`, `domain/`, `api/`, `adr/`) | criado |
 | `.ai/` (`knowledge/*`, `skills/`, `queries/`) | criado |
-| `.ai/skills/` (processo: 2 · conformidade legal: 14) | criado |
+| `.ai/skills/` (processo: 3 · conformidade legal: 14) | criado |
 | `.claude/skills/project-skills/` | criado |
 | `.github/workflows/` | criado |
 | `AGENTS.md`, `README.md` (raiz) | criado |
@@ -133,6 +133,8 @@ datasync-core/
 │   │   │   ├── SKILL.md
 │   │   │   └── reference.md
 │   │   ├── explicacao-eficiente/
+│   │   │   └── SKILL.md
+│   │   ├── questionador/
 │   │   │   └── SKILL.md
 │   │   ├── lgpd/
 │   │   │   └── SKILL.md
@@ -1061,6 +1063,7 @@ O Claude Code não lê `.ai/skills/` diretamente: a skill
 |---|---|
 | `git-commit` | padrão de commits (Conventional Commits + commits atômicos) |
 | `explicacao-eficiente` | respostas curtas, humanizadas e visuais em PT-BR |
+| `questionador` | nunca inferir ou supor; diante de lacunas ou conflitos, parar e perguntar |
 | `lgpd` | conformidade com a LGPD (Lei 13.709/2018) em tudo que toca dados pessoais |
 | `marco-civil` | conformidade com o Marco Civil da Internet (Lei 12.965/2014): registros de acesso, termos, conteúdo de usuários |
 | `conformidade-legal` | **roteador**: indica quais skills legais se aplicam a cada funcionalidade |
