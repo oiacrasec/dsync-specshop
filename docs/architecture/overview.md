@@ -14,7 +14,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 |---|---|
 | `docs/` (`architecture/`, `domain/`, `api/`, `adr/`) | criado |
 | `.ai/` (`knowledge/*`, `skills/`, `queries/`) | criado |
-| `.ai/skills/` (`git-commit`, `explicacao-eficiente`, `lgpd`, `marco-civil`) | criado |
+| `.ai/skills/` (processo: 2 · conformidade legal: 14) | criado |
 | `.claude/skills/project-skills/` | criado |
 | `.github/workflows/` | criado |
 | `AGENTS.md`, `README.md` (raiz) | criado |
@@ -132,6 +132,30 @@ datasync-core/
 │   │   ├── lgpd/
 │   │   │   └── SKILL.md
 │   │   ├── marco-civil/
+│   │   │   └── SKILL.md
+│   │   ├── conformidade-legal/
+│   │   │   └── SKILL.md
+│   │   ├── cdc/
+│   │   │   └── SKILL.md
+│   │   ├── acessibilidade/
+│   │   │   └── SKILL.md
+│   │   ├── propriedade-intelectual/
+│   │   │   └── SKILL.md
+│   │   ├── crimes-ciberneticos/
+│   │   │   └── SKILL.md
+│   │   ├── eca-digital/
+│   │   │   └── SKILL.md
+│   │   ├── assinatura-eletronica/
+│   │   │   └── SKILL.md
+│   │   ├── lai/
+│   │   │   └── SKILL.md
+│   │   ├── cadastro-positivo/
+│   │   │   └── SKILL.md
+│   │   ├── saude-digital/
+│   │   │   └── SKILL.md
+│   │   ├── financeiro-bacen/
+│   │   │   └── SKILL.md
+│   │   ├── inteligencia-artificial/
 │   │   │   └── SKILL.md
 │   │   ├── ingest-change/
 │   │   ├── update-knowledge/
@@ -1024,6 +1048,18 @@ O Claude Code não lê `.ai/skills/` diretamente: a skill
 | `explicacao-eficiente` | respostas curtas, humanizadas e visuais em PT-BR |
 | `lgpd` | conformidade com a LGPD (Lei 13.709/2018) em tudo que toca dados pessoais |
 | `marco-civil` | conformidade com o Marco Civil da Internet (Lei 12.965/2014): registros de acesso, termos, conteúdo de usuários |
+| `conformidade-legal` | **roteador**: indica quais skills legais se aplicam a cada funcionalidade |
+| `cdc` | CDC + decretos do e-commerce e do SAC: oferta, checkout, arrependimento, cancelamento |
+| `acessibilidade` | Lei Brasileira de Inclusão (13.146/2015): WCAG 2.2 AA em telas e conteúdo |
+| `propriedade-intelectual` | Leis 9.609/98 e 9.610/98: licenças de dependências, autoria, conteúdo de terceiros |
+| `crimes-ciberneticos` | Código Penal (12.737/12, 14.155/21): o que nunca fazer, proteção e evidências |
+| `eca-digital` | ECA + ECA Digital (15.211/2025): crianças e adolescentes em ambiente digital |
+| `assinatura-eletronica` | MP 2.200-2/2001 + Lei 14.063/2020: níveis de assinatura e ICP-Brasil |
+| `lai` | Lei de Acesso à Informação (12.527/2011): transparência ativa e passiva |
+| `cadastro-positivo` | Lei 12.414/2011 + CDC art. 43: crédito, score e birôs |
+| `saude-digital` | Leis 13.787/18 e 14.510/22: prontuário eletrônico e telessaúde |
+| `financeiro-bacen` | Res. CMN 4.893/2021 e BCB 85/2021: segurança cibernética e nuvem |
+| `inteligencia-artificial` | regras vigentes sobre IA + preparação para o PL 2.338/2023 |
 
 ## Skills planejadas
 

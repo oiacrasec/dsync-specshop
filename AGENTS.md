@@ -45,18 +45,28 @@ A memória da IA nunca substitui uma decisão oficial.
 
 ## Skills
 
-Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela. Skills atuais:
+Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
+
+### Processo
 
 | Skill | Quando usar |
 |---|---|
 | `git-commit` | **sempre** ao criar, dividir ou revisar commits |
 | `explicacao-eficiente` | ao explicar algo ao usuário |
-| `lgpd` | **sempre** que a mudança tocar dados pessoais (models, cadastros, APIs, logs, terceiros) |
-| `marco-civil` | **sempre** ao mexer em logs de acesso/IP, termos de uso, exclusão de conta, conteúdo de usuários ou ordens judiciais |
 
-**Conformidade legal é inegociável:** nenhuma mudança pode violar a LGPD ou o Marco
-Civil. Se um pedido conflitar com essas leis, pare, explique o risco e proponha uma
-alternativa conforme.
+### Conformidade legal
+
+**Comece sempre por `conformidade-legal`**: o roteador indica quais leis se aplicam
+à funcionalidade.
+
+| Escopo | Skills |
+|---|---|
+| Base (todo software) | `lgpd`, `marco-civil`, `acessibilidade`, `propriedade-intelectual`, `crimes-ciberneticos` |
+| Por domínio | `cdc`, `eca-digital`, `assinatura-eletronica`, `lai`, `cadastro-positivo`, `saude-digital`, `financeiro-bacen`, `inteligencia-artificial` |
+
+**Conformidade legal é inegociável:** nenhuma mudança pode violar a legislação
+brasileira. Se um pedido conflitar com alguma dessas leis, pare, explique o risco
+(citando o artigo) e proponha uma alternativa conforme.
 
 ## Procedimento de alteração
 

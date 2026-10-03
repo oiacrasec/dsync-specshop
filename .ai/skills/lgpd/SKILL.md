@@ -161,4 +161,6 @@ Se algum item falhar → **não implementar em silêncio**: explicar o risco ao 
 ## Relação com outras leis
 
 - **Marco Civil da Internet** (skill `marco-civil`): guarda obrigatória de registros de acesso e direitos do usuário de internet. A LGPD alterou o Marco Civil (art. 7º X e art. 16 II).
-- **CDC**: relações de consumo seguem também o Código de Defesa do Consumidor (art. 45).
+- **CDC**: relações de consumo seguem também o Código de Defesa do Consumidor (art. 45). Ver skill `cdc`.
+- **ECA Digital**: crianças e adolescentes têm regras adicionais (skill `eca-digital`).
+- Mapa completo de leis aplicáveis: skill `conformidade-legal`.
