@@ -1,0 +1,3 @@
+-r testing.txt
+
+ruff~=0.16.10

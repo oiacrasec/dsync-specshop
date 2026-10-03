@@ -20,9 +20,10 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `AGENTS.md`, `README.md` (raiz) | criado |
 | `.claude/settings.json` (hook que carrega `AGENTS.md`) | criado |
 | `.gitignore`, `.gitattributes` | criado |
-| `backend/` | **pendente** |
+| `backend/` (Django 5.2 LTS: `config/settings/*`, `apps/core`, `apps/users`, `requirements/*`, `AGENTS.md`, `README.md`) | criado |
+| `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |
-| `AGENTS.md` (backend, frontend) | **pendente** |
+| `AGENTS.md` (frontend) | **pendente** |
 
 Diretórios ainda sem conteúdo contêm `.gitkeep` apenas para preservar a estrutura
 no versionamento. Esses arquivos devem ser removidos quando o diretório receber
@@ -75,6 +76,10 @@ Apesar de estarem no mesmo repositório:
 - cada projeto pode possuir seu próprio `docker-compose.yml`;
 - cada projeto possui sua própria documentação técnica;
 - cada projeto pode ser movido futuramente para outro repositório sem refatoração estrutural significativa.
+
+A configuração do Git (`.gitignore`, `.gitattributes`) fica **somente na raiz**, por
+ser um monorepo. Se um projeto for extraído para outro repositório, ele recebe sua
+própria configuração nesse momento.
 
 A comunicação entre frontend e backend ocorre exclusivamente através de contratos bem definidos, normalmente via API HTTP/REST.
 
@@ -172,11 +177,11 @@ datasync-core/
 │   ├── AGENTS.md
 │   ├── README.md
 │   ├── .env.example
-│   ├── .gitignore
 │   ├── docker-compose.yml
 │   ├── Dockerfile
 │   ├── Makefile
 │   ├── manage.py
+│   ├── pyproject.toml     → pytest, coverage, ruff
 │   │
 │   ├── requirements/
 │   │   ├── base.txt
@@ -294,7 +299,6 @@ datasync-core/
 │   ├── AGENTS.md
 │   ├── README.md
 │   ├── .env.example
-│   ├── .gitignore
 │   ├── docker-compose.yml
 │   ├── Dockerfile
 │   ├── Makefile
@@ -490,7 +494,12 @@ Novos domínios devem ser adicionados no mesmo nível.
 
 # 5. Estrutura de um Django App
 
-Um app deve iniciar simples:
+Um app nasce com o mínimo gerado por `django-admin startapp` (`apps.py`, `models.py`,
+`admin.py` quando houver admin, `migrations/`, `tests/`). As demais camadas são
+**criadas sob demanda**, quando a primeira funcionalidade precisar delas, sem
+arquivos vazios antecipados (ver §30).
+
+Estrutura completa de um app maduro:
 
 ```text
 users/
@@ -622,6 +631,12 @@ Dependências específicas de produção.
 ### `testing.txt`
 
 Dependências relacionadas a testes e cobertura.
+
+### Política de versões
+
+- Sempre a **última versão LTS** do framework (hoje: **Django 5.2 LTS**, suporte até abril de 2028).
+- Versões declaradas com `~=` (*compatible release*): `Django~=5.2.17` aceita patches `5.2.x`, nunca `6.0`.
+- Atualizar com `pip install -U -r requirements/<ambiente>.txt`.
 
 ---
 

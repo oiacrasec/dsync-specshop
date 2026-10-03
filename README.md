@@ -4,7 +4,7 @@ Monorepo fullstack com backend e frontend autônomos.
 
 | Parte | Stack | Estado |
 |---|---|---|
-| `backend/` | Django + DRF + PostgreSQL | pendente |
+| `backend/` | Django 5.2 LTS + DRF + PostgreSQL | estrutura inicial |
 | `frontend/` | Angular | pendente |
 | Infra | Docker / Docker Compose | pendente |
 

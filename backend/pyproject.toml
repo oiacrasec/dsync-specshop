@@ -1,0 +1,28 @@
+[project]
+name = "datasync-core-backend"
+version = "0.1.0"
+requires-python = ">=3.14"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.testing"
+python_files = ["test_*.py"]
+addopts = "--strict-markers"
+
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = ["*/migrations/*", "*/tests/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ", "S"]
+ignore = ["S101"]  # assert é o padrão do pytest
+
+[tool.ruff.lint.per-file-ignores]
+"*/tests/*" = ["S105", "S106"]  # senhas fixas em testes
+
+[tool.ruff.format]
+quote-style = "single"

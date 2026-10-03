@@ -1,0 +1,50 @@
+# AGENTS.md — backend
+
+Regras específicas do backend Django. Complementam o `AGENTS.md` da raiz e
+prevalecem dentro de `backend/`.
+
+## Stack
+
+Python 3.14 · Django 5.2 LTS · Django REST Framework · PostgreSQL. Versões sempre
+na última LTS, com `~=` nos requirements (patches automáticos).
+
+## Organização
+
+- `config/` contém **apenas** configuração global (settings, URLs raiz, ASGI/WSGI). Nada de regra de negócio.
+- Cada domínio é um Django App em `apps/<dominio>/`, criado com `django-admin startapp` e com `name = 'apps.<dominio>'` no `apps.py`.
+- `apps/core/` guarda só o que é compartilhado por vários domínios. Não vira depósito genérico.
+- Fixtures ficam dentro do app dono do dado (`apps/<dominio>/fixtures/`).
+
+## Camadas de um app
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `models.py` | persistência e comportamento da entidade |
+| `serializers.py` | validação, entrada e saída da API |
+| `selectors.py` | **leituras** |
+| `services.py` | **escritas** e regras de negócio |
+| `views.py` | camada HTTP, sempre fina |
+| `urls.py` | rotas do app |
+| `permissions.py` | autorização |
+| `tests/` | testes do app (`test_*.py`) |
+
+Leitura: `View → Selector → Model`. Escrita: `Serializer → View → Service → Model`.
+Crie cada arquivo só quando ele for necessário.
+
+## Regras
+
+- Settings por ambiente em `config/settings/`. Segredos e valores de ambiente **só** por variável de ambiente (`.env.example` documenta todas).
+- `AUTH_USER_MODEL = 'users.User'`: sempre use `get_user_model()` ou `settings.AUTH_USER_MODEL`.
+- API segura por padrão: `IsAuthenticated` global; libere rotas públicas explicitamente na view.
+- Models que precisam de datas de criação e atualização herdam `apps.core.models.TimeStampedModel`.
+- Nunca logar dados pessoais em claro.
+- Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
+
+## Antes de entregar
+
+```bash
+pytest
+ruff check . && ruff format --check .
+python manage.py makemigrations --check --dry-run
+python manage.py check --deploy --settings=config.settings.production
+```
