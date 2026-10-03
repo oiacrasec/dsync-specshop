@@ -12,9 +12,9 @@ CSRF_TRUSTED_ORIGINS = env.list('DJANGO_CSRF_TRUSTED_ORIGINS', default=[])
 # Static files servidos pelo WhiteNoise
 
 MIDDLEWARE = [
-    MIDDLEWARE[0],  # SecurityMiddleware
+    *MIDDLEWARE[:2],  # RequestIdMiddleware e SecurityMiddleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    *MIDDLEWARE[1:],
+    *MIDDLEWARE[2:],
 ]
 
 STORAGES = {

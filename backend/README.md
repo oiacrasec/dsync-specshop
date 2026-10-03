@@ -4,9 +4,15 @@ API Django autônoma do monorepo.
 
 Não usa Django Admin, sessões nem messages (ADR 0008). A administração própria será
 implementada na API e no frontend; por enquanto, a manutenção usa management commands,
-como `createsuperuser`. Não há rotas HTTP publicadas nesta etapa. A autenticação por
+como `createsuperuser`. As rotas versionadas usam `/api/v1/`, sem endpoints de negócio
+publicados nesta etapa. A autenticação por
 JWT entra na etapa 0.3; até lá, o DRF não tem autenticadores configurados e mantém
 `IsAuthenticated` como permissão global.
+
+Erros da API seguem [RFC 9457](../docs/api/errors.md), com
+`Content-Type: application/problem+json`. Toda resposta inclui `X-Request-Id`;
+o mesmo identificador acompanha o corpo dos erros e os logs. Rotas desconhecidas da
+API retornam 404, inclusive em desenvolvimento.
 
 | Item | Versão |
 |---|---|

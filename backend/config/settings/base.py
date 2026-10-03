@@ -43,6 +43,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    'apps.core.middleware.RequestIdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -135,6 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # explicitamente na view.
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'apps.core.exceptions.exception_handler',
     # Sem sessões; a autenticação JWT entra na etapa 0.3 do plano.
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -159,7 +161,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': '{asctime} {levelname} {name} {message}',
+            'format': '{asctime} {levelname} {name} request_id={request_id} {message}',
             'style': '{',
         },
     },
@@ -167,7 +169,11 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'default',
+            'filters': ['request_id'],
         },
+    },
+    'filters': {
+        'request_id': {'()': 'apps.core.request_id.RequestIdFilter'},
     },
     'root': {
         'handlers': ['console'],

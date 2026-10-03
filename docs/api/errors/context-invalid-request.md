@@ -1,0 +1,16 @@
+# context-invalid-request
+
+- **Type:** `urn:datasync:problem:context-invalid-request`
+- **HTTP:** 400
+- **Title:** Contexto de organização inválido
+- **Detail padrão:** Informe uma organização válida no header X-Organization-Id.
+- **Quando:** Header X-Organization-Id ausente ou malformado.
+- **Origem:** ContextInvalidRequest (em `apps/core/exceptions.py` ou no framework).
+
+Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
+sem query string e `request_id` igual ao header `X-Request-Id`.
+
+O cliente deve limpar o contexto e voltar à seleção de organização.
+
+Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
+será implementada na etapa correspondente do plano da Entrega 1.

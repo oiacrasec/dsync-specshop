@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 17:55
+- **Atualizado em:** 2026-10-03 18:07
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Commit desta etapa:** `refactor(backend): remove Django admin and session stack` (inclui este handoff; consultar `git log -1` para o hash)
+- **Commit desta etapa:** `feat(api): add versioned routes and problem details` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 0.1 Remover Django Admin, `sessions` e `messages` — ✅ concluída |
-| Próximo passo exato | aguardar aprovação e executar a etapa 0.2: `/api/v1/`, handler global RFC 9457 e `request_id` |
-| Aguardando o usuário? | sim — aprovação para iniciar a etapa 0.2 |
+| Etapa atual | 0.2 `/api/v1/`, handler global RFC 9457 e `request_id` — ✅ concluída |
+| Próximo passo exato | aguardar aprovação e executar a etapa 0.3: JWT login/refresh/logout, rotação e blacklist conforme ADR 0004 |
+| Aguardando o usuário? | sim — aprovação para iniciar a etapa 0.3 |
 
 ## Feito até aqui
 - ADRs 0001–0012 escritos e revisados (0003 continua Proposto, para a discussão do frontend).
@@ -20,19 +20,24 @@
   `TimeStampedModel` ainda será substituído na etapa 1.1.
 - Configuração do PyCharm documentada em `backend/README.md`.
 - Skills `modo-de-trabalho` e `handoff` criadas; `AGENTS.md` exige lê-las no início de toda sessão.
+- Etapas 0.1 e 0.2 concluídas. Contrato de erros em `docs/api/errors.md` e catálogo
+  completo em `docs/api/errors/`; `config/api/v1.py` ainda sem endpoints de negócio.
 
 ## Feito nesta etapa
-- Removidos apps, middlewares, context processors, configurações de cookies de sessão,
-  `SessionAuthentication`, rota do Admin e `apps/users/admin.py`.
-- `IsAuthenticated` global mantido, com autenticadores vazios até o JWT da etapa 0.3.
-- Testes de rotas ausentes (404, sem cookie de sessão) e criação de superusuário.
-- Validador completo passou: 5 testes, lint, formatação, migrations sem alterações,
+- API v1 incluída no prefixo `/api/v1/`, fallback 404 JSON para rotas desconhecidas
+  da API, inclusive com DEBUG ligado (evita página de boas-vindas do Django).
+- Handler central de exceções DRF/Django/domínio: RFC 9457, validação 422, sintaxe
+  400, conflitos 409; 500 genérico e logs técnicos sem conteúdo de requisição.
+- UUID v7 gerado por requisição, `X-Request-Id`, contextvar isolado e filtro de logs.
+- Preservados headers de protocolo e rollback em transações de requisição.
+- Validador completo passou: 46 testes, lint, formatação, migrations sem alterações,
   system checks e checks de produção. Cache do pytest emitiu aviso não impeditivo.
-- Revisão OWASP: A01, A02, A04, A06, A07 e A10 sem achados novos no diff;
-  A03, A05, A08 e A09 sem alterações aplicáveis. Performance sem achados;
-  nenhuma nova query de aplicação. Checklist legal base sem novos tratamentos de
-  dados, dependências ou conteúdo de terceiros; sem nova interface de usuário.
-- Atualizados documentação, plano e `.ai/knowledge/` no mesmo commit.
+- Revisão OWASP A01/A02/A04/A05/A06/A07/A08/A09/A10 sem achados novos no diff;
+  A03 sem alterações de dependências. Performance sem achados: nenhuma nova query
+  de aplicação; logs registram status e ID, sem payload, IP ou identidade do usuário.
+- Checklist legal base revisado para o diff: nenhuma nova dependência ou interface;
+  sem coleta de novos campos pessoais. O AccessLog obrigatório permanece na etapa 4.1.
+- Atualizados documentação, catálogo dos 11 tipos, plano e `.ai/knowledge/`.
 
 ## Falta nesta etapa
 - Nada.

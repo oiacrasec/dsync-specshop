@@ -36,6 +36,12 @@ Crie cada arquivo só quando ele for necessário.
 - Settings por ambiente em `config/settings/`. Segredos e valores de ambiente **só** por variável de ambiente (`.env.example` documenta todas).
 - `AUTH_USER_MODEL = 'users.User'`: sempre use `get_user_model()` ou `settings.AUTH_USER_MODEL`.
 - API segura por padrão: `IsAuthenticated` global; libere rotas públicas explicitamente na view.
+- Rotas da API em `config/api/v1.py`, sob `/api/v1/`. Erros via exceções e handler
+  global RFC 9457 (`apps.core.exceptions`), nunca corpo de erro manual na view.
+- Usar `serializer.is_valid(raise_exception=True)`; validação retorna 422. Mensagens
+  de validação não devem incluir dados pessoais ou detalhes internos.
+- `RequestIdMiddleware` vem antes dos demais middlewares; `X-Request-Id` é gerado
+  pelo servidor e correlaciona logs e erros (contrato em `docs/api/errors.md`).
 - Não usar Django Admin, sessões ou messages (ADR 0008). Não registrar `admin.py`,
   `SessionAuthentication` nem middlewares de sessão/autenticação do Django.
 - Administração própria pela API e pelo frontend; manutenção por management commands

@@ -20,7 +20,7 @@ e só começa após aprovação do usuário.
 | # | Etapa | ADR | Status |
 |---|---|---|---|
 | 0.1 | Remover Django Admin, `sessions` e `messages`; ajustar `backend/AGENTS.md` e `README` | 0008 | ✅ |
-| 0.2 | Prefixo `/api/v1/` (`config/api/v1.py`) + handler global de erros RFC 9457 + `request_id` | 0004, skill `erros-api-rfc9457` | ⬜ |
+| 0.2 | Prefixo `/api/v1/` (`config/api/v1.py`) + handler global de erros RFC 9457 + `request_id` | 0004, skill `erros-api-rfc9457` | ✅ |
 | 0.3 | JWT: login, refresh e logout, com rotação e blacklist | 0004 | ⬜ |
 
 ## Bloco 1 — Persistência

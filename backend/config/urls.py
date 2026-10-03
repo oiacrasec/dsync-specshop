@@ -1,5 +1,10 @@
-"""Rotas raiz; a API versionada será adicionada na etapa 0.2 do plano."""
+"""Rotas raiz do backend."""
 
-from django.urls import URLPattern, URLResolver
+from django.urls import include, path, re_path
 
-urlpatterns: list[URLPattern | URLResolver] = []
+from apps.core.exceptions import api_not_found
+
+urlpatterns = [
+    path('api/v1/', include('config.api.v1')),
+    re_path(r'^api(?:/.*)?$', api_not_found),
+]
