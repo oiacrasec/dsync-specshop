@@ -47,7 +47,13 @@ Crie cada arquivo só quando ele for necessário.
 - Administração própria pela API e pelo frontend; manutenção por management commands
   (`createsuperuser` continua disponível). JWT entra na etapa 0.3; até lá, a lista de
   autenticadores do DRF fica vazia, mantendo `IsAuthenticated` global.
-- Models que precisam de datas de criação e atualização herdam `apps.core.models.TimeStampedModel`.
+- Todos os models próprios herdam `apps.core.models.BaseModel`: UUID v7 externo,
+  datas, autoria e soft delete (ADR 0007). Tabelas `dsc_` são geradas automaticamente.
+- `objects` oculta excluídos, mas mantém inativos; `all_objects` é acesso explícito
+  para auditoria. No `User`, `is_active` mantém a semântica de autenticação do Django.
+- Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema
+  sem usuário deixam autoria nula. Em `update`/operações bulk, preencher auditoria
+  explicitamente. Soft delete não faz cascata; relações são tratadas no service.
 - Nunca logar dados pessoais em claro.
 - Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
 

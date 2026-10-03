@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 1.1 antecipada ao JWT
+
+- Usuário aprovou executar 1.1 antes de 0.3, para usar `public_id` nos tokens
+  sem expor a PK interna. Ordem registrada no plano da Entrega 1.
+- `apps/core/models.py`: BaseModel, tabelas `dsc_` automáticas, UUID v7, datas,
+  autoria explícita, consultas sem excluídos e soft delete individual/em lote.
+- `apps/users/{models,managers}.py`: User adaptado, preservando `is_active`,
+  create_user/create_superuser e bloqueando autenticação dos excluídos.
+- Migration inicial regenerada após confirmar banco vazio; não aplicada ao
+  banco de desenvolvimento. Testes cobrem dados preservados, autoria, unicidade,
+  autenticação e exclusão em lote com número constante de queries.
+- Sincronizados AGENTS/README do backend, overview, plano, memória e handoff.
+  Expurgo, eliminação e escopos continuam em suas etapas futuras.
+
 ## 2026-10-03 — Nome do módulo de filtros de log
 
 - Por preferência do usuário, `apps/core/request_id.py` foi renomeado para

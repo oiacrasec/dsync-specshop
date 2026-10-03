@@ -1,7 +1,11 @@
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+
+from apps.core.models import BaseModel
+from apps.users.managers import UserManager
 
 
-class User(AbstractUser):
+class User(AbstractUser, BaseModel):
     """
     Usuário do sistema.
 
@@ -10,6 +14,9 @@ class User(AbstractUser):
     definidas (skill lgpd).
     """
 
-    class Meta:
-        verbose_name = 'usuário'
-        verbose_name_plural = 'usuários'
+    objects = UserManager()
+
+    class Meta(BaseModel.Meta):
+        abstract = False
+        verbose_name = _('usuário')
+        verbose_name_plural = _('usuários')

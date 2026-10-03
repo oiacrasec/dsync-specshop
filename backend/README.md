@@ -28,7 +28,7 @@ backend/
 ├── config/
 │   └── settings/      → base, development, production, testing
 ├── apps/
-│   ├── core/          → recursos compartilhados (TimeStampedModel)
+│   ├── core/          → recursos compartilhados (BaseModel, erros e correlação)
 │   └── users/         → usuário customizado
 ├── requirements/      → base, development, production, testing
 ├── static/ templates/ scripts/
@@ -48,8 +48,32 @@ cp .env.example .env        # ajuste DJANGO_SECRET_KEY e DATABASE_URL
 python manage.py runserver
 ```
 
-**Não executar `migrate` antes da etapa 1.1 do plano de entrega:** a migration inicial
-do usuário será regenerada para `dsc_user` e os campos do `BaseModel`.
+A etapa 1.1 foi concluída antes do JWT: a migration inicial do usuário foi regenerada
+para `dsc_user` e os campos do `BaseModel`, após confirmar que o banco estava vazio.
+Ela ainda não foi aplicada ao banco de desenvolvimento nesta etapa.
+
+## Persistência comum
+
+Todos os models próprios herdam `apps.core.models.BaseModel` (ADR 0007). O `id`
+BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o futuro JWT.
+Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relações
+N:N automáticas seguem a tabela de origem.
+
+`objects` exclui registros com `deleted_at`, mas mantém os inativos. `all_objects`
+inclui excluídos para acesso explícito de auditoria. No `User`, o `is_active` original
+do Django continua bloqueando autenticação; usuários excluídos também não autenticam.
+
+Autoria é passada explicitamente por `save(actor=user)` e `delete(actor=user)`.
+Operações de sistema, como o bootstrap por `createsuperuser`, podem não ter autor.
+`QuerySet.delete(actor=user)` faz soft delete em lote, com uma única atualização;
+até pelo `all_objects`, `delete()` preserva os dados. Não há cascata de soft delete:
+as regras de relações devem ser implementadas no service de cada domínio.
+`update()`, `bulk_create()` e `bulk_update()` não chamam `save()`; o chamador deve
+preencher autoria e datas de alteração explicitamente nessas operações.
+
+Soft delete não equivale à eliminação legal dos dados. Expurgo, retenções e
+`LegalHold` permanecem na entrega própria definida no plano; nenhum endpoint de
+exclusão nem rotina de eliminação foi publicado nesta etapa.
 
 ## Configuração do PyCharm
 

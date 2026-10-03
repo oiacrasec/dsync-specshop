@@ -1,61 +1,67 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:22
+- **Atualizado em:** 2026-10-03 18:38
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(core): rename request ID module to log filters` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(db): add audited base model with soft delete` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 0.2 `/api/v1/`, handler global RFC 9457 e `request_id` — ✅ concluída |
-| Próximo passo exato | aguardar aprovação e executar a etapa 0.3: JWT login/refresh/logout, rotação e blacklist conforme ADR 0004 |
-| Aguardando o usuário? | sim — aprovação para iniciar a etapa 0.3 |
+| Etapa atual | 1.1 BaseModel, tabelas dsc_ e User adaptado — ✅ concluída |
+| Próximo passo exato | etapa 0.3: JWT login/refresh/logout, rotação e blacklist conforme ADR 0004, usando public_id do User nos tokens |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 0.3 após o fechamento de 1.1 |
 
 ## Feito até aqui
-- ADRs 0001–0012 escritos e revisados (0003 continua Proposto, para a discussão do frontend).
-- Skills de processo, conformidade legal, segurança, performance, erros da API, validação de etapa e handoff.
-- Backend Django 5.2 LTS montado (`backend/`), sem Django Admin, sessões ou messages;
-  `TimeStampedModel` ainda será substituído na etapa 1.1.
-- Configuração do PyCharm documentada em `backend/README.md`.
-- Skills `modo-de-trabalho` e `handoff` criadas; `AGENTS.md` exige lê-las no início de toda sessão.
-- Etapas 0.1 e 0.2 concluídas. Contrato de erros em `docs/api/errors.md` e catálogo
-  completo em `docs/api/errors/`; `config/api/v1.py` ainda sem endpoints de negócio.
+
+- ADRs 0001–0012 revisados; 0003 continua Proposto para discussão do frontend.
+- Backend Django 5.2 LTS, sem Admin, sessões ou messages; etapas 0.1/0.2 concluídas.
+- API versionada, handler RFC 9457, request ID e log_filters; logs de conclusão
+  apenas para erros (4xx WARNING / 5xx ERROR), por decisão do usuário.
+- Etapa 1.1 antecipada ao JWT por aprovação do usuário: a configuração padrão
+  de SimpleJWT usa a PK interna, que o ADR 0007 proíbe expor.
 
 ## Feito nesta etapa
-- API v1 incluída no prefixo `/api/v1/`, fallback 404 JSON para rotas desconhecidas
-  da API, inclusive com DEBUG ligado (evita página de boas-vindas do Django).
-- Handler central de exceções DRF/Django/domínio: RFC 9457, validação 422, sintaxe
-  400, conflitos 409; 500 genérico e logs técnicos sem conteúdo de requisição.
-- UUID v7 gerado por requisição, `X-Request-Id`, contextvar isolado e filtro de logs.
-- Preservados headers de protocolo e rollback em transações de requisição.
-- Validador completo passou: 46 testes, lint, formatação, migrations sem alterações,
-  system checks e checks de produção. Cache do pytest emitiu aviso não impeditivo.
-- Revisão OWASP A01/A02/A04/A05/A06/A07/A08/A09/A10 sem achados novos no diff;
-  A03 sem alterações de dependências. Performance sem achados: nenhuma nova query
-  de aplicação; logs registram status e ID, sem payload, IP ou identidade do usuário.
-- Checklist legal base revisado para o diff: nenhuma nova dependência ou interface;
-  sem coleta de novos campos pessoais. O AccessLog obrigatório permanece na etapa 4.1.
-- Atualizados documentação, catálogo dos 11 tipos, plano e `.ai/knowledge/`.
-- Ajuste posterior solicitado pelo usuário: log de conclusão apenas para erros
-  (4xx WARNING / 5xx ERROR). Respostas 2xx/3xx mantêm o ID, sem log de conclusão.
-  Observabilidade mais ampla fica para evolução futura.
-- Validação do ajuste: 47 testes e todas as verificações automáticas passaram;
-  revisão do diff sem novos achados de segurança ou performance. Permanece o
-  aviso não impeditivo do cache do pytest.
-- Por preferência do usuário, módulo `request_id.py` renomeado para `log_filters.py`,
-  com imports e configuração de logging atualizados; comportamento preservado.
+
+- BaseModel substitui TimeStampedModel: PK BIGINT, public_id UUID v7 único,
+  timestamps, autoria explícita, is_active e exclusão lógica.
+- Metaclasse gera tabelas dsc_ em snake_case antes das relações N:N automáticas.
+- objects oculta excluídos e preserva inativos; all_objects permite auditoria.
+- save(actor=user) registra autoria; delete(actor=user) e QuerySet.delete(actor=user)
+  preservam dados e são idempotentes. Sem cascata; futuras regras ficam no service.
+- User herda AbstractUser e BaseModel, mantém o is_active do Django e o manager
+  de criação de usuários/superusuários. Usuários excluídos não autenticam.
+- Banco de desenvolvimento consultado: sem tabelas ou migrations aplicadas.
+  Migration inicial regenerada para dsc_user; não aplicada ao banco local.
+- Validador completo passou: 58 testes, lint, formatação, ausência de migrations
+  pendentes e checks de desenvolvimento/produção, sem avisos nesta execução.
+- Revisão de segurança do diff sem novos achados: A01/A04/A05/A06/A07/A08/A09/A10;
+  A02 sem mudanças de settings; A03 sem dependências novas. Autenticação de
+  excluídos testada; nenhuma API ou regra de escopo criada nesta etapa.
+- Performance sem achados: exclusão em lote comprovada em uma query para 1/30
+  usuários; índice único de public_id e índices de FKs gerados pelo Django.
+- Checklist legal base revisado no escopo: autoria para rastreabilidade prevista
+  no ADR 0007; sem novos dados de perfil, logs ou dependências. Soft delete não
+  equivale à eliminação; expurgo, LegalHold e política de retenção continuam
+  pendentes na entrega própria. AccessLog continua na etapa 4.1.
+- Atualizados AGENTS/README do backend, overview, plano e conhecimento da IA.
 
 ## Falta nesta etapa
+
 - Nada.
 
 ## Dúvidas abertas
+
 - Nenhuma.
 
 ## Avisos
-- **Não rodar `migrate`** antes da etapa 1.1: a migration do `User` será refeita (`dsc_user` + `BaseModel`).
-- `backend/.env` existe só localmente (credenciais `postgres:postgres`, banco `datasync-core`); nunca versionar.
-- Push para o GitHub só quando o usuário pedir (a `main` local está à frente do `origin/main`).
-- No Windows, o validador passou com Git Bash e PATH definido dentro do Bash:
-  `"C:/Program Files/Git/bin/bash.exe" -c 'export PATH=/usr/bin:/bin:$PATH; bash .ai/skills/validar-etapa/validar.sh'`.
+
+- O banco de desenvolvimento continua vazio. Não executar alterações nele sem
+  autorização; a migration inicial de User está pronta e validada nos testes.
+- Autoria pode ser nula em operações de sistema/bootstrap; bulk/update precisam
+  de auditoria explícita do chamador. all_objects não dispensa autorização.
+- Escopos e system checks ficam na etapa 1.2, após JWT; expurgo em entrega própria.
+- backend/.env é local e nunca deve ser versionado.
+- Push para o GitHub só quando o usuário pedir.
+- Validador no Windows: Git Bash com PATH=/usr/bin:/bin:$PATH, conforme histórico.
