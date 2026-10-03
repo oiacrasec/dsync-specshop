@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Padrão de models documentado no backend
+
+- Revisados os models de core/users; agrupados os itens restantes de
+  `update_fields` em BaseModel, sem alteração de comportamento.
+- Após o usuário apontar linhas longas, confirmou o limite de **100 caracteres**.
+  FKs foram quebradas mantendo argumentos agrupados e alinhamento vertical;
+  removida a exceção E501 dos models, preservando a exclusão do formatter.
+- Criados `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md`
+  nos locais previstos pelo baseline. AGENTS/README passaram a referenciar essas
+  fontes; memória e handoff sincronizados.
+
 ## 2026-10-03 — Preferência de formatação dos models
 
 - Usuário definiu campos compactos, argumentos agrupados e continuação alinhada,

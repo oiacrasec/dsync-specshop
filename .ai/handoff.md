@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:49
+- **Atualizado em:** 2026-10-03 18:56
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `style(backend): preserve compact model field declarations` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `docs(backend): document compact model style and examples` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
@@ -51,6 +51,14 @@
   formatter e de E501 para preservar a preferência, mantendo demais regras de lint.
   Lint, check de formatação e verificação de migrations passaram após esse ajuste;
   sem alteração de comportamento e sem novos testes.
+- Padrão consolidado em backend/docs/standards/django-style.md, com exemplo em
+  backend/docs/examples/model.md; AGENTS e README apontam para esses documentos.
+  Models de core/users revisados e itens de update_fields agrupados.
+- Usuário confirmou limite de 100 caracteres. Corrigidas as FKs longas mantendo
+  argumentos agrupados e continuação alinhada; removida a exceção E501 de models.py.
+  Formatação manual permanece preservada; documentação e memória refletem o limite.
+  Lint, formatação, migrations e sintaxe dos exemplos validados; todos os models
+  têm linhas de até 100 caracteres e AST preservada, sem mudança de comportamento.
 
 ## Falta nesta etapa
 

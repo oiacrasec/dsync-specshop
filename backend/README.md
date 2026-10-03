@@ -54,6 +54,9 @@ Ela ainda não foi aplicada ao banco de desenvolvimento nesta etapa.
 
 ## Persistência comum
 
+Estilo obrigatório de models: [padrão Django](docs/standards/django-style.md) e
+[exemplo de referência](docs/examples/model.md).
+
 Todos os models próprios herdam `apps.core.models.BaseModel` (ADR 0007). O `id`
 BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o futuro JWT.
 Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relações
