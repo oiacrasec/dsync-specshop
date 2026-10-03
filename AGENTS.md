@@ -4,6 +4,12 @@ Regras globais para agentes de IA neste repositório. Regras específicas ficam 
 `backend/AGENTS.md` e `frontend/AGENTS.md` (quando existirem) e prevalecem dentro
 de cada projeto.
 
+## Início de toda sessão (obrigatório, qualquer agente)
+
+1. Ler e seguir a skill **`modo-de-trabalho`** (`.ai/skills/modo-de-trabalho/SKILL.md`).
+2. Retomar pelo **`.ai/handoff.md`** e pelo plano ativo em `docs/plans/` (skill `handoff`).
+3. Confirmar com o usuário onde parou **antes** de executar qualquer coisa.
+
 ## Visão geral
 
 Monorepo fullstack com projetos **autônomos**:
@@ -35,6 +41,7 @@ Princípio central: **código isolado, conhecimento conectado.**
 | `.ai/knowledge/` | memória compilada do projeto para IA |
 | `.ai/skills/<nome>/SKILL.md` | procedimentos que agentes devem seguir |
 | `.ai/queries/` | consultas reutilizáveis de investigação |
+| `.ai/handoff.md` | estado atual do trabalho, para retomar em qualquer agente |
 
 ### Fontes de verdade (em caso de conflito)
 
@@ -52,6 +59,8 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
 
 | Skill | Quando usar |
 |---|---|
+| `modo-de-trabalho` | **início de toda sessão**: preferências permanentes do usuário |
+| `handoff` | início de sessão (retomar) e fim de toda etapa ou troca de LLM (passar o bastão) |
 | `git-commit` | **sempre** ao criar, dividir ou revisar commits |
 | `explicacao-eficiente` | ao explicar algo ao usuário |
 | `questionador` | **sempre**: nunca inferir ou supor; parar e perguntar diante de lacunas ou conflitos entre docs, código, pedidos, regras ou leis |

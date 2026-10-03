@@ -14,7 +14,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 |---|---|
 | `docs/` (`architecture/`, `domain/`, `api/`, `adr/`) | criado |
 | `.ai/` (`knowledge/*`, `skills/`, `queries/`) | criado |
-| `.ai/skills/` (processo: 8 · conformidade legal: 14) | criado |
+| `.ai/skills/` (processo: 10 · conformidade legal: 14) | criado |
 | `.claude/skills/project-skills/` | criado |
 | `.github/workflows/` | criado |
 | `AGENTS.md`, `README.md` (raiz) | criado |
@@ -118,6 +118,7 @@ datasync-core/
 │
 ├── .ai/
 │   ├── README.md
+│   ├── handoff.md         → estado atual do trabalho (skill handoff)
 │   ├── schema.md
 │   │
 │   ├── knowledge/
@@ -163,6 +164,10 @@ datasync-core/
 │   │   ├── validar-etapa/
 │   │   │   ├── SKILL.md
 │   │   │   └── validar.sh
+│   │   ├── modo-de-trabalho/
+│   │   │   └── SKILL.md
+│   │   ├── handoff/
+│   │   │   └── SKILL.md
 │   │   ├── lgpd/
 │   │   │   └── SKILL.md
 │   │   ├── marco-civil/
@@ -1105,6 +1110,8 @@ O Claude Code não lê `.ai/skills/` diretamente: a skill
 | `erros-api-rfc9457` | formato único de erro da API (Problem Details, RFC 9457) |
 | `revisao-performance` | checklist de performance: N+1, agregação, anotação, subquery, CTE, índices, lotes |
 | `validar-etapa` | fechamento de cada etapa: verificações automáticas (`validar.sh`), segurança, performance, ADRs, docs e commit |
+| `modo-de-trabalho` | preferências permanentes do usuário; lida no início de toda sessão |
+| `handoff` | passagem de bastão entre sessões e agentes (`.ai/handoff.md`) |
 | `lgpd` | conformidade com a LGPD (Lei 13.709/2018) em tudo que toca dados pessoais |
 | `marco-civil` | conformidade com o Marco Civil da Internet (Lei 12.965/2014): registros de acesso, termos, conteúdo de usuários |
 | `conformidade-legal` | **roteador**: indica quais skills legais se aplicam a cada funcionalidade |

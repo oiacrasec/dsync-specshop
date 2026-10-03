@@ -1,6 +1,6 @@
 ---
 name: validar-etapa
-description: Fechamento obrigatório de cada etapa (micro-entrega) de implementação. Use SEMPRE ao terminar uma etapa do plano de entrega, antes do commit: roda as verificações automáticas, revisa segurança (owasp-top-10) e performance (revisao-performance), confere ADRs, leis e documentação, e só então commita e reporta.
+description: Fechamento obrigatório de cada etapa (micro-entrega) de implementação. Use SEMPRE ao terminar uma etapa do plano de entrega, antes do commit: roda as verificações automáticas, revisa segurança (owasp-top-10) e performance (revisao-performance), confere ADRs, leis e documentação, atualiza o handoff, e só então commita e reporta.
 ---
 
 # Validar etapa
@@ -52,11 +52,16 @@ formato dela.
   código **desta** etapa, no mesmo commit.
 - [ ] Plano de entrega atualizado (etapa marcada como concluída).
 
-## Passo 8 — Commit
+## Passo 8 — Handoff
+
+Atualizar o `.ai/handoff.md` pela skill `handoff` (etapa concluída, próximo passo,
+dúvidas e avisos). Ele entra no commit da etapa.
+
+## Passo 9 — Commit
 
 Commit pela skill `git-commit` (uma etapa = uma mudança lógica = um commit, em regra).
 
-## Passo 9 — Relatório ao usuário
+## Passo 10 — Relatório ao usuário
 
 No formato da skill `explicacao-eficiente`:
 

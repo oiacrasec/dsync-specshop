@@ -109,6 +109,18 @@ else
   printf '  ➖ Claude Code não detectado (seção ignorada)\n'
 fi
 
+# ---------------------------------------------------------------- codex
+section "Codex"
+
+CODEX_CFG="$HOME/.codex/config.toml"
+if [ -f "$CODEX_CFG" ]; then
+  grep -q 'rtk hook codex' "$CODEX_CFG"     && ok "hook rtk" ""     || fail "hook rtk" "rode: rtk init -g --codex"
+  grep -q 'mcp_servers.codegraph' "$CODEX_CFG"     && ok "MCP codegraph" ""     || fail "MCP codegraph" "rode: codegraph install --target=codex"
+else
+  printf '  ➖ Codex não detectado (seção ignorada)
+'
+fi
+
 # ---------------------------------------------------------------- resumo
 printf '\n'
 if [ "$FAILS" -eq 0 ]; then

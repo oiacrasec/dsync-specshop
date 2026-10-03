@@ -31,8 +31,12 @@ Mostra ✅/❌ por item e sai com código **1** se algo obrigatório faltar. Apr
 | | hook rtk | `PreToolUse` com matcher `Bash\|PowerShell` → `rtk hook claude` |
 | | MCP codegraph | servidor `codegraph` em `~/.claude.json` |
 | | hook do projeto | `SessionStart` em `.claude/settings.json` carregando o `AGENTS.md` |
+| Codex | hook rtk | `PreToolUse` com `rtk hook codex` em `~/.codex/config.toml` |
+| | MCP codegraph | `[mcp_servers.codegraph]` em `~/.codex/config.toml` |
 
-A seção Claude Code é ignorada se `~/.claude/` não existir (outros agentes).
+As seções Claude Code e Codex são ignoradas se `~/.claude/` ou `~/.codex/` não
+existirem. O Codex lê o `AGENTS.md` nativamente; as skills chegam a ele pelas
+referências do `AGENTS.md`.
 
 Fora do escopo, por decisão do projeto: `kotlin-lsp` e `swift-lsp` (a stack é Django + Angular).
 
@@ -48,6 +52,8 @@ Fora do escopo, por decisão do projeto: `kotlin-lsp` e `swift-lsp` (a stack é 
 | plugin | no Claude Code: `/plugin install <nome>@<marketplace>` (marketplaces extras: `/plugin marketplace add guillaumemeyer/watermarks-remover` e `/plugin marketplace add forrestchang/andrej-karpathy-skills`) |
 | hook rtk | `~/.claude/settings.json` → `PreToolUse`, matcher `Bash\|PowerShell`, comando `rtk hook claude` |
 | hook do projeto | restaurar `.claude/settings.json` do repositório |
+| rtk no Codex | `rtk init -g --codex` (hook `PreToolUse` + `AGENTS.md` + `RTK.md`) |
+| MCP codegraph no Codex | `codegraph install --target=codex` |
 
 Depois de instalar plugins, LSPs ou o MCP, **reinicie o Claude Code** e rode a verificação de novo.
 
