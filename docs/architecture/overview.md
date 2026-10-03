@@ -14,7 +14,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 |---|---|
 | `docs/` (`architecture/`, `domain/`, `api/`, `adr/`) | criado |
 | `.ai/` (`knowledge/*`, `skills/`, `queries/`) | criado |
-| `.ai/skills/` (processo: 6 · conformidade legal: 14) | criado |
+| `.ai/skills/` (processo: 7 · conformidade legal: 14) | criado |
 | `.claude/skills/project-skills/` | criado |
 | `.github/workflows/` | criado |
 | `AGENTS.md`, `README.md` (raiz) | criado |
@@ -157,6 +157,8 @@ datasync-core/
 │   │   ├── owasp-top-10/
 │   │   │   └── SKILL.md
 │   │   ├── erros-api-rfc9457/
+│   │   │   └── SKILL.md
+│   │   ├── revisao-performance/
 │   │   │   └── SKILL.md
 │   │   ├── lgpd/
 │   │   │   └── SKILL.md
@@ -1094,6 +1096,7 @@ O Claude Code não lê `.ai/skills/` diretamente: a skill
 | `verificar-ambiente` | checa ferramentas, `.venv`, CodeGraph, LSPs, plugins e hooks (`check.sh`) |
 | `owasp-top-10` | checklist de code review de segurança (OWASP Top 10:2025) |
 | `erros-api-rfc9457` | formato único de erro da API (Problem Details, RFC 9457) |
+| `revisao-performance` | checklist de performance: N+1, agregação, anotação, subquery, CTE, índices, lotes |
 | `lgpd` | conformidade com a LGPD (Lei 13.709/2018) em tudo que toca dados pessoais |
 | `marco-civil` | conformidade com o Marco Civil da Internet (Lei 12.965/2014): registros de acesso, termos, conteúdo de usuários |
 | `conformidade-legal` | **roteador**: indica quais skills legais se aplicam a cada funcionalidade |
@@ -1302,7 +1305,7 @@ Ao criar uma nova funcionalidade:
 10. escritas e regras de negócio devem utilizar services;
 11. views devem permanecer finas;
 12. adicionar testes, incluindo **isolamento entre contratos**;
-13. revisar segurança (skill `owasp-top-10`);
+13. revisar segurança (skill `owasp-top-10`) e performance (skill `revisao-performance`);
 14. atualizar documentação quando necessário.
 
 ## Frontend
