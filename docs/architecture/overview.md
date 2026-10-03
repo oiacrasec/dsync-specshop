@@ -465,7 +465,8 @@ datasync-core/
 │       ├── 0008-administracao-propria.md
 │       ├── 0009-rbac-hibrido.md
 │       ├── 0010-gestao-de-usuarios-pelo-superadmin.md
-│       └── 0011-endpoint-de-opcoes.md
+│       ├── 0011-endpoint-de-opcoes.md
+│       └── 0012-excecoes-ao-escopo-declarado.md
 │
 └── .github/
     └── workflows/
