@@ -37,6 +37,63 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+## Configuração do PyCharm
+
+Testado no PyCharm 2026.1 (Professional: o suporte a Django é recurso pago). O
+projeto é aberto pela **raiz do monorepo** (`datasync-core/`).
+
+### 1. Interpretador
+
+**Settings** (`Ctrl+Alt+S`) → **Python** → **Interpreter**: usar o `.venv` da raiz
+(`.venv/Scripts/python.exe`). Se houver mais de um interpretador apontando para o mesmo
+`.venv` (em **Show All**), remover os duplicados.
+
+### 2. Sources Root
+
+Na árvore do projeto: clique direito em **`backend`** → **Mark Directory as** →
+**Sources Root**. Sem isso, a IDE não encontra os imports `apps.*` e `config.*`.
+
+### 3. Suporte a Django
+
+**Settings** → **Python** → **Django**:
+
+| Campo | Valor |
+|---|---|
+| Enable Django Support | ✅ |
+| Django project root | `<caminho do repositório>/backend` |
+| Settings | `config/settings/development.py` |
+| Manage script | `manage.py` |
+
+### 4. Ruff
+
+**Settings** → **Plugins**: procurar **Ruff** (conferir se já vem embutido na versão
+instalada) e apontar para o executável do `.venv`. As regras ficam no `pyproject.toml`.
+
+### 5. Configurações de execução
+
+A pasta `.idea/` não é versionada; crie as configurações em **Run** → **Edit
+Configurations** → **+**:
+
+**`backend: runserver`** (tipo **Python**)
+
+| Campo | Valor |
+|---|---|
+| Script | `<caminho do repositório>/backend/manage.py` |
+| Script parameters | `runserver 127.0.0.1:8000` |
+| Working directory | `<caminho do repositório>/backend` |
+| Environment variables | `PYTHONUNBUFFERED=1` |
+
+**`backend: pytest`** (tipo **pytest**)
+
+| Campo | Valor |
+|---|---|
+| Target | Script path: `<caminho do repositório>/backend` |
+| Working directory | `<caminho do repositório>/backend` |
+
+Não é preciso configurar variáveis de ambiente: o settings lê o `backend/.env`, e o
+pytest usa `config.settings.testing` (definido no `pyproject.toml`). As duas
+configurações aceitam **Debug**, com breakpoints.
+
 ## Dependências
 
 As versões usam `~=` (*compatible release*): `Django~=5.2.17` aceita qualquer
