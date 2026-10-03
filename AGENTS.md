@@ -56,6 +56,7 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
 | `questionador` | **sempre**: nunca inferir ou supor; parar e perguntar diante de lacunas ou conflitos entre docs, código, pedidos, regras ou leis |
 | `verificar-ambiente` | máquina nova, pedido de checar ambiente/plugins, ou ferramenta (LSP, codegraph, rtk) falhando |
 | `erros-api-rfc9457` | **sempre** ao criar ou alterar endpoints, exceções e respostas de erro da API |
+| `validar-etapa` | **sempre** ao terminar cada etapa do plano de entrega, antes do commit |
 | `revisao-performance` | **sempre** em code review e ao escrever código que consulta o banco (N+1, agregação, índices) |
 | `owasp-top-10` | **sempre** em code review e antes de entregar mudanças em auth, permissões, endpoints, queries, dependências ou configuração |
 
