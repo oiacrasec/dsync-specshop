@@ -41,6 +41,7 @@ Este documento define a arquitetura-base do projeto fullstack utilizando:
 - **Banco de dados:** PostgreSQL
 - **Infraestrutura:** Docker / Docker Compose
 - **Desenvolvimento assistido por IA:** `AGENTS.md`, documentação estruturada, memória persistente e contexto arquitetural
+- **Multi-tenancy:** clientes isolados por **Contrato** e **Organização** num banco único (ADR 0006)
 
 O objetivo principal é manter **backend e frontend independentes em execução e dependências**, porém dentro do mesmo repositório Git para facilitar versionamento, documentação, integração, CI/CD e desenvolvimento assistido por agentes de IA.
 
@@ -82,6 +83,20 @@ ser um monorepo. Se um projeto for extraído para outro repositório, ele recebe
 própria configuração nesse momento.
 
 A comunicação entre frontend e backend ocorre exclusivamente através de contratos bem definidos, normalmente via API HTTP/REST.
+
+## 2.2 Multi-tenancy por Contrato e Organização
+
+```text
+Contract (cliente)  →  Organization (unidade)  →  Sector (futuro)
+```
+
+- Um banco por implantação; isolamento por colunas de contexto, com escopo **declarado**
+  em todo model e proteção em camadas contra vazamento (ADR 0006).
+- Contexto por requisição no header `X-Organization-Id`; o contrato vem do usuário.
+- Acesso e permissões pelo **RBAC híbrido** (ADR 0009).
+- Isolamento físico, quando necessário, por **implantação** própria (dedicada ou no
+  servidor do cliente).
+- Decisões completas: `docs/adr/` (índice em `docs/adr/README.md`).
 
 ---
 
@@ -218,8 +233,9 @@ datasync-core/
 │   │   ├── core/
 │   │   │   ├── __init__.py
 │   │   │   ├── apps.py
-│   │   │   ├── models.py
-│   │   │   ├── exceptions.py
+│   │   │   ├── models.py          → BaseModel e tipos de escopo
+│   │   │   ├── context.py         → contexto de organização
+│   │   │   ├── exceptions.py      → erros RFC 9457
 │   │   │   ├── permissions.py
 │   │   │   ├── pagination.py
 │   │   │   ├── utils.py
@@ -232,7 +248,6 @@ datasync-core/
 │   │   │
 │   │   └── users/
 │   │       ├── __init__.py
-│   │       ├── admin.py
 │   │       ├── apps.py
 │   │       ├── models.py
 │   │       ├── serializers.py
@@ -263,9 +278,7 @@ datasync-core/
 │   │
 │   ├── media/
 │   │
-│   ├── templates/
-│   │   ├── base.html
-│   │   └── admin/
+│   ├── templates/         → HTML dos relatórios em PDF (WeasyPrint, futuro)
 │   │
 │   ├── scripts/
 │   │
@@ -436,12 +449,18 @@ datasync-core/
 │   │   └── versioning.md
 │   │
 │   └── adr/
-│       ├── README.md
+│       ├── README.md                                       → índice e modelo
 │       ├── 0001-monorepo.md
-│       ├── 0002-backend-architecture.md
-│       ├── 0003-frontend-architecture.md
-│       ├── 0004-api-contract.md
-│       └── 0005-ai-memory.md
+│       ├── 0002-arquitetura-do-backend.md
+│       ├── 0003-arquitetura-do-frontend.md
+│       ├── 0004-contrato-de-api.md
+│       ├── 0005-memoria-de-ia.md
+│       ├── 0006-multi-tenancy-contrato-organizacao.md
+│       ├── 0007-identificadores-e-convencoes-de-persistencia.md
+│       ├── 0008-administracao-propria.md
+│       ├── 0009-rbac-hibrido.md
+│       ├── 0010-gestao-de-usuarios-pelo-superadmin.md
+│       └── 0011-endpoint-de-opcoes.md
 │
 └── .github/
     └── workflows/
@@ -504,7 +523,8 @@ Novos domínios devem ser adicionados no mesmo nível.
 # 5. Estrutura de um Django App
 
 Um app nasce com o mínimo gerado por `django-admin startapp` (`apps.py`, `models.py`,
-`admin.py` quando houver admin, `migrations/`, `tests/`). As demais camadas são
+`migrations/`, `tests/`); o `admin.py` gerado é removido, porque o Django Admin não é
+usado (ADR 0008). As demais camadas são
 **criadas sob demanda**, quando a primeira funcionalidade precisar delas, sem
 arquivos vazios antecipados (ver §30).
 
@@ -512,7 +532,6 @@ Estrutura completa de um app maduro:
 
 ```text
 users/
-├── admin.py
 ├── apps.py
 ├── models.py
 ├── serializers.py
@@ -537,7 +556,6 @@ A divisão de responsabilidades é:
 | `views.py` | Camada HTTP/API |
 | `urls.py` | Rotas do app |
 | `permissions.py` | Regras de autorização |
-| `admin.py` | Configuração do Django Admin |
 | `fixtures/` | Fixtures pertencentes ao domínio |
 | `migrations/` | Migrações do banco |
 | `tests/` | Testes automatizados |
@@ -587,10 +605,12 @@ O app `core` contém apenas recursos compartilhados por múltiplos domínios.
 
 Exemplos válidos:
 
-- `TimeStampedModel`;
-- paginação;
-- exceptions;
-- permissions genéricas;
+- `BaseModel` (`public_id` UUID v7, datas, autoria, `is_active`, soft delete; ADR 0007);
+- os tipos de escopo `SharedModel`, `HybridScopedModel`, `ContractScopedModel` e
+  `OrganizationScopedModel` (ADR 0006);
+- resolução do contexto de organização (ADR 0006);
+- paginação, exceções no formato RFC 9457 (skill `erros-api-rfc9457`) e o mixin de
+  `options` (ADR 0011);
 - utilitários realmente compartilhados.
 
 O `core` não deve se transformar em um depósito genérico de código.
@@ -1269,14 +1289,21 @@ Ao criar uma nova funcionalidade:
 
 ## Backend
 
-1. identificar o domínio;
+1. identificar o domínio e as leis aplicáveis (skill `conformidade-legal`);
 2. criar ou utilizar o Django App correspondente;
-3. seguir os exemplos em `backend/docs/examples/`;
-4. leituras devem preferencialmente utilizar selectors;
-5. escritas e regras de negócio devem utilizar services;
-6. views devem permanecer finas;
-7. adicionar testes;
-8. atualizar documentação quando necessário.
+3. todo model herda um **tipo de escopo** declarado (ADR 0006), com `BaseModel` e
+   tabela `dsc_*` gerada automaticamente (ADR 0007);
+4. todo endpoint declara a **permissão** do registry (sem declaração, é negado; ADR 0009);
+5. a API expõe só o `public_id`, em snake_case (ADR 0004/0007);
+6. seleções usam o endpoint `options` (ADR 0011);
+7. erros no formato RFC 9457 (skill `erros-api-rfc9457`);
+8. seguir os exemplos em `backend/docs/examples/`;
+9. leituras devem preferencialmente utilizar selectors;
+10. escritas e regras de negócio devem utilizar services;
+11. views devem permanecer finas;
+12. adicionar testes, incluindo **isolamento entre contratos**;
+13. revisar segurança (skill `owasp-top-10`);
+14. atualizar documentação quando necessário.
 
 ## Frontend
 
