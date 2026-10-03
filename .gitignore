@@ -37,3 +37,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Code graph / AI caches (reconstruíveis)
+.codegraph/
+.code-review-graph/
+.ai/cache/
+.ai/index/
