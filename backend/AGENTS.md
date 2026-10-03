@@ -64,7 +64,16 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   com bloqueio temporário de 60 s. Sucesso e validação não consomem o contador.
   Preservar normalização do username, HMAC da chave e operações atômicas de cache;
   cache compartilhado e proteção da borda são requisitos antes de produção.
-- Todos os models próprios herdam `apps.core.models.BaseModel`: UUID v7 externo,
+- Models próprios herdam exatamente um dos quatro tipos de escopo de
+  `apps.core.models`; somente `users.User` e `contracts.Contract` herdam diretamente
+  `BaseModel` (ADR 0012). Check `core.E001/E002/E003` exige declaração e campos
+  compatíveis, inclusive em proxies/unmanaged. Ver
+  [escopos de persistência](docs/architecture/model-scopes.md).
+- `Plan`, `Contract` e `Organization` ficam no futuro `apps/contracts` (etapa 2.1).
+  FKs de contexto usam `PROTECT` (ADR 0013). Os tipos abstratos ainda não
+  aplicam isolamento de queries; managers/contexto entram nas próximas etapas.
+- Ao personalizar `Meta`, herdar a do tipo escolhido e preservar índices herdados.
+- Os tipos de escopo herdam `apps.core.models.BaseModel`: UUID v7 externo,
   datas, autoria e soft delete (ADR 0007). Tabelas `dsc_` são geradas automaticamente.
 - `objects` oculta excluídos, mas mantém inativos; `all_objects` é acesso explícito
   para auditoria. No `User`, `is_active` mantém a semântica de autenticação do Django.

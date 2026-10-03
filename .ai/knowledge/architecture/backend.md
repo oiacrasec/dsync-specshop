@@ -1,4 +1,4 @@
-# Backend — estado após a etapa 0.3
+# Backend — estado após a etapa 1.2
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
 `backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/exceptions.py`,
@@ -55,7 +55,16 @@ e plano da Entrega 1.
   e HMAC protege a chave do cache. Contadores atômicos no cache local, testados
   com falhas concorrentes. Cache compartilhado/controles de produção e limpeza
   diária dos tokens expirados dependem da infraestrutura.
-- Próxima etapa: 1.2, tipos de escopo e system check de escopo declarado.
+- Etapa 1.2: SharedModel, HybridScopedModel, ContractScopedModel e
+  OrganizationScopedModel abstratos, com exemplos práticos nas docstrings.
+  FKs de contexto PROTECT para contracts.Contract/Organization; índice composto
+  contract/organization neste último tipo. Meta deve herdar a do tipo escolhido.
+  Check core.E001/E002/E003 registrado em CoreConfig.ready: exige exatamente
+  um tipo e campos compatíveis nos apps próprios, inclui proxies/unmanaged,
+  ignora terceiros e N:N automáticas. Exceções fechadas users.User/contracts.Contract.
+  Check sem SQL; tipos ainda não filtram queries. ADR 0013 registra decisão do
+  usuário: Plan/Contract/Organization em apps/contracts, a criar na etapa 2.1.
+- Próxima etapa: 2.1, Plan, Contract e Organization.
   A etapa 1.1 foi antecipada com aprovação do usuário para usar UUID nos tokens.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em

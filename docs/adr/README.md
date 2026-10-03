@@ -29,6 +29,7 @@ um ADR novo que **substitui** o anterior.
 | [0010](0010-gestao-de-usuarios-pelo-superadmin.md) | Gestão de usuários e superadmins pela área administrativa | Aceito |
 | [0011](0011-endpoint-de-opcoes.md) | Endpoint de opções (autocomplete e seleção) | Aceito |
 | [0012](0012-excecoes-ao-escopo-declarado.md) | Exceções ao escopo declarado (`Contract` e `User`) | Aceito |
+| [0013](0013-dominio-de-contratos-e-relacoes-de-contexto.md) | Domínio de contratos e relações de contexto | Aceito |
 
 ## Modelo
 

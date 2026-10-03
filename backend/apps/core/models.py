@@ -92,3 +92,62 @@ class BaseModel(models.Model, metaclass=DscModelBase):
         return result
 
     delete.alters_data = True
+
+
+class SharedModel(BaseModel):
+    """Dados comuns a todos os clientes, sem contrato ou organização.
+
+    Exemplos: país, cidade e plano de assinatura. Todo usuário autenticado pode
+    consultar; somente o superadmin pode alterar, conforme as camadas de autorização.
+    """
+
+    class Meta(BaseModel.Meta):
+        abstract = True
+
+
+class HybridScopedModel(BaseModel):
+    """Dados do sistema ou de um cliente, identificados pelo campo contract.
+
+    Exemplos: categoria padrão (contract=None) e categoria criada pelo cliente
+    (contract preenchido). O cliente consulta as categorias do sistema e as suas,
+    mas só altera as suas; categorias do sistema são alteradas pelo superadmin.
+    """
+
+    contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
+                                 null=True, blank=True, related_name='+',)
+
+    class Meta(BaseModel.Meta):
+        abstract = True
+
+
+class ContractScopedModel(BaseModel):
+    """Dados de um cliente, disponíveis entre as organizações do mesmo contrato.
+
+    Exemplo: catálogo de produtos compartilhado pelas filiais de uma empresa.
+    Contract é obrigatório; outro cliente não pode consultar nem alterar esse catálogo.
+    As camadas de contexto e autorização aplicam essas restrições.
+    """
+
+    contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
+                                 related_name='+',)
+
+    class Meta(BaseModel.Meta):
+        abstract = True
+
+
+class OrganizationScopedModel(BaseModel):
+    """Dados de uma organização, com contract e organization obrigatórios.
+
+    Exemplos: entrada de estoque de uma filial e os itens dessa entrada. Cada item
+    também guarda o contexto na própria tabela; não o deduz pelo registro pai.
+    Outra filial não acessa esses dados pelas camadas de contexto e autorização.
+    """
+
+    contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
+                                 related_name='+',)
+    organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização'),
+                                     on_delete=models.PROTECT, related_name='+',)
+
+    class Meta(BaseModel.Meta):
+        abstract = True
+        indexes = [models.Index(fields=['contract', 'organization'])]

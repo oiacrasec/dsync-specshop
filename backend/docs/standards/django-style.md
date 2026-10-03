@@ -43,7 +43,9 @@ e deve acompanhar o limite do projeto.
 
 O estilo não altera as regras do [ADR 0007](../../../docs/adr/0007-identificadores-e-convencoes-de-persistencia.md):
 
-- Models próprios herdam `BaseModel`; tipos de escopo entram na etapa 1.2.
+- Models próprios herdam um dos quatro tipos de escopo derivados de `BaseModel`,
+  exceto `User` e `Contract` (ADR 0012). Ver [escopos](../architecture/model-scopes.md).
+- Ao personalizar `Meta`, herdar a do tipo de escopo para preservar managers e índices.
 - `User` também herda `AbstractUser`, preservando o `is_active` do Django.
 - Campos e código em inglês; rótulos em português com `gettext_lazy`.
 - `id` é interno; `public_id` UUID v7 identifica registros externamente.

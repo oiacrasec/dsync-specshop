@@ -16,6 +16,7 @@ e só começa após aprovação do usuário.
 | 4 | A porta de origem do registro de acesso depende do proxy reverso: decidir na etapa 4.1 |
 | 5 | Por aprovação do usuário, executar **1.1 antes de 0.3**, para que o JWT use o `public_id` do usuário sem expor o ID interno (ADR 0007). Ordem: 0.1 → 0.2 → 1.1 → 0.3 → 1.2 → demais etapas |
 | 6 | Login: usuário aprovou contar somente falhas por conta, limite inicial 5/min e bloqueio temporário; cache compartilhado/atômico, controles de borda, recuperação e MFA administrativa devem ser tratados antes de produção |
+| 7 | Usuário aprovou `apps/contracts` para `Plan`, `Contract` e `Organization`, com `PROTECT` nas FKs de contexto (ADR 0013) |
 
 ## Bloco 0 — Fundação
 
@@ -30,7 +31,7 @@ e só começa após aprovação do usuário.
 | # | Etapa | ADR | Status |
 |---|---|---|---|
 | 1.1 | `BaseModel` (`public_id` v7, datas, autoria, `is_active`, soft delete) + tabelas `dsc_` automáticas + `User` adaptado (migration regenerada) | 0007 | ✅ |
-| 1.2 | Os 4 tipos de escopo + system check "escopo declarado" (com as exceções do ADR 0012) | 0006 §1.1 | ⬜ |
+| 1.2 | Os 4 tipos de escopo + system check "escopo declarado" (com as exceções do ADR 0012) | 0006 §1.1, 0013 | ✅ |
 
 ## Bloco 2 — Contratos e contexto
 

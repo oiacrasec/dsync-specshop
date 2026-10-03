@@ -1,5 +1,21 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 1.2: escopos de persistência
+
+- Criados quatro tipos abstratos derivados de BaseModel, com exemplos práticos
+  nas docstrings por pedido do usuário: Shared, Hybrid, Contract e Organization.
+- Usuário confirmou apps/contracts para Plan/Contract/Organization (etapa 2.1)
+  e PROTECT nas relações de contexto; decisão registrada no ADR 0013.
+- FKs lazy, nulabilidade conforme ADR 0006, índice composto contract/organization.
+  Check core.E001/E002/E003 registrado no CoreConfig.ready, sem SQL, exige um tipo
+  e campos compatíveis. Exceções fechadas users.User/contracts.Contract (ADR 0012).
+- 24 novos testes; validador completo passou com 123 testes, lint, formatação,
+  migrations e checks de desenvolvimento/produção. Sem migrations novas/aplicadas.
+- Atualizados core/models.py, apps.py, checks.py, testes, AGENTS/README/standard,
+  docs de escopos, índice dos ADRs, overview, plano, memória e handoff.
+- Isolamento de queries/contexto e testes entre tenants seguem nas próximas etapas;
+  não houve novos endpoints nem coleta de dados. Revisões registradas no handoff.
+
 ## 2026-10-03 — Etapa 0.3: autenticação JWT
 
 - Adicionados SimpleJWT 5.5.1 e PyJWT transitivo 2.15.1 (MIT); metadados do PyPI

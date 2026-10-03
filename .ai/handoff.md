@@ -1,21 +1,21 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 19:33
+- **Atualizado em:** 2026-10-03 19:47
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(auth): add JWT login rotation and logout` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(backend): add model scopes and declaration checks` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 0.3 JWT login/refresh/logout — ✅ concluída |
-| Próximo passo exato | etapa 1.2: quatro tipos de escopo e system check de escopo declarado, com exceções do ADR 0012 |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 1.2 |
+| Etapa atual | 1.2 tipos de escopo e system check — ✅ concluída |
+| Próximo passo exato | etapa 2.1: criar apps/contracts com Plan, Contract e Organization, seguindo ADRs 0006/0007/0012/0013 |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.1 |
 
 ## Feito até aqui
 
-- ADRs 0001–0012 revisados; 0003 continua Proposto para discussão do frontend.
+- ADRs 0001–0013 revisados; 0003 continua Proposto para discussão do frontend.
 - Backend Django 5.2 LTS, sem Admin, sessões ou messages; etapas 0.1/0.2 concluídas.
 - API versionada, handler RFC 9457, request ID e log_filters; logs de conclusão
   apenas para erros (4xx WARNING / 5xx ERROR), por decisão do usuário.
@@ -23,6 +23,38 @@
   de SimpleJWT usa a PK interna, que o ADR 0007 proíbe expor.
 
 ## Feito nesta etapa
+
+- Usuário autorizou a etapa 1.2 e confirmou apps/contracts para Plan, Contract
+  e Organization, com PROTECT nas relações de contexto. Decisão no ADR 0013.
+- Criados SharedModel, HybridScopedModel, ContractScopedModel e
+  OrganizationScopedModel abstratos em core/models.py, derivados de BaseModel.
+  Exemplos práticos nas quatro docstrings por pedido do usuário. FKs lazy para
+  contracts.Contract/Organization, nulabilidade conforme ADR 0006; índice
+  composto contract/organization, além dos índices individuais das FKs.
+- Check registrado em CoreConfig.ready, sem queries: core.E001 sem escopo,
+  E002 múltiplos tipos, E003 contexto incompatível (destino/null/blank/PROTECT).
+  Apps próprios incluindo proxies/unmanaged; terceiros e N:N automáticas fora.
+  Exceções fechadas users.User/contracts.Contract, exigindo BaseModel sem escopo.
+- 24 testes novos: herança, metadados, relações resolvidas, tentativa de remover
+  ou alterar contexto, proxies, exceções por label exato, registro e zero queries.
+- Validador completo: 123 testes, lint, formatação, migrations e checks
+  desenvolvimento/produção passaram. Nenhuma migration criada ou aplicada:
+  somente tipos abstratos e checks, sem novos models concretos.
+- Revisão OWASP A01/A06/A10: declaração obrigatória, bypass por múltipla herança
+  ou campos incompatíveis rejeitado; sem liberação nova de API. Isolamento de
+  queries/contexto e testes entre tenants permanecem nas etapas 2.3–2.5.
+  A02/A03/A04/A05/A07/A08/A09 sem alterações relevantes de configuração,
+  dependências, criptografia, SQL, autenticação, desserialização ou logs.
+- Performance sem achados: check percorre metadados sem SQL (teste com 0 queries),
+  FKs indexadas e índice composto começando pelo contexto. Sem novos endpoints.
+- Checklist legal base no escopo: sem coleta nova, retenção, UI, terceiros ou
+  dependências. PROTECT preserva contra remoção acidental, não substitui expurgo
+  legal; regras de eliminação continuam na entrega própria. Nenhuma declaração
+  de conformidade global do produto.
+- AGENTS/README/standard, docs de escopos, overview, plano e memória sincronizados.
+  Herdar Meta do tipo escolhido para preservar managers e índices.
+
+## Etapa 0.3 anterior: JWT
 
 - SimpleJWT 5.5.1 (MIT) e PyJWT transitivo 2.15.1 (MIT), metadados PyPI sem
   advisories dessas versões e pip check sem conflitos. Inventário de dependências
@@ -113,7 +145,10 @@
   migrations iniciais agora que foram aplicadas.
 - Autoria pode ser nula em operações de sistema/bootstrap; bulk/update precisam
   de auditoria explícita do chamador. all_objects não dispensa autorização.
-- Escopos e system checks ficam na etapa 1.2, após JWT; expurgo em entrega própria.
+- Tipos de escopo e checks concluídos; apps/contracts ainda será criado em 2.1.
+  Os tipos não filtram queries: contexto/managers/autorização ainda pendentes.
+  Não publicar endpoints de negócio antes das proteções e testes de isolamento.
+  Expurgo permanece em entrega própria.
 - Antes de produção, configurar cache compartilhado com incrementos atômicos e
   leitura consistente, proteção de borda, MFA/recuperação e agendar diariamente
   manage.py flushexpiredtokens. O cache atual é local a cada processo.

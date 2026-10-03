@@ -27,7 +27,7 @@ backend/
 ├── config/
 │   └── settings/      → base, development, production, testing
 ├── apps/
-│   ├── core/          → recursos compartilhados (BaseModel, erros e correlação)
+│   ├── core/          → BaseModel, tipos de escopo, checks, erros e correlação
 │   └── users/         → usuário customizado
 ├── requirements/      → base, development, production, testing
 ├── static/ templates/ scripts/
@@ -76,7 +76,12 @@ compartilhado e atômico antes de executar com múltiplos workers em produção.
 Estilo obrigatório de models: [padrão Django](docs/standards/django-style.md) e
 [exemplo de referência](docs/examples/model.md).
 
-Todos os models próprios herdam `apps.core.models.BaseModel` (ADR 0007). O `id`
+Models próprios herdam um dos quatro [tipos de escopo](docs/architecture/model-scopes.md),
+que derivam de `apps.core.models.BaseModel` (ADR 0007). Exceções: `User` e `Contract`
+(ADR 0012). System checks rejeitam escopo ausente, múltiplo ou campos incompatíveis.
+Os tipos ainda não filtram queries por tenant; contexto e autorização seguem pendentes.
+`Plan`, `Contract` e `Organization` serão criados em `apps/contracts` na etapa 2.1,
+com `PROTECT` nas relações de contexto (ADR 0013). O `id`
 BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o JWT.
 Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relações
 N:N automáticas seguem a tabela de origem.
