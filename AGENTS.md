@@ -54,6 +54,7 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
 | `git-commit` | **sempre** ao criar, dividir ou revisar commits |
 | `explicacao-eficiente` | ao explicar algo ao usuário |
 | `questionador` | **sempre**: nunca inferir ou supor; parar e perguntar diante de lacunas ou conflitos entre docs, código, pedidos, regras ou leis |
+| `verificar-ambiente` | máquina nova, pedido de checar ambiente/plugins, ou ferramenta (LSP, codegraph, rtk) falhando |
 
 **Nunca inferir, nunca supor; conflitos não se resolvem em silêncio:** sem fonte
 verificada, pergunte; ao encontrar divergência, pare, mostre as
