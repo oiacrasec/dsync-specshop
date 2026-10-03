@@ -21,6 +21,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `.claude/settings.json` (hook que carrega `AGENTS.md`) | criado |
 | `.gitignore`, `.gitattributes` | criado |
 | `backend/` (Django 5.2 LTS: `config/settings/*`, `apps/core`, `apps/users`, `requirements/*`, `AGENTS.md`, `README.md`) | criado |
+| `backend/` (etapa 0.1: sem Django Admin, sessões ou messages; `IsAuthenticated` global, autenticadores vazios até o JWT na etapa 0.3) | concluído |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |
 | `AGENTS.md` (frontend) | **pendente** |

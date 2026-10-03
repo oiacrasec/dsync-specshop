@@ -2,6 +2,12 @@
 
 API Django autônoma do monorepo.
 
+Não usa Django Admin, sessões nem messages (ADR 0008). A administração própria será
+implementada na API e no frontend; por enquanto, a manutenção usa management commands,
+como `createsuperuser`. Não há rotas HTTP publicadas nesta etapa. A autenticação por
+JWT entra na etapa 0.3; até lá, o DRF não tem autenticadores configurados e mantém
+`IsAuthenticated` como permissão global.
+
 | Item | Versão |
 |---|---|
 | Python | 3.14 |
@@ -33,9 +39,11 @@ Na raiz do monorepo, com o `.venv` ativo:
 pip install -U -r backend/requirements/development.txt
 cd backend
 cp .env.example .env        # ajuste DJANGO_SECRET_KEY e DATABASE_URL
-python manage.py migrate
 python manage.py runserver
 ```
+
+**Não executar `migrate` antes da etapa 1.1 do plano de entrega:** a migration inicial
+do usuário será regenerada para `dsc_user` e os campos do `BaseModel`.
 
 ## Configuração do PyCharm
 

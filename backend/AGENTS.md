@@ -36,6 +36,11 @@ Crie cada arquivo só quando ele for necessário.
 - Settings por ambiente em `config/settings/`. Segredos e valores de ambiente **só** por variável de ambiente (`.env.example` documenta todas).
 - `AUTH_USER_MODEL = 'users.User'`: sempre use `get_user_model()` ou `settings.AUTH_USER_MODEL`.
 - API segura por padrão: `IsAuthenticated` global; libere rotas públicas explicitamente na view.
+- Não usar Django Admin, sessões ou messages (ADR 0008). Não registrar `admin.py`,
+  `SessionAuthentication` nem middlewares de sessão/autenticação do Django.
+- Administração própria pela API e pelo frontend; manutenção por management commands
+  (`createsuperuser` continua disponível). JWT entra na etapa 0.3; até lá, a lista de
+  autenticadores do DRF fica vazia, mantendo `IsAuthenticated` global.
 - Models que precisam de datas de criação e atualização herdam `apps.core.models.TimeStampedModel`.
 - Nunca logar dados pessoais em claro.
 - Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
