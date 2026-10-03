@@ -70,7 +70,38 @@ PROTECT impede remoção física pelo ORM quando houver referências.
 - Migration `contracts.0001_initial` aplicada ao banco local autorizado.
 - Nenhum plano, contrato ou organização inicial foi cadastrado.
 - Sem endpoints, serializers ou serviços de contratação publicados nesta etapa.
-- Vínculo de usuário, limites de licenças e regras de superadmin: etapa 2.2.
+- Vínculo de usuário e regras de licenças: etapa 2.2 concluída, conforme
+  [ADR 0015](../adr/0015-contagem-de-licencas-de-usuarios.md).
 - Validação de contrato ativo/vigência e contexto: etapas seguintes.
 - Isolamento automático de consultas e testes entre tenants: etapas 2.3–2.5.
   `objects` hoje filtra somente excluídos; não é uma barreira de autorização.
+
+## Usuários e licenças
+
+`User.contract` é uma FK PROTECT, indexada. A constraint
+`dsc_user_contract_by_role` exige contrato para usuário comum e proíbe contrato
+para superadmin, inclusive em inserts/updates diretos. O vínculo identifica
+o cliente ao qual o usuário pertence, para prestação do serviço e isolamento.
+
+Ativos e inativos não excluídos ocupam vaga. Soft delete libera; restauração e
+transferência precisam de vaga no destino. Editar/reativar um usuário já contado
+não ocupa outra vaga. Superadmin não consome licença de cliente.
+
+`apps.users.services.save_user(user=..., actor=...)` é a escrita interna central,
+com transação e locks no usuário existente e no contrato de destino. Conta vagas
+no banco, verifica contrato disponível/ativo e vigência (início e fim inclusivos),
+e grava autoria explícita. Falta de vaga gera `LicenseLimitReached` (409).
+Contrato inativo, vencido ou futuro gera `ContractInactive` (403); ausente ou
+excluído gera validação (422), pelo handler global nos futuros endpoints.
+
+`create_user`/`create_superuser` e suas versões assíncronas delegam a essa escrita,
+preservando normalização e hash do Django. `createsuperuser` continua sem contrato.
+Não usar save/update/bulk/SQL direto para criar vagas, mudar vínculo ou restaurar:
+a constraint não impõe o limite agregado. Operações internas controladas de
+fixtures/migrations devem garantir as regras explicitamente.
+
+O serviço não é endpoint e não decide quem pode cadastrar, promover ou transferir
+usuários. Autorização, atribuições e auditoria completa entram nas etapas de RBAC
+e gestão de usuários. Não expor esse serviço por uma API sem essas proteções.
+Bloqueio de login/refresh e requisições por contrato indisponível será conectado
+na etapa de validação de contexto; esta etapa valida o contrato nas escritas.

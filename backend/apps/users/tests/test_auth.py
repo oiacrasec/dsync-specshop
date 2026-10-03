@@ -44,8 +44,8 @@ def reset_auth_cache():
 
 
 @pytest.fixture
-def user(db):
-    return get_user_model().objects.create_user(username='maria', password=PASSWORD)
+def user(user_contract):
+    return get_user_model().objects.create_user(username='maria', password=PASSWORD, contract=user_contract)
 
 
 @pytest.fixture
@@ -306,7 +306,7 @@ def test_concurrent_failures_do_not_lose_the_account_counter(user, api_client, m
 def test_concurrent_refresh_consumes_token_only_once():
     if connection.vendor != 'postgresql':
         pytest.skip('Row-lock concurrency requires PostgreSQL')
-    user = get_user_model().objects.create_user(username='concurrent', password=PASSWORD)
+    user = get_user_model().objects.create_superuser(username='concurrent', password=PASSWORD)
     client = APIClient()
     raw_token = login_client(client, username=user.username).json()['refresh']
     barrier = Barrier(2)
@@ -355,7 +355,9 @@ def test_refresh_http_failure_rolls_back_and_does_not_log_token(user, api_client
 
 @pytest.mark.parametrize('quantity', [1, 30])
 def test_auth_endpoints_have_constant_query_counts(user, api_client, django_assert_num_queries, quantity):
-    get_user_model().objects.bulk_create([get_user_model()(username=f'extra-{i}') for i in range(quantity)])
+    get_user_model().objects.bulk_create(
+        [get_user_model()(username=f'extra-{i}', contract=user.contract) for i in range(quantity)]
+    )
     with django_assert_num_queries(6):
         tokens = login_client(api_client).json()
     with django_assert_num_queries(19):

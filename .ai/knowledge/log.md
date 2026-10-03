@@ -1,5 +1,23 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 2.2: vínculo de usuário e licenças
+
+- User.contract PROTECT e constraint papel/vínculo: comum com contrato,
+  superadmin sem contrato. Migration users.0002 aplicada após verificar banco
+  local sem usuários, sem backfill nem mudanças em registros existentes.
+- Usuário escolheu contar inativos nas licenças; todos os não excluídos contam.
+  Soft delete libera, restauração/transferência/cadastro exigem vaga; edição
+  ou reativação de já contado não consome vaga nova. Decisão no ADR 0015.
+- Service save_user transacional com locks no usuário/contrato, validação de
+  contrato ativo/vigência, contagem no banco e exceção 409 existente. Manager
+  de criação delega ao serviço, inclusive async, preservando Django.
+- 14 testes novos, incluindo concorrência PostgreSQL e 5 queries constantes
+  para criar com 1/30 usuários. Fixtures anteriores ajustadas ao vínculo explícito;
+  validador completo passou com 160 testes, lint, formatação, migrations e checks.
+- Atualizados models/managers/services/migration/testes de users, conftest,
+  testes core/contracts, docs domínio/erros/ADR/índice/plano/overview,
+  AGENTS/README e memória/handoff. Sem novos endpoints; próximo contexto 2.3.
+
 ## 2026-10-03 — Etapa 2.1: planos, contratos e organizações
 
 - App apps/contracts gerado por startapp e instalado, sem Admin/rotas vazias.

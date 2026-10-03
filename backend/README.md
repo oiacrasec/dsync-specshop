@@ -112,8 +112,16 @@ mensais; somente o schema está pronto, sem contadores ou bloqueios por quota.
 Modalidade é definida pela implantação, sem campo no plano (ADR 0014).
 O contrato guarda vigência, licenças e retenção pós-contrato (90 dias, máximo 365).
 Datas e limites contratuais são protegidos por constraints. A organização pertence
-obrigatoriamente a um contrato. Vínculo do usuário, quotas, contexto e isolamento
+obrigatoriamente a um contrato. Quotas do plano, contexto e isolamento
 de consultas continuam nas etapas correspondentes; nenhum endpoint novo foi criado.
+
+Etapa 2.2: `User.contract` vincula usuário comum ao contrato; superadmin fica sem
+contrato, garantido por constraint. Licenças contam ativos e inativos não excluídos;
+soft delete libera vaga. Escritas usam `apps.users.services.save_user`, com
+transação/lock e disponibilidade no cadastro, transferência ou restauração.
+O manager delega a esse serviço, inclusive versões async; `createsuperuser`
+continua disponível. Sem novos endpoints; validação do contrato em login/contexto
+e autorização de gestão continuam nas próximas etapas.
 
 ## Configuração do PyCharm
 

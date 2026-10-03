@@ -73,7 +73,7 @@ def django_known_error(request, kind):
 def rollback_error(request):
     from django.contrib.auth import get_user_model
 
-    get_user_model().objects.create_user(username='must-be-rolled-back')
+    get_user_model().objects.create_superuser(username='must-be-rolled-back')
     raise RuntimeError(PRIVATE_DETAIL)
 
 

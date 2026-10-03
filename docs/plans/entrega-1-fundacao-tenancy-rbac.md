@@ -19,6 +19,7 @@ e só começa após aprovação do usuário.
 | 7 | Usuário aprovou `apps/contracts` para `Plan`, `Contract` e `Organization`, com `PROTECT` nas FKs de contexto (ADR 0013) |
 | 8 | Modalidade pertence à implantação; não será campo de `Plan` ou `Contract` (ADR 0014) |
 | 9 | Usuário aprovou preparar quatro quotas opcionais em Plan (organizações, armazenamento, integrações e operações mensais), somente schema nesta etapa, sem contadores ou enforcement |
+| 10 | Licenças contam usuários ativos e inativos não excluídos; soft delete libera vaga e restauração exige disponibilidade (ADR 0015) |
 
 ## Bloco 0 — Fundação
 
@@ -40,7 +41,7 @@ e só começa após aprovação do usuário.
 | # | Etapa | ADR | Status |
 |---|---|---|---|
 | 2.1 | `Plan`, `Contract` (vigência, licenças, retenção pós-contrato) e `Organization` | 0006, 0007, 0013, 0014 | ✅ |
-| 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2 | ⬜ |
+| 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2, 0015 | ✅ |
 | 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ⬜ |
 | 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ⬜ |
 | 2.5 | Testes de isolamento genéricos (camada F) | 0006 §1.3 | ⬜ |

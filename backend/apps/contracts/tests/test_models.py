@@ -127,7 +127,7 @@ def test_context_and_plan_relations_protect_against_physical_deletion():
 
 
 def test_soft_delete_preserves_related_data_and_explicit_authorship():
-    actor = get_user_model().objects.create_user(username='actor')
+    actor = get_user_model().objects.create_superuser(username='actor')
     contract = create_contract()
     organization = Organization(name='Filial', contract=contract)
     organization.save(actor=actor)

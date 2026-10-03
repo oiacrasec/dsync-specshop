@@ -1,19 +1,61 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 19:57
+- **Atualizado em:** 2026-10-03 20:24
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(contracts): add plans contracts and organizations` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(users): enforce contract membership and license limits` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.1 Plan, Contract e Organization — ✅ concluída |
-| Próximo passo exato | etapa 2.2: User.contract e regras de licenças e superadmin sem contrato |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.2 |
+| Etapa atual | 2.2 vínculo User.contract e licenças — ✅ concluída |
+| Próximo passo exato | etapa 2.3: contexto X-Organization-Id, 400/403, contrato ativo/vigência, superadmin opcional; conectar validação contratual à autenticação |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.3 |
 
-## Feito nesta etapa: 2.1
+## Feito nesta etapa: 2.2
+
+- Usuário autorizou 2.2 e escolheu contar também inativos nas licenças.
+  Decisão em ADR 0015; soft delete libera, cadastro/restauração/transferência
+  precisam de vaga no destino. Reativar/editar já contado não consome outra vaga.
+- User.contract FK PROTECT, índice, nullable; constraint dsc_user_contract_by_role
+  exige vínculo para usuário comum e proíbe para superadmin, inclusive em bulk/SQL.
+- Service save_user interno, transacional, com lock no usuário existente e no
+  contrato de destino. Valida papel, contrato disponível/ativo/vigência, conta
+  não excluídos (inclusive inativos) só quando consumirá vaga e grava autoria.
+  LicenseLimitReached existente 409; ContractInactive 403; ValidationError 422.
+  A contagem agregada não é constraint: não consumir/restaurar vagas por save,
+  update/bulk/SQL direto. Endpoints futuros devem usar o serviço com autorização.
+- Manager create_user/create_superuser e versões async delegam ao serviço,
+  preservando _create_user_object do Django (normalização/email/hash). Bootstrap
+  createsuperuser sem contrato preservado. Sem novos endpoints ou promoção HTTP.
+- Verificado banco local com 0 usuários antes da migration; users.0002 revisada
+  e aplicada com autorização persistente. Sem regenerar initial ou backfill.
+- 14 novos testes de regras, banco, erro, rollback, restauração, transferência,
+  datas inclusivas, actor e async. Concorrência PostgreSQL: dois cadastros com
+  uma vaga geram um sucesso e um LicenseLimitReached. Criação com 1/30 usuários
+  existentes constante em 5 queries incluindo savepoints.
+- Fixtures anteriores adaptadas: usuário comum com contrato explícito; testes
+  de infraestrutura/BaseModel usam superadmin sem contrato. Sem mock de regras
+  nem contrato padrão implícito no runtime. Queries JWT anteriores preservadas.
+- Validador completo passou: 160 testes, lint, formatação, migrations, checks
+  desenvolvimento/produção. Documentação e memória sincronizadas.
+- Segurança OWASP: A01/A06/A10 revisados — constraint por papel, serviço interno,
+  erro sem dados pessoais, operações atômicas e concorrência testada. Permissões
+  dos endpoints, auditoria completa de promoção e isolamento ainda nas etapas
+  de RBAC/contexto; não houve nova API privilegiada neste diff.
+  A02/A05/A08 revisados — configuração preservada, ORM parametrizado, sem
+  desserialização nova. A03/A04/A07/A09 sem dependências/crypto/auth/logs novos.
+  Validação contratual no login/refresh/contexto continua em 2.3.
+- Performance sem achados: contagem no banco, FK indexada, consultas constantes,
+  locks apenas dentro de atomic, sem N+1 ou novos endpoints/listagens.
+- Checklist legal base + CDC no escopo: vínculo com finalidade de prestação
+  de serviço/isolamento, sem novos dados de perfil, retenções ou cobrança;
+  sem UI, dependências, transmissão a terceiros ou log pessoal. Soft delete
+  permanece preservação, não eliminação. Políticas/expurgo continuam pendentes;
+  não é declaração de conformidade do produto.
+
+## Etapa 2.1 anterior: planos e contratos
 
 - Usuário autorizou avançar à etapa 2.1.
 - App apps/contracts gerado com django startapp e instalado; sem admin/rotas vazias.
@@ -53,7 +95,7 @@
 
 ## Feito até aqui
 
-- ADRs 0001–0014 revisados; 0003 continua Proposto para discussão do frontend.
+- ADRs 0001–0015 revisados; 0003 continua Proposto para discussão do frontend.
 - Backend Django 5.2 LTS, sem Admin, sessões ou messages; etapas 0.1/0.2 concluídas.
 - API versionada, handler RFC 9457, request ID e log_filters; logs de conclusão
   apenas para erros (4xx WARNING / 5xx ERROR), por decisão do usuário.

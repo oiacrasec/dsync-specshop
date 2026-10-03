@@ -1,4 +1,4 @@
-# Backend — estado após a etapa 2.1
+# Backend — estado após a etapa 2.2
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
 `backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/exceptions.py`,
@@ -76,7 +76,20 @@ e plano da Entrega 1.
   datas/licenças/retenção no banco. Organization tem name e FK Contract PROTECT.
   Sem seeds/endpoints novos, quota enforcement/expurgo/contexto ainda pendentes.
   Docstrings com exemplos práticos; __str__ só usa campo local, sem queries.
-- Próxima etapa: 2.2, vínculo User.contract e regras de licenças/superadmin.
+- Etapa 2.2: User.contract PROTECT, nullable só para superadmin por constraint
+  dsc_user_contract_by_role. Service save_user interno transacional, locks no
+  usuário existente e contrato de destino, verifica contrato ativo/vigência.
+  Usuário escolheu contar também inativos: todos os não excluídos consomem vaga;
+  soft delete libera, cadastro/transferência/restauração exigem vaga no destino.
+  Reativar/editar usuário já contado não consome outra vaga. ADR 0015 registra.
+  UserManager delega create_user/create_superuser e versões async ao serviço,
+  preservando hash e normalização Django. Escritas que consomem/restauram vagas
+  não podem usar save/update/bulk direto; constraint só garante papel/vínculo.
+  Migration users.0002 aplicada localmente após verificar 0 usuários existentes.
+  Sem endpoint/autorização novo; login/refresh/contexto por contrato ainda
+  serão conectados na etapa 2.3. Testes anteriores usam contratos explícitos ou
+  superadmins quando testam só BaseModel, sem defaults artificiais no runtime.
+- Próxima etapa: 2.3, resolução de contexto e validação de contrato.
   A etapa 1.1 foi antecipada com aprovação do usuário para usar UUID nos tokens.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em

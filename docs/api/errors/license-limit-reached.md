@@ -4,11 +4,12 @@
 - **HTTP:** 409
 - **Title:** Limite de licenças atingido
 - **Detail padrão:** O contrato não possui licenças disponíveis para cadastrar outro usuário.
-- **Quando:** Cadastro de usuário além das licenças disponíveis no contrato.
+- **Quando:** Cadastro, transferência ou restauração de usuário sem licença disponível no contrato.
 - **Origem:** LicenseLimitReached (em `apps/core/exceptions.py` ou no framework).
 
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.
 
-Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
-será implementada na etapa correspondente do plano da Entrega 1.
+Desde a etapa 2.2, `apps.users.services.save_user` dispara a exceção. Ativos e
+inativos não excluídos consomem vaga; desativar não libera, soft delete libera.
+Não há endpoint de gestão de usuários ainda; o handler RFC 9457 já cobre a exceção.

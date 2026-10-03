@@ -84,6 +84,12 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema
   sem usuário deixam autoria nula. Em `update`/operações bulk, preencher auditoria
   explicitamente. Soft delete não faz cascata; relações são tratadas no service.
+- `User.contract` obrigatório para usuário comum e nulo para superadmin, por
+  constraint. Escritas de usuários usam `apps.users.services.save_user`; o manager
+  delega create_user/create_superuser e versões async. Licenças contam todos os
+  não excluídos, inclusive inativos (ADR 0015); não usar save/bulk/update diretos
+  para consumir vagas ou restaurar. Serviço valida contrato e serializa por lock;
+  autorização dos futuros endpoints continua obrigatória.
 - Nunca logar dados pessoais em claro.
 - Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
 

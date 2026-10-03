@@ -1,12 +1,59 @@
 from uuid import UUID
 
 from django.contrib.auth import authenticate, get_user_model
-from django.db import transaction
+from django.core.exceptions import ValidationError
+from django.db import router, transaction
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from apps.contracts.models import Contract
+from apps.core.exceptions import ContractInactive, LicenseLimitReached
+
+
+def save_user(*, user, actor=None, using=None):
+    """Escrita interna: papel, contrato e licenças; autorização fica nos futuros endpoints.
+
+    Conta também inativos, exclui soft deleted. Manager de criação e futuras
+    escritas de vínculo/restauração devem passar por aqui, nunca por update/bulk.
+    """
+    database = using or router.db_for_write(type(user), instance=user)
+    with transaction.atomic(using=database):
+        current = None
+        if not user._state.adding:
+            current = type(user).all_objects.using(database).select_for_update().get(pk=user.pk)
+        if user.is_superuser:
+            if user.contract_id is not None:
+                raise ValidationError({'contract': _('Superadmin não pertence a contrato.')})
+        else:
+            if user.contract_id is None:
+                raise ValidationError({'contract': _('Informe o contrato do usuário.')})
+            try:
+                contract = Contract.objects.using(database).select_for_update().get(pk=user.contract_id)
+            except Contract.DoesNotExist:
+                raise ValidationError({'contract': _('Informe um contrato disponível.')}) from None
+            today = timezone.localdate()
+            if (
+                not contract.is_active
+                or contract.start_date > today
+                or (contract.end_date is not None and contract.end_date < today)
+            ):
+                raise ContractInactive()
+            needs_capacity = user.deleted_at is None and (
+                current is None or current.deleted_at is not None or current.contract_id != user.contract_id
+            )
+            if needs_capacity:
+                occupied = (
+                    type(user).objects.using(database).filter(contract_id=contract.pk).exclude(pk=user.pk).count()
+                )
+                if occupied >= contract.licenses:
+                    raise LicenseLimitReached()
+        user.save(using=database, actor=actor)
+    return user
 
 
 @transaction.atomic
