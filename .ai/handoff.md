@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:07
+- **Atualizado em:** 2026-10-03 18:16
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Commit desta etapa:** `feat(api): add versioned routes and problem details` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `fix(api): log request completion only for errors` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
@@ -38,6 +38,12 @@
 - Checklist legal base revisado para o diff: nenhuma nova dependência ou interface;
   sem coleta de novos campos pessoais. O AccessLog obrigatório permanece na etapa 4.1.
 - Atualizados documentação, catálogo dos 11 tipos, plano e `.ai/knowledge/`.
+- Ajuste posterior solicitado pelo usuário: log de conclusão apenas para erros
+  (4xx WARNING / 5xx ERROR). Respostas 2xx/3xx mantêm o ID, sem log de conclusão.
+  Observabilidade mais ampla fica para evolução futura.
+- Validação do ajuste: 47 testes e todas as verificações automáticas passaram;
+  revisão do diff sem novos achados de segurança ou performance. Permanece o
+  aviso não impeditivo do cache do pytest.
 
 ## Falta nesta etapa
 - Nada.

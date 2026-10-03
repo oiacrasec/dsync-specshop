@@ -21,6 +21,9 @@ Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.p
   SecurityMiddleware e WhiteNoise. Gera UUID v7, ignora IDs enviados pelo cliente,
   devolve `X-Request-Id` e restaura o contextvar após a requisição.
 - Logs usam o mesmo ID, inclusive logs do Django com request fora do contexto ativo.
+  O middleware registra só erros: 4xx em WARNING e 5xx em ERROR; não registra
+  conclusão de respostas 2xx/3xx. Observabilidade mais ampla fica para depois,
+  conforme decisão do usuário.
   Logs fora de requisição usam `-`; 500 registra classe/frames, sem mensagem da
   exceção, conteúdo de requisição ou variáveis locais.
 - Exceções tratadas preservam rollback de `ATOMIC_REQUESTS` e headers de protocolo.

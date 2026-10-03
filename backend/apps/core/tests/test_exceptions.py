@@ -200,23 +200,37 @@ def test_json_syntax_and_validation_have_distinct_statuses(client, test_routes, 
 
 
 def test_request_id_correlates_response_and_logs(client, test_routes, caplog):
-    with caplog.at_level(logging.INFO, logger='apps.core.middleware'):
+    with caplog.at_level(logging.WARNING, logger='apps.core.middleware'):
         response = client.post(
             '/api/v1/input/',
-            data='{"quantity":2}',
+            data='{"quantity":0}',
             content_type='application/json',
             HTTP_X_REQUEST_ID='untrusted',
         )
-    assert response.status_code == 200
+    assert response.status_code == 422
     request_id = response['X-Request-Id']
     assert UUID(request_id).version == 7
     assert request_id != 'untrusted'
     record = next(record for record in caplog.records if record.name == 'apps.core.middleware')
     assert record.request_id == request_id
+    assert record.levelno == logging.WARNING
+    assert response.json()['request_id'] == request_id
     assert request_id_context.get() == '-'
     second = client.get('/api/v1/missing/')
     assert second['X-Request-Id'] != request_id
     assert second.json()['request_id'] == second['X-Request-Id']
+
+
+def test_successful_request_has_id_without_completion_log(client, test_routes, caplog):
+    with caplog.at_level(logging.DEBUG, logger='apps.core.middleware'):
+        response = client.post(
+            '/api/v1/input/', data='{"quantity":2}', content_type='application/json'
+        )
+
+    assert response.status_code == 200
+    assert UUID(response['X-Request-Id']).version == 7
+    assert not any(record.name == 'apps.core.middleware' for record in caplog.records)
+    assert request_id_context.get() == '-'
 
 
 @pytest.mark.parametrize('debug', [False, True])

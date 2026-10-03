@@ -34,7 +34,9 @@ class RequestIdMiddleware:
                     problem.cookies = response.cookies
                     response = problem
             response['X-Request-Id'] = request.request_id
-            logger.info('Requisição concluída: status=%s', response.status_code)
+            if response.status_code >= 400:
+                level = logging.ERROR if response.status_code >= 500 else logging.WARNING
+                logger.log(level, 'Requisição com erro: status=%s', response.status_code)
             return response
         finally:
             request_id_context.reset(token)

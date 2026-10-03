@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Logs de requisição apenas para erros
+
+- Por decisão do usuário, `RequestIdMiddleware` registra apenas respostas 4xx
+  (WARNING) e 5xx (ERROR). Sucessos e redirecionamentos não geram log de conclusão.
+- Mantido `X-Request-Id` em todas as respostas e correlação dos erros com logs.
+- Atualizados middleware, testes, contrato em `docs/api/`, memória e handoff.
+- Observabilidade mais ampla será tratada futuramente; AccessLog da etapa 4.1
+  continua previsto no plano.
+- Validador completo passou com 47 testes, lint, formatação, migrations e checks
+  de desenvolvimento/produção. Permanece o aviso não impeditivo de cache do pytest.
+
 ## 2026-10-03 — Etapa 0.2: API versionada, erros e correlação
 
 - Criado `backend/config/api/v1.py`, incluído sob `/api/v1/` em `config/urls.py`;

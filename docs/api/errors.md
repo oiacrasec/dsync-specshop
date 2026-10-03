@@ -26,6 +26,9 @@ nas views: levante exceções; use `serializer.is_valid(raise_exception=True)`.
   `X-Request-Id`. O header de entrada é ignorado. O mesmo ID acompanha os logs.
 - O contexto do ID é restaurado ao terminar a requisição, inclusive quando há erro.
   Logs fora de requisições usam `request_id=-`.
+- O middleware registra apenas respostas com erro: 4xx em WARNING e 5xx em ERROR.
+  Respostas 2xx/3xx não geram log de conclusão, mas continuam recebendo `X-Request-Id`.
+  Observabilidade mais ampla fica para uma evolução futura.
 - `errors` existe só em 422: objeto campo → lista de mensagens. Campos aninhados
   usam pontos e índices (`items.0.quantity`); erros gerais usam `non_field_errors`.
 - 400 indica sintaxe inválida; 422 indica falha de validação; 409 indica conflito de estado.

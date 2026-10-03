@@ -11,5 +11,7 @@ com lista de autenticadores vazia. Nenhum endpoint de negócio está publicado.
 
 Todas as respostas do backend recebem `X-Request-Id`, gerado pelo servidor,
 para correlação com os logs. Em erros da API, o mesmo valor aparece no corpo.
+O middleware registra apenas respostas 4xx/5xx, sem log de conclusão para sucessos
+ou redirecionamentos. Observabilidade mais ampla será tratada futuramente.
 
 Fonte: ADR 0004 e plano `docs/plans/entrega-1-fundacao-tenancy-rbac.md`.
