@@ -52,21 +52,17 @@ class BaseModel(models.Model, metaclass=DscModelBase):
     """Persistência comum; autoria é explícita, não inferida da requisição."""
 
     id = models.BigAutoField(primary_key=True)
-    public_id = models.UUIDField(_('identificador público'), default=uuid7,
-                                 unique=True, editable=False)
+    public_id = models.UUIDField(_('identificador público'), default=uuid7, unique=True, editable=False)
     created_at = models.DateTimeField(_('criado em'), auto_now_add=True)
     updated_at = models.DateTimeField(_('atualizado em'), auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('criado por'),
-                                   on_delete=models.SET_NULL, null=True, blank=True,
-                                   editable=False, related_name='+',)
+                                   on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('atualizado por'),
-                                   on_delete=models.SET_NULL, null=True, blank=True,
-                                   editable=False, related_name='+',)
+                                   on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
     is_active = models.BooleanField(_('ativo'), default=True)
     deleted_at = models.DateTimeField(_('excluído em'), null=True, blank=True, editable=False)
     deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('excluído por'),
-                                   on_delete=models.SET_NULL, null=True, blank=True,
-                                   editable=False, related_name='+',)
+                                   on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
 
     objects = SoftDeleteManager()
     all_objects = models.Manager.from_queryset(SoftDeleteQuerySet)()
@@ -82,8 +78,7 @@ class BaseModel(models.Model, metaclass=DscModelBase):
                 self.created_by = actor
             self.updated_by = actor
             if kwargs.get('update_fields'):
-                kwargs['update_fields'] = set(kwargs['update_fields']) | {
-                    'updated_by', 'updated_at'}
+                kwargs['update_fields'] = set(kwargs['update_fields']) | {'updated_by', 'updated_at'}
         return super().save(*args, **kwargs)
 
     save.alters_data = True

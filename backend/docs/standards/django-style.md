@@ -6,7 +6,7 @@ referência: [models](../examples/model.md). Implementações atuais:
 
 ## Declaração de campos
 
-- Manter campos curtos e seus argumentos na mesma linha, até **100 caracteres**.
+- Manter campos curtos e seus argumentos na mesma linha, até **120 caracteres**.
 - Em declarações longas, agrupar vários argumentos por linha e alinhar a
   continuação aos argumentos da chamada, seguindo o exemplo de referência.
 - Fechar a chamada na linha do último argumento, preservando a vírgula final
@@ -21,7 +21,7 @@ referência: [models](../examples/model.md). Implementações atuais:
 `pyproject.toml` preserva a formatação manual de `models.py`:
 
 - `ruff format` não reformata esses arquivos.
-- O limite de **100 caracteres** é obrigatório, inclusive nos models (`E501` ativo).
+- O limite de **120 caracteres** é obrigatório, inclusive nos models (`E501` ativo).
 - As demais verificações de lint continuam ativas, incluindo imports.
 - Os demais arquivos seguem a configuração normal do Ruff.
 
@@ -29,12 +29,12 @@ Não aplicar formatação automática do editor aos models que desfaça esse pad
 Migrations permanecem geradas pelo Django, com a exclusão própria já configurada;
 não são referência de estilo para os models.
 
-O limite de 100 caracteres foi confirmado pelo usuário e é uma convenção deste
+O limite de 120 caracteres foi confirmado pelo usuário e é uma convenção deste
 projeto. A [PEP 8](https://peps.python.org/pep-0008/#maximum-line-length) recomenda
 79 caracteres, permitindo até 99 por acordo da equipe; portanto, o limite do
 projeto não deve ser descrito como o limite estrito da PEP 8.
 
-No PyCharm, configurar a margem e a guia visual em 100 em
+No PyCharm, configurar a margem e a guia visual em 120 em
 **Settings → Editor → Code Style → Python → Wrapping and Braces**. A guia é
 configurável, conforme a [documentação do editor](https://www.jetbrains.com/help/pycharm/code-style-python.html#visual-guides),
 e deve acompanhar o limite do projeto.

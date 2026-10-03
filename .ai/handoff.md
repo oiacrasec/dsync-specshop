@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:56
+- **Atualizado em:** 2026-10-03 18:59
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `docs(backend): document compact model style and examples` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `style(backend): set line length limit to 120 characters` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
@@ -59,6 +59,11 @@
   Formatação manual permanece preservada; documentação e memória refletem o limite.
   Lint, formatação, migrations e sintaxe dos exemplos validados; todos os models
   têm linhas de até 100 caracteres e AST preservada, sem mudança de comportamento.
+- Preferência atual: usuário alterou o limite para **120 caracteres**. Ruff,
+  models, exemplos e documentação sincronizados; E501 continua ativo e
+  formatação manual dos models preservada. Esta decisão substitui o limite de 100.
+  Quatro arquivos ajustados pelo formatter ao novo limite. Validador completo
+  passou: 58 testes, lint, formatação, migrations e checks de produção.
 
 ## Falta nesta etapa
 

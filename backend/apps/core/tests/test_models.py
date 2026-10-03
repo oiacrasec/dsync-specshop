@@ -98,9 +98,7 @@ def test_bulk_delete_uses_one_query_and_keeps_rows(quantity, django_assert_num_q
 
 @pytest.mark.django_db
 def test_inactive_users_stay_visible_but_cannot_authenticate():
-    user = get_user_model().objects.create_user(
-        username='inactive', password='test-password', is_active=False
-    )
+    user = get_user_model().objects.create_user(username='inactive', password='test-password', is_active=False)
     assert get_user_model().objects.filter(pk=user.pk).exists()
     assert authenticate(username='inactive', password='test-password') is None
 

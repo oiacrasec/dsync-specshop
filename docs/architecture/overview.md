@@ -24,7 +24,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 0.1: sem Django Admin, sessões ou messages; `IsAuthenticated` global, autenticadores vazios até o JWT na etapa 0.3) | concluído |
 | `backend/` (etapa 0.2: `/api/v1/`, erros RFC 9457 e correlação por `request_id`) | concluído |
 | `backend/` (etapa 1.1, antecipada ao JWT: `BaseModel`, UUID v7, autoria, soft delete, tabelas `dsc_` e migration inicial do `User` regenerada) | concluído |
-| `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 100 caracteres) | criado |
+| `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |
 | `AGENTS.md` (frontend) | **pendente** |

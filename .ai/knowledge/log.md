@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Limite de linha alterado para 120
+
+- Por pedido do usuário, Ruff e padrão do backend passaram de 100 para 120
+  caracteres, mantendo E501 ativo e formatação manual nos models.
+- Models e exemplo sincronizados com o formato compacto dentro do novo limite;
+  AGENTS, standard Django, overview, conhecimento e handoff atualizados.
+- Ruff ajustou quatro arquivos ao novo limite; validador completo passou com
+  58 testes, lint, formatação, migrations e checks de desenvolvimento/produção.
+
 ## 2026-10-03 — Padrão de models documentado no backend
 
 - Revisados os models de core/users; agrupados os itens restantes de

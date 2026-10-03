@@ -223,9 +223,7 @@ def test_request_id_correlates_response_and_logs(client, test_routes, caplog):
 
 def test_successful_request_has_id_without_completion_log(client, test_routes, caplog):
     with caplog.at_level(logging.DEBUG, logger='apps.core.middleware'):
-        response = client.post(
-            '/api/v1/input/', data='{"quantity":2}', content_type='application/json'
-        )
+        response = client.post('/api/v1/input/', data='{"quantity":2}', content_type='application/json')
 
     assert response.status_code == 200
     assert UUID(response['X-Request-Id']).version == 7

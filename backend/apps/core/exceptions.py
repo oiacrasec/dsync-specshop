@@ -127,9 +127,7 @@ def validation_errors(detail, path='', result=None):
     elif isinstance(detail, (list, tuple)):
         for index, value in enumerate(detail):
             nested_path = f'{path}.{index}' if path else str(index)
-            validation_errors(
-                value, nested_path if isinstance(value, (dict, list)) else path, result
-            )
+            validation_errors(value, nested_path if isinstance(value, (dict, list)) else path, result)
     else:
         result.setdefault(path or 'non_field_errors', []).append(str(detail))
     return result
@@ -149,9 +147,7 @@ def exception_handler(exc, context):
     if isinstance(exc, (exceptions.ValidationError, DjangoValidationError)):
         status_code = 422
         detail = (
-            getattr(exc, 'message_dict', None) or exc.messages
-            if isinstance(exc, DjangoValidationError)
-            else exc.detail
+            getattr(exc, 'message_dict', None) or exc.messages if isinstance(exc, DjangoValidationError) else exc.detail
         )
         errors = validation_errors(detail)
     elif isinstance(exc, (exceptions.NotAuthenticated, exceptions.AuthenticationFailed)):
@@ -180,9 +176,7 @@ def exception_handler(exc, context):
     # Um erro continua sendo JSON mesmo se o cliente solicitar HTML.
     request.accepted_renderer = JSONRenderer()
     request.accepted_media_type = PROBLEM_CONTENT_TYPE
-    response = Response(
-        data, status=status_code, headers=headers, content_type=PROBLEM_CONTENT_TYPE
-    )
+    response = Response(data, status=status_code, headers=headers, content_type=PROBLEM_CONTENT_TYPE)
     response.accepted_renderer = request.accepted_renderer
     response.accepted_media_type = request.accepted_media_type
     response.renderer_context = {'request': request}
@@ -190,9 +184,7 @@ def exception_handler(exc, context):
 
 
 def problem_http_response(request, status_code):
-    return JsonResponse(
-        problem_data(request, status_code), status=status_code, content_type=PROBLEM_CONTENT_TYPE
-    )
+    return JsonResponse(problem_data(request, status_code), status=status_code, content_type=PROBLEM_CONTENT_TYPE)
 
 
 @transaction.non_atomic_requests

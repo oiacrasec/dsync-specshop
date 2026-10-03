@@ -45,5 +45,5 @@ e plano da Entrega 1.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em
   `backend/docs/examples/model.md`. AGENTS e README apontam para essas fontes.
-  `models.py` mantém formatação manual, mas respeita o limite de 100 caracteres
+  `models.py` mantém formatação manual, mas respeita o limite de 120 caracteres
   confirmado pelo usuário, com E501 e demais regras de lint ativas.
