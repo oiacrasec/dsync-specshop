@@ -51,6 +51,12 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela. Skills
 |---|---|
 | `git-commit` | **sempre** ao criar, dividir ou revisar commits |
 | `explicacao-eficiente` | ao explicar algo ao usuário |
+| `lgpd` | **sempre** que a mudança tocar dados pessoais (models, cadastros, APIs, logs, terceiros) |
+| `marco-civil` | **sempre** ao mexer em logs de acesso/IP, termos de uso, exclusão de conta, conteúdo de usuários ou ordens judiciais |
+
+**Conformidade legal é inegociável:** nenhuma mudança pode violar a LGPD ou o Marco
+Civil. Se um pedido conflitar com essas leis, pare, explique o risco e proponha uma
+alternativa conforme.
 
 ## Procedimento de alteração
 
