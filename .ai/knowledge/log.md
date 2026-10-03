@@ -1,5 +1,29 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 0.3: autenticação JWT
+
+- Adicionados SimpleJWT 5.5.1 e PyJWT transitivo 2.15.1 (MIT); metadados do PyPI
+  sem advisories nas versões instaladas e pip check sem conflitos.
+- Configurados JWT global, public_id UUID como claim, access 15 min, refresh
+  1 dia, rotação e blacklist. Chave independente gerada apenas no .env local.
+- Criados authentication/serializers/services/views/urls/throttles em users:
+  login, refresh e logout públicos em /api/v1/auth/, respostas JSON/no-store,
+  RFC 9457 e services transacionais. Locks e nova checagem da blacklist impedem
+  duas renovações simultâneas; usuário indisponível retorna 401.
+- Usuário confirmou 5 tentativas e depois aprovou a boa prática: contar apenas
+  falhas por conta, com janela de 60 s e bloqueio temporário de 60 s. Contadores
+  atômicos no cache local, chave HMAC, identidade normalizada; sucesso não conta.
+- Migrations de auth/contenttypes/users/blacklist aplicadas ao banco local com
+  autorização; dsc_user sem usuários criados, nenhuma migration pendente.
+- Testes cobrem autenticação, revogação, concorrência, rollback, ausência de
+  segredos nos logs, limite de falhas e queries constantes (login 6, refresh 19,
+  logout 13; access autenticado 1 query na rota de teste sem transação de request).
+- Contrato em docs/api/authentication.md; AGENTS, README, overview, plano,
+  inventário das dependências, memória e handoff sincronizados. Cache compartilhado,
+  controles de borda, MFA/recuperação e limpeza diária ficam pendentes para produção.
+- Validador completo passou: 99 testes, lint, formatação, migrations e checks de
+  desenvolvimento/produção; revisão de segurança/performance registrada no handoff.
+
 ## 2026-10-03 — Limite de linha alterado para 120
 
 - Por pedido do usuário, Ruff e padrão do backend passaram de 100 para 120

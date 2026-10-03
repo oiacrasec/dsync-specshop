@@ -1,5 +1,7 @@
-"""Rotas da API v1, preenchidas pelas próximas etapas da entrega."""
+"""Rotas da API v1."""
 
-from django.urls import URLPattern, URLResolver
+from django.urls import URLPattern, URLResolver, include, path
 
-urlpatterns: list[URLPattern | URLResolver] = []
+urlpatterns: list[URLPattern | URLResolver] = [
+    path('auth/', include('apps.users.urls')),
+]

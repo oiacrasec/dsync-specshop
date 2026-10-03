@@ -1,0 +1,58 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import AllowAny
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from apps.users import services
+from apps.users.serializers import LoginSerializer, RefreshSerializer
+from apps.users.throttles import LoginThrottle
+
+
+@method_decorator(never_cache, name='dispatch')
+@method_decorator(sensitive_post_parameters('username', 'password', 'refresh'), name='dispatch')
+class AuthView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    parser_classes = [JSONParser]
+    renderer_classes = [JSONRenderer]
+
+
+class LoginView(AuthView):
+    throttle_classes = [LoginThrottle]
+
+    def get_throttles(self):
+        self.login_throttles = super().get_throttles()
+        return self.login_throttles
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            tokens = services.login(request=request, **serializer.validated_data)
+        except AuthenticationFailed:
+            for throttle in self.login_throttles:
+                throttle.record_failure()
+            raise
+        return Response(tokens)
+
+
+class RefreshView(AuthView):
+    def post(self, request):
+        serializer = RefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tokens = services.refresh_tokens(**serializer.validated_data)
+        return Response(tokens)
+
+
+class LogoutView(AuthView):
+    def post(self, request):
+        serializer = RefreshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        services.logout(**serializer.validated_data)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -6,9 +6,12 @@ Valores sensíveis ou específicos de ambiente vêm de variáveis de ambiente
 estendem este arquivo.
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.crypto import constant_time_compare
 
 # backend/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -33,6 +36,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 LOCAL_APPS = [
@@ -137,12 +141,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'apps.core.exceptions.exception_handler',
-    # Sem sessões; a autenticação JWT entra na etapa 0.3 do plano.
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'apps.users.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': env('DJANGO_JWT_SIGNING_KEY'),
+    'USER_ID_FIELD': 'public_id',
+    'USER_ID_CLAIM': 'public_id',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+if len(SIMPLE_JWT['SIGNING_KEY'].encode('utf-8')) < 32 or constant_time_compare(SIMPLE_JWT['SIGNING_KEY'], SECRET_KEY):
+    raise ImproperlyConfigured(
+        'DJANGO_JWT_SIGNING_KEY deve ter pelo menos 32 bytes e ser independente de DJANGO_SECRET_KEY.'
+    )
+
+AUTH_LOGIN_RATE = env('DJANGO_AUTH_LOGIN_RATE', default='5/min')
 
 
 # Security (comum a todos os ambientes)

@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:59
+- **Atualizado em:** 2026-10-03 19:33
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `style(backend): set line length limit to 120 characters` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(auth): add JWT login rotation and logout` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 1.1 BaseModel, tabelas dsc_ e User adaptado — ✅ concluída |
-| Próximo passo exato | etapa 0.3: JWT login/refresh/logout, rotação e blacklist conforme ADR 0004, usando public_id do User nos tokens |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 0.3 após o fechamento de 1.1 |
+| Etapa atual | 0.3 JWT login/refresh/logout — ✅ concluída |
+| Próximo passo exato | etapa 1.2: quatro tipos de escopo e system check de escopo declarado, com exceções do ADR 0012 |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 1.2 |
 
 ## Feito até aqui
 
@@ -23,6 +23,40 @@
   de SimpleJWT usa a PK interna, que o ADR 0007 proíbe expor.
 
 ## Feito nesta etapa
+
+- SimpleJWT 5.5.1 (MIT) e PyJWT transitivo 2.15.1 (MIT), metadados PyPI sem
+  advisories dessas versões e pip check sem conflitos. Inventário de dependências
+  JWT em backend/docs/standards/dependencies.md; avisos MIT preservados nos pacotes.
+- JWT/IsAuthenticated globais. POST /api/v1/auth/login/, refresh/ e logout/ públicos,
+  JSON, no-store e RFC 9457. Serializers de entrada, views finas e services de escrita.
+- Claim public_id UUID v7; access 15 min, refresh 1 dia, rotação e blacklist
+  instalada. Chave independente (mínimo 32 bytes) gerada no .env local, sem expor valor.
+- Refresh/logout usam transação e lock de OutstandingToken, verificando novamente
+  a blacklist após obter lock. Concorrência no PostgreSQL e rollback testados.
+- Usuários inativos/excluídos não autenticam nem renovam; tokens e credenciais não
+  aparecem nos logs. Logout revoga refresh; access expira normalmente em até 15 min.
+- Usuário confirmou 5 tentativas, depois esclareceu e aprovou as boas práticas:
+  contar somente falhas por conta. Janela fixa de 60 s, bloqueio de 60 s ao atingir
+  5 falhas, HMAC da identidade normalizada, add/incr atômicos no cache local.
+  Sucesso e erros 400/422 não consomem limite; requests em andamento podem terminar.
+- Migrations de auth/contenttypes/users/blacklist aplicadas ao banco local com
+  autorização. dsc_user com 0 usuários; nenhuma migration pendente.
+- Validador completo passou: 99 testes, lint, formatação, migrations, checks e
+  checks de produção. Queries constantes provadas para 1/30 usuários adicionais:
+  login 6, refresh 19, logout 13; leitura de usuário via access em 1 query na probe.
+- Revisão OWASP A01–A10: autenticação fechada, erro genérico, segredo fora do Git,
+  Argon2 preservado, apenas ORM, claims validados e operações transacionais.
+  Sem achados novos de injection/crypto/exception handling. Pendências de produção
+  em A07: cache compartilhado/atômico, controles de borda, MFA e recuperação; A09:
+  AccessLog na etapa 4.1, logs de sucesso continuam desativados por decisão do usuário.
+- Performance sem N+1; public_id/jti únicos e FKs indexadas; cache sem queries SQL.
+- Checklist legal base no escopo: autenticação sem novos dados de perfil; HMAC no
+  cache, finalidade de segurança e expiração dos contadores/tokens documentadas.
+  Sem nova interface visual ou conteúdo/fluxos voltados a menores. Não equivale a
+  declaração de conformidade do produto, cujas políticas e AccessLog são pendentes.
+- Contrato em docs/api/authentication.md; AGENTS/README/overview/plano/memória atualizados.
+
+## Etapa 1.1 e ajustes de estilo anteriores
 
 - BaseModel substitui TimeStampedModel: PK BIGINT, public_id UUID v7 único,
   timestamps, autoria explícita, is_active e exclusão lógica.
@@ -75,11 +109,14 @@
 
 ## Avisos
 
-- O banco de desenvolvimento continua vazio. Não executar alterações nele sem
-  autorização; a migration inicial de User está pronta e validada nos testes.
+- Banco local migrado com autorização, ainda sem usuários. Não regenerar mais
+  migrations iniciais agora que foram aplicadas.
 - Autoria pode ser nula em operações de sistema/bootstrap; bulk/update precisam
   de auditoria explícita do chamador. all_objects não dispensa autorização.
 - Escopos e system checks ficam na etapa 1.2, após JWT; expurgo em entrega própria.
+- Antes de produção, configurar cache compartilhado com incrementos atômicos e
+  leitura consistente, proteção de borda, MFA/recuperação e agendar diariamente
+  manage.py flushexpiredtokens. O cache atual é local a cada processo.
 - backend/.env é local e nunca deve ser versionado.
 - Push para o GitHub só quando o usuário pedir.
 - Validador no Windows: Git Bash com PATH=/usr/bin:/bin:$PATH, conforme histórico.

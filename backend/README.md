@@ -5,9 +5,8 @@ API Django autônoma do monorepo.
 Não usa Django Admin, sessões nem messages (ADR 0008). A administração própria será
 implementada na API e no frontend; por enquanto, a manutenção usa management commands,
 como `createsuperuser`. As rotas versionadas usam `/api/v1/`, sem endpoints de negócio
-publicados nesta etapa. A autenticação por
-JWT entra na etapa 0.3; até lá, o DRF não tem autenticadores configurados e mantém
-`IsAuthenticated` como permissão global.
+publicados nesta etapa. JWT e `IsAuthenticated` são globais. Login, refresh e
+logout ficam sob `/api/v1/auth/`; veja o [contrato de autenticação](../docs/api/authentication.md).
 
 Erros da API seguem [RFC 9457](../docs/api/errors.md), com
 `Content-Type: application/problem+json`. Toda resposta inclui `X-Request-Id`;
@@ -45,12 +44,32 @@ Na raiz do monorepo, com o `.venv` ativo:
 pip install -U -r backend/requirements/development.txt
 cd backend
 cp .env.example .env        # ajuste DJANGO_SECRET_KEY e DATABASE_URL
+python manage.py migrate
 python manage.py runserver
 ```
 
 A etapa 1.1 foi concluída antes do JWT: a migration inicial do usuário foi regenerada
 para `dsc_user` e os campos do `BaseModel`, após confirmar que o banco estava vazio.
-Ela ainda não foi aplicada ao banco de desenvolvimento nesta etapa.
+Ela e as migrations da blacklist foram aplicadas ao banco de desenvolvimento
+na etapa 0.3, com autorização do usuário.
+
+Configurar `DJANGO_JWT_SIGNING_KEY` com uma chave aleatória de pelo menos 32 bytes,
+independente de `DJANGO_SECRET_KEY`. Configuração curta ou igual à chave Django
+impede a inicialização. Para gerar uma chave sem definir valor fixo no código:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Guardar o resultado apenas no ambiente local ou no gerenciador de segredos.
+Não publicar senhas nem tokens em logs. A limpeza de tokens expirados usa
+`python manage.py flushexpiredtokens`; o agendamento diário depende da infraestrutura.
+Licenças adicionadas: [dependências de autenticação](docs/standards/dependencies.md).
+
+`DJANGO_AUTH_LOGIN_RATE=5/min` conta falhas de login por conta, não logins
+bem-sucedidos. Na quinta falha, a conta espera 60 segundos antes de tentar de
+novo (429 com `Retry-After`). O cache local precisa ser substituído por cache
+compartilhado e atômico antes de executar com múltiplos workers em produção.
 
 ## Persistência comum
 
@@ -58,7 +77,7 @@ Estilo obrigatório de models: [padrão Django](docs/standards/django-style.md) 
 [exemplo de referência](docs/examples/model.md).
 
 Todos os models próprios herdam `apps.core.models.BaseModel` (ADR 0007). O `id`
-BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o futuro JWT.
+BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o JWT.
 Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relações
 N:N automáticas seguem a tabela de origem.
 

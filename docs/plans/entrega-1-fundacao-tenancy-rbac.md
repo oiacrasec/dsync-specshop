@@ -15,6 +15,7 @@ e só começa após aprovação do usuário.
 | 3 | Comandos de expurgo e eliminação (ADR 0007 §4) ficam para uma entrega própria; o soft delete entra na etapa 1.1 |
 | 4 | A porta de origem do registro de acesso depende do proxy reverso: decidir na etapa 4.1 |
 | 5 | Por aprovação do usuário, executar **1.1 antes de 0.3**, para que o JWT use o `public_id` do usuário sem expor o ID interno (ADR 0007). Ordem: 0.1 → 0.2 → 1.1 → 0.3 → 1.2 → demais etapas |
+| 6 | Login: usuário aprovou contar somente falhas por conta, limite inicial 5/min e bloqueio temporário; cache compartilhado/atômico, controles de borda, recuperação e MFA administrativa devem ser tratados antes de produção |
 
 ## Bloco 0 — Fundação
 
@@ -22,7 +23,7 @@ e só começa após aprovação do usuário.
 |---|---|---|---|
 | 0.1 | Remover Django Admin, `sessions` e `messages`; ajustar `backend/AGENTS.md` e `README` | 0008 | ✅ |
 | 0.2 | Prefixo `/api/v1/` (`config/api/v1.py`) + handler global de erros RFC 9457 + `request_id` | 0004, skill `erros-api-rfc9457` | ✅ |
-| 0.3 | JWT: login, refresh e logout, com rotação e blacklist | 0004 | ⬜ |
+| 0.3 | JWT: login, refresh e logout, com rotação e blacklist | 0004 | ✅ |
 
 ## Bloco 1 — Persistência
 

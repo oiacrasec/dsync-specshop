@@ -137,7 +137,7 @@ def test_exception_contract(rf, error, status, slug):
     assert PRIVATE_DETAIL not in response.content.decode()
     assert ('errors' in data) == (status == 422)
     if status == 401:
-        assert response['WWW-Authenticate'] == 'Bearer'
+        assert response['WWW-Authenticate'].startswith('Bearer')
 
 
 def test_nested_validation_errors(rf):

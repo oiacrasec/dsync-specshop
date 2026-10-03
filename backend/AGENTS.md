@@ -53,8 +53,17 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Não usar Django Admin, sessões ou messages (ADR 0008). Não registrar `admin.py`,
   `SessionAuthentication` nem middlewares de sessão/autenticação do Django.
 - Administração própria pela API e pelo frontend; manutenção por management commands
-  (`createsuperuser` continua disponível). JWT entra na etapa 0.3; até lá, a lista de
-  autenticadores do DRF fica vazia, mantendo `IsAuthenticated` global.
+  (`createsuperuser` continua disponível). JWT e `IsAuthenticated` são globais;
+  login/refresh/logout em `/api/v1/auth/` são públicos e usam JSON. Contrato em
+  `../docs/api/authentication.md`; tokens identificam pelo `public_id` do usuário.
+- Escritas de autenticação ficam em `apps/users/services.py`. Refresh/logout
+  mantêm a transação e o lock da blacklist, incluindo nova verificação após o lock.
+- Chave JWT independente via `DJANGO_JWT_SIGNING_KEY`; nunca versionar seu valor,
+  logar tokens ou retornar respostas de autenticação cacheáveis.
+- Limite de login conta apenas falhas por conta: `DJANGO_AUTH_LOGIN_RATE=5/min`,
+  com bloqueio temporário de 60 s. Sucesso e validação não consomem o contador.
+  Preservar normalização do username, HMAC da chave e operações atômicas de cache;
+  cache compartilhado e proteção da borda são requisitos antes de produção.
 - Todos os models próprios herdam `apps.core.models.BaseModel`: UUID v7 externo,
   datas, autoria e soft delete (ADR 0007). Tabelas `dsc_` são geradas automaticamente.
 - `objects` oculta excluídos, mas mantém inativos; `all_objects` é acesso explícito

@@ -1,6 +1,8 @@
 # Dependências comuns a todos os ambientes
 Django~=5.2.17  # LTS (suporte até abr/2028); ~= aceita só patches 5.2.x
 djangorestframework~=3.18.1
+djangorestframework-simplejwt~=5.5.1
+PyJWT~=2.15.1  # restrição da dependência transitiva de assinatura JWT
 django-environ~=0.14.0
 psycopg[binary]~=3.3.6
 argon2-cffi~=25.1.0
