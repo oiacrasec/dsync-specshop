@@ -1,0 +1,39 @@
+# Python / Django (backend)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+staticfiles/
+media/
+*.sqlite3
+
+# Node / Angular (frontend)
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDEs / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# AI tooling (local state)
+.remember/
+.claude/settings.local.json
+
+# Logs
+*.log
