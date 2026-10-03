@@ -1,5 +1,20 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 3.1: registry RBAC antecipado
+
+- Ao iniciar 2.3, verificada dependência das atribuições de 3.2. Usuário decidiu
+  antecipar RBAC antes do contexto; nova ordem registrada no plano.
+- Registry em apps/core/permission_registry.py: Python puro, códigos/escopos/
+  reservadas, definições imutáveis, catálogo inicial de gestão previsto no ADR
+  0009 e mapa protegido. Unknown/duplicados/escopos inválidos são rejeitados;
+  reserved só validável para perfil essencial verificado. Manage não expande.
+- 28 testes novos sem banco, incluindo reservas, desconhecidos, flags inválidos,
+  escopos, imutabilidade e ausência de imports do framework/runtime.
+- Validador completo passou: 188 testes, lint, formatação, migrations e checks
+  de desenvolvimento/produção. Sem migrations novas ou queries neste módulo.
+- Atualizados documentação do registry, AGENTS/README, overview, plano e memória.
+  Sem endpoints, models, migrations, concessões ou mudanças nos fluxos JWT.
+
 ## 2026-10-03 — Etapa 2.2: vínculo de usuário e licenças
 
 - User.contract PROTECT e constraint papel/vínculo: comum com contrato,

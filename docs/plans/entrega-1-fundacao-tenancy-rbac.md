@@ -20,6 +20,7 @@ e só começa após aprovação do usuário.
 | 8 | Modalidade pertence à implantação; não será campo de `Plan` ou `Contract` (ADR 0014) |
 | 9 | Usuário aprovou preparar quatro quotas opcionais em Plan (organizações, armazenamento, integrações e operações mensais), somente schema nesta etapa, sem contadores ou enforcement |
 | 10 | Licenças contam usuários ativos e inativos não excluídos; soft delete libera vaga e restauração exige disponibilidade (ADR 0015) |
+| 11 | Usuário decidiu antecipar o bloco RBAC antes do contexto, pois 2.3 depende das atribuições de 3.2. Após 2.2: 3.1 → 3.2 → demais etapas RBAC → 2.3 → 2.4 → 2.5, validando e confirmando cada etapa |
 
 ## Bloco 0 — Fundação
 
@@ -50,7 +51,7 @@ e só começa após aprovação do usuário.
 
 | # | Etapa | ADR | Status |
 |---|---|---|---|
-| 3.1 | Registry de permissões (Python puro): escopos permitidos e reservadas | 0009 §1, §3.1 | ⬜ |
+| 3.1 | Registry de permissões (Python puro): escopos permitidos e reservadas | 0009 §1, §3.1 | ✅ |
 | 3.2 | `Profile`, permissões do perfil e atribuições (com exceções de organização) | 0009 §2, §3 | ⬜ |
 | 3.3 | Cálculo da permissão efetiva + permissão do DRF que **nega por padrão** | 0009 §4 | ⬜ |
 | 3.4 | Perfil essencial "Administrador do contrato" (fixture, acesso total dinâmico) | 0009 §5 | ⬜ |

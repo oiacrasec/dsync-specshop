@@ -123,6 +123,15 @@ O manager delega a esse serviço, inclusive versões async; `createsuperuser`
 continua disponível. Sem novos endpoints; validação do contrato em login/contexto
 e autorização de gestão continuam nas próximas etapas.
 
+## RBAC
+
+Etapa 3.1 antecipada antes do contexto por decisão do usuário. O
+[registry de permissões](docs/architecture/permission-registry.md) fica em
+`apps/core/permission_registry.py`, sem Django ou banco. Declara códigos,
+escopos permitidos e reservadas; rejeita atribuições inválidas e não expande
+`manage` em outras ações. Perfis, atribuições e autorização DRF ainda serão
+implementados; não houve nova concessão de acesso nesta etapa.
+
 ## Configuração do PyCharm
 
 Testado no PyCharm 2026.1 (Professional: o suporte a Django é recurso pago). O

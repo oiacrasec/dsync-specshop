@@ -1,19 +1,53 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 20:24
+- **Atualizado em:** 2026-10-03 20:39
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(users): enforce contract membership and license limits` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(auth): add pure Python permission registry` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.2 vínculo User.contract e licenças — ✅ concluída |
-| Próximo passo exato | etapa 2.3: contexto X-Organization-Id, 400/403, contrato ativo/vigência, superadmin opcional; conectar validação contratual à autenticação |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 2.3 |
+| Etapa atual | 3.1 registry RBAC — ✅ concluída (antecipada por decisão do usuário) |
+| Próximo passo exato | etapa 3.2: Profile, permissões do perfil e atribuições com exceções de organização; concluir RBAC antes de retomar 2.3 |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 3.2 |
 
-## Feito nesta etapa: 2.2
+## Feito nesta etapa: 3.1
+
+- Usuário pediu 2.3. Verificada dependência do contexto nas atribuições de 3.2;
+  o usuário escolheu antecipar RBAC antes do contexto. Nova ordem no plano:
+  3.1 → 3.2 → demais etapas RBAC → 2.3 → 2.4 → 2.5, com validação por etapa.
+- Registry em apps/core/permission_registry.py, Python puro sem Django/DRF/SQL:
+  PermissionScope CONTRACT/ORGANIZATION; PermissionDefinition frozen/slotted
+  com código explícito, frozenset de escopos e flag reserved; PermissionRegistry
+  rejeita códigos inválidos/duplicados e protege mapa com MappingProxyType.
+- Catálogo inicial de 11 operações de gestão do ADR 0009 (organização, usuário,
+  perfil e atribuição), reservadas em CONTRACT. Não registrar recursos futuros
+  sem necessidade. Manage continua ação independente, sem implicações.
+- require_assignable exige código/escopo permitido e rejeita reservadas por
+  padrão. Essential_profile é opção exclusivamente interna após verificar
+  identidade do perfil essencial; não aceitar do payload ou tratá-la como
+  autorização do ator. Serviços futuros traduzem erros internos para domínio.
+- 28 testes novos sem banco: códigos, duplicados, desconhecidos, escopos,
+  reservas, tipos de flags, imutabilidade e imports sem framework/runtime.
+  Validador completo passou: 188 testes, lint, formatação, migrations e checks
+  desenvolvimento/produção. Sem novas migrations ou alterações no banco.
+- OWASP A01/A06/A10: catálogo fechado, reservas explícitas, desconhecido/escopo
+  inválido negado, sem defaults de concessão. Ainda não há RBAC de endpoints,
+  atribuições nem perfil essencial; proteção DRF entra na etapa 3.3. Sem nova
+  API pública/privilegiada ou input de request neste módulo. A02/A03/A04/A05/
+  A07/A08/A09 sem alterações relevantes em configuração/dependências/crypto/
+  SQL/auth/desserialização/logs. Sem achados novos neste diff.
+- Performance sem achados: zero acesso ao banco, busca por código em mapa,
+  nenhuma listagem/endpoint/N+1; testes puros sem pytest.mark.django_db.
+- Checklist legal base no escopo: sem dados novos, retenção, UI, terceiros,
+  dependências ou logging. Não equivale a conformidade global do produto.
+- Docs do registry, AGENTS/README, overview/plano, memória/handoff sincronizados.
+  Etapa 2.3 não iniciada no código; autenticação por contrato/contexto ainda
+  pendente. Próxima etapa 3.2 exige confirmação.
+
+## Etapa 2.2 anterior: vínculo e licenças
 
 - Usuário autorizou 2.2 e escolheu contar também inativos nas licenças.
   Decisão em ADR 0015; soft delete libera, cadastro/restauração/transferência

@@ -91,6 +91,12 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   para consumir vagas ou restaurar. Serviço valida contrato e serializa por lock;
   autorização dos futuros endpoints continua obrigatória.
 - Nunca logar dados pessoais em claro.
+- Registry RBAC em `apps/core/permission_registry.py`, somente Python puro:
+  fonte dos códigos/escopos/reservadas, sem auth_permission ou acesso ao banco.
+  `manage` não implica outras ações. Ver
+  [registry](docs/architecture/permission-registry.md). Não aceitar código
+  desconhecido; essential_profile é flag interno após verificar o perfil essencial,
+  nunca recebido do payload. Integração de autorização DRF fica na etapa 3.3.
 - Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
 
 ## Antes de entregar

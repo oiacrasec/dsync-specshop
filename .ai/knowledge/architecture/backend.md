@@ -1,4 +1,4 @@
-# Backend — estado após a etapa 2.2
+# Backend — estado após a etapa 3.1
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
 `backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/exceptions.py`,
@@ -89,7 +89,15 @@ e plano da Entrega 1.
   Sem endpoint/autorização novo; login/refresh/contexto por contrato ainda
   serão conectados na etapa 2.3. Testes anteriores usam contratos explícitos ou
   superadmins quando testam só BaseModel, sem defaults artificiais no runtime.
-- Próxima etapa: 2.3, resolução de contexto e validação de contrato.
+- Usuário decidiu antecipar o RBAC antes de 2.3, porque o contexto depende das
+  atribuições ainda não criadas. Etapa 3.1 concluída: permission_registry.py em
+  core, Python puro sem Django/banco, PermissionScope CONTRACT/ORGANIZATION,
+  definições imutáveis e mapa protegido. Código desconhecido, escopo inválido e
+  reservada fora do perfil essencial são rejeitados. Manage não expande ações.
+  Catálogo inicial de 11 operações de gestão reservadas em CONTRACT; novos
+  códigos entram com o domínio. Essential_profile somente interno após validar
+  perfil essencial, nunca payload. Nenhum acesso/endpoint/autorização novo.
+- Próxima etapa: 3.2, perfis e atribuições; concluir RBAC antes de retomar 2.3.
   A etapa 1.1 foi antecipada com aprovação do usuário para usar UUID nos tokens.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em
