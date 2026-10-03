@@ -1,6 +1,6 @@
 ---
 name: project-skills
-description: Consulta as skills compartilhadas do projeto em .ai/skills/. Use quando o usuário perguntar quais skills/padrões o projeto tem, pedir para seguir "a skill do projeto", ou ANTES de tarefas que podem ter um padrão definido — em especial criar/dividir/revisar commits ("commita", "faz o commit"), além de arquitetura, API, testes e documentação.
+description: Consulta as skills compartilhadas do projeto em .ai/skills/. Use quando o usuário perguntar quais skills/padrões o projeto tem, pedir para seguir "a skill do projeto", ou ANTES de tarefas que podem ter um padrão definido — em especial criar/dividir/revisar commits ("commita", "faz o commit"), explicar algo ao usuário ("o que é", "como funciona", "explica"), além de arquitetura, API, testes e documentação.
 ---
 
 # Skills do projeto
