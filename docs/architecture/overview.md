@@ -14,11 +14,15 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 |---|---|
 | `docs/` (`architecture/`, `domain/`, `api/`, `adr/`) | criado |
 | `.ai/` (`knowledge/*`, `skills/`, `queries/`) | criado |
+| `.ai/skills/` (`git-commit`, `explicacao-eficiente`) | criado |
+| `.claude/skills/project-skills/` | criado |
 | `.github/workflows/` | criado |
+| `AGENTS.md`, `README.md` (raiz) | criado |
+| `.claude/settings.json` (hook que carrega `AGENTS.md`) | criado |
+| `.gitignore`, `.gitattributes` | criado |
 | `backend/` | **pendente** |
 | `frontend/` | **pendente** |
-| `AGENTS.md` (raiz, backend, frontend) | **pendente** |
-| `README.md`, `.gitignore` | **pendente** |
+| `AGENTS.md` (backend, frontend) | **pendente** |
 
 Diretórios ainda sem conteúdo contêm `.gitkeep` apenas para preservar a estrutura
 no versionamento. Esses arquivos devem ser removidos quando o diretório receber
@@ -53,10 +57,12 @@ datasync-core/
 ├── frontend/
 ├── docs/
 ├── .ai/
+├── .claude/
 ├── .github/
 ├── AGENTS.md
 ├── README.md
-└── .gitignore
+├── .gitignore
+└── .gitattributes
 ```
 
 Apesar de estarem no mesmo repositório:
@@ -82,6 +88,13 @@ datasync-core/
 ├── AGENTS.md
 ├── README.md
 ├── .gitignore
+├── .gitattributes
+│
+├── .claude/
+│   ├── settings.json      → hook SessionStart: carrega AGENTS.md
+│   └── skills/
+│       └── project-skills/
+│           └── SKILL.md   → descobre e carrega as skills de .ai/skills/
 │
 ├── .ai/
 │   ├── README.md
@@ -111,11 +124,16 @@ datasync-core/
 │   │       └── frontend.md
 │   │
 │   ├── skills/
-│   │   ├── ingest-change.md
-│   │   ├── update-knowledge.md
-│   │   ├── impact-analysis.md
-│   │   ├── review-change.md
-│   │   └── lint-knowledge.md
+│   │   ├── git-commit/
+│   │   │   ├── SKILL.md
+│   │   │   └── reference.md
+│   │   ├── explicacao-eficiente/
+│   │   │   └── SKILL.md
+│   │   ├── ingest-change/
+│   │   ├── update-knowledge/
+│   │   ├── impact-analysis/
+│   │   ├── review-change/
+│   │   └── lint-knowledge/
 │   │
 │   └── queries/
 │       ├── architecture.md
@@ -817,6 +835,15 @@ Os agentes de IA devem preferir esses exemplos ao inventar novas estruturas.
 
 O projeto possui instruções de IA em diferentes níveis.
 
+`AGENTS.md` é o arquivo único de instruções para **todos** os agentes. A raiz não
+contém arquivos específicos de um agente (ex.: `CLAUDE.md`); o que é de cada
+ferramenta fica na pasta dela:
+
+| Agente | Como carrega o `AGENTS.md` |
+|---|---|
+| Codex e similares | nativamente |
+| Claude Code | hook `SessionStart` em `.claude/settings.json` |
+
 ## Raiz
 
 ```text
@@ -967,11 +994,34 @@ Documentação atualizada:
 .ai/skills/
 ```
 
-contém procedimentos que agentes devem seguir.
+contém procedimentos que agentes devem seguir. É a **única fonte de verdade** das
+skills, independente do agente utilizado.
 
-Exemplos:
+## Formato
 
-### `impact-analysis.md`
+Cada skill é um diretório com um `SKILL.md` (frontmatter `name` e `description` +
+procedimento) e, opcionalmente, arquivos de apoio:
+
+```text
+.ai/skills/<nome>/
+├── SKILL.md
+└── reference.md   (opcional)
+```
+
+O Claude Code não lê `.ai/skills/` diretamente: a skill
+`.claude/skills/project-skills/` lista as skills disponíveis e carrega a adequada
+à tarefa. Não duplicar skills em `.claude/skills/`.
+
+## Skills existentes
+
+| Skill | Uso |
+|---|---|
+| `git-commit` | padrão de commits (Conventional Commits + commits atômicos) |
+| `explicacao-eficiente` | respostas curtas, humanizadas e visuais em PT-BR |
+
+## Skills planejadas
+
+### `impact-analysis`
 
 Antes de alterar código:
 
@@ -982,7 +1032,7 @@ Antes de alterar código:
 5. analisar testes;
 6. produzir o plano de mudança.
 
-### `review-change.md`
+### `review-change`
 
 Antes de considerar uma tarefa concluída:
 
@@ -1229,10 +1279,12 @@ datasync-core/
 ├── frontend/      → aplicação Angular autônoma
 ├── docs/          → conhecimento oficial compartilhado
 ├── .ai/           → memória e procedimentos para IA
+├── .claude/       → integração com o Claude Code (carrega AGENTS.md via hook)
 ├── .github/       → automação e CI/CD
 ├── AGENTS.md      → regras globais para agentes
 ├── README.md      → entrada para humanos
-└── .gitignore
+├── .gitignore
+└── .gitattributes → padroniza fim de linha (LF)
 ```
 
 Essa estrutura é a baseline arquitetural do projeto e deve ser utilizada como referência para novas implementações, documentação e desenvolvimento assistido por IA.
