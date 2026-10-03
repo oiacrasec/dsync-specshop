@@ -31,6 +31,22 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 Leitura: `View → Selector → Model`. Escrita: `Serializer → View → Service → Model`.
 Crie cada arquivo só quando ele for necessário.
 
+## Estilo dos models
+
+Por preferência explícita do usuário, declarar campos de forma compacta: manter
+argumentos na mesma linha quando possível. Em declarações longas, agrupar vários
+argumentos por linha e alinhar a continuação à abertura dos argumentos; não
+expandir cada argumento para uma linha nem deixar o fechamento sozinho.
+
+```text
+public_id = models.UUIDField(_('identificador público'), default=uuid7, unique=True, editable=False)
+created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('criado por'), on_delete=models.SET_NULL,
+                               null=True, blank=True, editable=False, related_name='+',)
+```
+
+`models.py` tem formatação manual preservada: excluído do `ruff format`, com
+exceção de comprimento de linha (`E501`). As demais regras de lint continuam ativas.
+
 ## Regras
 
 - Settings por ambiente em `config/settings/`. Segredos e valores de ambiente **só** por variável de ambiente (`.env.example` documenta todas).

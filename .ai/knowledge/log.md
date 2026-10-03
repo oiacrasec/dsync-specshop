@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Preferência de formatação dos models
+
+- Usuário definiu campos compactos, argumentos agrupados e continuação alinhada,
+  sem um argumento por linha. Preferência registrada em `backend/AGENTS.md`.
+- Preservado o exemplo editado pelo usuário em `BaseModel`; os demais campos
+  de autoria foram ajustados ao mesmo formato, sem mudança de comportamento.
+- `backend/pyproject.toml` preserva formatação manual em `models.py`, excluindo
+  esses arquivos do formatter e permitindo linhas longas; demais regras de lint
+  mantidas. Handoff atualizado.
+
 ## 2026-10-03 — Etapa 1.1 antecipada ao JWT
 
 - Usuário aprovou executar 1.1 antes de 0.3, para usar `public_id` nos tokens

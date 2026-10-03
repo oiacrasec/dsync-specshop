@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:38
+- **Atualizado em:** 2026-10-03 18:49
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(db): add audited base model with soft delete` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `style(backend): preserve compact model field declarations` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
@@ -46,6 +46,11 @@
   equivale à eliminação; expurgo, LegalHold e política de retenção continuam
   pendentes na entrega própria. AccessLog continua na etapa 4.1.
 - Atualizados AGENTS/README do backend, overview, plano e conhecimento da IA.
+- Ajuste posterior: usuário definiu estilo compacto para campos dos models,
+  registrado em backend/AGENTS.md. BaseModel ajustado; models.py excluído do
+  formatter e de E501 para preservar a preferência, mantendo demais regras de lint.
+  Lint, check de formatação e verificação de migrations passaram após esse ajuste;
+  sem alteração de comportamento e sem novos testes.
 
 ## Falta nesta etapa
 

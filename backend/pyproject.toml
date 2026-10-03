@@ -23,6 +23,8 @@ ignore = ["S101"]  # assert é o padrão do pytest
 
 [tool.ruff.lint.per-file-ignores]
 "*/tests/*" = ["S105", "S106"]  # senhas fixas em testes
+"**/models.py" = ["E501"]  # campos compactos, conforme preferência do usuário
 
 [tool.ruff.format]
 quote-style = "single"
+exclude = ["**/models.py"]  # preservar a formatação manual dos models
