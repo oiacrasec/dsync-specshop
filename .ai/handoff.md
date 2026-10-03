@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 18:16
+- **Atualizado em:** 2026-10-03 18:22
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `fix(api): log request completion only for errors` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `refactor(core): rename request ID module to log filters` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
@@ -44,6 +44,8 @@
 - Validação do ajuste: 47 testes e todas as verificações automáticas passaram;
   revisão do diff sem novos achados de segurança ou performance. Permanece o
   aviso não impeditivo do cache do pytest.
+- Por preferência do usuário, módulo `request_id.py` renomeado para `log_filters.py`,
+  com imports e configuração de logging atualizados; comportamento preservado.
 
 ## Falta nesta etapa
 - Nada.

@@ -21,6 +21,8 @@ Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.p
   SecurityMiddleware e WhiteNoise. Gera UUID v7, ignora IDs enviados pelo cliente,
   devolve `X-Request-Id` e restaura o contextvar após a requisição.
 - Logs usam o mesmo ID, inclusive logs do Django com request fora do contexto ativo.
+  O filtro de logging e seu contextvar ficam em `apps/core/log_filters.py`, nome
+  escolhido pelo usuário para distinguir dos futuros filtros da API.
   O middleware registra só erros: 4xx em WARNING e 5xx em ERROR; não registra
   conclusão de respostas 2xx/3xx. Observabilidade mais ampla fica para depois,
   conforme decisão do usuário.

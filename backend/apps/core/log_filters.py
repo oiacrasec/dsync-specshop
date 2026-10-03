@@ -1,4 +1,4 @@
-"""Correlação de logs isolada por contexto de execução."""
+"""Filtros de log e contexto de correlação por requisição."""
 
 import logging
 from contextvars import ContextVar

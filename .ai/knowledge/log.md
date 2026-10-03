@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Nome do módulo de filtros de log
+
+- Por preferência do usuário, `apps/core/request_id.py` foi renomeado para
+  `apps/core/log_filters.py`. O contexto de correlação permanece junto ao filtro.
+- Atualizados imports em middleware/exceções/testes e caminho do filtro nos settings.
+- Documentação, memória e handoff atualizados. Comportamento preservado.
+
 ## 2026-10-03 — Logs de requisição apenas para erros
 
 - Por decisão do usuário, `RequestIdMiddleware` registra apenas respostas 4xx

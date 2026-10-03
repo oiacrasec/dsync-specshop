@@ -22,7 +22,7 @@ from apps.core.exceptions import (
     LicenseLimitReached,
     ProfileInUse,
 )
-from apps.core.request_id import request_id_context
+from apps.core.log_filters import request_id_context
 
 PRIVATE_DETAIL = 'secret@example.com SELECT * FROM private_table /internal/private.py'
 

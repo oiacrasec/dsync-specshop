@@ -7,8 +7,8 @@ import pytest
 from django.http import HttpResponse
 from django.test import RequestFactory
 
+from apps.core.log_filters import RequestIdFilter, request_id_context
 from apps.core.middleware import RequestIdMiddleware
-from apps.core.request_id import RequestIdFilter, request_id_context
 
 
 def test_concurrent_requests_keep_separate_ids():

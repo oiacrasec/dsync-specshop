@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 from rest_framework.views import set_rollback
 
-from .request_id import request_id_context
+from .log_filters import request_id_context
 
 logger = logging.getLogger(__name__)
 PROBLEM_CONTENT_TYPE = 'application/problem+json'

@@ -4,7 +4,7 @@ import logging
 from uuid import uuid7
 
 from .exceptions import PROBLEM_CONTENT_TYPE, exception_handler, problem_http_response
-from .request_id import request_id_context
+from .log_filters import request_id_context
 
 logger = logging.getLogger(__name__)
 

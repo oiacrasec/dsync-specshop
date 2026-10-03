@@ -173,7 +173,7 @@ LOGGING = {
         },
     },
     'filters': {
-        'request_id': {'()': 'apps.core.request_id.RequestIdFilter'},
+        'request_id': {'()': 'apps.core.log_filters.RequestIdFilter'},
     },
     'root': {
         'handlers': ['console'],
