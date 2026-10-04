@@ -174,3 +174,33 @@ def test_bulk_delete_of_common_users_keeps_authorship(admin, user_contract, esse
     assert set(get_user_model().all_objects.filter(username__in=['c1', 'c2']).values_list('deleted_by', flat=True)) == {
         admin.pk
     }
+
+
+def test_model_save_also_protects_the_last_admin(admin, user_contract, essential_profile):
+    ana, _ = make_admin(admin, user_contract, 'ana', essential_profile)
+    ana.is_active = False
+    with pytest.raises(LastContractAdmin):
+        ana.save(actor=admin)
+    ana.refresh_from_db()
+    assert ana.is_active
+
+
+def test_model_save_with_rule_field_in_update_fields_is_checked(admin, user_contract, essential_profile):
+    ana, _ = make_admin(admin, user_contract, 'ana', essential_profile)
+    ana.is_active = False
+    with pytest.raises(LastContractAdmin):
+        ana.save(update_fields=['is_active'])
+
+
+def test_save_without_rule_fields_skips_locks(admin, user_contract, essential_profile, django_assert_num_queries):
+    ana, _ = make_admin(admin, user_contract, 'ana', essential_profile)
+    ana.first_name = 'Ana'
+    with django_assert_num_queries(1):
+        ana.save(update_fields=['first_name'])
+    ana.refresh_from_db()
+    assert ana.first_name == 'Ana'
+
+
+def test_save_rejects_positional_arguments(admin):
+    with pytest.raises(TypeError):
+        admin.save(False)

@@ -105,7 +105,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   criado pela migration rbac.0002 e não é editável. O contrato nunca fica sem administrador
   ativo (`LastContractAdmin`, 409), nem por ação do superadmin: excluir usuário só via
   `apps.users.services.delete_user`; `user.delete()` e `User.objects...delete()` delegam a ele
-  (o lote de usuários exclui um a um, com N queries, de propósito). Ver
+  (o lote de usuários exclui um a um, com N queries, de propósito). `User.save()` delega a
+  `save_user` (só argumentos nomeados); `update_fields` sem campo de regra grava direto. Ver
   [domínio RBAC](../docs/domain/rbac.md). Transferir User de contrato exige remover
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view

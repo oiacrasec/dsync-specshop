@@ -15,14 +15,22 @@ from apps.contracts.models import Contract
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
 from apps.core.models import SoftDeleteQuerySet
 
+# Campos que mexem em papel, contrato, licença ou último admin.
+RULE_FIELDS = frozenset({'is_active', 'is_superuser', 'contract', 'contract_id', 'deleted_at'})
 
-def save_user(*, user, actor=None, using=None):
+
+def save_user(*, user, actor=None, using=None, **save_options):
     """Escrita interna: papel, contrato e licenças; autorização fica nos futuros endpoints.
 
-    Conta também inativos, exclui soft deleted. Manager de criação e futuras
-    escritas de vínculo/restauração devem passar por aqui, nunca por update/bulk.
+    Conta também inativos, exclui soft deleted. User.save() e o manager de criação
+    delegam para cá; update/bulk continuam fora das regras. `update_fields` sem campo
+    de regra (ex.: last_login, password) grava direto, sem locks.
     """
     database = using or router.db_for_write(type(user), instance=user)
+    update_fields = save_options.get('update_fields')
+    if update_fields is not None and not RULE_FIELDS.intersection(update_fields):
+        _base_save(user, using=database, actor=actor, **save_options)
+        return user
     with transaction.atomic(using=database):
         current = None
         if not user._state.adding:
@@ -64,8 +72,13 @@ def save_user(*, user, actor=None, using=None):
                 from apps.rbac.services import ensure_contract_keeps_admin
 
                 ensure_contract_keeps_admin(current.contract_id, exclude_user_id=user.pk)
-        user.save(using=database, actor=actor)
+        _base_save(user, using=database, actor=actor, **save_options)
     return user
+
+
+def _base_save(user, **kwargs):
+    """Grava sem voltar ao override de User.save (AbstractBaseUser.save e BaseModel.save seguem valendo)."""
+    super(type(user), user).save(**kwargs)
 
 
 def _leaves_contract_admin(current, user):

@@ -21,10 +21,13 @@ def test_common_user_requires_contract_and_superadmin_requires_no_contract(user_
         manager.create_user(username='missing-contract')
     with pytest.raises(ValidationError):
         manager.create_superuser(username='invalid-admin', contract=user_contract)
-    with pytest.raises(IntegrityError), transaction.atomic():
+    with pytest.raises(ValidationError):  # create() também passa por User.save → save_user.
         manager.create(username='direct-invalid')
+    model = get_user_model()
+    with pytest.raises(IntegrityError), transaction.atomic():  # A constraint segura o que pula o service.
+        manager.bulk_create([model(username='direct-invalid')])
     with pytest.raises(IntegrityError), transaction.atomic():
-        manager.create(username='direct-invalid-admin', is_superuser=True, contract=user_contract)
+        manager.bulk_create([model(username='direct-invalid-admin', is_superuser=True, contract=user_contract)])
     admin = manager.create_superuser(username='valid-admin')
     assert admin.contract_id is None
 
@@ -159,3 +162,13 @@ def test_license_check_queries_do_not_grow_with_user_count(user_contract, quanti
     model.objects.bulk_create([model(username=f'existing-{i}', contract=user_contract) for i in range(quantity)])
     with django_assert_num_queries(5):
         model.objects.create_user(username='new', contract=user_contract)
+
+
+@pytest.mark.django_db
+def test_model_save_also_enforces_license_limit(user_contract):
+    user_contract.licenses = 1
+    user_contract.save()
+    model = get_user_model()
+    model.objects.create_user(username='occupant', contract=user_contract)
+    with pytest.raises(LicenseLimitReached):
+        model(username='extra', contract=user_contract).save()

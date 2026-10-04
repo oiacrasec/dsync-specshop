@@ -31,6 +31,16 @@ class User(AbstractUser, BaseModel):
                                    name='dsc_user_contract_by_role'),
         ]
 
+    def save(self, *args, actor=None, using=None, **kwargs):
+        """Delega a save_user: papel, contrato, licenças e último administrador."""
+        from apps.users.services import save_user
+
+        if args:
+            raise TypeError('Use argumentos nomeados em User.save().')
+        save_user(user=self, actor=actor, using=using, **kwargs)
+
+    save.alters_data = True
+
     def delete(self, using=None, keep_parents=False, *, actor=None):
         """Delega a delete_user: nunca deixa o contrato sem administrador (ADR 0009 §5)."""
         from apps.users.services import delete_user
