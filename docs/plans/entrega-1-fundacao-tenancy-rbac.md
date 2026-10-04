@@ -105,13 +105,14 @@ e só começa após aprovação do usuário.
 
 ## Bloco 6 — Área administrativa e frontend (prioridade, decisões 37 a 39)
 
-Ordem proposta: 6.1 → 6.2 → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 → 6.8. Cada etapa fecha com
+Ordem proposta: 6.1 → 6.2 → 6.2a → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 → 6.8. Cada etapa fecha com
 `validar-etapa`; as de frontend usam lint/build/testes do próprio `frontend/`.
 
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
 | 6.1 | Copiar o datasync-gis para `frontend/` (sem `.git`, `node_modules`, `dist`, `.angular`; `environment*.ts` revisados), com `AGENTS.md`, README e `Dockerfile` próprios; conferir versão LTS do Angular/PrimeNG; build e lint passando | frontend | 0001, 0003 | ✅ (lint pendente, ver abaixo) |
-| 6.2 | Desabilitar telas fora do escopo comentando rotas e menu (`// DESABILITADO: fora do escopo atual`): ficam login, primeiro acesso, seleção de organização e administração de contratos | frontend | — | ⬜ |
+| 6.2 | Desabilitar telas fora do escopo comentando rotas e menu (`DESABILITADO: fora do escopo atual`): ficam login, primeiro acesso, seleção de organização, administração de contratos, home KPI fictícia (pedido do usuário) e páginas de erro | frontend | — | ✅ |
+| 6.2a | Qualidade herdada do GIS (decisão A do usuário): ESLint funcional com `angular-eslint`, Prettier nos 65 arquivos em commit só de formatação, revisar o bundle inicial (1,46 MB > 1 MB) e o CSS de preloading não encontrado | frontend | — | ⬜ |
 | 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API; `Contract.plan` opcional (decisão 40) | backend | novo (contracts × administration) | ⬜ |
 | 6.4 | Primeiro acesso: `User.must_change_password`; login devolve resumo do usuário; bloqueio global no backend até trocar; `POST` de troca de senha (atual + nova + confirmação, validadores do Django, diferente da atual) | backend | 0010 | ⬜ |
 | 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização | frontend | 0003, 0004 | ⬜ |

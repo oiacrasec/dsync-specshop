@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 6.1 Copiar o datasync-gis para `frontend/` — ✅ concluída |
-| Próximo passo exato | decidir os achados da 6.1 (lint quebrado, 65 arquivos fora do Prettier, bundle) e aprovar a 6.2 |
-| Aguardando o usuário? | sim |
+| Etapa atual | 6.2 Desabilitar telas fora do escopo — ✅ concluída |
+| Próximo passo exato | 6.2a: ESLint (`angular-eslint`), Prettier nos 65 arquivos (commit só de formatação), bundle |
+| Aguardando o usuário? | sim — aprovação da 6.2a |
 
 Superadmin local criado pelo usuário: `datasync_admin` (via `createsuperuser`; senha só com o usuário).
 Referências: `D:\Projetos\PycharmProjects\datasync-spatial` (backend) e `datasync-gis` (frontend).

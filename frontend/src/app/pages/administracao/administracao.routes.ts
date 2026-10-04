@@ -38,6 +38,7 @@ export default [
             requiredPermission: PERMISSION_KEYS.CONTRATO_UPDATE
         }
     },
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao',
         canActivate: [accessGuard, permissionGuard],
@@ -49,6 +50,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.ORGANIZACAO_VIEW
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao/novo',
         canActivate: [accessGuard, permissionGuard],
@@ -60,6 +63,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.ORGANIZACAO_CREATE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao/:id',
         canActivate: [accessGuard, permissionGuard],
@@ -71,6 +76,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.ORGANIZACAO_UPDATE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'setor',
         canActivate: [accessGuard, permissionGuard],
@@ -82,6 +89,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.SETOR_VIEW
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'setor/novo',
         canActivate: [accessGuard, permissionGuard],
@@ -93,6 +102,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.SETOR_CREATE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'setor/:id',
         canActivate: [accessGuard, permissionGuard],
@@ -104,6 +115,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.SETOR_UPDATE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario',
         canActivate: [accessGuard, permissionGuard],
@@ -115,6 +128,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario/novo',
         canActivate: [accessGuard, permissionGuard],
@@ -126,6 +141,8 @@ export default [
             requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
         }
     },
+    */
+    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario/:id',
         canActivate: [accessGuard, permissionGuard],
@@ -137,4 +154,5 @@ export default [
             requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
         }
     }
+    */
 ] as Routes;

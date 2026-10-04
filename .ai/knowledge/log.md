@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.2: telas fora do escopo desabilitadas
+
+- Rotas e menu comentados com `/* DESABILITADO: fora do escopo atual ... */` em app.routes,
+  pages.routes, administracao.routes e app.menu. Home KPI fictícia mantida (pedido do usuário);
+  `/landing` redireciona ao login. Build ok; avisos de CSS geoespacial e quill sumiram.
+
 ## 2026-10-04 — Etapa 6.1: frontend copiado do datasync-gis
 
 - `git archive` do GIS para `frontend/` (só arquivos versionados); nome `datasync-core-frontend`,

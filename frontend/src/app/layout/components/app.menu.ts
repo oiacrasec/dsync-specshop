@@ -53,27 +53,35 @@ export class AppMenu {
                     visible: () => this.canViewContratos(),
                     routerLink: ['/pages/administracao/contrato']
                 },
+                /* DESABILITADO: fora do escopo atual
                 {
                     label: 'Organizações',
                     icon: 'pi pi-fw pi-building',
                     visible: () => this.canViewOrganizacoes(),
                     routerLink: ['/pages/administracao/organizacao']
                 },
+                */
+                /* DESABILITADO: fora do escopo atual
                 {
                     label: 'Setores',
                     icon: 'pi pi-fw pi-sitemap',
                     visible: () => this.canViewSetores(),
                     routerLink: ['/pages/administracao/setor']
                 },
+                */
+                /* DESABILITADO: fora do escopo atual
                 {
                     label: 'Usuários',
                     icon: 'pi pi-fw pi-users',
                     visible: () => this.canManageUsers(),
                     routerLink: ['/pages/administracao/usuario']
                 }
+                */
             ]
         },
-        { separator: true },
+        // DESABILITADO: separador do bloco Geoespacial
+        // { separator: true },
+        /* DESABILITADO: fora do escopo atual
         {
             label: 'Geoespacial',
             icon: 'pi pi-fw pi-map',
@@ -117,7 +125,10 @@ export class AppMenu {
                 }
             ]
         },
-        { separator: true },
+        */
+        // DESABILITADO: separador do bloco User Management
+        // { separator: true },
+        /* DESABILITADO: fora do escopo atual
         {
             label: 'User Management',
             icon: 'pi pi-fw pi-user',
@@ -136,6 +147,7 @@ export class AppMenu {
                 }
             ]
         }
+        */
     ];
 
     private isSuperuser() {

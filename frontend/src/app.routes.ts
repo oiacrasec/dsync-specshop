@@ -51,6 +51,7 @@ export const appRoutes: Routes = [
                     audience: ACCESS_AUDIENCE.AUTHENTICATED
                 }
             },
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'dashboard-marketing',
                 canActivate: [accessGuard],
@@ -60,6 +61,8 @@ export const appRoutes: Routes = [
                     audience: ACCESS_AUDIENCE.COMMON
                 }
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'dashboard-ecommerce',
                 canActivate: [accessGuard],
@@ -69,6 +72,8 @@ export const appRoutes: Routes = [
                     audience: ACCESS_AUDIENCE.COMMON
                 }
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'dashboard-banking',
                 canActivate: [accessGuard],
@@ -78,95 +83,127 @@ export const appRoutes: Routes = [
                     audience: ACCESS_AUDIENCE.COMMON
                 }
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'uikit',
                 canActivate: [accessGuard],
                 data: { breadcrumb: 'UI Kit' },
                 loadChildren: () => import('@/app/pages/examples/uikit/uikit.routes')
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'documentation',
                 canActivate: [accessGuard],
                 data: { breadcrumb: 'Documentation' },
                 loadComponent: () => import('@/app/pages/examples/documentation/documentation').then((c) => c.Documentation)
             },
+            */
             {
                 path: 'pages',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/pages.routes'),
                 data: { breadcrumb: 'Páginas', breadcrumbHidden: true }
             },
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'apps',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/examples/apps.routes'),
                 data: { breadcrumb: 'Apps' }
             },
+            */
 
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'blocks',
                 canActivate: [accessGuard],
                 data: { breadcrumb: 'Free Blocks' },
                 loadChildren: () => import('@/app/pages/examples/blocks/blocks.routes')
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'ecommerce',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/examples/ecommerce/ecommerce.routes'),
                 data: { breadcrumb: 'E-Commerce' }
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'profile',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/examples/usermanagement/usermanagement.routes'),
                 data: { breadcrumb: 'User Management' }
             }
+            */
         ]
     },
     {
         path: 'landing',
         component: LandingLayout,
         children: [
+            { path: '', redirectTo: 'login', pathMatch: 'full' },
+            /* DESABILITADO: fora do escopo atual
             {
                 path: '',
                 loadComponent: () => import('@/app/pages/examples/landing').then((c) => c.Landing)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'about',
                 loadComponent: () => import('@/app/pages/examples/landing/about').then((c) => c.About)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'pricing',
                 loadComponent: () => import('@/app/pages/examples/landing/pricing').then((c) => c.Pricing)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'contact',
                 loadComponent: () => import('@/app/pages/examples/landing/contact').then((c) => c.Contact)
             },
+            */
             {
                 path: 'login',
                 loadComponent: () => import('@/app/pages/auth/login').then((c) => c.Login)
             },
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'register',
                 loadComponent: () => import('@/app/pages/auth/register').then((c) => c.Register)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'verification',
                 loadComponent: () => import('@/app/pages/auth/verification').then((c) => c.Verification)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'forgot-password',
                 loadComponent: () => import('@/app/pages/auth/forgotpassword').then((c) => c.ForgotPassword)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'new-password',
                 loadComponent: () => import('@/app/pages/auth/newpassword').then((c) => c.NewPassword)
             },
+            */
+            /* DESABILITADO: fora do escopo atual
             {
                 path: 'lock-screen',
                 loadComponent: () => import('@/app/pages/auth/lockscreen').then((c) => c.LockScreen)
             },
+            */
             {
                 path: 'oops',
                 loadComponent: () => import('@/app/pages/examples/oops/oops').then((c) => c.Oops)
