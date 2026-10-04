@@ -30,6 +30,7 @@ class ContractFilterSet(BaseFilterSet):
 
 
 class OrganizationFilterSet(PlanFilterSet):
+    contract = filters.UUIDFilter(field_name='contract__public_id')
     ordering = filters.OrderingFilter(fields=('name',))
 
     class Meta:

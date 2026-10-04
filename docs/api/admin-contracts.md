@@ -13,12 +13,15 @@ retorna 404; validação 422, sempre no formato [RFC 9457](errors.md).
 | GET / PUT / PATCH / DELETE | `/api/v1/admin/contracts/{public_id}/` | consultar / substituir / alterar / excluir logicamente |
 | GET | `/api/v1/admin/{plans,contracts}/options/` | seleção UUID/rótulo conforme [options](options.md) |
 | GET | `/api/v1/admin/{plans,contracts}/schema/` | columns, filters, ordering_fields para a tabela |
-| GET | `/api/v1/admin/contracts/{public_id}/organizations/` | organizações ativas e não excluídas desse contrato, para entrada do superadmin |
 
 Criação retorna 201; consultas/alterações 200; exclusão 204. Registros excluídos
 nunca aparecem em listagens ou detalhes. Exclusão não remove dependentes nem
 executa expurgo ou encerramento comercial. Inativos e contratos fora de vigência
 continuam disponíveis na administração para suporte.
+
+Organizações agora usam [OrganizationViewSet próprio](organizations.md), em
+`/api/v1/admin/organizations/?contract=<public_id>`. A action aninhada foi removida
+(ADR 0032). O novo endpoint também atende usuários comuns, com queryset RBAC.
 
 ## Entrada e saída
 

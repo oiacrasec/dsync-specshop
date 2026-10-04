@@ -85,7 +85,7 @@ class ContractSerializer(BaseAdminModelSerializer):
         read_only_fields = ('public_id', 'created_at', 'updated_at')
 
 
-class OrganizationSummarySerializer(ScopedModelSerializer):
+class OrganizationSerializer(ScopedModelSerializer):
     class Meta:
         model = Organization
         fields = ('public_id', 'name')

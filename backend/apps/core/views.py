@@ -48,3 +48,13 @@ class BaseAdminModelViewSet(BaseModelViewSet):
     options_permission_class = SuperadminPermission
     options_label_field = 'name'
     options_search_fields = ('name',)
+
+
+# fmt: off
+class BaseReadOnlyModelViewSet(ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
+                               viewsets.ReadOnlyModelViewSet,):
+    # fmt: on
+    lookup_field = 'public_id'
+    lookup_value_converter = 'uuid'
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [ValidatedDjangoFilterBackend]

@@ -183,6 +183,7 @@ limite de 120 caracteres continuam ativos.
 | `SerializerDeleteMixin` | exclusão com autoria/auditoria via serializer.delete() |
 | `BaseModelSerializer` | super().create/update do DRF, autoria, auditoria e hooks |
 | `BaseAdminModelSerializer` | escrita global autorizada explicitamente ao superadmin |
+| `BaseReadOnlyModelViewSet` | list/retrieve do DRF com filtros, paginação, options/schema |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
 | `TableSchemaMixin` | schema de campos declarados, metadados do model e OrderingFilter |

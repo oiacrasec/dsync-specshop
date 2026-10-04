@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — OrganizationViewSet independente com leitura autorizada
+
+- Removida organizations do ContractViewSet. OrganizationViewSet herda base de
+  leitura DRF com paginação/filter/options/schema; usa OrganizationSerializer.
+- Registro no MESMO SchemaRouter de plans/contracts, conforme ajuste do usuário;
+  rota /api/v1/admin/organizations/, filtro contract na lista (ADR 0032).
+- Usuário comum usa accessible_organizations/RBAC, com contrato/perfis/atribuições/
+  exceções; superadmin usa queryset global explícito. Sem header ativo, sem CRUD,
+  somente organizações ativas de contextos permitidos. /me/organizations preservado.
+- 68 testes dirigidos passaram após ajuste do router; suíte completa 507 passou.
+  Permissões/IDOR, exclusões, inativos, contrato excluído, detalhe/options e query
+  inválida testados. OWASP A01–A10 revisadas sem achados novos. Sem migrations.
+- List/options: cinco SELECTs com perfil (três RBAC + COUNT/página) com 1/30 itens,
+  sem writes/locks/N+1, campos mínimos e até 100 itens materializados. Sem JWT real
+  ou ensaio de carga novo; contagem constante não certifica capacidade.
+- Atualizados plano/ADR/índice, API administrativa/organizações, AGENTS/README,
+  estilo/overview e memória/handoff. CRUD de gestão continua na 5.4.
 ## 2026-10-04 — Responses compartilhadas para actions customizadas
 
 - Criado core/responses.py com build_result_response e build_exception_response.

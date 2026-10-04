@@ -1,7 +1,7 @@
 # Handoff
 
 - **Atualizado em:** 2026-10-04
-- **Agente:** Codex
+- **Agente:** Claude (retomou do Codex)
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
 - **Último commit funcional:** 6991ea8 — refactor(api): standardize custom action responses
 
@@ -32,7 +32,9 @@
   Models com verbose_name explícito e limite 120. Cabeçalhos compactos/audit_events
   multiline preservados localmente por fmt off/on; Ruff não configura esse estilo.
 
-## Trabalho NÃO commitado
+## Organizações: commitado como rascunho (revisão pendente)
+
+Usuário autorizou commitar para seguir com a área administrativa; ADR 0032 = Proposto.
 
 - OrganizationViewSet próprio e BaseReadOnlyModelViewSet, com OrganizationSerializer
   (nome solicitado), django-filter, paginação, options/schema. Action do contrato removida.

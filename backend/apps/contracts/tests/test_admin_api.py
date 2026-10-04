@@ -230,7 +230,7 @@ def test_organizations_search_is_limited_to_selected_contract(world):
     Organization.objects.create(name='Inativa', contract=contract, is_active=False)
     other = Contract.objects.create(name='Outro', plan=world['plan'], start_date=date(2020, 1, 1), licenses=5)
     Organization.objects.create(name='Filial estrangeira', contract=other)
-    response = world['api'].get(f'/api/v1/admin/contracts/{contract.public_id}/organizations/')
+    response = world['api'].get('/api/v1/admin/organizations/', {'contract': str(contract.public_id)})
     assert response.json()['data'] == [{'public_id': str(own.public_id), 'name': 'Filial'}]
 
 
