@@ -33,6 +33,7 @@ export class UsuarioPage implements OnInit {
 
     ngOnInit() {
         const canManage = this.permissionContext.hasPermission(PERMISSION_KEYS.USUARIO_MANAGE);
+
         this.canCreate = canManage;
         this.canDelete = canManage;
 
@@ -68,6 +69,7 @@ export class UsuarioPage implements OnInit {
 
     delete(usuario: Usuario) {
         const fullName = (usuario.nome_completo ?? '').trim() || usuario.username;
+
         this.confirmationService.confirm({
             header: 'Excluir usuário',
             message: `Confirma excluir o usuário "${fullName}"?`,

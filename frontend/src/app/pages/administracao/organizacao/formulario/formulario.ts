@@ -52,13 +52,16 @@ export class OrganizacaoFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -79,10 +82,12 @@ export class OrganizacaoFormPage implements OnInit {
                 summary: 'Campos obrigatorios',
                 detail: 'Preencha os campos obrigatorios antes de salvar.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request = this.isEditing && this.organizacaoId ? this.organizacaoService.update(this.organizacaoId, payload) : this.organizacaoService.create(payload);
@@ -162,6 +167,7 @@ export class OrganizacaoFormPage implements OnInit {
 
     private normalizeOptionalString(value: string | null | undefined) {
         const normalized = (value ?? '').trim();
+
         return normalized ? normalized : null;
     }
 }

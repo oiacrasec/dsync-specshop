@@ -22,6 +22,7 @@ export interface WorkspaceQuery {
 export class WorkspaceService extends BaseCrudService {
     list(query: WorkspaceQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Workspace>>(`${this.baseUrl}/mapa/workspace/`, { params });
     }
 
@@ -43,6 +44,7 @@ export class WorkspaceService extends BaseCrudService {
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/mapa/workspace/options/`, { params });
     }
 }

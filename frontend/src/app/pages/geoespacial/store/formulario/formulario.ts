@@ -64,13 +64,16 @@ export class StoreFormPage implements OnInit, OnDestroy {
         this.observeWorkspaceSelection();
 
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -95,6 +98,7 @@ export class StoreFormPage implements OnInit, OnDestroy {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
@@ -104,16 +108,19 @@ export class StoreFormPage implements OnInit, OnDestroy {
 
     private ensureSchemaThenPersist() {
         const payload = this.buildEnsureSchemaPayload(false);
+
         this.storeService.ensureSchema(payload).subscribe({
             next: (response) => {
                 if (response.exists) {
                     this.persistStore();
+
                     return;
                 }
 
                 if (response.requires_confirmation) {
                     this.saving = false;
                     this.confirmCreateSchemaAndPersist();
+
                     return;
                 }
 
@@ -235,10 +242,12 @@ export class StoreFormPage implements OnInit, OnDestroy {
             this.workspaceLookupRequestId++;
             this.workspaceGeoserverId = null;
             this.form.controls.banco_geoespacial.setValue(null);
+
             return;
         }
 
         const requestId = ++this.workspaceLookupRequestId;
+
         this.workspaceService.get(Number(workspaceId)).subscribe({
             next: (workspace) => {
                 if (requestId !== this.workspaceLookupRequestId) {
@@ -246,6 +255,7 @@ export class StoreFormPage implements OnInit, OnDestroy {
                 }
 
                 const previousGeoserverId = this.workspaceGeoserverId;
+
                 this.workspaceGeoserverId = workspace.geoserver;
 
                 if (previousGeoserverId !== null && previousGeoserverId !== workspace.geoserver) {
@@ -270,6 +280,7 @@ export class StoreFormPage implements OnInit, OnDestroy {
             if (hasPk) {
                 return this.bancoService.options(query);
             }
+
             return of(this.buildEmptyLookupResponse(query));
         }
 
@@ -317,6 +328,7 @@ export class StoreFormPage implements OnInit, OnDestroy {
 
     private buildCreatePayload(): StoreCreate {
         const raw = this.form.getRawValue();
+
         return {
             workspace: Number(raw.workspace),
             banco_geoespacial: Number(raw.banco_geoespacial),

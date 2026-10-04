@@ -32,6 +32,7 @@ export function resolveCrudPermissions<T>(
     const canDelete = has(keys.delete) || has(keys.manage);
 
     const actions: UiTableAction<T>[] = [];
+
     if (canUpdate && opts.onEdit) {
         actions.push({
             id: 'edit',

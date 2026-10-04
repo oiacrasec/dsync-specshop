@@ -75,6 +75,7 @@ export class BarChart {
 
     setChartColors() {
         const rootStyles = getComputedStyle(document.documentElement);
+
         this.chartColors = {
             surface100: rootStyles.getPropertyValue('--p-surface-100'),
             surface200: rootStyles.getPropertyValue('--p-surface-200'),
@@ -87,10 +88,13 @@ export class BarChart {
 
     setChartData(option: string) {
         const sampledData: any = sampleDataByFixedLength(this.dataset(), option, this.show());
+
         if (sampledData.length <= 0) {
             this.data.set([]);
+
             return;
         }
+
         const rootStyles = getComputedStyle(document.documentElement);
         const primary = rootStyles.getPropertyValue('--p-primary-color');
         const primary600 = rootStyles.getPropertyValue('--p-primary-600');
@@ -98,9 +102,12 @@ export class BarChart {
         if (sampledData[sampledData.length - 1].x === undefined) {
             const lastValidDate = sampledData[sampledData.length - 2].x;
             const interval = this.getIntervalFromOption(option);
+
             sampledData[sampledData.length - 1].x = this.addInterval(lastValidDate, interval);
         }
+
         this.data.set(sampledData);
+
         return {
             datasets: [
                 {
@@ -150,6 +157,7 @@ export class BarChart {
         const dataValue = this.data();
         const endDate = new Date(dataValue[dataValue.length - 1].x);
         const startDate = new Date(dataValue[0].x);
+
         return {
             interaction: {
                 intersect: false,
@@ -167,6 +175,7 @@ export class BarChart {
                     external: function (context: any) {
                         const { chart, tooltip } = context;
                         let tooltipEl = chart.canvas.parentNode.querySelector('div.chartjs-tooltip');
+
                         if (!tooltipEl) {
                             tooltipEl = document.createElement('div');
                             tooltipEl.classList.add(
@@ -189,8 +198,10 @@ export class BarChart {
 
                         if (tooltip.opacity === 0) {
                             tooltipEl.style.opacity = 0;
+
                             return;
                         }
+
                         const datasetPointsX = tooltip.dataPoints.map((dp: any) => dp.element.x);
                         const avgX = datasetPointsX.reduce((a: any, b: any) => a + b, 0) / datasetPointsX.length;
                         const avgY = tooltip.dataPoints[0].element.y;
@@ -198,23 +209,29 @@ export class BarChart {
                         if (tooltip.body) {
                             tooltipEl.innerHTML = '';
                             const tooltipHeader = document.createElement('div');
+
                             tooltipHeader.classList.add('bg-surface-100', 'dark:bg-surface-900', 'px-3', 'py-2.5', 'border-b', 'border-surface', 'text-left', 'label-xsmall');
                             tooltipHeader.appendChild(document.createTextNode(tooltip.title[0]));
                             tooltipEl.appendChild(tooltipHeader);
                             const tooltipBody = document.createElement('div');
+
                             tooltipBody.classList.add('flex', 'flex-col', 'gap-2', 'px-3', 'py-2', 'min-w-50');
                             tooltip.dataPoints.reverse().forEach((body: any) => {
                                 const row = document.createElement('div');
+
                                 row.classList.add('flex', 'items-center', 'gap-2', 'w-full');
                                 const point = document.createElement('div');
+
                                 point.classList.add('w-2.5', 'h-2.5', 'rounded-full');
                                 point.style.backgroundColor = body.dataset.backgroundColor;
                                 row.appendChild(point);
                                 const label = document.createElement('span');
+
                                 label.appendChild(document.createTextNode(body.dataset.label));
                                 label.classList.add('paragraph-xsmall', 'text-base', 'text-surface-950', 'dark:text-surface-0', 'flex-1', 'text-left', 'capitalize');
                                 row.appendChild(label);
                                 const value = document.createElement('span');
+
                                 value.appendChild(document.createTextNode(tooltipPrefix + body.formattedValue));
                                 value.classList.add('paragraph-xsmall', 'text-base', 'text-surface-950', 'dark:text-surface-0', 'text-right');
                                 row.appendChild(value);
@@ -310,6 +327,7 @@ export class BarChart {
                             if (value > 1000) {
                                 return value / 1000 + 'K';
                             }
+
                             return value;
                         }
                     }

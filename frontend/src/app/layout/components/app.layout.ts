@@ -77,20 +77,25 @@ export class AppLayout {
 
     shouldShowAppShell() {
         const user = this.authSession.getUser();
+
         if (user?.is_superuser) {
             return true;
         }
+
         return this.userContextService.hasActiveContext();
     }
 
     shouldShowBreadcrumb() {
         let current: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
+
         while (current) {
             if (current.data?.['hideBreadcrumbBar'] === true) {
                 return false;
             }
+
             current = current.firstChild ?? null;
         }
+
         return true;
     }
 }

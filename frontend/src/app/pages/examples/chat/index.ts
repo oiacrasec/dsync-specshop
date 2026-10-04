@@ -157,18 +157,18 @@ export class Chat implements OnInit {
     selectedUserId = signal<number | null>(null);
     showChatView = false;
 
-    activeChat = computed(() => {
-        return this.chatRooms().find((chat) => chat.id === this.activeChatId()) ?? null;
-    });
+    activeChat = computed(() => this.chatRooms().find((chat) => chat.id === this.activeChatId()) ?? null);
 
     selectedUser = computed(() => {
         const userId = this.selectedUserId();
+
         return userId ? this.userData()[userId] : null;
     });
 
     menuItems = computed<MenuItem[]>(() => {
         this.chatRooms();
         const chat = this.activeChat();
+
         return [
             {
                 label: chat?.pinned ? 'Unpin Chat' : 'Pin Chat',
@@ -193,6 +193,7 @@ export class Chat implements OnInit {
     async ngOnInit() {
         const response = await fetch('/demo/data/chatData.json');
         const data = await response.json();
+
         this.chatRooms.set(data.chatRooms);
         this.currentUser.set(data.currentUser);
         this.userData.set(data.userData);
@@ -214,9 +215,11 @@ export class Chat implements OnInit {
             accept: () => {
                 const rooms = this.chatRooms();
                 const chatIndex = rooms.findIndex((chat) => chat.id === this.activeChatId());
+
                 if (chatIndex !== -1) {
                     rooms.splice(chatIndex, 1);
                     this.chatRooms.set([...rooms]);
+
                     if (rooms.length > 0) {
                         this.activeChatId.set(rooms[0].id);
                     } else {
@@ -231,10 +234,12 @@ export class Chat implements OnInit {
     archiveChat() {
         const rooms = this.chatRooms();
         const chat = rooms.find((c) => c.id === this.activeChatId());
+
         if (chat) {
             chat.archived = true;
             this.chatRooms.set([...rooms]);
             const availableChats = rooms.filter((c) => !c.archived);
+
             if (availableChats.length > 0) {
                 this.activeChatId.set(availableChats[0].id);
             } else {
@@ -247,6 +252,7 @@ export class Chat implements OnInit {
     restoreChat() {
         const rooms = this.chatRooms();
         const chat = rooms.find((c) => c.id === this.activeChatId());
+
         if (chat) {
             chat.archived = false;
             this.chatRooms.set([...rooms]);
@@ -256,6 +262,7 @@ export class Chat implements OnInit {
     togglePin() {
         const rooms = this.chatRooms();
         const chat = rooms.find((c) => c.id === this.activeChatId());
+
         if (chat) {
             chat.pinned = !chat.pinned;
             this.chatRooms.set([...rooms]);
@@ -266,10 +273,12 @@ export class Chat implements OnInit {
         if (participants.length <= 3) {
             return participants.map((p) => p.name).join(', ');
         }
+
         const first3 = participants
             .slice(0, 3)
             .map((p) => p.name)
             .join(', ');
+
         return `${first3} ...`;
     }
 
@@ -279,6 +288,7 @@ export class Chat implements OnInit {
                 this.closeUserProfile();
             } else {
                 const participant = this.activeChat()?.participants?.[0];
+
                 if (participant) {
                     this.openUserProfile(participant.id);
                 }
@@ -338,6 +348,7 @@ export class Chat implements OnInit {
     handleSendMessage(message: Message) {
         const rooms = this.chatRooms();
         const chat = rooms.find((c) => c.id === this.activeChatId());
+
         if (chat) {
             chat.messages.push(message);
             this.chatRooms.set([...rooms]);

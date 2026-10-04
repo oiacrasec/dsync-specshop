@@ -273,23 +273,18 @@ export class ShoppingCart {
 
     promoCode = '';
 
-    subtotal = computed(() => {
-        return this.cartItems().reduce((sum, item) => sum + item.currentPrice * item.quantity, 0);
-    });
+    subtotal = computed(() => this.cartItems().reduce((sum, item) => sum + item.currentPrice * item.quantity, 0));
 
-    totalEarnings = computed(() => {
-        return this.cartItems().reduce((sum, item) => sum + item.earnings * item.quantity, 0);
-    });
+    totalEarnings = computed(() => this.cartItems().reduce((sum, item) => sum + item.earnings * item.quantity, 0));
 
     vat = computed(() => 20.0);
 
-    total = computed(() => {
-        return this.subtotal() + this.vat();
-    });
+    total = computed(() => this.subtotal() + this.vat());
 
     updateQuantity(itemId: number, newQuantity: number) {
         const items = this.cartItems();
         const item = items.find((i) => i.id === itemId);
+
         if (item && newQuantity > 0) {
             item.quantity = newQuantity;
             this.cartItems.set([...items]);
@@ -299,6 +294,7 @@ export class ShoppingCart {
     removeItem(itemId: number) {
         const items = this.cartItems();
         const index = items.findIndex((i) => i.id === itemId);
+
         if (index > -1) {
             items.splice(index, 1);
             this.cartItems.set([...items]);

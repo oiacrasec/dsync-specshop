@@ -64,14 +64,18 @@ export class UsuarioFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             this.loadOrganizacoes();
+
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -85,6 +89,7 @@ export class UsuarioFormPage implements OnInit {
         if (!this.selectedOrganizacaoId) {
             return null;
         }
+
         return this.organizacoesVinculadas.find((item) => item.id === this.selectedOrganizacaoId)?.nome ?? null;
     }
 
@@ -104,6 +109,7 @@ export class UsuarioFormPage implements OnInit {
                 summary: 'Campos obrigatorios',
                 detail: 'Preencha os campos obrigatorios antes de salvar.'
             });
+
             return;
         }
 
@@ -123,6 +129,7 @@ export class UsuarioFormPage implements OnInit {
                         detail: 'Alteracoes salvas com sucesso.'
                     });
                     this.goBack();
+
                     return;
                 }
 
@@ -152,9 +159,11 @@ export class UsuarioFormPage implements OnInit {
 
     copyTemporaryPassword() {
         const temporaryPassword = this.createdUser?.senha_temporaria;
+
         if (!temporaryPassword) {
             return;
         }
+
         navigator.clipboard
             .writeText(temporaryPassword)
             .then(() => {
@@ -181,7 +190,9 @@ export class UsuarioFormPage implements OnInit {
         if (!this.selectedOrganizacaoId) {
             return false;
         }
+
         const selectedPermissions = this.permissoesPorOrganizacao[this.selectedOrganizacaoId] ?? [];
+
         return selectedPermissions.includes(permissionKey);
     }
 
@@ -191,11 +202,14 @@ export class UsuarioFormPage implements OnInit {
         }
 
         const currentPermissions = [...(this.permissoesPorOrganizacao[this.selectedOrganizacaoId] ?? [])];
+
         if (checked) {
             if (!currentPermissions.includes(permissionKey)) {
                 currentPermissions.push(permissionKey);
             }
+
             this.permissoesPorOrganizacao[this.selectedOrganizacaoId] = this.normalizePermissions(currentPermissions);
+
             return;
         }
 
@@ -206,7 +220,9 @@ export class UsuarioFormPage implements OnInit {
         if (!this.selectedOrganizacaoId || !this.selectedPresetCode) {
             return;
         }
+
         const preset = this.presets.find((item) => item.code === this.selectedPresetCode);
+
         if (!preset) {
             return;
         }
@@ -223,7 +239,9 @@ export class UsuarioFormPage implements OnInit {
         if (!this.selectedPresetCode) {
             return;
         }
+
         const preset = this.presets.find((item) => item.code === this.selectedPresetCode);
+
         if (!preset) {
             return;
         }
@@ -243,6 +261,7 @@ export class UsuarioFormPage implements OnInit {
         if (!this.selectedPresetCode) {
             return;
         }
+
         this.confirmationService.confirm({
             header: 'Confirmar aplicação em todas',
             message: 'Deseja aplicar este preset para todas as organizações do usuário?',
@@ -323,6 +342,7 @@ export class UsuarioFormPage implements OnInit {
 
     private buildConfigurationPayload(): UsuarioConfiguracaoUpdate {
         const raw = this.form.getRawValue();
+
         return {
             username: (raw.username ?? '').trim(),
             email: (raw.email ?? '').trim().toLowerCase(),
@@ -338,12 +358,15 @@ export class UsuarioFormPage implements OnInit {
 
     private applyPermissoesConfiguracao(usuario: UsuarioConfiguracao) {
         const nextMap: Record<number, string[]> = {};
+
         for (const organizacao of usuario.organizacoes) {
             nextMap[organizacao.id] = [];
         }
+
         for (const permissao of usuario.permissoes_organizacoes) {
             nextMap[permissao.organizacao_id] = this.normalizePermissions([...(permissao.permissoes ?? [])]);
         }
+
         this.permissoesPorOrganizacao = nextMap;
         this.contratoAdmin = Boolean(usuario.contrato_admin);
     }
@@ -355,6 +378,7 @@ export class UsuarioFormPage implements OnInit {
                 summary: 'Usuario sem organizacoes',
                 detail: 'Vincule ao menos uma organizacao antes de configurar permissoes.'
             });
+
             return false;
         }
 

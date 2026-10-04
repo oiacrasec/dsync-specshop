@@ -153,6 +153,7 @@ export class TaskDrawer implements OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes['task']) {
             const newTask = changes['task'].currentValue;
+
             if (newTask) {
                 this.formData = {
                     id: newTask.id,
@@ -173,9 +174,11 @@ export class TaskDrawer implements OnChanges {
     parseDate(dateStr: string): Date | null {
         if (!dateStr) return null;
         const parts = dateStr.split('.');
+
         if (parts.length === 3) {
             return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
         }
+
         return null;
     }
 
@@ -195,6 +198,7 @@ export class TaskDrawer implements OnChanges {
     filterMembers(event: AutoCompleteCompleteEvent) {
         if (!event.query) {
             this.filteredMembers = this.availableMembers;
+
             return;
         }
 
@@ -204,6 +208,7 @@ export class TaskDrawer implements OnChanges {
     formatDateForSave(date: Date | null): string | null {
         if (!date) return null;
         const d = new Date(date);
+
         return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
     }
 

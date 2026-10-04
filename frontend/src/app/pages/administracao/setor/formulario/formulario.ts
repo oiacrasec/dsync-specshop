@@ -36,13 +36,16 @@ export class SetorFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -63,10 +66,12 @@ export class SetorFormPage implements OnInit {
                 summary: 'Campos obrigatorios',
                 detail: 'Preencha os campos obrigatorios antes de salvar.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request = this.isEditing && this.setorId ? this.setorService.update(this.setorId, payload) : this.setorService.create(payload);

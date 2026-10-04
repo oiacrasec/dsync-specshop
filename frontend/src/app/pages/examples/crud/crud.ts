@@ -335,6 +335,7 @@ export class Crud implements OnInit {
 
     findIndexById(id: string): number {
         let index = -1;
+
         for (let i = 0; i < this.products().length; i++) {
             if (this.products()[i].id === id) {
                 index = i;
@@ -347,10 +348,12 @@ export class Crud implements OnInit {
 
     createId(): string {
         let id = '';
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (var i = 0; i < 5; i++) {
+        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        for (let i = 0; i < 5; i++) {
             id += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+
         return id;
     }
 
@@ -370,6 +373,7 @@ export class Crud implements OnInit {
     saveProduct() {
         this.submitted = true;
         let _products = this.products();
+
         if (this.product.name?.trim()) {
             if (this.product.id) {
                 _products[this.findIndexById(this.product.id)] = this.product;

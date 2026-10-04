@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { generateRandomHeatmapData } from '@/app/lib/utils';
 import { SectionCard } from '@/app/layout/components/ui/sectioncard';
@@ -126,7 +126,7 @@ interface HeatmapData {
         </section>
         <customers-logo-widget class="my-16 landing-container mx-auto" />`
 })
-export class AboutHeroWidget {
+export class AboutHeroWidget implements OnInit {
     layoutService = inject(LayoutService);
 
     isDarkTheme = computed(() => this.layoutService.isDarkTheme());

@@ -378,39 +378,50 @@ export class NewProduct {
     handleCoverUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
+
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 this.coverImage.set(e.target?.result as string);
             };
+
             reader.readAsDataURL(file);
         }
+
         input.value = '';
     }
 
     handleImageUpload(event: Event, index: number) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
+
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 const images = [...this.additionalImages()];
+
                 images[index] = e.target?.result as string;
                 this.additionalImages.set(images);
             };
+
             reader.readAsDataURL(file);
         }
+
         input.value = '';
     }
 
     toggleSize(sizeLabel: string) {
         const sizes = [...this.selectedSizes()];
         const index = sizes.indexOf(sizeLabel);
+
         if (index > -1) {
             sizes.splice(index, 1);
         } else {
             sizes.push(sizeLabel);
         }
+
         this.selectedSizes.set(sizes);
     }
 
@@ -430,6 +441,7 @@ export class NewProduct {
 
     getColorClass(colorValue: string): string {
         const color = this.colorOptions.find((c) => c.value === colorValue);
+
         return color ? color.class : 'bg-gray-500';
     }
 
@@ -441,6 +453,7 @@ export class NewProduct {
     removeAdditionalImage(event: Event, index: number) {
         event.stopPropagation();
         const images = [...this.additionalImages()];
+
         images[index] = null;
         this.additionalImages.set(images);
     }

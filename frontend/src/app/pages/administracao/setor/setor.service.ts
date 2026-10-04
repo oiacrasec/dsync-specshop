@@ -22,6 +22,7 @@ export interface SetorQuery {
 export class SetorService extends BaseCrudService {
     list(query: SetorQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Setor>>(`${this.baseUrl}/administracao/setor/`, { params });
     }
 
@@ -43,6 +44,7 @@ export class SetorService extends BaseCrudService {
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/administracao/setor/options/`, { params });
     }
 }

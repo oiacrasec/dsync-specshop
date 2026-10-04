@@ -23,12 +23,15 @@ function resolvePermissionData(route: ActivatedRouteSnapshot): ResolvedPermissio
 
     for (const snapshot of route.pathFromRoot) {
         const data = (snapshot.data ?? {}) as PermissionGuardData;
+
         if (data.requiredPermission) {
             result.requiredAllPermissions = [data.requiredPermission];
         }
+
         if (Array.isArray(data.requiredAllPermissions)) {
             result.requiredAllPermissions = data.requiredAllPermissions;
         }
+
         if (Array.isArray(data.requiredAnyPermissions)) {
             result.requiredAnyPermissions = data.requiredAnyPermissions;
         }
@@ -48,11 +51,13 @@ export const permissionGuard: CanActivateFn = (route, state) => {
     }
 
     const user = authSession.getUser();
+
     if (user?.is_superuser) {
         return true;
     }
 
     const { requiredAllPermissions, requiredAnyPermissions } = resolvePermissionData(route);
+
     if (requiredAllPermissions.length === 0 && requiredAnyPermissions.length === 0) {
         return true;
     }
@@ -67,6 +72,7 @@ export const permissionGuard: CanActivateFn = (route, state) => {
         map(() => {
             const hasAll = permissionContext.hasAllPermissions(requiredAllPermissions);
             const hasAny = permissionContext.hasAnyPermission(requiredAnyPermissions);
+
             return hasAll && hasAny
                 ? true
                 : router.createUrlTree([ACCESS_DENIED_PATH], {

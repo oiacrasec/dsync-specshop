@@ -169,10 +169,12 @@ export class EditorMapService {
         this.clearFeatureEdit();
         this.clearHighlight();
         this.drawSource.clear();
+
         if (this.mapSingleClickKey) {
             unByKey(this.mapSingleClickKey);
             this.mapSingleClickKey = undefined;
         }
+
         this.mapClickHandler = undefined;
         this.wmsLayers.forEach((layer) => this.olMap?.removeLayer(layer));
         this.wmsLayers.clear();
@@ -214,6 +216,7 @@ export class EditorMapService {
                 dataProjection: `EPSG:${srid}`,
                 featureProjection: 'EPSG:3857'
             });
+
             this.drawSource.clear();
             this.drawSource.addFeature(new Feature({ geometry: parsedGeometry }));
         } catch {
@@ -231,19 +234,23 @@ export class EditorMapService {
         }
 
         const activeLayerIds = new Set<number>();
+
         for (const layer of layers) {
             if (layer.id <= 0) {
                 continue;
             }
+
             activeLayerIds.add(layer.id);
             const visible = layer.visivel && layer.status === 'ACTIVE';
             const existing = this.wmsLayers.get(layer.id);
+
             if (!existing) {
                 const wmsLayer = new TileLayer({
                     source: this.createAuthenticatedWmsSource(mapaId, layer.id),
                     visible,
                     zIndex: 100 + layer.ordem
                 });
+
                 this.wmsLayers.set(layer.id, wmsLayer);
                 this.olMap.addLayer(wmsLayer);
                 continue;
@@ -268,9 +275,11 @@ export class EditorMapService {
     refreshWmsLayer(layerId: number) {
         const layer = this.wmsLayers.get(layerId);
         const source = layer?.getSource();
+
         if (!source) {
             return;
         }
+
         this.wmsRefreshToken += 1;
         source.updateParams({
             _ts: `${Date.now()}-${this.wmsRefreshToken}`
@@ -285,11 +294,13 @@ export class EditorMapService {
 
         this.clearDrawMode();
         this.drawSource.clear();
+
         if (!config) {
             return true;
         }
 
         const resolvedType = this.resolveDrawType(config.geomType);
+
         if (!resolvedType) {
             return false;
         }
@@ -298,25 +309,32 @@ export class EditorMapService {
             source: this.drawSource,
             type: resolvedType
         });
+
         interaction.on('drawend', (event) => {
             const geometry = this.geojson.writeGeometryObject(event.feature.getGeometry() as Geometry, {
                 dataProjection: `EPSG:${config.srid}`,
                 featureProjection: 'EPSG:3857'
             });
+
             this.drawSource.clear();
+
             if (!geometry || typeof geometry !== 'object') {
                 return;
             }
+
             if (this.ngZone) {
                 this.ngZone.run(() => config.onDrawEnd(geometry as Record<string, any>));
+
                 return;
             }
+
             config.onDrawEnd(geometry as Record<string, any>);
         });
 
         this.drawInteraction = interaction;
         this.drawModeLayerId = config.layerId;
         this.olMap.addInteraction(interaction);
+
         return true;
     }
 
@@ -324,6 +342,7 @@ export class EditorMapService {
         if (!this.olMap || !this.drawInteraction) {
             this.drawInteraction = undefined;
             this.drawModeLayerId = null;
+
             return;
         }
 
@@ -346,6 +365,7 @@ export class EditorMapService {
         });
 
         const feature = new Feature({ geometry: parsedGeometry });
+
         this.featureEditSource.addFeature(feature);
         this.featureEditSrid = config.srid;
         this.featureEditModifyCallback = config.onModifyEnd;
@@ -354,11 +374,14 @@ export class EditorMapService {
             source: this.featureEditSource,
             pixelTolerance: 10
         });
+
         interaction.on('modifyend', () => {
             const geometry = this.getFeatureEditGeometry();
+
             if (!geometry || !this.featureEditModifyCallback) {
                 return;
             }
+
             this.featureEditModifyCallback(geometry);
         });
         this.featureEditInteraction = interaction;
@@ -366,6 +389,7 @@ export class EditorMapService {
 
         if (config.fitToGeometry !== false) {
             const extent = parsedGeometry.getExtent();
+
             if (extent && Number.isFinite(extent[0])) {
                 this.olMap.getView().fit(extent, {
                     padding: [64, 64, 64, 64],
@@ -382,6 +406,7 @@ export class EditorMapService {
         if (this.olMap && this.featureEditInteraction) {
             this.olMap.removeInteraction(this.featureEditInteraction);
         }
+
         this.featureEditInteraction = undefined;
         this.featureEditSrid = null;
         this.featureEditModifyCallback = undefined;
@@ -396,6 +421,7 @@ export class EditorMapService {
         const feature = this.featureEditSource.getFeatures()[0];
         const geometry = feature?.getGeometry();
         const targetSrid = srid ?? this.featureEditSrid;
+
         if (!geometry || !targetSrid) {
             return null;
         }
@@ -404,9 +430,11 @@ export class EditorMapService {
             dataProjection: `EPSG:${targetSrid}`,
             featureProjection: 'EPSG:3857'
         });
+
         if (!serialized || typeof serialized !== 'object') {
             return null;
         }
+
         return serialized as Record<string, any>;
     }
 
@@ -416,17 +444,21 @@ export class EditorMapService {
         }
 
         let hit = false;
+
         this.olMap.forEachFeatureAtPixel(
             pixel,
             (_feature, layer) => {
                 if (layer === this.featureEditLayer) {
                     hit = true;
+
                     return true;
                 }
+
                 return undefined;
             },
             { hitTolerance }
         );
+
         return hit;
     }
 
@@ -437,6 +469,7 @@ export class EditorMapService {
 
         const topLeft = this.olMap.getCoordinateFromPixel([pixel[0] - tolerancePx, pixel[1] - tolerancePx]);
         const bottomRight = this.olMap.getCoordinateFromPixel([pixel[0] + tolerancePx, pixel[1] + tolerancePx]);
+
         if (!topLeft || !bottomRight) {
             return null;
         }
@@ -469,6 +502,7 @@ export class EditorMapService {
             }
 
             let geometry: Geometry;
+
             try {
                 geometry = this.geojson.readGeometry(candidate.geometry, {
                     dataProjection: `EPSG:${srid}`,
@@ -511,15 +545,18 @@ export class EditorMapService {
             if (!geometryPayload || typeof geometryPayload !== 'object') {
                 continue;
             }
+
             try {
                 const geometry = this.geojson.readGeometry(geometryPayload, {
                     dataProjection: `EPSG:${srid}`,
                     featureProjection: 'EPSG:3857'
                 });
                 const extent = geometry.getExtent();
+
                 if (!extent || !Number.isFinite(extent[0])) {
                     continue;
                 }
+
                 minx = Math.min(minx, extent[0]);
                 miny = Math.min(miny, extent[1]);
                 maxx = Math.max(maxx, extent[2]);
@@ -535,11 +572,13 @@ export class EditorMapService {
         }
 
         const extent: [number, number, number, number] = [minx, miny, maxx, maxy];
+
         this.olMap.getView().fit(extent, {
             padding: [64, 64, 64, 64],
             duration: 220,
             maxZoom: 18
         });
+
         return true;
     }
 
@@ -555,12 +594,15 @@ export class EditorMapService {
         });
 
         const feature = new Feature({ geometry: parsedGeometry });
+
         this.highlightSource.addFeature(feature);
 
         const extent = parsedGeometry.getExtent();
+
         if (!extent || !Number.isFinite(extent[0])) {
             return;
         }
+
         this.olMap.getView().fit(extent, {
             padding: [64, 64, 64, 64],
             duration: 220,
@@ -593,6 +635,7 @@ export class EditorMapService {
 
             if (this.ngZone) {
                 this.ngZone.run(() => this.mapClickHandler?.(payload));
+
                 return;
             }
 
@@ -616,23 +659,29 @@ export class EditorMapService {
 
     private loadAuthenticatedTile(tile: AuthenticatedTile, src: string) {
         const image = tile.getImage();
+
         if (!image) {
             return;
         }
 
         const headers = this.buildMapApiHeaders();
+
         if (!headers.has('Authorization')) {
             image.removeAttribute('src');
+
             return;
         }
 
         tile.__abortController?.abort();
         const abortController = new AbortController();
+
         tile.__abortController = abortController;
         const requestToken = ++this.wmsTileRequestToken;
+
         tile.__requestToken = requestToken;
 
         const previousBlobUrl = tile.__blobUrl;
+
         if (previousBlobUrl) {
             URL.revokeObjectURL(previousBlobUrl);
             tile.__blobUrl = undefined;
@@ -643,39 +692,50 @@ export class EditorMapService {
                 if (tile.__requestToken !== requestToken) {
                     return null;
                 }
+
                 const contentType = String(response.headers.get('Content-Type') || response.headers.get('content-type') || '').toLowerCase();
+
                 if (!response.ok) {
                     return response
                         .text()
                         .catch(() => '')
                         .then((bodyText) => {
                             const snippet = bodyText.slice(0, 300).trim();
+
                             throw new Error(`Falha no carregamento WMS (${response.status})${snippet ? `: ${snippet}` : ''}`);
                         });
                 }
+
                 if (contentType && !contentType.startsWith('image/')) {
                     return response
                         .text()
                         .catch(() => '')
                         .then((bodyText) => {
                             const snippet = bodyText.slice(0, 300).trim();
+
                             throw new Error(`Resposta WMS nao e imagem (${contentType || 'desconhecido'})${snippet ? `: ${snippet}` : ''}`);
                         });
                 }
+
                 return response.blob();
             })
             .then((blob) => {
                 if (!(blob instanceof Blob)) {
                     return;
                 }
+
                 if (tile.__requestToken !== requestToken) {
                     return;
                 }
+
                 const objectUrl = URL.createObjectURL(blob);
+
                 if (tile.__requestToken !== requestToken) {
                     URL.revokeObjectURL(objectUrl);
+
                     return;
                 }
+
                 tile.__blobUrl = objectUrl;
 
                 image.onload = () => {
@@ -684,18 +744,21 @@ export class EditorMapService {
                         tile.__blobUrl = undefined;
                     }
                 };
+
                 image.onerror = () => {
                     if (tile.__blobUrl === objectUrl) {
                         URL.revokeObjectURL(objectUrl);
                         tile.__blobUrl = undefined;
                     }
                 };
+
                 image.src = objectUrl;
             })
             .catch((error) => {
                 if (abortController.signal.aborted || tile.__requestToken !== requestToken) {
                     return;
                 }
+
                 // Ajuda a diagnosticar erro de proxy/autenticacao/GeoServer sem depender do ORB do browser.
                 console.error('[MapEditor][WMS] Falha ao carregar tile', error);
                 image.removeAttribute('src');
@@ -705,6 +768,7 @@ export class EditorMapService {
     private buildMapApiHeaders() {
         const headers = new Headers();
         const token = this.authSession.getAccessToken();
+
         if (!token) {
             return headers;
         }
@@ -712,17 +776,20 @@ export class EditorMapService {
         headers.set('Authorization', `Bearer ${token}`);
 
         const user = this.authSession.getUser();
+
         if (user?.is_superuser) {
             return headers;
         }
 
         const context = this.userContextService.getActiveContext();
+
         if (!context) {
             return headers;
         }
 
         headers.set('X-Contrato-Id', String(context.contrato_id));
         headers.set('X-Organizacao-Id', String(context.organizacao_id));
+
         return headers;
     }
 
@@ -730,18 +797,23 @@ export class EditorMapService {
         const normalizedType = String(geomType || '')
             .trim()
             .toUpperCase();
+
         if (!normalizedType) {
             return null;
         }
+
         if (normalizedType === 'POINT' || normalizedType === 'MULTIPOINT') {
             return 'Point';
         }
+
         if (normalizedType === 'LINESTRING' || normalizedType === 'MULTILINESTRING') {
             return 'LineString';
         }
+
         if (normalizedType === 'POLYGON' || normalizedType === 'MULTIPOLYGON') {
             return 'Polygon';
         }
+
         return null;
     }
 }

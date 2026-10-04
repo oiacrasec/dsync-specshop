@@ -65,6 +65,7 @@ export class PrimeiroAcessoTrocarSenhaPage {
                 summary: 'Campos obrigatorios',
                 detail: 'Preencha os campos obrigatorios antes de continuar.'
             });
+
             return;
         }
 
@@ -84,6 +85,7 @@ export class PrimeiroAcessoTrocarSenhaPage {
                 },
                 error: (error) => {
                     const detail = error?.error?.detail ?? error?.error?.current_password?.[0] ?? error?.error?.new_password?.[0] ?? error?.error?.new_password_confirm?.[0] ?? 'Nao foi possivel trocar a senha.';
+
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Falha ao trocar senha',

@@ -37,6 +37,7 @@ export interface MapaQuery {
 export class MapaService extends BaseCrudService {
     list(query: MapaQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Mapa>>(`${this.baseUrl}/mapa/mapa/`, { params });
     }
 
@@ -82,6 +83,7 @@ export class MapaService extends BaseCrudService {
 
     removeLayerColumn(mapaId: number, layerId: number, columnName: string, confirmIrreversible = true) {
         const encodedColumn = encodeURIComponent(columnName);
+
         return this.http
             .delete<{ data: MapaLayerColumn[]; detail?: string }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/${encodedColumn}/`, {
                 params: this.buildParams({ confirm_irreversible: confirmIrreversible })

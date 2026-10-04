@@ -9,6 +9,7 @@ import { BaseCrudService } from '@/app/core/services/base-crud.service';
 export class UsuarioService extends BaseCrudService {
     list(query: UsuarioQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Usuario>>(`${this.baseUrl}/autorizacao/usuarios/`, { params }).pipe(
             map((response) => ({
                 ...response,

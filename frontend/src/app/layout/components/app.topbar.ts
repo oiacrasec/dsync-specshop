@@ -276,12 +276,15 @@ export class AppTopbar {
 
     shouldShowBreadcrumb() {
         let current: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
+
         while (current) {
             if (current.data?.['hideBreadcrumbBar'] === true) {
                 return false;
             }
+
             current = current.firstChild ?? null;
         }
+
         return true;
     }
 
@@ -307,6 +310,7 @@ export class AppTopbar {
     switchContext(event: Event) {
         event.preventDefault();
         const currentUrl = this.router.url || '/kpi';
+
         this.router.navigate(['/contexto/selecao'], { queryParams: { returnUrl: currentUrl } });
     }
 

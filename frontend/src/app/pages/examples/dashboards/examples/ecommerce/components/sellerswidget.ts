@@ -129,6 +129,7 @@ export class SellersWidget {
 
     toggleSellerListMenu(index: number, event: any) {
         const menusToToggle = this.sellerListMenu.toArray();
+
         menusToToggle[index].toggle(event);
     }
 }

@@ -62,12 +62,14 @@ export class ContratoFormPage implements OnInit {
 
     ngOnInit() {
         const tabParam = this.route.snapshot.queryParamMap.get('tab');
+
         if (tabParam === 'primeiro-acesso' || tabParam === 'administradores') {
             this.requestedTab = tabParam;
             this.activeTab = tabParam;
         }
 
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (idParam) {
             this.isEditing = true;
             this.contratoId = Number(idParam);
@@ -96,10 +98,12 @@ export class ContratoFormPage implements OnInit {
                 summary: 'Campos obrigatorios',
                 detail: 'Preencha os campos obrigatorios antes de salvar.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request = this.isEditing && this.contratoId ? this.contratoService.update(this.contratoId, payload) : this.contratoService.create(payload);
@@ -116,6 +120,7 @@ export class ContratoFormPage implements OnInit {
 
                 if (this.isEditing) {
                     this.goBack();
+
                     return;
                 }
 
@@ -144,6 +149,7 @@ export class ContratoFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios para provisionar o primeiro acesso.'
             });
+
             return;
         }
 
@@ -207,6 +213,7 @@ export class ContratoFormPage implements OnInit {
 
     copyTemporaryPassword() {
         const temporaryPassword = this.provisionamentoResult?.senha_temporaria;
+
         if (!temporaryPassword) {
             return;
         }
@@ -231,6 +238,7 @@ export class ContratoFormPage implements OnInit {
 
     copyResetTemporaryPassword() {
         const temporaryPassword = this.resetSenhaResult?.senha_temporaria;
+
         if (!temporaryPassword) {
             return;
         }
@@ -271,6 +279,7 @@ export class ContratoFormPage implements OnInit {
                 });
 
                 const currentOrganizationName = this.primeiroAcessoForm.controls.organizacao_nome.value.trim();
+
                 if (!currentOrganizationName) {
                     this.primeiroAcessoForm.patchValue({
                         organizacao_nome: `${contrato.nome} - Organização Principal`
@@ -321,21 +330,25 @@ export class ContratoFormPage implements OnInit {
 
         if (this.requestedTab) {
             const requested = this.requestedTab;
+
             this.requestedTab = null;
 
             if (requested === 'primeiro-acesso' && this.administradores.length === 0) {
                 this.activeTab = 'primeiro-acesso';
+
                 return;
             }
 
             if (requested === 'administradores' && this.administradores.length > 0) {
                 this.activeTab = 'administradores';
+
                 return;
             }
         }
 
         if (this.administradores.length > 0 && this.activeTab === 'primeiro-acesso') {
             this.activeTab = 'administradores';
+
             return;
         }
 
@@ -346,6 +359,7 @@ export class ContratoFormPage implements OnInit {
 
     private buildPayload(): ContratoCreate {
         const raw = this.form.getRawValue();
+
         return {
             nome: raw.nome.trim(),
             data_inicio: raw.data_inicio,
@@ -357,6 +371,7 @@ export class ContratoFormPage implements OnInit {
 
     private buildPrimeiroAcessoPayload(): ContratoProvisionamentoInicialCreate {
         const raw = this.primeiroAcessoForm.getRawValue();
+
         return {
             organizacao_nome: raw.organizacao_nome.trim(),
             usuario_nome: raw.usuario_nome.trim(),

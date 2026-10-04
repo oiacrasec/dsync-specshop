@@ -268,7 +268,9 @@ export class UserList {
 
     menuItems = computed(() => {
         const userId = this.selectedUserId();
+
         if (!userId) return [];
+
         return [
             {
                 label: 'Edit',
@@ -319,6 +321,7 @@ export class UserList {
 
     openEditDialog(userId: number) {
         const user = this.users().find((u) => u.id === userId);
+
         if (user) {
             this.editingUser = user;
             this.editForm = {
@@ -337,6 +340,7 @@ export class UserList {
         if (this.editingUser) {
             const users = this.users();
             const index = users.findIndex((u) => u.id === this.editingUser!.id);
+
             if (index !== -1) {
                 users[index] = {
                     ...users[index],
@@ -349,6 +353,7 @@ export class UserList {
                 };
                 this.users.set([...users]);
             }
+
             this.editDialogVisible = false;
             this.editingUser = null;
         }

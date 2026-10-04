@@ -17,7 +17,7 @@ import { AccordionModule } from 'primeng/accordion';
                         <p-accordion-panel
                             [value]="index"
                             class="border! border-surface! dark:border-white/10! bg-white/64! dark:bg-white/10! shadow-[0px_10px_10px_-8px_rgba(18,18,23,0.02),0px_2px_2px_-1.5px_rgba(18,18,23,0.02),0px_1px_1px_-0.5px_rgba(18,18,23,0.02),0px_0px_0px_1px_rgba(18,18,23,0.02)]"
-                            [ngClass]="{ 'rounded-3xl': preset() == 'Aura' }"
+                            [ngClass]="{ 'rounded-3xl': preset() === 'Aura' }"
                         >
                             <p-accordion-header [ngClass]="{ 'rounded-none! border!': preset() !== 'Aura' }" class="p-6! bg-transparent! data-[p-active=true]:pb-4! transition-all! duration-200!">
                                 <h5 class="font-medium text-xl">{{ faq.question }}</h5>

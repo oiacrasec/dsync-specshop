@@ -149,6 +149,7 @@ export class BusinessInformation {
 
     getSalaryRangeDisplay(): string {
         const range = this.formState().salaryRange;
+
         return `${range[0].toLocaleString()}-${range[1].toLocaleString()}`;
     }
 

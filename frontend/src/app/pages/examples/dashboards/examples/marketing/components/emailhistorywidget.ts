@@ -227,6 +227,7 @@ export class EmailHistoryWidget {
 
     onFilter() {
         const value = this.searchInput();
+
         this.dt.filterGlobal(value, this.filters.global.matchMode);
     }
 }

@@ -492,9 +492,11 @@ export class TaskList {
         setTimeout(() => {
             const tasks = this.taskData();
             const taskIndex = tasks.findIndex((t) => t.id === task.id);
+
             if (taskIndex !== -1) {
                 const updatedTask = { ...tasks[taskIndex], status: completed ? 'completed' : 'pending', completed };
                 const remainingTasks = tasks.filter((t) => t.id !== task.id);
+
                 this.taskData.set([updatedTask, ...remainingTasks]);
             }
         }, 400);
@@ -516,6 +518,7 @@ export class TaskList {
             },
             accept: () => {
                 const tasks = this.taskData().filter((task) => task.id !== taskId);
+
                 this.taskData.set(tasks);
             }
         });
@@ -547,10 +550,12 @@ export class TaskList {
                 endDate: newTaskData.endDate || null,
                 members: newTaskData.members || []
             };
+
             this.taskData.set([newTask, ...tasks]);
         } else {
             const tasks = this.taskData();
             const taskIndex = tasks.findIndex((t) => t.id === newTaskData.id);
+
             if (taskIndex !== -1) {
                 tasks[taskIndex] = {
                     ...tasks[taskIndex],
@@ -560,6 +565,7 @@ export class TaskList {
                 this.taskData.set([...tasks]);
             }
         }
+
         this.isDrawerVisible = false;
     }
 

@@ -41,9 +41,11 @@ export class HeatMapChart {
 
     createChart() {
         const ctx = (document.getElementById('heatmap') as HTMLCanvasElement).getContext('2d');
+
         if (this.chart) {
             this.chart.destroy();
         }
+
         this.chart = new ChartJS(ctx!, {
             type: 'matrix',
             data: this.chartData,
@@ -77,6 +79,7 @@ export class HeatMapChart {
                 break;
             }
         }
+
         return rootStyles.getPropertyValue(backgroundColor);
     }
 
@@ -93,10 +96,12 @@ export class HeatMapChart {
                     borderWidth: 0,
                     width(c: any) {
                         const a = c.chart.chartArea || {};
+
                         return (a.right - a.left) / 14 - 1;
                     },
                     height(c: any) {
                         const a = c.chart.chartArea || {};
+
                         return (a.bottom - a.top) / 9 - 1;
                     }
                 }

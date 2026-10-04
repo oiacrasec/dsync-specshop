@@ -18,6 +18,7 @@ export class EditorLayoutState {
 
     toggleLayersPanelVisibility() {
         this.layersPanelVisible = !this.layersPanelVisible;
+
         if (this.layersPanelVisible) {
             this.layersMenuOpen = true;
         }

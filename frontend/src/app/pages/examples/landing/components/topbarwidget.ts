@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, afterNextRender, computed, inject, signal, viewChild, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LogoWidget } from './logowidget';
 
@@ -78,7 +78,7 @@ import { LogoWidget } from './logowidget';
         </section>
     `
 })
-export class TopbarWidget {
+export class TopbarWidget implements OnDestroy {
     private router = inject(Router);
     private elRef = inject(ElementRef);
 
@@ -97,8 +97,10 @@ export class TopbarWidget {
     maxHeightStyle = computed(() => {
         if (this.openMobileMenu()) {
             const content = this.menuContent();
+
             return content ? `${content.nativeElement.scrollHeight}px` : '0px';
         }
+
         return '0px';
     });
 
@@ -121,6 +123,7 @@ export class TopbarWidget {
     @HostListener('document:click', ['$event'])
     handleClickOutside(event: Event) {
         const navElement = this.elRef.nativeElement;
+
         if (navElement && !navElement.contains(event.target)) {
             this.openMobileMenu.set(false);
         }

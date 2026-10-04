@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, computed, input, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, input, signal, viewChild, AfterViewInit } from '@angular/core';
 
 @Component({
     selector: 'lazy-image-widget',
@@ -7,7 +7,7 @@ import { Component, ElementRef, computed, input, signal, viewChild } from '@angu
     imports: [CommonModule],
     template: `<img [src]="isIntersecting() ? src() : ''" [alt]="alt()" [ngClass]="imgClass()" (load)="handleLoad()" #image [style]="style()" />`
 })
-export class LazyImageWidget {
+export class LazyImageWidget implements AfterViewInit {
     src = input.required<string>();
     alt = input<string>('');
     className = input<string>('');
@@ -30,6 +30,7 @@ export class LazyImageWidget {
 
     ngAfterViewInit() {
         const imageEl = this.image();
+
         if (!imageEl) return;
 
         const observer = new IntersectionObserver(

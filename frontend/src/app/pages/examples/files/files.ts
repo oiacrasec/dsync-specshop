@@ -550,6 +550,7 @@ export class Files {
 
     filteredDocuments = computed(() => {
         const docs = this.documents();
+
         switch (this.activeFilter()) {
             case 'Recently Uploaded':
                 return [...docs].sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
@@ -613,6 +614,7 @@ export class Files {
             SVG: 'success',
             SQL: 'contrast'
         };
+
         return severityMap[type] || 'secondary';
     }
 
@@ -655,15 +657,18 @@ export class Files {
                 icon: this.getIconByType(this.editForm.type || ''),
                 comments: []
             };
+
             this.documents.set([newDoc, ...docs]);
         } else if (this.editingItem) {
             const docs = this.documents();
             const index = docs.findIndex((d) => d.id === this.editingItem!.id);
+
             if (index !== -1) {
                 docs[index] = { ...docs[index], ...this.editForm } as Document;
                 this.documents.set([...docs]);
             }
         }
+
         this.showEditDrawer = false;
     }
 
@@ -675,6 +680,7 @@ export class Files {
                 content: this.newComment.trim(),
                 time: 'Just now'
             };
+
             this.editingItem.comments.push(comment);
             this.newComment = '';
         }
@@ -683,6 +689,7 @@ export class Files {
     removeComment(commentId: number) {
         if (this.editingItem?.comments) {
             const commentIndex = this.editingItem.comments.findIndex((c) => c.id === commentId);
+
             if (commentIndex !== -1) {
                 this.editingItem.comments.splice(commentIndex, 1);
             }
@@ -703,6 +710,7 @@ export class Files {
             PPTX: 'pi-file',
             SQL: 'pi-database'
         };
+
         return iconMap[type] || 'pi-file';
     }
 
@@ -713,8 +721,10 @@ export class Files {
     handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
+
         if (file) {
             const currentDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
             this.editForm.fileName = file.name.split('.')[0];
             this.editForm.type = file.name.split('.').pop()?.toUpperCase() || '';
             this.editForm.fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
@@ -723,12 +733,15 @@ export class Files {
                 if (!this.editForm.uploadDate) {
                     this.editForm.uploadDate = currentDate;
                 }
+
                 if (!this.editForm.editDate) {
                     this.editForm.editDate = currentDate;
                 }
+
                 if (!this.editForm.owner) {
                     this.editForm.owner = 'Robert Fox';
                 }
+
                 if (!this.editForm.size) {
                     this.editForm.size = '-';
                 }
@@ -776,9 +789,11 @@ export class Files {
     deleteDocument(documentId: number) {
         const docs = this.documents();
         const index = docs.findIndex((d) => d.id === documentId);
+
         if (index !== -1) {
             docs.splice(index, 1);
             this.documents.set([...docs]);
+
             if (this.editingItem?.id === documentId) {
                 this.showEditDrawer = false;
             }

@@ -42,13 +42,16 @@ export class WorkspaceFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -69,10 +72,12 @@ export class WorkspaceFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request = this.isEditing && this.workspaceId ? this.workspaceService.update(this.workspaceId, payload) : this.workspaceService.create(payload);

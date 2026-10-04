@@ -88,6 +88,7 @@ export class UiInputDate implements ControlValueAccessor {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }
+
         this.initLocale();
     }
 
@@ -97,17 +98,24 @@ export class UiInputDate implements ControlValueAccessor {
     writeValue(value: string | Date | null | undefined): void {
         if (value == null) {
             this.value = '';
+
             return;
         }
+
         if (typeof value === 'string' && this.dataType === 'string') {
             this.value = this.formatFromIso(value);
+
             return;
         }
+
         if (value instanceof Date) {
             const iso = this.toIsoFromDate(value);
+
             this.value = this.formatFromIso(iso);
+
             return;
         }
+
         this.value = String(value);
     }
 
@@ -126,19 +134,27 @@ export class UiInputDate implements ControlValueAccessor {
     handleChange(value: string | Date | null) {
         if (this.useMask && this.dataType === 'string' && typeof value === 'string') {
             const masked = this.applyMask(value);
+
             this.value = masked;
             const iso = this.toIsoFromDisplay(masked);
+
             this.onChange(iso ?? '');
+
             return;
         }
+
         if (value instanceof Date) {
             const iso = this.toIsoFromDate(value);
+
             this.value = this.formatFromIso(iso);
             this.onChange(iso);
+
             return;
         }
+
         this.value = value ? String(value) : '';
         const iso = this.toIsoFromDisplay(this.value);
+
         this.onChange(iso ?? '');
     }
 
@@ -154,8 +170,10 @@ export class UiInputDate implements ControlValueAccessor {
         }
 
         const masked = this.applyMask(rawValue);
+
         this.value = masked;
         const iso = this.toIsoFromDisplay(masked);
+
         this.onChange(iso ?? '');
     }
 
@@ -191,6 +209,7 @@ export class UiInputDate implements ControlValueAccessor {
                 order.push('y');
             } else if (part.type === 'literal' && separator === '/') {
                 const trimmed = part.value.trim();
+
                 if (trimmed) {
                     separator = trimmed[0];
                 }
@@ -200,6 +219,7 @@ export class UiInputDate implements ControlValueAccessor {
         if (order.length === 3) {
             this.dateOrder = order;
         }
+
         this.maskSeparator = separator;
     }
 
@@ -215,11 +235,14 @@ export class UiInputDate implements ControlValueAccessor {
         for (const part of this.dateOrder) {
             const size = sizes[part];
             const chunk = clipped.slice(index, index + size);
+
             if (!chunk) {
                 break;
             }
+
             segments.push(this.normalizeSegment(part, chunk));
             index += chunk.length;
+
             if (chunk.length < size) {
                 break;
             }
@@ -230,19 +253,25 @@ export class UiInputDate implements ControlValueAccessor {
 
     private toIsoFromDisplay(display: string) {
         const digits = display.replace(/\D/g, '');
+
         if (digits.length < 8) {
             return null;
         }
+
         const map: Record<'d' | 'm' | 'y', string> = { d: '', m: '', y: '' };
         let index = 0;
+
         for (const part of this.dateOrder) {
             const size = part === 'y' ? 4 : 2;
+
             map[part] = digits.slice(index, index + size);
             index += size;
         }
+
         if (!map.y || !map.m || !map.d) {
             return null;
         }
+
         return `${map.y}-${map.m}-${map.d}`;
     }
 
@@ -250,6 +279,7 @@ export class UiInputDate implements ControlValueAccessor {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
+
         return `${year}-${month}-${day}`;
     }
 
@@ -257,26 +287,34 @@ export class UiInputDate implements ControlValueAccessor {
         if (value.length < 2 || part === 'y') {
             return part === 'y' && value.length > 4 ? value.slice(0, 4) : value;
         }
+
         const num = Number(value);
+
         if (Number.isNaN(num)) {
             return value;
         }
+
         if (part === 'd') {
             return String(Math.min(Math.max(num, 1), 31)).padStart(2, '0');
         }
+
         if (part === 'm') {
             return String(Math.min(Math.max(num, 1), 12)).padStart(2, '0');
         }
+
         return value;
     }
 
     private formatFromIso(value: string) {
         const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
         if (!isoMatch) {
             return value;
         }
+
         const [, year, month, day] = isoMatch;
         const map: Record<'d' | 'm' | 'y', string> = { d: day, m: month, y: year };
+
         return this.dateOrder.map((part) => map[part]).join(this.maskSeparator);
     }
 
@@ -286,6 +324,7 @@ export class UiInputDate implements ControlValueAccessor {
         }
 
         const map: Record<'d' | 'm' | 'y', string> = { d: 'dd', m: 'mm', y: 'yy' };
+
         return this.dateOrder.map((part) => map[part]).join(this.maskSeparator);
     }
 
@@ -295,6 +334,7 @@ export class UiInputDate implements ControlValueAccessor {
         }
 
         const map: Record<'d' | 'm' | 'y', string> = { d: 'dd', m: 'mm', y: 'yyyy' };
+
         return this.dateOrder.map((part) => map[part]).join(this.maskSeparator);
     }
 
@@ -302,6 +342,7 @@ export class UiInputDate implements ControlValueAccessor {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 }

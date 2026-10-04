@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, computed } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -74,7 +74,7 @@ interface ComposeData {
         </p-dialog>
     `
 })
-export class ComposeDialog {
+export class ComposeDialog implements OnChanges {
     @Input() visible = false;
     @Input() initialData: ComposeData = { to: '', subject: '', message: '' };
     @Output() visibleChange = new EventEmitter<boolean>();

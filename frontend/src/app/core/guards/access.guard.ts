@@ -15,9 +15,11 @@ function resolveGuardData(route: ActivatedRouteSnapshot): Required<AccessGuardDa
 
     for (const snapshot of route.pathFromRoot) {
         const data = (snapshot.data ?? {}) as AccessGuardData;
+
         if (data.audience) {
             audience = data.audience;
         }
+
         if (typeof data.requireContext === 'boolean') {
             requireContext = data.requireContext;
         }
@@ -44,6 +46,7 @@ export const accessGuard: CanActivateFn = (route, state) => {
         if (state.url.startsWith(FIRST_ACCESS_PASSWORD_PATH)) {
             return true;
         }
+
         return router.createUrlTree([FIRST_ACCESS_PASSWORD_PATH], {
             queryParams: { returnUrl: state.url }
         });
@@ -61,6 +64,7 @@ export const accessGuard: CanActivateFn = (route, state) => {
         if (state.url.startsWith(CONTEXT_SELECTION_PATH)) {
             return true;
         }
+
         return router.createUrlTree([CONTEXT_SELECTION_PATH], {
             queryParams: { returnUrl: state.url }
         });

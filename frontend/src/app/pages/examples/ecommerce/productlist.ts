@@ -240,6 +240,7 @@ export class ProductList {
 
         if (this.searchQuery.trim()) {
             const query = this.searchQuery.toLowerCase();
+
             filtered = filtered.filter((product) => product.name.toLowerCase().includes(query));
         }
 

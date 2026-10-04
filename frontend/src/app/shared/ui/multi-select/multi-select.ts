@@ -119,6 +119,7 @@ export class UiMultiSelect implements ControlValueAccessor {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 }

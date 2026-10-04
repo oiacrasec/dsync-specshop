@@ -58,6 +58,7 @@ export class AppBreadcrumb {
     private updateBreadcrumbs() {
         const root = this.router.routerState.snapshot.root;
         const breadcrumbs: Breadcrumb[] = [];
+
         this.addBreadcrumb(root, [], breadcrumbs);
         this.ensureActionParentBreadcrumb(breadcrumbs);
 
@@ -76,21 +77,25 @@ export class AppBreadcrumb {
 
         const lastIndex = breadcrumbs.length - 1;
         const current = breadcrumbs[lastIndex];
+
         if (!current?.label) {
             return;
         }
 
         const inferredParentLabel = this.extractParentLabelFromAction(current.label);
+
         if (!inferredParentLabel) {
             return;
         }
 
         const parentLabel = inferredParentLabel;
+
         if (!parentLabel) {
             return;
         }
 
         const previous = breadcrumbs[lastIndex - 1];
+
         if (previous?.label?.trim().toLowerCase() === parentLabel.toLowerCase()) {
             return;
         }
@@ -100,6 +105,7 @@ export class AppBreadcrumb {
 
     private extractParentLabelFromAction(label: string): string | null {
         const value = String(label || '').trim();
+
         if (!value) {
             return null;
         }
@@ -108,13 +114,17 @@ export class AppBreadcrumb {
 
         for (const pattern of patterns) {
             const match = value.match(pattern);
+
             if (!match || !match[1]) {
                 continue;
             }
+
             const parsed = String(match[1]).trim();
+
             if (!parsed) {
                 continue;
             }
+
             return parsed.charAt(0).toUpperCase() + parsed.slice(1);
         }
 

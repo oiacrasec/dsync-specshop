@@ -21,11 +21,13 @@ export interface ContratoQuery {
 export class ContratoService extends BaseCrudService {
     list(query: ContratoQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Contrato>>(`${this.baseUrl}/administracao/contrato/`, { params });
     }
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/administracao/contrato/options/`, { params });
     }
 

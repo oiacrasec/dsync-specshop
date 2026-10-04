@@ -86,11 +86,13 @@ export class Login {
                 summary: 'Campos obrigatorios',
                 detail: 'Informe usuario e senha para continuar.'
             });
+
             return;
         }
 
         this.loading = true;
         const payload = this.form.getRawValue();
+
         this.authService
             .login(payload)
             .pipe(finalize(() => (this.loading = false)))
@@ -111,13 +113,16 @@ export class Login {
 
     private navigateAfterLogin() {
         const user = this.authSession.getUser();
+
         if (user?.is_superuser) {
             this.router.navigateByUrl('/kpi');
+
             return;
         }
 
         if (user?.must_change_password) {
             this.router.navigateByUrl('/primeiro-acesso/trocar-senha');
+
             return;
         }
 

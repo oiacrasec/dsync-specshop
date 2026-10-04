@@ -352,6 +352,7 @@ export class Edit {
         if (!this.publishDate()) return 'Immediately';
         const date = new Date(this.publishDate()!);
         const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+
         return date.toLocaleDateString('en-US', options);
     });
 
@@ -366,11 +367,14 @@ export class Edit {
     handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
+
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
+
             reader.onload = (e) => {
                 this.coverImage.set(e.target?.result as string);
             };
+
             reader.readAsDataURL(file);
         }
     }

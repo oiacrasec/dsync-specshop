@@ -23,6 +23,7 @@ export interface GeoServerQuery {
 export class GeoServerService extends BaseCrudService {
     list(query: GeoServerQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<GeoServer>>(`${this.baseUrl}/mapa/geoserver/`, { params });
     }
 
@@ -44,6 +45,7 @@ export class GeoServerService extends BaseCrudService {
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/mapa/geoserver/options/`, { params });
     }
 

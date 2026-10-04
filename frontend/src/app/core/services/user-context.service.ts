@@ -21,14 +21,17 @@ export class UserContextService {
 
     syncActiveContextLabelsFromAvailableContexts(contexts: UserContextsResponse) {
         const activeContext = this.getActiveContext();
+
         if (!activeContext || !contexts.contrato) {
             return;
         }
+
         if (activeContext.contrato_id !== contexts.contrato.id) {
             return;
         }
 
         const matchedOrganization = contexts.organizacoes.find((organization) => organization.id === activeContext.organizacao_id);
+
         if (!matchedOrganization) {
             return;
         }
@@ -50,11 +53,13 @@ export class UserContextService {
 
     updateActiveOrganizationName(organizationId: number, organizationName: string) {
         const activeContext = this.getActiveContext();
+
         if (!activeContext || activeContext.organizacao_id !== organizationId) {
             return;
         }
 
         const normalizedName = (organizationName ?? '').trim();
+
         if (!normalizedName || normalizedName === activeContext.organizacao_nome) {
             return;
         }
@@ -70,11 +75,13 @@ export class UserContextService {
 
     updateActiveContractName(contractId: number, contractName: string) {
         const activeContext = this.getActiveContext();
+
         if (!activeContext || activeContext.contrato_id !== contractId) {
             return;
         }
 
         const normalizedName = (contractName ?? '').trim();
+
         if (!normalizedName || normalizedName === activeContext.contrato_nome) {
             return;
         }
@@ -90,15 +97,18 @@ export class UserContextService {
 
     getActiveContext(): ActiveUserContext | null {
         const raw = localStorage.getItem(ACTIVE_CONTEXT_KEY);
+
         if (!raw) {
             return null;
         }
 
         try {
             const parsed = JSON.parse(raw) as ActiveUserContext;
+
             if (Number.isFinite(parsed.contrato_id) && Number.isFinite(parsed.organizacao_id) && typeof parsed.contrato_nome === 'string' && typeof parsed.organizacao_nome === 'string') {
                 return parsed;
             }
+
             return null;
         } catch {
             return null;
@@ -120,6 +130,7 @@ export class UserContextService {
 
     private persistActiveContext(context: ActiveUserContext, clearTableQueryCache: boolean) {
         localStorage.setItem(ACTIVE_CONTEXT_KEY, JSON.stringify(context));
+
         if (clearTableQueryCache) {
             this.tableQueryCache.clearAll();
         }

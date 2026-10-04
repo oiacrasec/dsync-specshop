@@ -44,6 +44,7 @@ export class MailService {
 
         const response = await fetch('/demo/data/emailData.json');
         const data = await response.json();
+
         this._emailsData.set(data.emails);
         this._loaded.set(true);
     }
@@ -55,6 +56,7 @@ export class MailService {
     updateEmail(id: number, updates: Partial<Email>) {
         const emails = this._emailsData();
         const emailIndex = emails.findIndex((e) => e.id === id);
+
         if (emailIndex !== -1) {
             emails[emailIndex] = { ...emails[emailIndex], ...updates };
             this._emailsData.set([...emails]);
@@ -71,6 +73,7 @@ export class MailService {
 
     toggleStar(id: number) {
         const email = this.getEmailById(id);
+
         if (email) {
             this.updateEmail(id, { starred: !email.starred });
         }
@@ -78,6 +81,7 @@ export class MailService {
 
     toggleImportant(id: number) {
         const email = this.getEmailById(id);
+
         if (email) {
             this.updateEmail(id, { important: !email.important });
         }

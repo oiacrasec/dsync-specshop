@@ -29,6 +29,7 @@ export interface StoreQuery {
 export class StoreService extends BaseCrudService {
     list(query: StoreQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<Store>>(`${this.baseUrl}/mapa/store/`, { params });
     }
 
@@ -54,6 +55,7 @@ export class StoreService extends BaseCrudService {
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/mapa/store/options/`, { params });
     }
 }

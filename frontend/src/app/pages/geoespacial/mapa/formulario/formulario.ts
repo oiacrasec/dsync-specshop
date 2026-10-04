@@ -87,11 +87,13 @@ export class MapaFormPage implements OnInit {
 
     get visibilidadeLabel(): string {
         const visibilidade = this.form.controls.visibilidade.value;
+
         return this.visibilidadeOptions.find((option) => option.value === visibilidade)?.label ?? 'Visibilidade não definida';
     }
 
     get preview(): MapaPreviewState {
         const setorId = this.form.controls.setor.value ?? null;
+
         return {
             storeLabel: this.storeSummary?.label ?? this.resolveStoreLabel(this.form.controls.store.value ?? null),
             workspace: this.storeSummary?.workspace ?? '-',
@@ -105,11 +107,13 @@ export class MapaFormPage implements OnInit {
     get showSharedSummary(): boolean {
         const visibilidade = this.form.controls.visibilidade.value;
         const sharedIds = this.form.controls.setor_compartilhado_ids.value ?? [];
+
         return visibilidade === 'COMPARTILHADO' && sharedIds.length > 0;
     }
 
     get sharedSetoresSummary(): string {
         const sharedIds = this.form.controls.setor_compartilhado_ids.value ?? [];
+
         if (sharedIds.length === 0) {
             return 'nenhum setor';
         }
@@ -133,13 +137,16 @@ export class MapaFormPage implements OnInit {
         this.loadSetores();
 
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -160,30 +167,36 @@ export class MapaFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
         const visibilidade = this.form.controls.visibilidade.value;
         const setor = this.form.controls.setor.value;
         const sharedIds = this.form.controls.setor_compartilhado_ids.value ?? [];
+
         if (visibilidade === 'SETOR' && !setor) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Setor obrigatório',
                 detail: 'Selecione o setor quando a visibilidade for SETOR.'
             });
+
             return;
         }
+
         if (visibilidade === 'COMPARTILHADO' && sharedIds.length === 0) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Compartilhamento obrigatório',
                 detail: 'Selecione ao menos um setor para visibilidade compartilhada.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request = this.isEditing && this.mapaId ? this.mapaService.update(this.mapaId, payload) : this.mapaService.create(payload);
@@ -298,6 +311,7 @@ export class MapaFormPage implements OnInit {
         } else {
             setorControl.setValidators([]);
         }
+
         setorControl.updateValueAndValidity({ emitEvent: false });
     }
 
@@ -307,6 +321,7 @@ export class MapaFormPage implements OnInit {
         }
 
         const matchedSetor = this.setorOptions.find((option) => option.value === setorId);
+
         if (matchedSetor) {
             return matchedSetor.label;
         }
@@ -317,6 +332,7 @@ export class MapaFormPage implements OnInit {
     private loadStoreSummary(storeId: number | null) {
         if (!storeId) {
             this.storeSummary = null;
+
             return;
         }
 
@@ -348,9 +364,11 @@ export class MapaFormPage implements OnInit {
         if (!storeId) {
             return 'Store não selecionado';
         }
+
         if (this.storeSummary && this.storeSummary.id === storeId) {
             return this.storeSummary.label;
         }
+
         return `Store #${storeId}`;
     }
 }

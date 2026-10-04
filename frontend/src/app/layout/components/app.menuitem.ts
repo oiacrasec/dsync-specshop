@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, AfterViewInit } from '@angular/core';
 import { isActive, Router, RouterModule } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
@@ -95,7 +95,7 @@ import { LayoutService } from '@/app/layout/service/layout.service';
         `
     ]
 })
-export class AppMenuitem {
+export class AppMenuitem implements AfterViewInit {
     layoutService = inject(LayoutService);
 
     router = inject(Router);
@@ -116,11 +116,14 @@ export class AppMenuitem {
 
     fullPath = computed(() => {
         const itemPath = this.item()?.path;
+
         if (!itemPath) return this.parentPath();
         const parent = this.parentPath();
+
         if (parent && !itemPath.startsWith(parent)) {
             return parent + itemPath;
         }
+
         return itemPath;
     });
 
@@ -128,9 +131,11 @@ export class AppMenuitem {
 
     isActive = computed(() => {
         const activePath = this.layoutService.layoutState().activePath;
+
         if (this.item()?.path) {
             return activePath?.startsWith(this.fullPath() ?? '') ?? false;
         }
+
         if (this.item()?.routerLink) {
             return isActive(this.item().routerLink[0], this.router, {
                 paths: 'exact',
@@ -139,6 +144,7 @@ export class AppMenuitem {
                 fragment: 'ignored'
             })();
         }
+
         return false;
     });
 
@@ -188,6 +194,7 @@ export class AppMenuitem {
     itemClick(event: Event) {
         if (this.isDisabled()) {
             event.preventDefault();
+
             return;
         }
 
@@ -198,6 +205,7 @@ export class AppMenuitem {
         if (this.hasChildren()) {
             if (this.isActive()) {
                 const deactivateHover = this.root() && this.layoutService.hasOverlaySubmenu() && this.layoutService.isDesktop();
+
                 this.layoutService.layoutState.update((val) => ({
                     ...val,
                     activePath: this.parentPath(),
@@ -239,9 +247,11 @@ export class AppMenuitem {
 
     isVisible() {
         const visible = this.item()?.visible;
+
         if (typeof visible === 'function') {
             return visible() !== false;
         }
+
         return visible !== false;
     }
 }

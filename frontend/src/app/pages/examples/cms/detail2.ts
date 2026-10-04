@@ -303,6 +303,7 @@ export class Detail2 implements OnInit, OnDestroy {
         setTimeout(() => {
             this.handleScroll();
             const container = this.scrollContainer?.nativeElement;
+
             if (container) {
                 container.addEventListener('scroll', this.scrollHandler, { passive: true });
             }
@@ -311,6 +312,7 @@ export class Detail2 implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         const container = this.scrollContainer?.nativeElement;
+
         if (container && this.scrollHandler) {
             container.removeEventListener('scroll', this.scrollHandler);
         }
@@ -351,19 +353,23 @@ export class Detail2 implements OnInit, OnDestroy {
         const isFirst = index === 0;
         const isLast = index === this.sections.length - 1;
         const adjustment = isFirst ? 13 : isLast ? -4 : 0;
+
         return baseOffset + adjustment;
     }
 
     private getElementTop(element: HTMLElement): number {
         const container = this.scrollContainer?.nativeElement;
+
         if (!container) return 0;
         const rect = element.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
+
         return rect.top - containerRect.top + container.scrollTop;
     }
 
     private getScrollTop(): number {
         const container = this.scrollContainer?.nativeElement;
+
         return container ? container.scrollTop : 0;
     }
 

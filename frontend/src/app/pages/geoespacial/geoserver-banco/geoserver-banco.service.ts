@@ -22,6 +22,7 @@ export interface GeoServerBancoQuery {
 export class GeoServerBancoService extends BaseCrudService {
     list(query: GeoServerBancoQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<GeoServerBanco>>(`${this.baseUrl}/mapa/geoserverbanco/`, { params });
     }
 

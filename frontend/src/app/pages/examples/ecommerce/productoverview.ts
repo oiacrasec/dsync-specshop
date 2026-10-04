@@ -537,9 +537,11 @@ export class ProductOverview {
 
     filteredReviews = computed(() => {
         const rating = this.selectedRating();
+
         if (rating === 'all') {
             return Object.values(this.reviews).flat();
         }
+
         return this.reviews[rating] || [];
     });
 
@@ -677,6 +679,7 @@ export class ProductOverview {
 
     setSize(size: string) {
         const sizeItem = this.sizes.find((s) => s.label === size);
+
         if (sizeItem && !sizeItem.disabled) {
             this.selectedSize.set(size);
         }
@@ -691,6 +694,7 @@ export class ProductOverview {
 
     toggleReviewMenu(event: Event, index: number) {
         const menuArray = this.reviewMenus.toArray();
+
         if (menuArray[index]) {
             menuArray[index].toggle(event);
         }

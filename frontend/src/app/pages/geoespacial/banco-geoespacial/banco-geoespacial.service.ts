@@ -24,6 +24,7 @@ export interface BancoGeoespacialQuery {
 export class BancoGeoespacialService extends BaseCrudService {
     list(query: BancoGeoespacialQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<PaginatedResponse<BancoGeoespacial>>(`${this.baseUrl}/mapa/banco/`, { params });
     }
 
@@ -45,6 +46,7 @@ export class BancoGeoespacialService extends BaseCrudService {
 
     options(query: UiLookupQuery = {}) {
         const params = this.buildParams(query);
+
         return this.http.get<UiLookupOptionsResponse>(`${this.baseUrl}/mapa/banco/options/`, { params });
     }
 

@@ -83,13 +83,16 @@ export class GeoServerFormPage implements OnInit {
         this.resolveVinculoPermissions();
 
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -110,16 +113,19 @@ export class GeoServerFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
         const adminPassword = (this.form.controls.admin_password.value ?? '').trim();
+
         if (!this.isEditing && !adminPassword) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Senha obrigatória',
                 detail: 'Informe a senha para criar o GeoServer.'
             });
+
             return;
         }
 
@@ -160,6 +166,7 @@ export class GeoServerFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha URL base e usuário admin para testar a conexão.'
             });
+
             return;
         }
 
@@ -169,6 +176,7 @@ export class GeoServerFormPage implements OnInit {
                 summary: 'Senha obrigatória',
                 detail: 'Informe a senha para testar a conexão.'
             });
+
             return;
         }
 
@@ -180,6 +188,7 @@ export class GeoServerFormPage implements OnInit {
         if (adminPassword) {
             payload.admin_password = adminPassword;
         }
+
         if (this.isEditing && this.geoserverId) {
             payload.geoserver_id = this.geoserverId;
         }
@@ -254,6 +263,7 @@ export class GeoServerFormPage implements OnInit {
         };
 
         const adminPassword = (raw.admin_password ?? '').trim();
+
         if (adminPassword) {
             payload.admin_password = adminPassword;
         }
@@ -266,6 +276,7 @@ export class GeoServerFormPage implements OnInit {
         this.form.controls.admin_password.markAsPristine();
         setTimeout(() => {
             const passwordInput = document.getElementById('senha') as HTMLInputElement | null;
+
             if (passwordInput) {
                 passwordInput.value = '';
             }
@@ -288,10 +299,12 @@ export class GeoServerFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Selecione o banco para criar o vínculo.'
             });
+
             return;
         }
 
         const raw = this.vinculoForm.getRawValue();
+
         this.vinculoSaving = true;
 
         this.geoserverBancoService
@@ -393,6 +406,7 @@ export class GeoServerFormPage implements OnInit {
     private loadVinculos() {
         if (!this.geoserverId) {
             this.vinculos = [];
+
             return;
         }
 

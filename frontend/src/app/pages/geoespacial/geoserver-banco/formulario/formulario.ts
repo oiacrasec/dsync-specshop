@@ -44,13 +44,16 @@ export class GeoServerBancoFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -71,10 +74,12 @@ export class GeoServerBancoFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
         const payload = this.buildPayload();
+
         this.saving = true;
 
         const request =
@@ -136,6 +141,7 @@ export class GeoServerBancoFormPage implements OnInit {
 
     private buildPayload(): GeoServerBancoUpdate {
         const raw = this.form.getRawValue();
+
         return {
             geoserver: Number(raw.geoserver),
             banco: Number(raw.banco),

@@ -21,6 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         if (!user?.is_superuser && !skipContextHeaders) {
             const context = userContextService.getActiveContext();
+
             if (context) {
                 headers['X-Contrato-Id'] = String(context.contrato_id);
                 headers['X-Organizacao-Id'] = String(context.organizacao_id);

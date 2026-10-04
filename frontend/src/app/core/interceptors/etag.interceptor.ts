@@ -14,6 +14,7 @@ const etagCache = new Map<string, ETagEntry>();
 export const etagInterceptor: HttpInterceptorFn = (req, next) => {
     const baseUrl = inject(API_BASE_URL);
     const isApiGet = req.method === 'GET' && req.url.startsWith(baseUrl);
+
     if (!isApiGet) {
         return next(req);
     }
@@ -38,6 +39,7 @@ export const etagInterceptor: HttpInterceptorFn = (req, next) => {
 
             if (event.status === 200) {
                 const etag = event.headers.get('ETag');
+
                 if (etag) {
                     etagCache.set(key, { etag, body: event.body });
                 }
@@ -57,6 +59,7 @@ export const etagInterceptor: HttpInterceptorFn = (req, next) => {
                     })
                 );
             }
+
             return throwError(() => error);
         })
     );

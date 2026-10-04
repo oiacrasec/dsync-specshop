@@ -184,30 +184,36 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
         if (value === null || value === undefined || value === '') {
             this.selectedOption = null;
             queueMicrotask(() => this.cdRef.detectChanges());
+
             return;
         }
 
         if (typeof value === 'object' && value !== null && this.optionValue in (value as Record<string, unknown>)) {
             this.selectedOption = value as UiLookupOption;
             queueMicrotask(() => this.cdRef.detectChanges());
+
             return;
         }
 
         const primitiveValue = value as string | number;
         const existing = this.findOptionByValue(primitiveValue);
+
         if (existing) {
             this.selectedOption = existing;
             queueMicrotask(() => this.cdRef.detectChanges());
+
             return;
         }
 
         if (!this.optionsProvider) {
             this.selectedOption = null;
             queueMicrotask(() => this.cdRef.detectChanges());
+
             return;
         }
 
         const requestId = ++this.resolveRequestSeq;
+
         this.optionsProvider({ pk: primitiveValue, first: 0, rows: 1 })
             .pipe(
                 takeUntil(this.destroy$),
@@ -217,6 +223,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
                 if (requestId !== this.resolveRequestSeq) {
                     return;
                 }
+
                 this.selectedOption = response.data.find((option) => this.compareValues(this.resolveOptionValue(option), primitiveValue)) ?? response.data[0] ?? null;
                 queueMicrotask(() => this.cdRef.detectChanges());
             });
@@ -239,6 +246,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
 
         if (query.length < this.minLength) {
             this.suggestions = [];
+
             return;
         }
 
@@ -251,12 +259,15 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
         }
 
         const selectedValue = this.selectedOption ? this.resolveOptionValue(this.selectedOption) : null;
+
         if (selectedValue !== null) {
             this.enqueueSearch({ pk: selectedValue, first: 0, rows: 1 }, 0, true);
+
             return;
         }
 
         const query = (event.query ?? '').trim();
+
         this.enqueueSearch({ q: query, first: 0, rows: this.rows }, 0, true);
     }
 
@@ -264,13 +275,16 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
         if (value === null || value === undefined || value === '') {
             this.selectedOption = null;
             this.onChange(null);
+
             return;
         }
 
         if (typeof value === 'object') {
             const option = value as UiLookupOption;
+
             this.selectedOption = option;
             this.onChange(this.resolveOptionValue(option));
+
             return;
         }
 
@@ -335,9 +349,11 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
     private resolveOptionValue(option: UiLookupOption): string | number | null {
         const optionRecord = option as Record<string, unknown>;
         const extracted = optionRecord[this.optionValue];
+
         if (typeof extracted === 'string' || typeof extracted === 'number') {
             return extracted;
         }
+
         return null;
     }
 
@@ -345,6 +361,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
         if (a === null || a === undefined) {
             return false;
         }
+
         return String(a) === String(b);
     }
 
@@ -356,6 +373,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 }

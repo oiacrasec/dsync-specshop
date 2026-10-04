@@ -300,10 +300,12 @@ export class MailInbox implements OnInit {
 
         const response = await fetch('/demo/data/emailData.json');
         const data = await response.json();
+
         this.menuItems.set(data.menuItems);
         this.categoryItems.set(data.categoryItems);
 
         const viewFromQuery = this.route.snapshot.queryParams['view'];
+
         if (viewFromQuery) {
             const isMenuItem = this.menuItems().some((item) => item.label === viewFromQuery);
             const isCategoryItem = this.categoryItems().some((item) => item.label === viewFromQuery);
@@ -401,37 +403,41 @@ export class MailInbox implements OnInit {
         } else if (category) {
             return this.getCategoryEmails(this.emailsData(), category);
         }
+
         return this.getInboxEmails(this.emailsData());
     });
 
     filteredEmails = computed(() => {
         const emails = this.baseFilteredEmails();
         const query = this.searchQuery();
+
         if (!query.trim()) {
             return emails;
         }
+
         return emails.filter((email) => email.sender.toLowerCase().includes(query.toLowerCase().trim()));
     });
 
     paginatedEmails = computed(() => {
         const start = this.first();
         const end = start + this.rows();
+
         return this.filteredEmails().slice(start, end);
     });
 
-    menuItemsWithCounts = computed(() => {
-        return this.menuItems().map((item) => ({
+    menuItemsWithCounts = computed(() =>
+        this.menuItems().map((item) => ({
             ...item,
             count: this.getMenuItemCount(item.label)
-        }));
-    });
+        }))
+    );
 
-    categoryItemsWithCounts = computed(() => {
-        return this.categoryItems().map((item) => ({
+    categoryItemsWithCounts = computed(() =>
+        this.categoryItems().map((item) => ({
             ...item,
             count: this.getCategoryItemCount(item.label)
-        }));
-    });
+        }))
+    );
 
     actionMenuItems = computed<MenuItem[]>(() => {
         const email = this.selectedEmailData();
@@ -479,9 +485,11 @@ export class MailInbox implements OnInit {
         if (hasNonArchivedEmails) {
             items.push({ label: 'Archive', icon: 'pi pi-inbox', command: () => this.bulkArchive() });
         }
+
         if (hasArchivedEmails) {
             items.push({ label: 'Unarchive', icon: 'pi pi-replay', command: () => this.bulkUnarchive() });
         }
+
         items.push({ label: 'Mark as Spam', icon: 'pi pi-ban', command: () => this.bulkMarkAsSpam() });
         items.push({ label: 'Delete', icon: 'pi pi-trash', command: () => this.bulkDelete() });
 
@@ -524,6 +532,7 @@ export class MailInbox implements OnInit {
     getAvatarColor(name: string): string {
         const colors = ['bg-violet-100 text-violet-950', 'bg-lime-100 text-lime-950', 'bg-red-100 text-rose-950', 'bg-cyan-100 text-cyan-950', 'bg-indigo-100 text-indigo-950'];
         const index = name.charCodeAt(0) % colors.length;
+
         return colors[index];
     }
 
@@ -557,7 +566,9 @@ export class MailInbox implements OnInit {
         if (!email.read) {
             this.mailService.markAsRead(email.id);
         }
+
         const from = this.selectedMenuItem() || this.selectedCategory() || 'Inbox';
+
         this.router.navigate(['/apps/mail/detail', email.id], { queryParams: { from } });
     }
 

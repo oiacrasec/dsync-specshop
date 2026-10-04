@@ -66,9 +66,7 @@ export class GaugeChart {
                 {
                     label: '',
                     data: this.inputData(),
-                    backgroundColor: bgColors.map((color: any) => {
-                        return rootStyles.getPropertyValue(`--p-${color}`).trim();
-                    }),
+                    backgroundColor: bgColors.map((color: any) => rootStyles.getPropertyValue(`--p-${color}`).trim()),
                     borderWidth: 0,
                     spacing: 6,
                     borderRadius: 6,
@@ -93,6 +91,7 @@ export class GaugeChart {
                     external: function (context: any) {
                         const { chart, tooltip } = context;
                         let tooltipEl = chart.canvas.parentNode.querySelector('div.chartjs-tooltip');
+
                         if (!tooltipEl) {
                             tooltipEl = document.createElement('div');
                             tooltipEl.classList.add(
@@ -115,18 +114,24 @@ export class GaugeChart {
 
                         if (tooltip.opacity === 0) {
                             tooltipEl.style.opacity = 0;
+
                             return;
                         }
+
                         tooltipEl.innerHTML = '';
+
                         if (tooltip.body) {
                             const tooltipBody = document.createElement('div');
+
                             tooltipBody.classList.add('flex', 'itens-center', 'justify-center', 'gap-2', 'px-3', 'py-1.5', 'min-w-12');
                             const value = document.createElement('span');
+
                             value.appendChild(document.createTextNode(tooltip.dataPoints[0].parsed.toLocaleString('en-US')));
                             value.classList.add('font-semibold', 'text-base', 'text-surface-950', 'dark:text-surface-0', 'text-right');
                             tooltipBody.appendChild(value);
                             tooltipEl.appendChild(tooltipBody);
                         }
+
                         tooltipEl.style.opacity = 1;
                         tooltipEl.style.font = tooltip.options.bodyFont.string;
                         tooltipEl.style.padding = 0;

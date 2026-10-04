@@ -1286,6 +1286,7 @@ export class ProductService {
         };
 
         product.image = product.name?.toLocaleLowerCase().split(/[ ,]+/).join('-') + '.jpg';
+
         return product;
     }
 
@@ -1293,7 +1294,7 @@ export class ProductService {
         let text = '';
         let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-        for (var i = 0; i < 5; i++) {
+        for (let i = 0; i < 5; i++) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
 

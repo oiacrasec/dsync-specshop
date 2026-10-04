@@ -191,8 +191,10 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         const idParam = this.route.snapshot.paramMap.get('id');
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -241,11 +243,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (event.key !== 'Delete' && event.code !== 'Delete') {
             return;
         }
+
         if (!this.canHandleFeatureDeleteShortcut(event)) {
             return;
         }
 
         const currentEdit = this.activeGeometryEditFeatureRef;
+
         if (!currentEdit) {
             return;
         }
@@ -274,9 +278,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     get overlayAppendTarget(): HTMLElement | 'body' {
         const shell = this.editorShell?.nativeElement;
+
         if (this.mapFullscreenActive && shell) {
             return shell;
         }
+
         return 'body';
     }
 
@@ -286,9 +292,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     selectedDrawLayerCanDraw() {
         const layer = this.selectedDrawLayer;
+
         if (!layer) {
             return false;
         }
+
         return this.mapService.canDraw(layer.geom_type);
     }
 
@@ -296,6 +304,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.selectedDrawLayerId) {
             return null;
         }
+
         return this.layersState.findLayer(this.selectedDrawLayerId) ?? null;
     }
 
@@ -315,11 +324,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.isFeatureCreateDialogMode()) {
             return 'Nova (desenho)';
         }
+
         return this.featureEditFeatureId ? `#${this.featureEditFeatureId}` : '-';
     }
 
     isFeatureColumnBoolean(column: MapaLayerColumn) {
         const type = this.getFeatureColumnType(column);
+
         return type === 'boolean' || type === 'bool';
     }
 
@@ -329,11 +340,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     isFeatureColumnNumber(column: MapaLayerColumn) {
         const type = this.getFeatureColumnType(column);
+
         return type === 'integer' || type === 'bigint' || type === 'double' || type === 'numeric' || type === 'float' || type === 'real';
     }
 
     isFeatureColumnInteger(column: MapaLayerColumn) {
         const type = this.getFeatureColumnType(column);
+
         return type === 'integer' || type === 'bigint';
     }
 
@@ -346,6 +359,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featureQuickActionsLayerId || !this.featureQuickActionsFeatureData) {
             return;
         }
+
         this.openFeatureEditDialogByLayerFeature(this.featureQuickActionsLayerId, this.featureQuickActionsLayerName, this.featureQuickActionsFeatureData);
     }
 
@@ -353,6 +367,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featureQuickActionsLayerId || !this.featureQuickActionsFeatureId) {
             return;
         }
+
         this.confirmFeatureDeletion(this.featureQuickActionsLayerId, this.featureQuickActionsFeatureId);
     }
 
@@ -368,30 +383,37 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     onSelectedDrawLayerChange(silent = false) {
         const currentEdit = this.activeGeometryEditFeatureRef;
+
         if (currentEdit && currentEdit.layerId !== this.selectedDrawLayerId) {
             this.closeActiveFeatureGeometryEdit({ silent: true });
         }
 
         const selectedLayer = this.selectedDrawLayer;
+
         if (!selectedLayer && this.drawingModeEnabled) {
             this.stopDrawingMode(!silent);
+
             return;
         }
+
         if (!selectedLayer) {
             this.mapService.clearHighlight();
             this.refreshView();
+
             return;
         }
 
         if (!this.mapService.canDraw(selectedLayer.geom_type) && this.drawingModeEnabled) {
             this.stopDrawingMode();
         }
+
         this.mapService.clearHighlight();
         this.refreshView();
     }
 
     onLayersPanelBackgroundClick(event: MouseEvent) {
         const target = event.target;
+
         if (!(target instanceof Element)) {
             return;
         }
@@ -407,6 +429,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.selectedDrawLayerId == null) {
             return;
         }
+
         this.selectedDrawLayerId = null;
         this.activeLayerPanelManuallyMoved = false;
         this.onSelectedDrawLayerChange(true);
@@ -414,12 +437,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     selectDrawLayer(layerId: number) {
         const layer = this.layersState.findLayer(layerId);
+
         if (!layer || layer.id <= 0 || layer.status !== 'ACTIVE') {
             return;
         }
+
         if (this.isLayerDeletePending(layerId)) {
             return;
         }
+
         if (this.selectedDrawLayerId === layerId) {
             return;
         }
@@ -434,14 +460,18 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     toggleDrawingMode() {
         if (!this.drawingModeEnabled && this.activeGeometryEditFeatureRef) {
             const closedNow = this.closeActiveFeatureGeometryEdit({ silent: true });
+
             if (!closedNow) {
                 return;
             }
         }
+
         if (this.drawingModeEnabled) {
             this.stopDrawingMode();
+
             return;
         }
+
         this.startDrawingMode();
     }
 
@@ -449,7 +479,9 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId || !this.mapa) {
             return;
         }
+
         const layer = this.selectedDrawLayer;
+
         if (!layer) {
             this.messageService.add({
                 key: this.toastKey,
@@ -457,8 +489,10 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Selecione um layer',
                 detail: 'Escolha o layer para iniciar o desenho.'
             });
+
             return;
         }
+
         if (!this.mapService.canDraw(layer.geom_type)) {
             this.messageService.add({
                 key: this.toastKey,
@@ -466,6 +500,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Geometria não suportada',
                 detail: `O tipo ${layer.geom_type} não está habilitado para desenho direto no editor.`
             });
+
             return;
         }
 
@@ -475,6 +510,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             srid: this.mapa.srid,
             onDrawEnd: (geometry) => this.createFeatureFromDraw(layer.id, geometry)
         });
+
         if (!enabled) {
             this.messageService.add({
                 key: this.toastKey,
@@ -482,6 +518,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Desenho indisponível',
                 detail: 'Não foi possível iniciar o modo desenho para este layer.'
             });
+
             return;
         }
 
@@ -498,7 +535,9 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     stopDrawingMode(showMessage = true, triggerRefresh = true) {
         this.mapService.clearDrawMode();
         const wasEnabled = this.drawingModeEnabled;
+
         this.drawingModeEnabled = false;
+
         if (showMessage && wasEnabled) {
             this.messageService.add({
                 key: this.toastKey,
@@ -507,6 +546,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 detail: 'O desenho de novas geometrias foi encerrado.'
             });
         }
+
         if (triggerRefresh) {
             this.refreshView();
         }
@@ -519,6 +559,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.activeGeometryEditFeatureRef?.layerId === layerId) {
             const closedNow = this.closeActiveFeatureGeometryEdit({ silent: true });
+
             if (!closedNow) {
                 this.messageService.add({
                     key: this.toastKey,
@@ -526,19 +567,23 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     summary: 'Finalizando edição',
                     detail: 'Aguarde a finalização da edição da geometria para alterar a visibilidade do layer.'
                 });
+
                 return;
             }
         }
 
         const currentLayer = this.layersState.findLayer(layerId);
+
         if (!currentLayer || currentLayer.visivel === checked) {
             return;
         }
+
         if (layerId <= 0) {
             return;
         }
 
         const previousValue = currentLayer.visivel;
+
         this.layersState.setLayerVisibility(layerId, checked);
         this.syncMapLayerRendering();
         this.layersState.setVisibilityPending(layerId, true);
@@ -580,6 +625,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.creatingLayer) {
             return;
         }
+
         this.addLayerDialogVisible = false;
         this.addLayerActiveTab = 'dados';
     }
@@ -597,11 +643,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Campos obrigatórios',
                 detail: 'Informe nome e tipo de geometria do layer.'
             });
+
             return;
         }
 
         const raw = this.layerForm.getRawValue();
         const layerName = raw.nome.trim();
+
         if (!layerName) {
             this.messageService.add({
                 key: this.toastKey,
@@ -609,6 +657,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Nome obrigatório',
                 detail: 'Informe um nome válido para o layer.'
             });
+
             return;
         }
 
@@ -618,14 +667,17 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             visivel: raw.visivel
         };
         const styleName = raw.style_name.trim();
+
         if (styleName) {
             payload.style_name = styleName;
         }
+
         if (this.layerColumnsDraft.length > 0) {
             payload.columns = this.layerColumnsDraft;
         }
 
         const provisionalLayerId = -Date.now();
+
         this.layersState.upsertProvisionalLayer(provisionalLayerId, {
             nome: layerName,
             geomType: raw.geom_type,
@@ -639,9 +691,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.addLayerDialogVisible = false;
                 this.layersState.removeLayer(provisionalLayerId);
                 this.layersState.upsertLayer(layer);
+
                 if (!this.selectedDrawLayerId && layer.status === 'ACTIVE') {
                     this.selectedDrawLayerId = layer.id;
                 }
+
                 this.syncMapLayerRendering();
                 this.messageService.add({
                     key: this.toastKey,
@@ -670,6 +724,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId || this.layersState.isDeletePending(layerId)) {
             return;
         }
+
         if (layerId <= 0) {
             return;
         }
@@ -700,6 +755,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.layerColumnsSaving) {
             return;
         }
+
         this.layerColumnsDialogVisible = false;
         this.layerColumnsTargetId = null;
         this.layerColumnsTargetName = '';
@@ -708,11 +764,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     addDraftColumnToNewLayer() {
         const column = this.buildColumnFromForm(this.newLayerColumnForm);
+
         if (!column) {
             return;
         }
 
         const exists = this.layerColumnsDraft.some((item) => item.name.toLowerCase() === column.name.toLowerCase());
+
         if (exists) {
             this.messageService.add({
                 key: this.toastKey,
@@ -720,6 +778,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Coluna duplicada',
                 detail: 'Já existe uma coluna com esse nome na lista de criação.'
             });
+
             return;
         }
 
@@ -737,6 +796,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const column = this.buildColumnFromForm(this.layerColumnForm);
+
         if (!column) {
             return;
         }
@@ -786,6 +846,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId || layerId <= 0) {
             return;
         }
+
         this.featuresDialogVisible = true;
         this.featuresDialogLayerId = layerId;
         this.featuresDialogLayerName = layerName;
@@ -822,7 +883,9 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featuresDialogVisible || this.featuresDialogFirst <= 0) {
             return;
         }
+
         const nextFirst = Math.max(0, this.featuresDialogFirst - this.featuresDialogRows);
+
         this.featuresDialogFirst = nextFirst;
         this.loadFeaturesDialogData();
     }
@@ -831,10 +894,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featuresDialogVisible) {
             return;
         }
+
         const nextFirst = this.featuresDialogFirst + this.featuresDialogRows;
+
         if (nextFirst >= this.featuresDialogTotalRecords) {
             return;
         }
+
         this.featuresDialogFirst = nextFirst;
         this.loadFeaturesDialogData();
     }
@@ -851,6 +917,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.featuresDialogTotalRecords === 0) {
             return 0;
         }
+
         return this.featuresDialogFirst + 1;
     }
 
@@ -862,12 +929,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (value === null || value === undefined || value === '') {
             return '-';
         }
+
         if (column && this.isFeatureColumnDateLike(column)) {
             return this.formatFeatureDateValue(value, column);
         }
+
         if (typeof value === 'boolean') {
             return value ? 'Sim' : 'Não';
         }
+
         if (typeof value === 'object') {
             try {
                 return JSON.stringify(value);
@@ -875,6 +945,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 return String(value);
             }
         }
+
         return String(value);
     }
 
@@ -887,11 +958,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             if (this.mapService.isPixelOnFeatureEdit(event.pixel)) {
                 return;
             }
+
             this.closeActiveFeatureGeometryEdit();
+
             return;
         }
 
         const selectedLayer = this.selectedDrawLayer;
+
         if (!selectedLayer || selectedLayer.id <= 0 || selectedLayer.status !== 'ACTIVE' || !selectedLayer.visivel) {
             return;
         }
@@ -905,6 +979,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const bbox = this.mapService.buildSearchBboxFromPixel(event.pixel, this.mapa.srid, 8);
+
         if (!bbox) {
             return;
         }
@@ -923,14 +998,17 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     if (requestSeq !== this.mapClickIdentifySeq || !this.mapa) {
                         return;
                     }
+
                     if (this.selectedDrawLayerId !== layerId) {
                         return;
                     }
+
                     if (this.mapService.hasActiveFeatureEdit() || this.activeGeometryEditSaving || this.drawingModeEnabled) {
                         return;
                     }
 
                     const feature = this.mapService.pickFeatureForMapClick(response.data ?? [], event.coordinate, this.mapa.srid);
+
                     if (!feature || !feature.geometry) {
                         return;
                     }
@@ -941,6 +1019,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     if (requestSeq !== this.mapClickIdentifySeq) {
                         return;
                     }
+
                     this.messageService.add({
                         key: this.toastKey,
                         severity: 'error',
@@ -966,6 +1045,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.refreshView();
             }
         });
+
         if (!started) {
             this.messageService.add({
                 key: this.toastKey,
@@ -973,6 +1053,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Edição indisponível',
                 detail: 'Não foi possível abrir a geometria para edição no mapa.'
             });
+
             return;
         }
 
@@ -996,12 +1077,16 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             if (this.mapService.hasActiveFeatureEdit()) {
                 this.mapService.clearFeatureEdit();
             }
+
             return true;
         }
+
         if (!this.mapaId || !this.mapa) {
             this.resetActiveGeometryEditState();
+
             return true;
         }
+
         if (this.activeGeometryEditSaving) {
             return false;
         }
@@ -1009,13 +1094,16 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!persistChanges || !this.activeGeometryEditDirty) {
             this.resetActiveGeometryEditState();
             this.refreshView();
+
             return true;
         }
 
         const geometry = this.mapService.getFeatureEditGeometry(this.mapa.srid);
+
         if (!geometry) {
             this.resetActiveGeometryEditState();
             this.refreshView();
+
             return true;
         }
 
@@ -1025,6 +1113,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.mapService.refreshWmsLayer(currentEdit.layerId);
                 this.upsertFeatureInDialog(feature);
                 this.resetActiveGeometryEditState();
+
                 if (!silent) {
                     this.messageService.add({
                         key: this.toastKey,
@@ -1033,6 +1122,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                         detail: `Feição #${feature.id} atualizada no mapa.`
                     });
                 }
+
                 this.refreshView();
             },
             error: (error: unknown) => {
@@ -1054,6 +1144,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (clearOverlay) {
             this.mapService.clearFeatureEdit();
         }
+
         this.activeGeometryEditFeatureRef = null;
         this.activeGeometryEditDirty = false;
         this.activeGeometryEditSaving = false;
@@ -1064,19 +1155,23 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapa) {
             return;
         }
+
         this.mapService.highlightGeometry(feature.geometry, this.mapa.srid);
     }
 
     openFeatureEditDialog(feature: MapaLayerFeature, event?: Event) {
         event?.stopPropagation();
+
         if (!this.featuresDialogLayerId) {
             return;
         }
+
         this.openFeatureEditDialogByLayerFeature(this.featuresDialogLayerId, this.featuresDialogLayerName, feature);
     }
 
     closeFeatureEditDialog(silentDiscard = false) {
         const discardCreateDrawing = this.isFeatureCreateDialogMode() && this.pendingCreateFeatureGeometry !== null;
+
         this.featureEditDialogVisible = false;
         this.featureEditSaving = false;
         this.featureEditLayerId = null;
@@ -1087,6 +1182,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         this.featureEditOriginalValues = {};
         this.featureEditTouchedValues = {};
         this.pendingCreateFeatureGeometry = null;
+
         if (discardCreateDrawing) {
             this.mapService.clearDrawPreview();
         }
@@ -1103,10 +1199,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private cancelDrawingMenuActionsOnLayerSelection() {
         this.stopDrawingMode(false, false);
+
         if (this.featuresDialogVisible) {
             this.closeFeaturesDialog();
+
             return;
         }
+
         if (this.featureEditDialogVisible) {
             this.closeFeatureEditDialog(true);
         }
@@ -1116,9 +1215,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId || !this.featureEditLayerId) {
             return;
         }
+
         const layerId = this.featureEditLayerId;
         const normalizedAttributes = this.normalizeFeatureAttributes(this.featureEditValues);
         const missingRequiredFields = this.getMissingRequiredFeatureFields(this.featureEditColumns, normalizedAttributes);
+
         if (missingRequiredFields.length > 0) {
             this.messageService.add({
                 key: this.toastKey,
@@ -1127,6 +1228,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 detail: `Preencha os campos obrigatórios: ${missingRequiredFields.join(', ')}.`
             });
             this.refreshView();
+
             return;
         }
 
@@ -1134,6 +1236,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         if (!this.featureEditFeatureId) {
             const geometry = this.pendingCreateFeatureGeometry;
+
             if (!geometry) {
                 this.featureEditSaving = false;
                 this.closeFeatureEditDialog(true);
@@ -1144,6 +1247,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     detail: 'A geometria desenhada não está disponível para envio.'
                 });
                 this.refreshView();
+
                 return;
             }
 
@@ -1163,12 +1267,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                             detail: `Feição #${feature.id} criada com sucesso.`
                         });
                         this.mapService.refreshWmsLayer(layerId);
+
                         if (this.mapa) {
                             this.mapService.highlightGeometry(feature.geometry, this.mapa.srid);
                         }
+
                         if (this.featuresDialogVisible && this.featuresDialogLayerId === layerId) {
                             this.loadFeaturesDialogData();
                         }
+
                         this.refreshView();
                     },
                     error: (error: unknown) => {
@@ -1182,12 +1289,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                         this.refreshView();
                     }
                 });
+
             return;
         }
 
         const payload: MapaLayerFeatureUpdatePayload = {
             attributes: normalizedAttributes
         };
+
         this.mapaService.updateLayerFeature(this.mapaId, layerId, this.featureEditFeatureId, payload).subscribe({
             next: (feature) => {
                 this.featureEditSaving = false;
@@ -1199,9 +1308,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     detail: 'Atributos da feição salvos com sucesso.'
                 });
                 this.upsertFeatureInDialog(feature);
+
                 if (this.mapa) {
                     this.mapService.highlightGeometry(feature.geometry, this.mapa.srid);
                 }
+
                 this.mapService.refreshWmsLayer(layerId);
                 this.refreshView();
             },
@@ -1220,9 +1331,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     confirmRemoveFeature(feature: MapaLayerFeature, event?: Event) {
         event?.stopPropagation();
+
         if (!this.mapaId || !this.featuresDialogLayerId) {
             return;
         }
+
         this.confirmFeatureDeletion(this.featuresDialogLayerId, feature.id);
     }
 
@@ -1236,6 +1349,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     shouldShowSizeField(formName: 'new' | 'edit') {
         const form = formName === 'new' ? this.newLayerColumnForm : this.layerColumnForm;
+
         return form.controls.type.value === 'string';
     }
 
@@ -1243,12 +1357,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panel = this.getPanelElement(panelId);
         const panelSize = this.getElementSize(panel);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const free = event.source.getFreeDragPosition();
         const clamped = this.layoutState.updateDraggedPosition(panelId, free, frame, panelSize);
+
         event.source.setFreeDragPosition(clamped);
         this.syncFloatingPanelsPosition();
     }
@@ -1256,12 +1372,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     onActiveLayerPanelDragEnd(event: CdkDragEnd) {
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.activeLayerPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const free = event.source.getFreeDragPosition();
         const clamped = this.clampFreePosition(free, frame, panelSize, 8);
+
         this.activeLayerPanelPosition = clamped;
         this.activeLayerPanelManuallyMoved = true;
         event.source.setFreeDragPosition(clamped);
@@ -1270,12 +1388,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     onFeatureQuickActionsDragEnd(event: CdkDragEnd) {
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.featureActionsPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const free = event.source.getFreeDragPosition();
         const clamped = this.clampFreePosition(free, frame, panelSize, 8);
+
         this.featureQuickActionsPosition = clamped;
         event.source.setFreeDragPosition(clamped);
     }
@@ -1283,12 +1403,14 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     onFeaturesDrawerDragEnd(event: CdkDragEnd) {
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.featuresDrawerPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const free = event.source.getFreeDragPosition();
         const clamped = this.clampFreePosition(free, frame, panelSize, 8);
+
         this.featuresDrawerPosition = clamped;
         event.source.setFreeDragPosition(clamped);
     }
@@ -1358,9 +1480,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     private setupPanelsLayoutSync() {
         if (typeof ResizeObserver !== 'undefined') {
             this.frameResizeObserver = new ResizeObserver(() => this.syncFloatingPanelsPosition());
+
             if (this.mapFrame?.nativeElement) {
                 this.frameResizeObserver.observe(this.mapFrame.nativeElement);
             }
+
             if (this.layersPanel?.nativeElement) {
                 this.frameResizeObserver.observe(this.layersPanel.nativeElement);
             }
@@ -1372,26 +1496,31 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private syncFloatingPanelsPosition() {
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
+
         if (!frame || frame.width <= 0 || frame.height <= 0) {
             return;
         }
 
         const zoomPanel = this.zoomPanel?.nativeElement;
         const zoomSize = this.getElementSize(zoomPanel);
+
         if (!zoomSize) {
             return;
         }
 
         const layersPanel = this.layersPanel?.nativeElement;
+
         if (this.layoutState.layersPanelVisible && layersPanel && layersPanel.offsetWidth > 0) {
             this.layoutState.initializeLayersPanelPosition(frame, layersPanel.offsetWidth || 320);
         }
 
         const layersSize = this.layoutState.layersPanelVisible ? this.getElementSize(layersPanel) : null;
+
         this.layoutState.clampPanels(frame, zoomSize, layersSize ?? undefined);
 
         if (this.selectedDrawLayerId != null) {
             const activeLayerPanelSize = this.getElementSize(this.activeLayerPanel?.nativeElement);
+
             if (activeLayerPanelSize) {
                 if (!this.activeLayerPanelManuallyMoved) {
                     this.activeLayerPanelPosition = {
@@ -1399,14 +1528,17 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                         y: this.layoutState.zoomPosition.y
                     };
                 }
+
                 this.activeLayerPanelPosition = this.clampFreePosition(this.activeLayerPanelPosition, frame, activeLayerPanelSize, 8);
             }
         }
 
         this.applyDragPositions();
+
         if (this.featureQuickActionsVisible) {
             this.ensureFeatureQuickActionsInBounds();
         }
+
         if (this.featuresDialogVisible) {
             this.ensureFeaturesDrawerInBounds();
         }
@@ -1414,15 +1546,19 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private applyDragPositions() {
         this.zoomDrag?.setFreeDragPosition(this.layoutState.zoomPosition);
+
         if (this.selectedDrawLayerId != null) {
             this.activeLayerDrag?.setFreeDragPosition(this.activeLayerPanelPosition);
         }
+
         if (this.layoutState.layersPanelVisible) {
             this.layersDrag?.setFreeDragPosition(this.layoutState.layersPosition);
         }
+
         if (this.featureQuickActionsVisible) {
             this.featureActionsDrag?.setFreeDragPosition(this.featureQuickActionsPosition);
         }
+
         if (this.featuresDialogVisible) {
             this.featuresDrawerDrag?.setFreeDragPosition(this.featuresDrawerPosition);
         }
@@ -1432,6 +1568,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (panelId === 'zoom-panel') {
             return this.zoomPanel?.nativeElement ?? null;
         }
+
         return this.layersPanel?.nativeElement ?? null;
     }
 
@@ -1459,6 +1596,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private toggleLayersPanelVisibility() {
         const panel = this.layersPanel?.nativeElement;
+
         if (panel && this.frameResizeObserver && this.layoutState.layersPanelVisible) {
             this.frameResizeObserver.unobserve(panel);
         }
@@ -1471,8 +1609,10 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 if (this.layersPanel?.nativeElement && this.frameResizeObserver) {
                     this.frameResizeObserver.observe(this.layersPanel.nativeElement);
                 }
+
                 this.syncFloatingPanelsPosition();
             });
+
             return;
         }
 
@@ -1481,21 +1621,26 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private syncMapFullscreenState() {
         const shell = this.editorShell?.nativeElement;
+
         if (!shell || typeof document === 'undefined') {
             this.mapFullscreenActive = false;
+
             return;
         }
+
         this.mapFullscreenActive = document.fullscreenElement === shell;
     }
 
     private async toggleMapFullscreen() {
         const shell = this.editorShell?.nativeElement;
+
         if (!shell || typeof document === 'undefined') {
             return;
         }
 
         try {
             const isFullscreen = document.fullscreenElement === shell;
+
             if (isFullscreen) {
                 await document.exitFullscreen();
             } else {
@@ -1540,17 +1685,21 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             next: () => {
                 this.layersState.setDeletePending(layerId, false);
                 this.layersState.removeLayer(layerId);
+
                 if (this.activeGeometryEditFeatureRef?.layerId === layerId) {
                     this.resetActiveGeometryEditState();
                 }
+
                 if (this.featuresDialogVisible && this.featuresDialogLayerId === layerId) {
                     this.closeFeaturesDialog();
                 }
+
                 if (this.selectedDrawLayerId === layerId) {
                     this.selectedDrawLayerId = null;
                     this.activeLayerPanelManuallyMoved = false;
                     this.stopDrawingMode(false);
                 }
+
                 this.syncMapLayerRendering();
                 this.messageService.add({
                     key: this.toastKey,
@@ -1633,8 +1782,10 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     private createFeatureFromDraw(layerId: number, geometry: Record<string, any>) {
         if (!this.mapaId || !this.mapa) {
             this.mapService.clearDrawPreview();
+
             return;
         }
+
         if (this.featureEditDialogVisible || this.featureEditSaving) {
             this.mapService.clearDrawPreview();
             this.messageService.add({
@@ -1644,11 +1795,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 detail: 'Conclua o preenchimento dos atributos da feição atual antes de desenhar uma nova.'
             });
             this.refreshView();
+
             return;
         }
 
         this.mapService.showDrawPreviewGeometry(geometry, this.mapa.srid);
         const layerName = this.layersState.findLayer(layerId)?.nome ?? `#${layerId}`;
+
         this.mapaService.listLayerColumns(this.mapaId, layerId).subscribe({
             next: (columns) => {
                 this.pendingCreateFeatureGeometry = geometry;
@@ -1659,11 +1812,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.featureEditValues = {};
                 this.featureEditOriginalValues = {};
                 this.featureEditTouchedValues = {};
+
                 for (const column of this.featureEditColumns) {
                     this.featureEditValues[column.name] = null;
                     this.featureEditOriginalValues[column.name] = null;
                     this.featureEditTouchedValues[column.name] = false;
                 }
+
                 this.featureEditDialogVisible = true;
                 this.refreshView();
             },
@@ -1691,12 +1846,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         this.mapaService.removeLayerFeature(this.mapaId, layerId, featureId).subscribe({
             next: () => {
                 this.featureDeletePending = false;
+
                 if (isActiveMapEditTarget) {
                     this.resetActiveGeometryEditState();
                 }
+
                 if (this.featureEditDialogVisible && this.featureEditLayerId === layerId && this.featureEditFeatureId === featureId) {
                     this.closeFeatureEditDialog();
                 }
+
                 this.messageService.add({
                     key: this.toastKey,
                     severity: 'success',
@@ -1746,6 +1904,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.editorConfirmDialogVisible) {
             return;
         }
+
         this.editorConfirmDialogResolution = 'accept';
         this.editorConfirmDialogVisible = false;
     }
@@ -1754,6 +1913,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.editorConfirmDialogVisible) {
             return;
         }
+
         this.editorConfirmDialogResolution = 'reject';
         this.editorConfirmDialogVisible = false;
     }
@@ -1762,12 +1922,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         const resolution = this.editorConfirmDialogResolution;
         const onAccept = this.editorConfirmDialogAcceptAction;
         const onReject = this.editorConfirmDialogRejectAction;
+
         this.resetEditorConfirmDialogState();
 
         if (resolution === 'accept') {
             onAccept?.();
+
             return;
         }
+
         onReject?.();
     }
 
@@ -1803,9 +1966,11 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const hasFeatureOnPage = this.featuresDialogData.some((feature) => feature.id === featureId);
+
         if (hasFeatureOnPage) {
             this.featuresDialogData = this.featuresDialogData.filter((feature) => feature.id !== featureId);
         }
+
         this.featuresDialogTotalRecords = Math.max(0, this.featuresDialogTotalRecords - 1);
 
         if (this.featuresDialogData.length === 0 && this.featuresDialogFirst > 0) {
@@ -1818,12 +1983,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId || this.loading || this.drawingModeEnabled || this.activeGeometryEditSaving || this.featureDeletePending || this.featureDeleteConfirmOpen) {
             return false;
         }
+
         if (!this.activeGeometryEditFeatureRef) {
             return false;
         }
+
         if (event.repeat) {
             return false;
         }
+
         return !this.isTypingInEditableElement(event);
     }
 
@@ -1833,14 +2001,17 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const targets: Array<EventTarget | null> = [event.target, document.activeElement];
+
         for (const target of targets) {
             if (!(target instanceof Element)) {
                 continue;
             }
+
             if (target.closest('input, textarea, select, [contenteditable], [role=\"textbox\"]')) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1850,19 +2021,25 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private normalizeFeatureAttributes(values: Record<string, any>) {
         const normalized: Record<string, any> = {};
+
         for (const column of this.featureEditColumns) {
             const columnName = column.name;
             let value = values[columnName];
+
             if (this.isFeatureColumnBoolean(column) && this.featureEditTouchedValues[columnName] !== true) {
                 value = this.featureEditOriginalValues[columnName] ?? null;
             }
+
             if (typeof value === 'string') {
                 const trimmed = value.trim();
+
                 normalized[columnName] = trimmed === '' ? null : trimmed;
                 continue;
             }
+
             normalized[columnName] = value === '' ? null : value;
         }
+
         return normalized;
     }
 
@@ -1871,12 +2048,15 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             .filter((column) => column.nullable === false)
             .filter((column) => {
                 const value = attributes[column.name];
+
                 if (value === null || value === undefined) {
                     return true;
                 }
+
                 if (typeof value === 'string') {
                     return value.trim() === '';
                 }
+
                 return false;
             })
             .map((column) => column.name);
@@ -1890,6 +2070,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private isFeatureColumnDateLike(column: MapaLayerColumn) {
         const type = this.getFeatureColumnType(column);
+
         return type === 'date' || type === 'timestamp' || type === 'timestamptz';
     }
 
@@ -1897,6 +2078,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         const locale = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'pt-BR';
         const type = this.getFeatureColumnType(column);
         const parsedDate = this.parseFeatureDateValue(value, type);
+
         if (!parsedDate) {
             return String(value);
         }
@@ -1915,28 +2097,34 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (value instanceof Date) {
             return Number.isNaN(value.getTime()) ? null : value;
         }
+
         if (typeof value !== 'string') {
             return null;
         }
 
         const raw = value.trim();
+
         if (!raw) {
             return null;
         }
 
         if (columnType === 'date') {
             const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
             if (!match) {
                 return null;
             }
+
             const year = Number(match[1]);
             const month = Number(match[2]);
             const day = Number(match[3]);
             const date = new Date(year, month - 1, day);
+
             return Number.isNaN(date.getTime()) ? null : date;
         }
 
         const datetime = new Date(raw);
+
         return Number.isNaN(datetime.getTime()) ? null : datetime;
     }
 
@@ -1958,6 +2146,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
                 for (const column of this.featureEditColumns) {
                     const value = feature.attributes?.[column.name] ?? null;
+
                     this.featureEditValues[column.name] = value;
                     this.featureEditOriginalValues[column.name] = value;
                     this.featureEditTouchedValues[column.name] = false;
@@ -2001,19 +2190,24 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     private updateFeatureQuickActionsPosition(mapPixel: number[] | null) {
         const frame = this.mapFrame?.nativeElement;
+
         if (!frame) {
             this.featureQuickActionsPosition = { x: 16, y: 16 };
+
             return;
         }
 
         const anchoredToLayers = this.buildFeatureQuickActionsPositionFromLayersPanel(frame);
+
         if (anchoredToLayers) {
             this.featureQuickActionsPosition = anchoredToLayers;
+
             return;
         }
 
         if (!mapPixel || mapPixel.length < 2) {
             this.featureQuickActionsPosition = { x: 16, y: 16 };
+
             return;
         }
 
@@ -2041,6 +2235,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         const layersPanel = this.layersPanel?.nativeElement;
+
         if (!layersPanel || layersPanel.offsetWidth <= 0 || layersPanel.offsetHeight <= 0) {
             return null;
         }
@@ -2069,11 +2264,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.featureActionsPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const clamped = this.clampFreePosition(this.featureQuickActionsPosition, frame, panelSize, 8);
+
         this.featureQuickActionsPosition = clamped;
         this.featureActionsDrag?.setFreeDragPosition(clamped);
     }
@@ -2085,6 +2282,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.featuresDrawerPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
@@ -2098,6 +2296,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             panelSize,
             8
         );
+
         this.featuresDrawerPosition = target;
         this.featuresDrawerDrag?.setFreeDragPosition(target);
     }
@@ -2109,11 +2308,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         const frame = this.getFrameSize(this.mapFrame?.nativeElement);
         const panelSize = this.getElementSize(this.featuresDrawerPanel?.nativeElement);
+
         if (!frame || !panelSize) {
             return;
         }
 
         const clamped = this.clampFreePosition(this.featuresDrawerPosition, frame, panelSize, 8);
+
         this.featuresDrawerPosition = clamped;
         this.featuresDrawerDrag?.setFreeDragPosition(clamped);
     }
@@ -2121,6 +2322,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
     private clampFreePosition(position: { x: number; y: number }, frame: PanelSize, panel: PanelSize, padding = 0) {
         const maxX = Math.max(padding, frame.width - panel.width - padding);
         const maxY = Math.max(padding, frame.height - panel.height - padding);
+
         return {
             x: Math.min(maxX, Math.max(padding, Number(position.x ?? 0))),
             y: Math.min(maxY, Math.max(padding, Number(position.y ?? 0)))
@@ -2188,13 +2390,18 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featuresDialogVisible) {
             return;
         }
+
         const index = this.featuresDialogData.findIndex((item) => item.id === feature.id);
+
         if (index < 0) {
             this.featuresDialogData = [feature, ...this.featuresDialogData];
             this.featuresDialogTotalRecords += 1;
+
             return;
         }
+
         const updated = [...this.featuresDialogData];
+
         updated[index] = feature;
         this.featuresDialogData = updated;
     }
@@ -2203,6 +2410,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.mapaId) {
             return;
         }
+
         this.mapService.syncWmsLayers(this.mapaId, this.layersState.layers);
         this.reconcileDrawLayerSelection();
     }
@@ -2211,18 +2419,22 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.initialFeatureAutoFitDone || this.initialFeatureAutoFitStarted) {
             return;
         }
+
         if (!this.mapaId || !this.mapa || !this.mapContainer?.nativeElement) {
             return;
         }
+
         if (this.layersState.loading) {
             return;
         }
 
         const targetLayers = this.layersState.layers.filter((layer) => layer.id > 0 && layer.status === 'ACTIVE' && layer.visivel);
+
         this.initialFeatureAutoFitStarted = true;
 
         if (targetLayers.length === 0) {
             this.initialFeatureAutoFitDone = true;
+
             return;
         }
 
@@ -2245,10 +2457,12 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             next: (responses) => {
                 if (!this.mapa) {
                     this.initialFeatureAutoFitDone = true;
+
                     return;
                 }
 
                 const geometries = responses.flatMap((response) => (response.data ?? []).map((feature) => feature.geometry));
+
                 this.mapService.fitGeometries(geometries, this.mapa.srid);
                 this.initialFeatureAutoFitDone = true;
             },
@@ -2263,21 +2477,28 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             if (this.activeGeometryEditFeatureRef) {
                 this.closeActiveFeatureGeometryEdit({ silent: true });
             }
+
             return;
         }
+
         const selectedLayer = this.layersState.findLayer(this.selectedDrawLayerId);
+
         if (!selectedLayer || selectedLayer.id <= 0 || selectedLayer.status !== 'ACTIVE') {
             if (this.activeGeometryEditFeatureRef?.layerId === this.selectedDrawLayerId) {
                 this.closeActiveFeatureGeometryEdit({ silent: true });
             }
+
             this.selectedDrawLayerId = null;
             this.activeLayerPanelManuallyMoved = false;
             this.stopDrawingMode(false);
+
             return;
         }
+
         if (this.activeGeometryEditFeatureRef?.layerId === selectedLayer.id && !selectedLayer.visivel) {
             this.closeActiveFeatureGeometryEdit({ silent: true });
         }
+
         if (!this.mapService.canDraw(selectedLayer.geom_type) && this.drawingModeEnabled) {
             this.stopDrawingMode(false);
         }
@@ -2287,10 +2508,12 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (this.isDestroyed) {
             return;
         }
+
         queueMicrotask(() => {
             if (this.isDestroyed) {
                 return;
             }
+
             this.cdRef.detectChanges();
         });
     }
@@ -2304,11 +2527,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Campos obrigatórios',
                 detail: 'Informe nome e tipo da coluna.'
             });
+
             return null;
         }
 
         const raw = form.getRawValue();
         const name = raw.name.trim();
+
         if (!name) {
             this.messageService.add({
                 key: this.toastKey,
@@ -2316,6 +2541,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 summary: 'Nome obrigatório',
                 detail: 'Informe um nome válido para a coluna.'
             });
+
             return null;
         }
 
@@ -2326,8 +2552,10 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             nullable: raw.nullable,
             unique: raw.unique
         };
+
         if (backendType === 'varchar') {
             const size = raw.size ?? 255;
+
             if (!Number.isFinite(size) || size <= 0) {
                 this.messageService.add({
                     key: this.toastKey,
@@ -2335,10 +2563,13 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     summary: 'Tamanho inválido',
                     detail: 'Informe um tamanho válido para coluna string.'
                 });
+
                 return null;
             }
+
             column.size = Number(size);
         }
+
         return column;
     }
 
@@ -2346,18 +2577,23 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (value === 'string') {
             return 'varchar';
         }
+
         if (value === 'integer') {
             return 'integer';
         }
+
         if (value === 'double') {
             return 'double';
         }
+
         if (value === 'boolean') {
             return 'boolean';
         }
+
         if (value === 'date') {
             return 'date';
         }
+
         return value;
     }
 

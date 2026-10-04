@@ -13,12 +13,15 @@ export abstract class BaseCrudService {
 
     protected buildParams(query: Record<string, any>) {
         let params = new HttpParams();
+
         Object.entries(query).forEach(([key, value]) => {
             if (value === undefined || value === null || value === '') {
                 return;
             }
+
             params = params.set(key, String(value));
         });
+
         return params;
     }
 

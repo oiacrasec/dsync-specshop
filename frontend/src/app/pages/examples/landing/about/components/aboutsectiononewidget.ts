@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { generateRandomData } from '@/app/lib/utils';
 import { SectionCard } from '@/app/layout/components/ui/sectioncard';
@@ -72,7 +72,7 @@ import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
         </section-card>
     </section>`
 })
-export class AboutSectionOneWidget {
+export class AboutSectionOneWidget implements OnInit {
     randomData: any[] = [];
 
     ngOnInit() {

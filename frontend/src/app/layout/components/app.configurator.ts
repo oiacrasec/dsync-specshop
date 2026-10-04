@@ -158,6 +158,7 @@ export class AppConfigurator implements OnInit {
         if (isPlatformBrowser(this.platformId)) {
             this.onPresetChange(this.layoutService.layoutConfig().preset);
         }
+
         this.updateMenuThemeOptions();
     }
 
@@ -176,9 +177,7 @@ export class AppConfigurator implements OnInit {
         }
     }
 
-    selectedPrimaryColor = computed(() => {
-        return this.layoutService.layoutConfig().primary;
-    });
+    selectedPrimaryColor = computed(() => this.layoutService.layoutConfig().primary);
 
     selectedPreset = computed(() => this.layoutService.layoutConfig().preset);
 
@@ -356,6 +355,7 @@ export class AppConfigurator implements OnInit {
                 primary: color.name
             }));
         }
+
         this.applyTheme(type, color);
         this.layoutService.updateBodyBackground(color.name);
         event.stopPropagation();
@@ -375,6 +375,7 @@ export class AppConfigurator implements OnInit {
             preset: event
         }));
         const preset = presets[event as KeyOfType<typeof presets>];
+
         $t().preset(preset).preset(this.getPresetExt()).use({ useDefaultOptions: true });
     }
 
@@ -405,9 +406,11 @@ export class AppConfigurator implements OnInit {
             ...state,
             darkTheme: !state.darkTheme
         }));
+
         if (this.darkTheme()) {
             this.setMenuTheme('dark');
         }
+
         this.updateMenuThemeOptions();
         this.layoutService.updateBodyBackground(this.layoutService.layoutConfig().primary);
     }

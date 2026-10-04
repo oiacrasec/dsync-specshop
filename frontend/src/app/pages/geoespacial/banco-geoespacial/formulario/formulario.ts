@@ -46,13 +46,16 @@ export class BancoGeoespacialFormPage implements OnInit {
 
     ngOnInit() {
         const idParam = this.route.snapshot.paramMap.get('id');
+
         if (!idParam) {
             return;
         }
 
         const id = Number(idParam);
+
         if (!Number.isFinite(id) || id <= 0) {
             this.goBack();
+
             return;
         }
 
@@ -73,16 +76,19 @@ export class BancoGeoespacialFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
+
             return;
         }
 
         const senha = (this.form.controls.senha.value ?? '').trim();
+
         if (!this.isEditing && !senha) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Senha obrigatória',
                 detail: 'Informe a senha para criar o banco geoespacial.'
             });
+
             return;
         }
 
@@ -125,6 +131,7 @@ export class BancoGeoespacialFormPage implements OnInit {
                 summary: 'Campos obrigatórios',
                 detail: 'Preencha host, porta, banco e usuário para testar a conexão.'
             });
+
             return;
         }
 
@@ -134,6 +141,7 @@ export class BancoGeoespacialFormPage implements OnInit {
                 summary: 'Senha obrigatória',
                 detail: 'Informe a senha para testar a conexão.'
             });
+
             return;
         }
 
@@ -147,6 +155,7 @@ export class BancoGeoespacialFormPage implements OnInit {
         if (senha) {
             payload.senha = senha;
         }
+
         if (this.isEditing && this.bancoId) {
             payload.banco_id = this.bancoId;
         }
@@ -217,6 +226,7 @@ export class BancoGeoespacialFormPage implements OnInit {
         };
 
         const senha = (raw.senha ?? '').trim();
+
         if (senha) {
             payload.senha = senha;
         }

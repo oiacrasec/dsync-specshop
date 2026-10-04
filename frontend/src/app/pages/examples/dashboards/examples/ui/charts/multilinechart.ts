@@ -74,6 +74,7 @@ export class MultiLineChart {
 
     setChartData(option: string) {
         const sampledData = this.dataReduction() ? sampleDataReductionByArray(this.datasets(), option, this.show()) : this.datasets();
+
         if (sampledData.length <= 0) {
             this.data.set([]);
 
@@ -81,6 +82,7 @@ export class MultiLineChart {
                 datasets: null
             };
         }
+
         const darkMode = this.layoutService.isDarkTheme() ?? false;
         const rootStyles = getComputedStyle(document.documentElement);
         const surface0Color = rootStyles.getPropertyValue('--p-surface-0');
@@ -89,45 +91,44 @@ export class MultiLineChart {
         const lineCount = sampledData[0].y.length;
         const dataArr: any = Array(lineCount)
             .fill(null)
-            .map((_, index) => {
-                return {
-                    label: this.labels()[index] ?? 'dataset' + index,
-                    data: [],
-                    fill: true,
-                    borderColor: this.borderColors()?.[index] ?? (darkMode ? '#FAFAFA' : '#030616'),
-                    tension: 0.3,
-                    borderWidth: 1.2,
-                    pointBorderColor: 'rgba(0, 0, 0, 0)',
-                    pointBackgroundColor: 'rgba(0, 0, 0, 0)',
-                    pointHoverBackgroundColor: this.borderColors()?.[index] ?? (darkMode ? surface0Color : surface950Color),
-                    pointHoverBorderColor: darkMode ? surface950Color : surface0Color,
-                    pointBorderWidth: 12,
-                    hideInLegendAndTooltip: false,
-                    pointStyle: 'circle',
-                    pointRadius: 4,
-                    backgroundColor: (context: any) => {
-                        const defaultColor = [darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(3, 6, 22, 0.06)', darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(3, 6, 22, 0)'];
-                        const bg = this.bgColors()?.[index] !== undefined ? this.bgColors()![index] : defaultColor;
+            .map((_, index) => ({
+                label: this.labels()[index] ?? 'dataset' + index,
+                data: [],
+                fill: true,
+                borderColor: this.borderColors()?.[index] ?? (darkMode ? '#FAFAFA' : '#030616'),
+                tension: 0.3,
+                borderWidth: 1.2,
+                pointBorderColor: 'rgba(0, 0, 0, 0)',
+                pointBackgroundColor: 'rgba(0, 0, 0, 0)',
+                pointHoverBackgroundColor: this.borderColors()?.[index] ?? (darkMode ? surface0Color : surface950Color),
+                pointHoverBorderColor: darkMode ? surface950Color : surface0Color,
+                pointBorderWidth: 12,
+                hideInLegendAndTooltip: false,
+                pointStyle: 'circle',
+                pointRadius: 4,
+                backgroundColor: (context: any) => {
+                    const defaultColor = [darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(3, 6, 22, 0.06)', darkMode ? 'rgba(255, 255, 255, 0)' : 'rgba(3, 6, 22, 0)'];
+                    const bg = this.bgColors()?.[index] !== undefined ? this.bgColors()![index] : defaultColor;
 
-                        if (!context.chart.chartArea) {
-                            return;
-                        }
-
-                        const {
-                            ctx,
-                            chartArea: { top, bottom }
-                        } = context.chart;
-                        const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
-                        const colorTranches = 1 / (bg.length - 1);
-
-                        for (let i = 0; i < bg.length; i++) {
-                            gradientBg.addColorStop(0 + i * colorTranches, bg[i]);
-                        }
-
-                        return gradientBg;
+                    if (!context.chart.chartArea) {
+                        return;
                     }
-                };
-            });
+
+                    const {
+                        ctx,
+                        chartArea: { top, bottom }
+                    } = context.chart;
+                    const gradientBg = ctx.createLinearGradient(0, top, 0, bottom);
+                    const colorTranches = 1 / (bg.length - 1);
+
+                    for (let i = 0; i < bg.length; i++) {
+                        gradientBg.addColorStop(0 + i * colorTranches, bg[i]);
+                    }
+
+                    return gradientBg;
+                }
+            }));
+
         sampledData.forEach(({ x, y }) => {
             Array(lineCount)
                 .fill(null)
@@ -136,6 +137,7 @@ export class MultiLineChart {
                 });
         });
         this.data.set(dataArr);
+
         return {
             datasets: dataArr
         };
@@ -151,13 +153,16 @@ export class MultiLineChart {
                     chartArea: { bottom },
                     scales: { x }
                 } = chart;
+
                 if (tooltip && tooltip._active.length > 0) {
                     const xCoor = x.getPixelForValue(tooltip.dataPoints[0].raw.x);
+
                     ctx.save();
                     ctx.beginPath();
                     ctx.lineWidth = 1.2;
                     const rootStyles = getComputedStyle(document.documentElement);
                     const surface500Color = rootStyles.getPropertyValue('--p-surface-500');
+
                     ctx.strokeStyle = surface500Color;
                     ctx.setLineDash([4, 4]);
                     ctx.moveTo(xCoor, 0);
@@ -181,6 +186,7 @@ export class MultiLineChart {
         const dataValue = this.data();
         const endDate = new Date(dataValue[dataValue.length - 1].x);
         const startDate = new Date(dataValue[0].x);
+
         return {
             interaction: {
                 intersect: false,
@@ -198,6 +204,7 @@ export class MultiLineChart {
                     external: function (context: any) {
                         const { chart, tooltip } = context;
                         let tooltipEl = chart.canvas.parentNode.querySelector('div.chartjs-tooltip');
+
                         if (!tooltipEl) {
                             tooltipEl = document.createElement('div');
                             tooltipEl.classList.add(
@@ -220,8 +227,10 @@ export class MultiLineChart {
 
                         if (tooltip.opacity === 0) {
                             tooltipEl.style.opacity = 0;
+
                             return;
                         }
+
                         const datasetPointsX = tooltip.dataPoints.map((dp: any) => dp.element.x);
                         const avgX = datasetPointsX.reduce((a: any, b: any) => a + b, 0) / datasetPointsX.length;
 
@@ -231,23 +240,29 @@ export class MultiLineChart {
                         if (tooltip.body) {
                             tooltipEl.innerHTML = '';
                             const tooltipHeader = document.createElement('div');
+
                             tooltipHeader.classList.add('bg-surface-100', 'dark:bg-surface-900', 'px-3', 'py-2.5', 'border-b', 'border-surface', 'text-left', 'label-xsmall');
                             tooltipHeader.appendChild(document.createTextNode(tooltip.title[0]));
                             tooltipEl.appendChild(tooltipHeader);
                             const tooltipBody = document.createElement('div');
+
                             tooltipBody.classList.add('flex', 'flex-col', 'gap-2', 'px-3', 'py-2', 'min-w-50');
                             tooltip.dataPoints.forEach((body: any) => {
                                 const row = document.createElement('div');
+
                                 row.classList.add('flex', 'items-center', 'gap-2', 'w-full');
                                 const point = document.createElement('div');
+
                                 point.classList.add('w-2.5', 'h-2.5', 'rounded-full');
                                 point.style.backgroundColor = body.dataset.borderColor;
                                 row.appendChild(point);
                                 const label = document.createElement('span');
+
                                 label.appendChild(document.createTextNode(body.dataset.label));
                                 label.classList.add('text-base', 'text-surface-950', 'dark:text-surface-0', 'flex-1', 'text-left', 'capitalize');
                                 row.appendChild(label);
                                 const value = document.createElement('span');
+
                                 value.appendChild(document.createTextNode(tooltipPrefix + body.formattedValue));
                                 value.classList.add('text-base', 'text-surface-950', 'dark:text-surface-0', 'text-right');
                                 row.appendChild(value);
@@ -333,6 +348,7 @@ export class MultiLineChart {
                             if (value > 1000) {
                                 return value / 1000 + 'K';
                             }
+
                             return value;
                         }
                     },

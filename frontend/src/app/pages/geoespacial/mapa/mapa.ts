@@ -97,6 +97,7 @@ export class MapaPage implements OnInit {
         this.canOpenEditor = this.permissionContext.hasPermission(PERMISSION_KEYS.MAPEDITOR_VIEW);
 
         const actions: UiTableAction<Mapa>[] = [];
+
         if (this.canOpenEditor) {
             actions.push({
                 id: 'open_editor',

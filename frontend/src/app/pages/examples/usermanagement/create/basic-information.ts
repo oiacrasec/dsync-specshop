@@ -134,6 +134,7 @@ export class BasicInformation {
     handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
+
         if (file) {
             this.formStateService.updateField('profilePhoto', file);
             this.formStateService.updateField('profilePhotoUrl', URL.createObjectURL(file));

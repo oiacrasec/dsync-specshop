@@ -69,31 +69,39 @@ export class MiniLineChart {
                     chartArea: { bottom },
                     scales: { x, y }
                 } = chart;
+
                 if (tooltip._active.length > 0) {
                     const xCoor = x.getPixelForValue(tooltip.dataPoints[0].dataIndex);
                     const yCoor = y.getPixelForValue(tooltip.dataPoints[0].parsed.y);
+
                     ctx.save();
                     ctx.beginPath();
                     ctx.lineWidth = 1.2;
 
                     const gradient = ctx.createLinearGradient(0, yCoor, 0, bottom);
+
                     if (this.borderColor()) {
                         gradient.addColorStop(0, this.borderColor());
                     } else {
                         const rootStyles = getComputedStyle(document.documentElement);
                         const surface0Color = rootStyles.getPropertyValue('--p-surface-0');
                         const surface950Color = rootStyles.getPropertyValue('--p-surface-950');
+
                         const hexToRgba = (hex: any, alpha: any) => {
                             let r = parseInt(hex.slice(1, 3), 16);
                             let g = parseInt(hex.slice(3, 5), 16);
                             let b = parseInt(hex.slice(5, 7), 16);
+
                             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
                         };
+
                         const startColor = darkMode ? surface0Color : surface950Color;
                         const endColor = darkMode ? hexToRgba(surface0Color, 0) : hexToRgba(surface950Color, 0);
+
                         gradient.addColorStop(0, startColor);
                         gradient.addColorStop(1, endColor);
                     }
+
                     ctx.strokeStyle = gradient;
                     ctx.setLineDash([4, 2]);
                     ctx.moveTo(xCoor, yCoor + 4);
@@ -104,6 +112,7 @@ export class MiniLineChart {
                 }
             }
         };
+
         return [hoverLine];
     }
 
@@ -171,6 +180,7 @@ export class MiniLineChart {
                     external: function (context: any) {
                         const { chart, tooltip } = context;
                         let tooltipEl = chart.canvas.parentNode.querySelector('div.chartjs-tooltip');
+
                         if (!tooltipEl) {
                             tooltipEl = document.createElement('div');
                             tooltipEl.classList.add(
@@ -199,12 +209,14 @@ export class MiniLineChart {
 
                         if (tooltip.opacity === 0) {
                             tooltipEl.style.opacity = 0;
+
                             return;
                         }
 
                         if (tooltip.body) {
                             const bodyLines = tooltip.body.map((b: any) => {
                                 const strArr = b.lines[0].split(':');
+
                                 return {
                                     text: strArr[0].trim(),
                                     value: strArr[1].trim()
@@ -214,6 +226,7 @@ export class MiniLineChart {
                             tooltipEl.innerHTML = '';
                             bodyLines.forEach((body: any) => {
                                 const text = document.createElement('div');
+
                                 text.appendChild(document.createTextNode(tooltipPrefix + body.value));
                                 text.classList.add('label-small', 'text-surface-950', 'dark:text-surface-0', 'font-medium');
                                 text.style.fontSize = '14px';

@@ -227,13 +227,16 @@ export class MailDetail implements OnInit {
         await this.mailService.loadEmails();
 
         const id = this.route.snapshot.params['id'];
+
         this.emailId.set(parseInt(id));
         this.fromView.set(this.route.snapshot.queryParams['from'] || 'Inbox');
     }
 
     currentEmail = computed(() => {
         const id = this.emailId();
+
         if (!id) return null;
+
         return this.mailService.getEmailById(id);
     });
 
@@ -280,6 +283,7 @@ export class MailDetail implements OnInit {
 
     toggleStar() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.toggleStar(email.id);
         }
@@ -287,6 +291,7 @@ export class MailDetail implements OnInit {
 
     toggleImportant() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.toggleImportant(email.id);
         }
@@ -294,6 +299,7 @@ export class MailDetail implements OnInit {
 
     archiveEmail() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.archiveEmail(email.id);
             this.goBack();
@@ -302,6 +308,7 @@ export class MailDetail implements OnInit {
 
     unarchiveEmail() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.unarchiveEmail(email.id);
         }
@@ -309,6 +316,7 @@ export class MailDetail implements OnInit {
 
     markAsSpam() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.markAsSpam(email.id);
             this.goBack();
@@ -317,6 +325,7 @@ export class MailDetail implements OnInit {
 
     deleteEmail() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.deleteEmail(email.id);
             this.goBack();
@@ -325,6 +334,7 @@ export class MailDetail implements OnInit {
 
     recoverEmail() {
         const email = this.currentEmail();
+
         if (email) {
             this.mailService.recoverEmail(email.id);
             this.goBack();

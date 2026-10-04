@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ContentChild, TemplateRef } from '@angular/core';
+import { Component, ContentChild, TemplateRef, AfterContentInit } from '@angular/core';
 
 @Component({
     selector: 'section-card',
@@ -37,7 +37,7 @@ import { Component, ContentChild, TemplateRef } from '@angular/core';
         class: 'card'
     }
 })
-export class SectionCard {
+export class SectionCard implements AfterContentInit {
     @ContentChild('title') titleTemplate!: TemplateRef<any>;
 
     @ContentChild('description') descriptionTemplate!: TemplateRef<any>;

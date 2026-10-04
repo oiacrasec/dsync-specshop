@@ -28,11 +28,13 @@ export class PermissionContextService {
 
     loadForCurrentContext(forceRefresh = false): Observable<PermissionContextResponse> {
         const user = this.authSession.getUser();
+
         if (!user) {
             return throwError(() => new Error('permission_user_not_authenticated'));
         }
 
         const contextKey = this.buildContextKey();
+
         if (!contextKey) {
             return throwError(() => new Error('permission_context_required'));
         }
@@ -43,9 +45,11 @@ export class PermissionContextService {
 
         if (!forceRefresh) {
             const persisted = this.readPersisted();
+
             if (persisted && persisted.user_uuid === user.uuid && persisted.context_key === contextKey) {
                 this.snapshot = persisted.payload;
                 this.snapshotKey = contextKey;
+
                 return of(persisted.payload);
             }
         }
@@ -63,6 +67,7 @@ export class PermissionContextService {
                     payload,
                     fetched_at: Date.now()
                 };
+
                 this.snapshot = payload;
                 this.snapshotKey = contextKey;
                 localStorage.setItem(PERMISSION_CONTEXT_KEY, JSON.stringify(nextEntry));
@@ -93,11 +98,13 @@ export class PermissionContextService {
 
     getSnapshot(): PermissionContextResponse | null {
         const user = this.authSession.getUser();
+
         if (!user) {
             return null;
         }
 
         const contextKey = this.buildContextKey();
+
         if (!contextKey) {
             return null;
         }
@@ -107,26 +114,32 @@ export class PermissionContextService {
         }
 
         const persisted = this.readPersisted();
+
         if (!persisted) {
             return null;
         }
+
         if (persisted.user_uuid !== user.uuid || persisted.context_key !== contextKey) {
             return null;
         }
 
         this.snapshot = persisted.payload;
         this.snapshotKey = contextKey;
+
         return persisted.payload;
     }
 
     hasPermission(permission: string) {
         const snapshot = this.getSnapshot();
+
         if (!snapshot) {
             return false;
         }
+
         if (snapshot.is_superuser) {
             return true;
         }
+
         return snapshot.permissoes.includes(permission);
     }
 
@@ -134,6 +147,7 @@ export class PermissionContextService {
         if (permissions.length === 0) {
             return true;
         }
+
         return permissions.some((permission) => this.hasPermission(permission));
     }
 
@@ -141,11 +155,13 @@ export class PermissionContextService {
         if (permissions.length === 0) {
             return true;
         }
+
         return permissions.every((permission) => this.hasPermission(permission));
     }
 
     private buildContextKey() {
         const user = this.authSession.getUser();
+
         if (!user) {
             return null;
         }
@@ -155,6 +171,7 @@ export class PermissionContextService {
         }
 
         const context = this.userContextService.getActiveContext();
+
         if (!context) {
             return null;
         }
@@ -164,15 +181,18 @@ export class PermissionContextService {
 
     private readPersisted(): PermissionContextCacheEntry | null {
         const raw = localStorage.getItem(PERMISSION_CONTEXT_KEY);
+
         if (!raw) {
             return null;
         }
 
         try {
             const parsed = JSON.parse(raw) as PermissionContextCacheEntry;
+
             if (typeof parsed?.user_uuid === 'string' && typeof parsed?.context_key === 'string' && parsed?.payload && Array.isArray(parsed.payload.permissoes) && Array.isArray(parsed.payload.papeis_ativos)) {
                 return parsed;
             }
+
             return null;
         } catch {
             return null;

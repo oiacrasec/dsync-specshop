@@ -386,6 +386,7 @@ export class ChatMenu implements OnInit {
     async ngOnInit() {
         const response = await fetch('/demo/data/chatData.json');
         const data = await response.json();
+
         this.userData.set(data.userData);
     }
 
@@ -420,45 +421,51 @@ export class ChatMenu implements OnInit {
     filterChatsBySearch(chats: ChatRoom[]): ChatRoom[] {
         if (!this.searchQuery().trim()) return chats;
         const query = this.searchQuery().toLowerCase().trim();
+
         return chats.filter((chat) => chat.name.toLowerCase().includes(query));
     }
 
     pinnedChats = computed(() => {
         const pinnedChatsList = this.chatRooms().filter((chat) => chat.pinned && !chat.archived);
+
         return this.filterChatsBySearch(pinnedChatsList);
     });
 
     allChats = computed(() => {
         const nonArchivedChats = this.chatRooms().filter((chat) => !chat.archived);
+
         return this.filterChatsBySearch(nonArchivedChats);
     });
 
     groupChats = computed(() => {
         const nonArchivedGroupChats = this.chatRooms().filter((chat) => chat.type === 'group' && !chat.archived);
+
         return this.filterChatsBySearch(nonArchivedGroupChats);
     });
 
     unreadChats = computed(() => {
         const nonArchivedUnreadChats = this.chatRooms().filter((chat) => (chat.unreadCount ?? 0) > 0 && !chat.archived);
+
         return this.filterChatsBySearch(nonArchivedUnreadChats);
     });
 
     archivedChats = computed(() => {
         const archivedChatList = this.chatRooms().filter((chat) => chat.archived);
+
         return this.filterChatsBySearch(archivedChatList);
     });
 
     hasArchivedChats = computed(() => this.archivedChats().length > 0);
 
-    availableContacts = computed(() => {
-        return Object.values(this.userData());
-    });
+    availableContacts = computed(() => Object.values(this.userData()));
 
     getLastMessage(chat: ChatRoom): string {
         if (!chat.messages || chat.messages.length === 0) {
             return 'Start conversation';
         }
+
         const lastMessage = chat.messages[chat.messages.length - 1];
+
         return lastMessage.content;
     }
 
@@ -466,7 +473,9 @@ export class ChatMenu implements OnInit {
         if (!chat.messages || chat.messages.length === 0) {
             return '';
         }
+
         const lastMessage = chat.messages[chat.messages.length - 1];
+
         return lastMessage.senderId === 'me' ? 'You' : lastMessage.senderName;
     }
 
@@ -474,7 +483,9 @@ export class ChatMenu implements OnInit {
         if (!chat.messages || chat.messages.length === 0) {
             return '';
         }
+
         const lastMessage = chat.messages[chat.messages.length - 1];
+
         return lastMessage.time;
     }
 

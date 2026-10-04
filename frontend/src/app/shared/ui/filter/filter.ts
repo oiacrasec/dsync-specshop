@@ -77,8 +77,10 @@ export class UiFilter implements OnChanges, OnDestroy {
         }
 
         const nextSchemaKey = this.buildSchemaKey();
+
         if (changes['filters'].firstChange) {
             this.schemaKey = nextSchemaKey;
+
             return;
         }
 
@@ -116,9 +118,11 @@ export class UiFilter implements OnChanges, OnDestroy {
 
     get generalPlaceholder() {
         const names = this.generalFilters.map((item) => item.header);
+
         if (!names.length) {
             return 'Buscar';
         }
+
         return `Buscar por ${names.join(', ')}`;
     }
 
@@ -145,15 +149,18 @@ export class UiFilter implements OnChanges, OnDestroy {
         const query: Record<string, any> = {};
 
         const normalizedTerm = this.generalTerm.trim();
+
         if (this.hasGeneralFilters && normalizedTerm) {
             query['search'] = normalizedTerm;
         }
 
         for (const filter of this.advancedFilters) {
             const value = this.advancedValues[filter.field];
+
             if (value === undefined || value === null || value === '') {
                 continue;
             }
+
             query[filter.field] = value;
         }
 
@@ -167,25 +174,32 @@ export class UiFilter implements OnChanges, OnDestroy {
 
         const cacheKey = `${filter.field}|${filter.lookup.endpoint}`;
         const cachedProvider = this.relationProviders.get(cacheKey);
+
         if (cachedProvider) {
             return cachedProvider;
         }
 
         const endpoint = filter.lookup.endpoint;
+
         const provider: UiLookupOptionsProvider = (query: UiLookupQuery) => {
             let params = new HttpParams();
+
             if (query.q !== undefined && query.q !== null && query.q !== '') {
                 params = params.set('q', String(query.q));
             }
+
             if (query.pk !== undefined && query.pk !== null && query.pk !== '') {
                 params = params.set('pk', String(query.pk));
             }
+
             params = params.set('first', String(query.first ?? 0));
             params = params.set('rows', String(query.rows ?? 50));
+
             return this.http.get<UiLookupOptionsResponse>(endpoint, { params });
         };
 
         this.relationProviders.set(cacheKey, provider);
+
         return provider;
     }
 

@@ -502,6 +502,7 @@ export class TableDemo implements OnInit {
                 } else {
                     const previousRowData = this.customers3[i - 1];
                     const previousRowGroup = previousRowData?.representative?.name;
+
                     if (representativeName === previousRowGroup) {
                         this.rowGroupMetadata[representativeName].size++;
                     } else {
@@ -579,6 +580,7 @@ export class TableDemo implements OnInit {
                 if (p.id) {
                     acc[p.id] = true;
                 }
+
                 return acc;
             },
             {} as { [key: string]: boolean }

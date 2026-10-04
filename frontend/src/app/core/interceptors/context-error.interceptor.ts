@@ -30,6 +30,7 @@ export const contextErrorInterceptor: HttpInterceptorFn = (req, next) => {
             }
 
             const user = authSessionService.getUser();
+
             if (user?.is_superuser) {
                 return throwError(() => error);
             }
@@ -37,6 +38,7 @@ export const contextErrorInterceptor: HttpInterceptorFn = (req, next) => {
             const errorCode = error.error?.code;
             const isInvalidRequest = error.status === 400 && errorCode === 'context_invalid_request';
             const isForbidden = error.status === 403 && errorCode === 'context_forbidden';
+
             if (!isInvalidRequest && !isForbidden) {
                 return throwError(() => error);
             }

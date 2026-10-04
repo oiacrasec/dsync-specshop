@@ -30,6 +30,7 @@ export class AppComponent {
 
     private preloadPermissions() {
         const user = this.authSession.getUser();
+
         if (!user) {
             return;
         }
@@ -47,6 +48,7 @@ export class AppComponent {
 
     private configureLocale() {
         const lang = (navigator.language || 'en').toLowerCase();
+
         if (lang.startsWith('pt')) {
             this.primengConfig.setTranslation({
                 startsWith: 'Comeca com',

@@ -134,6 +134,7 @@ export class UiInputText implements ControlValueAccessor {
     handleInput(event: Event) {
         const target = event.target as HTMLInputElement;
         const nextValue = target.value;
+
         this.value = nextValue;
         this.onChange(nextValue);
     }
@@ -145,6 +146,7 @@ export class UiInputText implements ControlValueAccessor {
 
     handleMaskInput(event: { value?: string | null } | Event) {
         const nextValue = typeof event === 'object' && event !== null && 'value' in event ? (event.value ?? '') : (this.value ?? '');
+
         this.value = String(nextValue);
         this.onChange(this.value);
     }
@@ -153,6 +155,7 @@ export class UiInputText implements ControlValueAccessor {
         if (this.clearOnIncompleteMask && this.isIncompleteMaskValue(this.value)) {
             this.clearMaskValue();
         }
+
         this.markTouched();
     }
 
@@ -174,6 +177,7 @@ export class UiInputText implements ControlValueAccessor {
 
     get resolvedMaskInputClass() {
         const customClass = typeof this.styleClass === 'string' ? this.styleClass.trim() : '';
+
         return customClass ? `${customClass} w-full` : 'w-full';
     }
 
@@ -181,11 +185,13 @@ export class UiInputText implements ControlValueAccessor {
         if (!this.styleClass) {
             return 'w-full';
         }
+
         return [this.styleClass, 'w-full'];
     }
 
     private isIncompleteMaskValue(value: string | null) {
         const currentValue = (value ?? '').trim();
+
         if (!currentValue || !this.mask) {
             return false;
         }
@@ -195,11 +201,13 @@ export class UiInputText implements ControlValueAccessor {
         }
 
         const requiredTokens = (this.mask.match(/[9a\*]/g) ?? []).length;
+
         if (!requiredTokens) {
             return false;
         }
 
         const typedTokens = currentValue.replace(/\W/g, '').length;
+
         return typedTokens < requiredTokens;
     }
 
@@ -217,6 +225,7 @@ export class UiInputText implements ControlValueAccessor {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 }

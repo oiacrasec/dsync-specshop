@@ -40,12 +40,15 @@ export class EditorLayersState {
         };
 
         const existingIndex = this.layers.findIndex((current) => current.id === layer.id);
+
         if (existingIndex === -1) {
             this.layers = [...this.layers, mappedLayer].sort((a, b) => (a.ordem === b.ordem ? a.id - b.id : a.ordem - b.ordem));
+
             return;
         }
 
         const updated = [...this.layers];
+
         updated[existingIndex] = mappedLayer;
         this.layers = updated.sort((a, b) => (a.ordem === b.ordem ? a.id - b.id : a.ordem - b.ordem));
     }
@@ -70,12 +73,15 @@ export class EditorLayersState {
             status: 'PROVISIONING'
         };
         const existingIndex = this.layers.findIndex((current) => current.id === tempId);
+
         if (existingIndex === -1) {
             this.layers = [...this.layers, provisional].sort((a, b) => (a.ordem === b.ordem ? a.id - b.id : a.ordem - b.ordem));
+
             return;
         }
 
         const updated = [...this.layers];
+
         updated[existingIndex] = provisional;
         this.layers = updated.sort((a, b) => (a.ordem === b.ordem ? a.id - b.id : a.ordem - b.ordem));
     }
@@ -97,16 +103,20 @@ export class EditorLayersState {
     setVisibilityPending(layerId: number, pending: boolean) {
         if (pending) {
             this.pendingVisibilityLayerIds.add(layerId);
+
             return;
         }
+
         this.pendingVisibilityLayerIds.delete(layerId);
     }
 
     setDeletePending(layerId: number, pending: boolean) {
         if (pending) {
             this.pendingDeleteLayerIds.add(layerId);
+
             return;
         }
+
         this.pendingDeleteLayerIds.delete(layerId);
     }
 

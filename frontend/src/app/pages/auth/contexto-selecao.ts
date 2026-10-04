@@ -100,8 +100,10 @@ export class ContextoSelecaoPage implements OnInit {
 
     ngOnInit() {
         const user = this.authSessionService.getUser();
+
         if (user?.is_superuser) {
             this.router.navigateByUrl('/');
+
             return;
         }
 
@@ -136,10 +138,13 @@ export class ContextoSelecaoPage implements OnInit {
     selectedOrganizationName() {
         const contexts = this.contexts();
         const selectedOrganizationId = this.selectedOrganizationId();
+
         if (!contexts || selectedOrganizationId === null) {
             return null;
         }
+
         const selected = contexts.organizacoes.find((organization) => organization.id === selectedOrganizationId);
+
         return selected?.nome ?? null;
     }
 
@@ -150,22 +155,26 @@ export class ContextoSelecaoPage implements OnInit {
     confirmContext() {
         const contexts = this.contexts();
         const selectedOrganizationId = this.selectedOrganizationId();
+
         if (!contexts || !contexts.contrato || selectedOrganizationId === null) {
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Seleção obrigatória',
                 detail: 'Selecione uma organização para continuar.'
             });
+
             return;
         }
 
         const selected = contexts.organizacoes.find((organization) => organization.id === selectedOrganizationId);
+
         if (!selected) {
             this.messageService.add({
                 severity: 'error',
                 summary: 'Organização inválida',
                 detail: 'A organização selecionada não está disponível para este usuário.'
             });
+
             return;
         }
 
@@ -210,6 +219,7 @@ export class ContextoSelecaoPage implements OnInit {
         if (!value || !value.startsWith('/') || value.startsWith('/contexto/selecao')) {
             return '/kpi';
         }
+
         return value;
     }
 }

@@ -642,6 +642,7 @@ export class OrderHistory {
 
         if (this.searchQuery().trim()) {
             const query = this.searchQuery().toLowerCase().trim();
+
             filtered = filtered.filter((order) => order.orderNumber.toLowerCase().includes(query) || order.product.toLowerCase().includes(query) || order.variant.toLowerCase().includes(query));
         }
 

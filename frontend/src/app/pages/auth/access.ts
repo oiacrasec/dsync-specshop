@@ -169,13 +169,16 @@ export class Access {
 
     goBack() {
         const from = this.route.snapshot.queryParamMap.get('from');
+
         if (from && from.startsWith('/') && !from.startsWith('/landing/access')) {
             void this.router.navigateByUrl(from);
+
             return;
         }
 
         if (window.history.length > 1) {
             this.location.back();
+
             return;
         }
 

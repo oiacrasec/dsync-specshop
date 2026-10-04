@@ -1,4 +1,4 @@
-import { Component, computed, effect, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { AppMenu } from './app.menu';
 import { LayoutService } from '@/app/layout/service/layout.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
@@ -44,7 +44,7 @@ const MAX_ORGANIZATION_LABEL_LENGTH = 20;
         '(mouseleave)': 'onMouseLeave()'
     }
 })
-export class AppSidebar {
+export class AppSidebar implements OnInit, OnDestroy {
     layoutService = inject(LayoutService);
 
     router = inject(Router);
@@ -99,6 +99,7 @@ export class AppSidebar {
 
         effect(() => {
             const hasOpenOverlaySubmenu = this.layoutService.hasOpenOverlaySubmenu();
+
             if (this.layoutService.isDesktop()) {
                 if (hasOpenOverlaySubmenu) {
                     setTimeout(() => this.setupIntersectionObserver());
@@ -110,6 +111,7 @@ export class AppSidebar {
 
         effect(() => {
             const hasOpenOverlay = this.layoutService.hasOpenOverlay();
+
             if (this.layoutService.isHorizontal() && this.layoutService.isDesktop()) {
                 if (hasOpenOverlay) {
                     this.bindScrollListener();
@@ -130,6 +132,7 @@ export class AppSidebar {
             )
             .subscribe((event) => {
                 const navEvent = event as NavigationEnd;
+
                 this.onRouteChange(navEvent.urlAfterRedirects);
             });
 
@@ -251,6 +254,7 @@ export class AppSidebar {
                 clearTimeout(this.timeout);
                 this.timeout = null;
             }
+
             this.layoutService.layoutState.update((state) => ({
                 ...state,
                 sidebarExpanded: true
@@ -284,12 +288,15 @@ export class AppSidebar {
         if (!label) {
             return null;
         }
+
         if (label.length <= maxLength) {
             return label;
         }
+
         if (maxLength <= 3) {
             return '.'.repeat(maxLength);
         }
+
         return `${label.slice(0, maxLength - 3)}...`;
     }
 
@@ -304,9 +311,11 @@ export class AppSidebar {
     getOrganizationTooltip(): string | null {
         const fullName = this.getOrganizationName();
         const shortName = this.getOrganizationLabel();
+
         if (!fullName || !shortName || fullName === shortName) {
             return null;
         }
+
         return fullName;
     }
 
@@ -314,9 +323,11 @@ export class AppSidebar {
         if (this.menuContainerWrapper?.nativeElement && this.menuContainer?.el.nativeElement) {
             if (this.layoutService.isHorizontal()) {
                 const scrollLeft = this.menuContainerWrapper.nativeElement.scrollLeft;
+
                 this.menuContainer.el.nativeElement.style.setProperty('--menu-scroll-x', `-${scrollLeft}px`);
             } else {
                 const scrollTop = this.menuContainerWrapper.nativeElement.scrollTop;
+
                 this.menuContainer.el.nativeElement.style.setProperty('--menu-scroll-y', `-${scrollTop}px`);
             }
         }
@@ -338,6 +349,7 @@ export class AppSidebar {
         }
 
         const activeMenuItem = this.menuContainer.el.nativeElement.querySelector('.layout-root-menuitem.active-menuitem');
+
         if (!activeMenuItem) return;
 
         this.observer = new IntersectionObserver(

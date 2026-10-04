@@ -168,6 +168,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         if (!this.service) {
             return;
         }
+
         if (changes['reloadKey'] && !changes['reloadKey'].firstChange) {
             this.fetch(true);
         }
@@ -196,17 +197,22 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
 
     handleLazyLoad(event: TableLazyLoadEvent) {
         this.lazyLoad.emit(event);
+
         if (!this.service) {
             return;
         }
+
         this.first = event.first ?? 0;
         this.rows = event.rows ?? this.rows;
+
         if (typeof event.sortField === 'string') {
             this.sortField = event.sortField;
         }
+
         if (event.sortOrder === 1 || event.sortOrder === 0 || event.sortOrder === -1) {
             this.sortOrder = event.sortOrder;
         }
+
         this.fetch();
     }
 
@@ -220,6 +226,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         if (!this.service) {
             return;
         }
+
         const ordering = this.sortField ? (this.sortOrder === -1 ? `-${this.sortField}` : this.sortField) : undefined;
         const query = {
             first: this.first,
@@ -228,8 +235,10 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
             ...this.filtersQuery
         };
         const cacheKey = this.buildCacheKey(query);
+
         if (this.cacheEnabled && !forceRefresh) {
             const cached = this.tableQueryCache.get<UiTableListResponse<T>>(cacheKey);
+
             if (cached) {
                 this.internalValue = cached.data;
                 this.internalTotalRecords = cached.totalRecords;
@@ -237,6 +246,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
                 this.updateFiltersSchema(cached.filters ?? []);
                 this.loading = false;
                 queueMicrotask(() => this.cdRef.detectChanges());
+
                 return;
             }
         }
@@ -251,9 +261,11 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
                     this.internalTotalRecords = response.totalRecords;
                     this.updateColumnsSchema(response.columns ?? []);
                     this.updateFiltersSchema(response.filters ?? []);
+
                     if (this.cacheEnabled) {
                         this.tableQueryCache.set(cacheKey, response, this.cacheTtlMs);
                     }
+
                     this.loading = false;
                     queueMicrotask(() => this.cdRef.detectChanges());
                 },
@@ -279,9 +291,11 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
                 valueField: column.valueField ?? null
             }))
         );
+
         if (this.columnsSchemaKey === nextKey) {
             return;
         }
+
         this.columnsSchemaKey = nextKey;
         this.internalColumns = nextColumns;
     }
@@ -295,9 +309,11 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
                 choices: filter.choices ?? []
             }))
         );
+
         if (this.filtersSchemaKey === nextKey) {
             return;
         }
+
         this.filtersSchemaKey = nextKey;
         this.internalFilters = nextFilters;
     }
@@ -306,6 +322,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         if (column.displayField) {
             return row[column.displayField];
         }
+
         return row[column.field];
     }
 
@@ -325,7 +342,9 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         if (!column.choices) {
             return value;
         }
+
         const match = column.choices.find((item) => item.value === value);
+
         return match ? match.label : value;
     }
 
@@ -341,16 +360,20 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         event.stopPropagation();
         event.preventDefault();
         this.menuItems = this.buildMenuItems(row);
+
         if (typeof menu.show === 'function') {
             menu.show(event);
+
             return;
         }
+
         menu.toggle(event);
     }
 
     private buildCacheKey(query: Record<string, any>) {
         const serviceName = this.service?.constructor?.name ?? 'UnknownService';
         const namespace = this.cacheNamespace?.trim() || this.router.url || 'unknown-route';
+
         return `${serviceName}|${namespace}|${JSON.stringify(query)}`;
     }
 }

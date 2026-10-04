@@ -53,9 +53,11 @@ export class AuthSessionService {
 
     getUser(): LoginUser | null {
         const raw = localStorage.getItem(USER_KEY);
+
         if (!raw) {
             return null;
         }
+
         try {
             return JSON.parse(raw) as LoginUser;
         } catch {
@@ -65,41 +67,54 @@ export class AuthSessionService {
 
     updateUser(partial: Partial<LoginUser>) {
         const current = this.getUser();
+
         if (!current) {
             return;
         }
+
         const next = { ...current, ...partial };
+
         localStorage.setItem(USER_KEY, JSON.stringify(next));
     }
 
     isAuthenticated() {
         const token = this.getAccessToken();
         const expiresAt = this.getAccessExpiresAt();
+
         if (!token || !expiresAt) {
             this.clearSession();
+
             return false;
         }
+
         if (Date.now() >= expiresAt) {
             this.clearSession();
+
             return false;
         }
+
         return true;
     }
 
     initExpiryWarning() {
         const expiresAt = this.getAccessExpiresAt();
+
         if (!expiresAt || Date.now() >= expiresAt) {
             return;
         }
+
         this.scheduleExpiryWarning(expiresAt);
     }
 
     private getAccessExpiresAt() {
         const raw = localStorage.getItem(ACCESS_EXPIRES_AT_KEY);
+
         if (!raw) {
             return null;
         }
+
         const value = Number(raw);
+
         return Number.isFinite(value) ? value : null;
     }
 
@@ -112,6 +127,7 @@ export class AuthSessionService {
             if (Date.now() < expiresAt) {
                 this.showExpiryWarning();
             }
+
             return;
         }
 

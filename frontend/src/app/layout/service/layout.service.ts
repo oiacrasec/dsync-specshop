@@ -114,14 +114,13 @@ export class LayoutService {
 
     hasOpenOverlay = computed(() => this.layoutState().overlayMenuActive || this.hasOpenOverlaySubmenu());
 
-    hasOpenOverlaySubmenu = computed(() => {
-        return this.hasOverlaySubmenu() && !!this.layoutState().activePath;
-    });
+    hasOpenOverlaySubmenu = computed(() => this.hasOverlaySubmenu() && !!this.layoutState().activePath);
 
     isSidebarActive = computed(() => this.layoutState().overlayMenuActive || this.layoutState().mobileMenuActive);
 
     isSidebarStateChanged = computed(() => {
         const layoutConfig = this.layoutConfig();
+
         return layoutConfig.menuMode === 'horizontal' || layoutConfig.menuMode === 'slim' || layoutConfig.menuMode === 'slim-plus' || layoutConfig.menuMode === 'compact';
     });
 
@@ -135,6 +134,7 @@ export class LayoutService {
 
             if (!this.initialized || !config) {
                 this.initialized = true;
+
                 return;
             }
 
@@ -148,8 +148,10 @@ export class LayoutService {
 
     private updateMenuState() {
         const menuMode = this.layoutConfig().menuMode;
+
         if (this.previousMenuMode === undefined) {
             this.previousMenuMode = menuMode;
+
             return;
         }
 
@@ -191,6 +193,7 @@ export class LayoutService {
 
     toggleDarkMode(config?: LayoutConfig): void {
         const _config = config || this.layoutConfig();
+
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');
         } else {
@@ -259,6 +262,7 @@ export class LayoutService {
     updateBodyBackground(color: string) {
         const root = document.documentElement;
         const colorScheme: any = this.isDarkTheme() ? this.bodyBackgroundPalette.dark : this.bodyBackgroundPalette.light;
+
         root.style.setProperty('--surface-ground', colorScheme[color]);
     }
 }

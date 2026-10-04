@@ -82,6 +82,7 @@ export class UiCheckbox implements ControlValueAccessor {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 
@@ -89,9 +90,11 @@ export class UiCheckbox implements ControlValueAccessor {
         if (this.marginTop === undefined || this.marginTop === null || this.marginTop === '') {
             return null;
         }
+
         if (typeof this.marginTop === 'number') {
             return `${this.marginTop}px`;
         }
+
         return this.marginTop;
     }
 }

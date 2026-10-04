@@ -126,17 +126,21 @@ export class UiInputPassword implements ControlValueAccessor, AfterViewInit {
         if (!this.errorMessage || !this.ngControl?.control) {
             return false;
         }
+
         return this.ngControl.control.touched && this.ngControl.control.invalid;
     }
 
     private applyNativeInputAttributes() {
         const input = this.hostElement.nativeElement.querySelector('input');
+
         if (!(input instanceof HTMLInputElement)) {
             return;
         }
+
         if (this.name) {
             input.setAttribute('name', this.name);
         }
+
         if (this.autocomplete) {
             input.setAttribute('autocomplete', this.autocomplete);
         }
