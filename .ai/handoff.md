@@ -3,17 +3,21 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): separate general search from individual filters` (consultar git log -1)
+- **Última alteração:** `refactor(auth): remove password form style` (consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 e revisão da busca geral concluídas |
-| Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato, após confirmação |
-| Aguardando o usuário? | sim — confirmar início da 5.3 |
+| Etapa atual | 5.2 concluída; revisão para CRUD auditado via serializers em andamento |
+| Próximo passo exato | Concluir validação e documentação da refatoração autorizada dos serializers antes da 5.3 |
+| Aguardando o usuário? | não para esta revisão; 5.3 ainda exige confirmação |
 
 ## Concluído
+
+Removido o estilo HTML da senha de LoginSerializer; write_only e espaços preservados.
+Validação deste ajuste: 41 testes de autenticação e lint passaram.
+Os itens abaixo descrevem a base commitada antes da refatoração ainda pendente.
 
 0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1–3.6 · 2.3–2.5 · 4.1 e revisão · 5.1–5.2.
 
@@ -56,7 +60,15 @@
 
 ## Falta / dúvidas
 
-- Nada pendente na implementação 5.2. Aprovação da próxima etapa necessária.
+- Revisão autorizada, NÃO commitada: BaseModelSerializer/BaseAdminModelSerializer
+  usam super().create/update, autoria/auditoria e hooks create_extra/update_extra.
+  Plan/Contract migrados; services comuns removidos; view trava antes de validar.
+  Alterações em contracts/{apps,serializers,services,tests/test_admin_api}.py e
+  core/{mixins,serializers,services,views,tests/test_services}.py.
+- Última rodada dirigida: 43/46 testes passaram; três falharam por classe de exceção
+  esperada. Import corrigido, ainda precisa repetir a rodada e verificar lint.
+  Faltam validação completa, revisão, ADR/docs/memória e commit dessa refatoração.
+- 5.3 não iniciada; aprovação da próxima etapa necessária.
 - Models já usam verbose_name explícito nos rótulos; sem migrations pendentes.
 - ADR 0019: AccessLog só login sucesso/falha e refresh sucesso; leituras não gravam.
   Cobertura jurídica escolhida precisa de validação antes de produção; não afirmar

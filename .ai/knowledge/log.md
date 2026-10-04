@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Login: remoção do estilo de formulário da senha
+
+- Removido `style={'input_type': 'password'}` de `LoginSerializer` em
+  `backend/apps/users/serializers.py`, por solicitação do usuário.
+- Mantidos `write_only=True` e `trim_whitespace=False`; contrato JSON e autenticação
+  preservados. A máscara do formulário será responsabilidade do Angular.
+- Validação dirigida: 41 testes de autenticação e lint do arquivo passaram.
+
 ## 2026-10-04 — Revisão 5.2: busca geral e filtros individuais
 
 - search_fields do BaseFilterSet virou general_search_fields (padrão vazio);
