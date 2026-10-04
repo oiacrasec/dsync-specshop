@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Último commit:** etapa 2.5 (`test(tenancy): add generic isolation tests for every scoped model`)
+- **Último commit:** a159e97 (após a 2.5: refactors de organização dos módulos e padrões de SQL)
 
 ## Situação
 
@@ -17,6 +17,12 @@
 
 0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1 · 3.2 · 3.3 · 3.4 · 3.5 · 2.3 · 3.6 · 2.4 · 2.5. Ordem atual:
 4.1 → bloco 5.
+
+## Após a 2.5 (sem mudar comportamento)
+
+Reorganização dos módulos (`managers`, `utils`, `constants`, `problems`), padrão de SQL à mão
+(`queries/`, `@tenant_params`, `fetch_all`) e código em inglês. Tudo em `backend/AGENTS.md`
+e `backend/docs/standards/django-style.md`; checado pelo `validar-etapa`.
 
 ## Dúvidas abertas
 
