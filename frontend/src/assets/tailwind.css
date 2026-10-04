@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-primeui';
+
+@custom-variant dark (&:where([class*="app-dark"], [class*="app-dark"] *));
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1920px;
+
+  --shadow-v1: 0px 10px 10px -8px rgba(18, 18, 23, 0.02), 0px 2px 2px -1.5px rgba(18, 18, 23, 0.02), 0px 1px 1px -0.5px rgba(18, 18, 23, 0.02);
+  --shadow-v2: 0px 10px 10px -8px rgba(18, 18, 23, 0.02), 0px 2px 2px -1.5px rgba(18, 18, 23, 0.02), 0px 1px 1px -0.5px rgba(18, 18, 23, 0.02);
+  --shadow-custom-shadow: 0px 10px 10px -8px rgba(18, 18, 23, 0.02), 0px 2px 2px -1.5px rgba(18, 18, 23, 0.02), 0px 1px 1px -0.5px rgba(18, 18, 23, 0.02);
+
+  --opacity-4: 0.04;
+  --opacity-6: 0.06;
+  --opacity-8: 0.08;
+  --opacity-12: 0.12;
+  --opacity-16: 0.16;
+  --opacity-32: 0.32;
+  --opacity-36: 0.36;
+  --opacity-48: 0.48;
+  --opacity-64: 0.64;
+  --opacity-72: 0.72;
+
+  --animate-infinite-scroll: infinite-scroll 25s linear infinite;
+  --animate-float: float 3.5s ease-in-out infinite;
+  --animate-wiggle: wiggle 3.5s ease-in-out infinite;
+
+  @keyframes infinite-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px) scale(1.005); }
+  }
+
+  @keyframes wiggle {
+    0%, 30%, 100% {
+      transform: rotate(0deg);
+    }
+    10%, 20% {
+      transform: rotate(-1deg);
+    }
+    15%, 25% {
+      transform: rotate(1deg);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  :root {
+    --custom-shadow: 0px 10px 10px -8px rgba(18, 18, 23, 0.02), 0px 2px 2px -1.5px rgba(18, 18, 23, 0.02), 0px 1px 1px -0.5px rgba(18, 18, 23, 0.02);
+  }
+}
+
+@layer components {
+    .card {
+        @apply rounded-2xl lg:rounded-3xl p-4 lg:p-6 bg-[var(--surface-card)] shadow-[0px_10px_10px_-8px_rgba(18,18,23,0.02),0px_2px_2px_-1.5px_rgba(18,18,23,0.02),0px_1px_1px_-0.5px_rgba(18,18,23,0.02),0px_0px_0px_1px_rgba(18,18,23,0.02)];
+    }
+    .landing-container {
+        @apply px-6 w-full max-w-[62rem] md:max-w-[70rem] xl:max-w-[85rem] mx-auto;
+    }
+    .badge {
+        @apply px-3.5 py-1 rounded-full bg-surface-0 dark:bg-white/12 border border-surface dark:border-white/10 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)] font-medium text-surface-950 dark:text-surface-0;
+    }
+    .button-primary {
+        @apply flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-primary hover:bg-primary-emphasis text-primary-contrast font-medium shadow-custom-shadow transition-all;
+    }
+    .button {
+        @apply flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-white dark:bg-white/10 hover:bg-surface-50 dark:hover:bg-white/20 text-surface-700 dark:text-white font-medium shadow-custom-shadow transition-all;
+    }
+}
+
+.pattern {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.42) -1.85%, rgba(255, 255, 255, 0) 72.51%);
+    box-shadow:
+        -72px -298px 86px 0px rgba(120, 149, 206, 0),
+        -46px -191px 79px 0px rgba(120, 149, 206, 0.01),
+        -26px -107px 66px 0px rgba(120, 149, 206, 0.02),
+        -12px -48px 49px 0px rgba(120, 149, 206, 0.03),
+        -3px -12px 27px 0px rgba(120, 149, 206, 0.04);
+    backdrop-filter: blur(90px);
+}
+.app-dark .pattern {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) -1.85%, rgba(255, 255, 255, 0) 72.51%);
+    box-shadow:
+        -72px -298px 86px 0px rgba(9, 9, 11, 0),
+        -46px -191px 79px 0px rgba(9, 9, 11, 0.01),
+        -26px -107px 66px 0px rgba(9, 9, 11, 0.02),
+        -12px -48px 49px 0px rgba(9, 9, 11, 0.03),
+        -3px -12px 27px 0px rgba(9, 9, 11, 0.04);
+}

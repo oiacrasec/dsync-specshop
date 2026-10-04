@@ -1,0 +1,821 @@
+<div #editorShell class="editor-shell">
+    <div #mapFrame class="map-frame">
+        <div #mapContainer class="ol-container"></div>
+
+        <div
+            #zoomPanel
+            #zoomDrag="cdkDrag"
+            class="floating-block"
+            cdkDrag
+            [cdkDragBoundary]="'.map-frame'"
+            [cdkDragFreeDragPosition]="layoutState.zoomPosition"
+            (cdkDragEnded)="onPanelDragEnd('zoom-panel', $event)"
+        >
+            <div class="rounded-lg border border-surface-200 dark:border-surface-700 bg-white/90 dark:bg-surface-900/90 shadow-sm p-1.5 flex flex-col gap-1.5">
+                <div
+                    class="drag-handle px-1.5 py-1 rounded border border-surface-200 dark:border-surface-700 bg-surface-50/80 dark:bg-surface-800/70 text-surface-500 dark:text-white/70 text-[11px] leading-none flex items-center justify-center"
+                    cdkDragHandle
+                >
+                    <i class="pi pi-arrows-alt"></i>
+                </div>
+                <button
+                    pButton
+                    type="button"
+                    class="p-button-secondary p-button-outlined p-button-icon-only"
+                    (click)="openQuickActionsMenu($event, quickActionsMenu)"
+                >
+                    <span pButtonIcon class="pi pi-bars"></span>
+                </button>
+                <p-menu #quickActionsMenu [popup]="true" [appendTo]="overlayAppendTarget" [styleClass]="'map-quick-actions-menu'" [model]="quickActionItems"></p-menu>
+                <ui-button
+                    icon="pi pi-plus"
+                    severity="secondary"
+                    [text]="false"
+                    [outlined]="true"
+                    (onClick)="zoomIn()"
+                />
+                <ui-button
+                    icon="pi pi-minus"
+                    severity="secondary"
+                    [text]="false"
+                    [outlined]="true"
+                    (onClick)="zoomOut()"
+                />
+            </div>
+        </div>
+
+        @if (selectedDrawLayer) {
+            <div
+                #activeLayerPanel
+                #activeLayerDrag="cdkDrag"
+                class="floating-block"
+                cdkDrag
+                [cdkDragBoundary]="'.map-frame'"
+                [cdkDragFreeDragPosition]="activeLayerPanelPosition"
+                (cdkDragEnded)="onActiveLayerPanelDragEnd($event)"
+            >
+                <div class="active-layer-card rounded-lg border border-surface-200 dark:border-surface-700 bg-white/90 dark:bg-surface-900/90 shadow-sm p-1.5 flex items-center gap-2">
+                    <span
+                        class="drag-handle h-7 w-7 rounded border border-surface-200 dark:border-surface-700 bg-surface-50/80 dark:bg-surface-800/70 text-surface-500 dark:text-white/70 text-[11px] leading-none flex items-center justify-center"
+                        cdkDragHandle
+                    >
+                        <i class="pi pi-arrows-alt"></i>
+                    </span>
+                    <button
+                        pButton
+                        type="button"
+                        [icon]="drawingModeEnabled ? 'pi pi-stop' : 'pi pi-pencil'"
+                        [text]="true"
+                        severity="secondary"
+                        class="layer-draw-button"
+                        [disabled]="!drawingModeEnabled && !selectedDrawLayerCanDraw()"
+                        [pTooltip]="activeLayerDrawTooltip"
+                        [tooltipDisabled]="mapFullscreenActive"
+                        [attr.title]="mapFullscreenActive ? activeLayerDrawTooltip : null"
+                        tooltipPosition="bottom"
+                        [appendTo]="overlayAppendTarget"
+                        [attr.aria-label]="activeLayerDrawTooltip"
+                        (click)="toggleDrawingMode()"
+                    ></button>
+                    <span class="text-surface-400 dark:text-white/40">|</span>
+                    <button
+                        pButton
+                        type="button"
+                        icon="pi pi-list"
+                        [text]="true"
+                        severity="secondary"
+                        class="layer-features-button"
+                        [disabled]="isLayerDeletePending(selectedDrawLayer.id) || isLayerVisibilityPending(selectedDrawLayer.id)"
+                        pTooltip="Feições do layer"
+                        [tooltipDisabled]="mapFullscreenActive"
+                        [attr.title]="mapFullscreenActive ? 'Feições do layer' : null"
+                        tooltipPosition="bottom"
+                        [appendTo]="overlayAppendTarget"
+                        aria-label="Feições do layer"
+                        (click)="openFeaturesDialog(selectedDrawLayer.id, selectedDrawLayer.nome)"
+                    ></button>
+                </div>
+            </div>
+        }
+
+        @if (layoutState.layersPanelVisible) {
+            <div
+                #layersPanel
+                #layersDrag="cdkDrag"
+                class="floating-block"
+                cdkDrag
+                [cdkDragBoundary]="'.map-frame'"
+                [cdkDragFreeDragPosition]="layoutState.layersPosition"
+                (cdkDragEnded)="onPanelDragEnd('layers-panel', $event)"
+            >
+                <div
+                    class="layers-card rounded-lg border border-surface-200 dark:border-surface-700 bg-white/90 dark:bg-surface-900/90 shadow-sm"
+                    (click)="onLayersPanelBackgroundClick($event)"
+                >
+                    <div class="px-3 py-2 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="drag-handle h-7 w-7 rounded border border-surface-200 dark:border-surface-700 bg-surface-50/80 dark:bg-surface-800/70 text-surface-500 dark:text-white/70 text-[11px] leading-none flex items-center justify-center"
+                                cdkDragHandle
+                            >
+                                <i class="pi pi-arrows-alt"></i>
+                            </span>
+                            <div class="flex flex-col">
+                                <span class="text-xs uppercase tracking-wide text-surface-500 dark:text-white/70">Mapa</span>
+                                <span class="text-sm font-medium text-surface-900 dark:text-surface-0">{{ mapa?.nome || 'Editor' }}</span>
+                            </div>
+                        </div>
+                        <ui-button
+                            [icon]="layoutState.layersMenuOpen ? 'pi pi-minus' : 'pi pi-plus'"
+                            severity="secondary"
+                            [text]="true"
+                            (onClick)="toggleLayersMenu()"
+                        />
+                    </div>
+
+                    @if (layoutState.layersMenuOpen) {
+                        <div class="layers-card-body px-3 py-3 flex flex-col gap-2">
+                            <span class="text-xs uppercase tracking-wide text-surface-500 dark:text-white/70">Layers do mapa</span>
+
+                            @if (layersState.loading) {
+                                <div class="rounded-md border border-dashed border-surface-300 dark:border-surface-600 px-3 py-5 text-center text-sm text-surface-600 dark:text-white/75">
+                                    Carregando layers...
+                                </div>
+                            } @else {
+                                @if (menuLayers.length === 0) {
+                                    <div class="rounded-md border border-dashed border-surface-300 dark:border-surface-600 px-3 py-5 text-center text-sm text-surface-600 dark:text-white/75">
+                                        Nenhum layer ativo disponível neste mapa.
+                                    </div>
+                                } @else {
+                                    @for (layer of menuLayers; track layer.id) {
+                                        <div
+                                            class="layer-row rounded-md border border-surface-200 dark:border-surface-700 px-2 py-1.5 flex items-center justify-between gap-2 cursor-pointer transition-colors"
+                                            [ngClass]="{ 'layer-row-selected': selectedDrawLayerId === layer.id }"
+                                            (click)="$event.stopPropagation(); selectDrawLayer(layer.id)"
+                                        >
+                                            <div class="min-w-0 flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    [checked]="layer.visivel"
+                                                    [disabled]="layer.id <= 0 || isLayerVisibilityPending(layer.id) || isLayerDeletePending(layer.id)"
+                                                    (click)="$event.stopPropagation()"
+                                                    (change)="toggleLayer(layer.id, $any($event.target).checked)"
+                                                    class="h-4 w-4"
+                                                />
+                                                <span class="truncate text-sm text-surface-800 dark:text-white/85">
+                                                    {{ layer.nome }}
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-0.5">
+                                                <button
+                                                    pButton
+                                                    type="button"
+                                                    icon="pi pi-table"
+                                                    [text]="true"
+                                                    severity="secondary"
+                                                    class="layer-action-button"
+                                                    [disabled]="layer.id <= 0 || isLayerDeletePending(layer.id) || isLayerVisibilityPending(layer.id)"
+                                                    pTooltip="Metadados do layer"
+                                                    [tooltipDisabled]="mapFullscreenActive"
+                                                    [attr.title]="mapFullscreenActive ? 'Metadados do layer' : null"
+                                                    tooltipPosition="left"
+                                                    [appendTo]="overlayAppendTarget"
+                                                    aria-label="Metadados do layer"
+                                                    (click)="$event.stopPropagation(); openLayerColumns(layer.id, layer.nome)"
+                                                ></button>
+                                                <button
+                                                    pButton
+                                                    type="button"
+                                                    icon="pi pi-trash"
+                                                    [text]="true"
+                                                    severity="danger"
+                                                    class="layer-action-button"
+                                                    [disabled]="layer.id <= 0 || isLayerDeletePending(layer.id) || isLayerVisibilityPending(layer.id)"
+                                                    pTooltip="Remover layer"
+                                                    [tooltipDisabled]="mapFullscreenActive"
+                                                    [attr.title]="mapFullscreenActive ? 'Remover layer' : null"
+                                                    tooltipPosition="left"
+                                                    [appendTo]="overlayAppendTarget"
+                                                    aria-label="Remover layer"
+                                                    (click)="$event.stopPropagation(); confirmRemoveLayer(layer.id, layer.nome)"
+                                                ></button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+
+                            <div class="pt-2 flex items-center justify-end gap-1.5">
+                                <ui-button
+                                    label="Voltar"
+                                    icon="pi pi-arrow-left"
+                                    severity="secondary"
+                                    [text]="true"
+                                    (onClick)="goBack()"
+                                />
+                                <ui-button
+                                    label="Adicionar layer"
+                                    icon="pi pi-plus"
+                                    severity="secondary"
+                                    (onClick)="addLayer()"
+                                />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (featureQuickActionsVisible && featureQuickActionsFeatureId) {
+            <div
+                #featureActionsPanel
+                #featureActionsDrag="cdkDrag"
+                class="floating-block feature-actions-floating"
+                cdkDrag
+                [cdkDragBoundary]="'.map-frame'"
+                [cdkDragFreeDragPosition]="featureQuickActionsPosition"
+                (cdkDragEnded)="onFeatureQuickActionsDragEnd($event)"
+            >
+                <div class="feature-actions-popover rounded-lg border border-surface-200 dark:border-surface-700 bg-white/95 dark:bg-surface-900/95 shadow-md">
+                    <div class="feature-actions-popover-head px-2.5 py-2 flex items-center gap-2" [ngClass]="{ 'border-b border-surface-200 dark:border-surface-700': !featureQuickActionsCollapsed }">
+                        <span
+                            class="drag-handle h-7 w-7 rounded border border-surface-200 dark:border-surface-700 bg-surface-50/80 dark:bg-surface-800/70 text-surface-500 dark:text-white/70 text-[11px] leading-none flex items-center justify-center"
+                            cdkDragHandle
+                        >
+                            <i class="pi pi-arrows-alt"></i>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-[11px] uppercase tracking-wide text-surface-500 dark:text-white/70">Feição</div>
+                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0">#{{ featureQuickActionsFeatureId }}</div>
+                        </div>
+                        <ui-button
+                            [icon]="featureQuickActionsCollapsed ? 'pi pi-plus' : 'pi pi-minus'"
+                            severity="secondary"
+                            [text]="true"
+                            (onClick)="toggleFeatureQuickActionsCollapsed()"
+                        />
+                    </div>
+
+                    @if (!featureQuickActionsCollapsed) {
+                        <div class="feature-actions-popover-body p-2 flex flex-col gap-1.5">
+                            <ui-button
+                                label="Editar atributos"
+                                icon="pi pi-pencil"
+                                severity="secondary"
+                                [text]="true"
+                                [styleClass]="'w-full'"
+                                (onClick)="openFeatureAttributesFromQuickActions()"
+                            />
+                            <ui-button
+                                label="Remover feição"
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [text]="true"
+                                [styleClass]="'w-full'"
+                                (onClick)="confirmRemoveFeatureFromQuickActions()"
+                            />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (featuresDialogVisible) {
+            <aside
+                #featuresDrawerPanel
+                #featuresDrawerDrag="cdkDrag"
+                class="features-drawer"
+                [ngClass]="{ 'is-collapsed': featuresDrawerCollapsed }"
+                cdkDrag
+                [cdkDragBoundary]="'.map-frame'"
+                [cdkDragFreeDragPosition]="featuresDrawerPosition"
+                (cdkDragEnded)="onFeaturesDrawerDragEnd($event)"
+            >
+                <div class="features-drawer-card rounded-lg border border-surface-200 dark:border-surface-700 bg-white/95 dark:bg-surface-900/95 shadow-md" [ngClass]="{ 'is-collapsed': featuresDrawerCollapsed }">
+                    <div class="features-drawer-head px-3 py-2 border-b border-surface-200 dark:border-surface-700 flex items-start justify-between gap-2">
+                        <span
+                            class="drag-handle h-7 w-7 rounded border border-surface-200 dark:border-surface-700 bg-surface-50/80 dark:bg-surface-800/70 text-surface-500 dark:text-white/70 text-[11px] leading-none flex items-center justify-center"
+                            cdkDragHandle
+                        >
+                            <i class="pi pi-arrows-alt"></i>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-[11px] uppercase tracking-wide text-surface-500 dark:text-white/70">Feições do layer</div>
+                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0 truncate">{{ featuresDialogLayerName || '-' }}</div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <ui-button
+                                [icon]="featuresDrawerCollapsed ? 'pi pi-plus' : 'pi pi-minus'"
+                                severity="secondary"
+                                [text]="true"
+                                (onClick)="toggleFeaturesDrawerCollapsed()"
+                            />
+                            <ui-button
+                                icon="pi pi-times"
+                                severity="secondary"
+                                [text]="true"
+                                (onClick)="closeFeaturesDialog()"
+                            />
+                        </div>
+                    </div>
+
+                    @if (!featuresDrawerCollapsed) {
+                        <div class="features-drawer-body p-3 flex flex-col gap-3">
+                            <div class="features-drawer-table-wrap overflow-auto rounded-md border border-surface-200 dark:border-surface-700">
+                                <table class="w-full min-w-[760px] text-sm">
+                                    <thead class="bg-surface-50/90 dark:bg-surface-800/70">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">ID</th>
+                                            @for (column of featuresDialogColumns; track column.name) {
+                                                <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">
+                                                    {{ column.name }}
+                                                </th>
+                                            }
+                                            <th class="px-2 py-2 text-right text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (featuresDialogLoading) {
+                                            <tr class="border-t border-surface-200 dark:border-surface-700">
+                                                <td [attr.colspan]="featuresDialogColumns.length + 2" class="px-3 py-4 text-center text-xs text-surface-500 dark:text-white/70">
+                                                    Carregando feições...
+                                                </td>
+                                            </tr>
+                                        } @else {
+                                            @if (featuresDialogData.length === 0) {
+                                                <tr class="border-t border-surface-200 dark:border-surface-700">
+                                                    <td [attr.colspan]="featuresDialogColumns.length + 2" class="px-3 py-4 text-center text-xs text-surface-500 dark:text-white/70">
+                                                        Nenhuma feição cadastrada neste layer.
+                                                    </td>
+                                                </tr>
+                                            } @else {
+                                                @for (feature of featuresDialogData; track feature.id) {
+                                                    <tr
+                                                        class="border-t border-surface-200 dark:border-surface-700 cursor-pointer hover:bg-surface-50/60 dark:hover:bg-surface-800/40"
+                                                        (click)="focusFeature(feature)"
+                                                    >
+                                                        <td class="px-2 py-2 font-mono text-xs text-surface-700 dark:text-white/85">{{ feature.id }}</td>
+                                                        @for (column of featuresDialogColumns; track column.name) {
+                                                            <td class="px-2 py-2 text-surface-700 dark:text-white/85">
+                                                                {{ formatFeatureValue(featureValue(feature, column.name), column) }}
+                                                            </td>
+                                                        }
+                                                        <td class="px-2 py-2 text-right">
+                                                            <div class="flex items-center justify-end gap-1">
+                                                                <ui-button
+                                                                    icon="pi pi-pencil"
+                                                                    severity="secondary"
+                                                                    [text]="true"
+                                                                    (onClick)="openFeatureEditDialog(feature, $event)"
+                                                                />
+                                                                <ui-button
+                                                                    icon="pi pi-trash"
+                                                                    severity="danger"
+                                                                    [text]="true"
+                                                                    (onClick)="confirmRemoveFeature(feature, $event)"
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="features-drawer-footer flex items-center justify-between gap-2">
+                                <span class="text-xs text-surface-500 dark:text-white/70">
+                                    Exibindo {{ currentFeaturePageStart() }} até {{ currentFeaturePageEnd() }} de {{ featuresDialogTotalRecords }}
+                                </span>
+                                <div class="flex items-center gap-1">
+                                    <ui-button
+                                        label="Anterior"
+                                        icon="pi pi-chevron-left"
+                                        severity="secondary"
+                                        [text]="true"
+                                        [disabled]="featuresDialogFirst <= 0 || featuresDialogLoading"
+                                        (onClick)="previousFeaturesPage()"
+                                    />
+                                    <ui-button
+                                        label="Próxima"
+                                        icon="pi pi-chevron-right"
+                                        iconPos="right"
+                                        severity="secondary"
+                                        [text]="true"
+                                        [disabled]="!canLoadNextFeaturesPage() || featuresDialogLoading"
+                                        (onClick)="nextFeaturesPage()"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </aside>
+        }
+    </div>
+
+    <p-dialog
+        header="Adicionar layer"
+        [(visible)]="addLayerDialogVisible"
+        [modal]="true"
+        [appendTo]="overlayAppendTarget"
+        [dismissableMask]="!creatingLayer"
+        [closable]="!creatingLayer"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: 'min(76rem, 94vw)' }"
+        [contentStyle]="{ 'max-height': '78vh', overflow: 'auto' }"
+        (onHide)="closeAddLayerDialog()"
+    >
+        <form [formGroup]="layerForm" class="flex flex-col gap-4">
+            <p-tabs [(value)]="addLayerActiveTab">
+                <p-tablist>
+                    <p-tab value="dados">Dados do layer</p-tab>
+                    <p-tab value="metadados">Metadados</p-tab>
+                </p-tablist>
+                <p-tabpanels>
+                    <p-tabpanel value="dados">
+                        <div class="flex flex-col gap-4">
+                            <ui-input-text
+                                inputId="layer_nome"
+                                formControlName="nome"
+                                label="Nome do layer"
+                                [maxlength]="150"
+                                [errorMessage]="'Informe o nome do layer.'"
+                            />
+
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-surface-600 dark:text-white/70">Tipo de geometria</label>
+                                <p-select
+                                    formControlName="geom_type"
+                                    [options]="geomTypeOptions"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [placeholder]="'Selecione o tipo de geometria'"
+                                    [class]="'w-full'"
+                                    [appendTo]="overlayAppendTarget"
+                                />
+                            </div>
+
+                            <ui-input-text
+                                inputId="layer_style"
+                                formControlName="style_name"
+                                label="Estilo (opcional)"
+                                [maxlength]="150"
+                            />
+
+                            <ui-checkbox inputId="layer_visivel" formControlName="visivel" label="Iniciar visível" />
+                        </div>
+                    </p-tabpanel>
+
+                    <p-tabpanel value="metadados">
+                        <div class="rounded-lg border border-surface-200 dark:border-surface-700 p-3 flex flex-col gap-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-sm font-medium text-surface-700 dark:text-white/80">Metadados (colunas extras)</span>
+                                <span class="text-xs text-surface-500 dark:text-white/70">{{ layerColumnsDraft.length }} coluna(s)</span>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-md border border-surface-200 dark:border-surface-700">
+                                <table class="w-full min-w-[820px] text-sm">
+                                    <thead class="bg-surface-50/90 dark:bg-surface-800/70">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Nome</th>
+                                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Tipo</th>
+                                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Tamanho</th>
+                                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Nulo</th>
+                                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Único</th>
+                                            <th class="px-2 py-2 text-right text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr [formGroup]="newLayerColumnForm" class="border-t border-surface-200 dark:border-surface-700 align-top">
+                                            <td class="px-2 py-2">
+                                                <ui-input-text inputId="new_col_name" formControlName="name" [maxlength]="63" />
+                                            </td>
+                                            <td class="px-2 py-2">
+                                                <p-select
+                                                    formControlName="type"
+                                                    [options]="metadataTypeOptions"
+                                                    optionLabel="label"
+                                                    optionValue="value"
+                                                    [class]="'w-full'"
+                                                    [appendTo]="overlayAppendTarget"
+                                                />
+                                            </td>
+                                            <td class="px-2 py-2 align-middle text-center">
+                                                @if (shouldShowSizeField('new')) {
+                                                    <input type="number" formControlName="size" min="1" class="p-inputtext p-component w-full" />
+                                                } @else {
+                                                    <span class="block w-full text-center text-xs text-surface-400 dark:text-white/40">-</span>
+                                                }
+                                            </td>
+                                            <td class="px-2 py-2 text-center align-middle">
+                                                <input id="new_col_nullable" type="checkbox" formControlName="nullable" class="h-4 w-4" />
+                                            </td>
+                                            <td class="px-2 py-2 text-center align-middle">
+                                                <input id="new_col_unique" type="checkbox" formControlName="unique" class="h-4 w-4" />
+                                            </td>
+                                            <td class="px-2 py-2 text-right">
+                                                <ui-button
+                                                    label="Adicionar"
+                                                    icon="pi pi-plus"
+                                                    severity="secondary"
+                                                    [text]="true"
+                                                    (onClick)="addDraftColumnToNewLayer()"
+                                                />
+                                            </td>
+                                        </tr>
+
+                                        @if (layerColumnsDraft.length === 0) {
+                                            <tr class="border-t border-surface-200 dark:border-surface-700">
+                                                <td colspan="6" class="px-3 py-4 text-center text-xs text-surface-500 dark:text-white/70">
+                                                    Nenhuma coluna extra configurada para este layer.
+                                                </td>
+                                            </tr>
+                                        } @else {
+                                            @for (column of layerColumnsDraft; track column.name; let index = $index) {
+                                                <tr class="border-t border-surface-200 dark:border-surface-700">
+                                                    <td class="px-2 py-2 text-surface-700 dark:text-white/85">{{ column.name }}</td>
+                                                    <td class="px-2 py-2 text-surface-700 dark:text-white/85">{{ column.type }}</td>
+                                                    <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.size ?? '-' }}</td>
+                                                    <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.nullable === false ? 'Não' : 'Sim' }}</td>
+                                                    <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.unique ? 'Sim' : 'Não' }}</td>
+                                                    <td class="px-2 py-2 text-right">
+                                                        <ui-button
+                                                            icon="pi pi-times"
+                                                            severity="danger"
+                                                            [text]="true"
+                                                            (onClick)="removeDraftColumnFromNewLayer(index)"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
+
+            <div class="pt-2 flex items-center justify-end gap-2">
+                <ui-button label="Cancelar" severity="secondary" [text]="true" [disabled]="creatingLayer" (onClick)="closeAddLayerDialog()" />
+                <ui-button label="Criar layer" icon="pi pi-check" [loading]="creatingLayer" (onClick)="createLayer()" />
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog
+        header="Metadados do layer"
+        [(visible)]="layerColumnsDialogVisible"
+        [modal]="true"
+        [appendTo]="overlayAppendTarget"
+        [dismissableMask]="!layerColumnsSaving"
+        [closable]="!layerColumnsSaving"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: 'min(70rem, 94vw)' }"
+        [contentStyle]="{ 'max-height': '78vh', overflow: 'auto' }"
+        (onHide)="closeLayerColumnsDialog()"
+    >
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-surface-600 dark:text-white/70">Layer: <strong>{{ layerColumnsTargetName || '-' }}</strong></span>
+            </div>
+
+            <div class="overflow-x-auto rounded-md border border-surface-200 dark:border-surface-700">
+                <table class="w-full min-w-[820px] text-sm">
+                    <thead class="bg-surface-50/90 dark:bg-surface-800/70">
+                        <tr>
+                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Nome</th>
+                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Tipo</th>
+                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Tamanho</th>
+                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Nulo</th>
+                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Único</th>
+                            <th class="px-2 py-2 text-right text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr [formGroup]="layerColumnForm" class="border-t border-surface-200 dark:border-surface-700 align-top">
+                            <td class="px-2 py-2">
+                                <ui-input-text inputId="layer_col_name" formControlName="name" [maxlength]="63" />
+                            </td>
+                            <td class="px-2 py-2">
+                                <p-select
+                                    formControlName="type"
+                                    [options]="metadataTypeOptions"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [class]="'w-full'"
+                                    [appendTo]="overlayAppendTarget"
+                                />
+                            </td>
+                            <td class="px-2 py-2 align-middle text-center">
+                                @if (shouldShowSizeField('edit')) {
+                                    <input type="number" formControlName="size" min="1" class="p-inputtext p-component w-full" />
+                                } @else {
+                                    <span class="block w-full text-center text-xs text-surface-400 dark:text-white/40">-</span>
+                                }
+                            </td>
+                            <td class="px-2 py-2 text-center align-middle">
+                                <input id="layer_col_nullable" type="checkbox" formControlName="nullable" class="h-4 w-4" />
+                            </td>
+                            <td class="px-2 py-2 text-center align-middle">
+                                <input id="layer_col_unique" type="checkbox" formControlName="unique" class="h-4 w-4" />
+                            </td>
+                            <td class="px-2 py-2 text-right">
+                                <ui-button
+                                    label="Adicionar"
+                                    icon="pi pi-plus"
+                                    severity="secondary"
+                                    [text]="true"
+                                    [loading]="layerColumnsSaving"
+                                    [disabled]="layerColumnsLoading"
+                                    (onClick)="addColumnToLayer()"
+                                />
+                            </td>
+                        </tr>
+
+                        @if (layerColumnsLoading) {
+                            <tr class="border-t border-surface-200 dark:border-surface-700">
+                                <td colspan="6" class="px-3 py-4 text-center text-xs text-surface-500 dark:text-white/70">
+                                    Carregando metadados...
+                                </td>
+                            </tr>
+                        } @else {
+                            @if (layerColumnsData.length === 0) {
+                                <tr class="border-t border-surface-200 dark:border-surface-700">
+                                    <td colspan="6" class="px-3 py-4 text-center text-xs text-surface-500 dark:text-white/70">
+                                        Nenhuma coluna extra cadastrada neste layer.
+                                    </td>
+                                </tr>
+                            } @else {
+                                @for (column of layerColumnsData; track column.name) {
+                                    <tr class="border-t border-surface-200 dark:border-surface-700">
+                                        <td class="px-2 py-2 text-surface-700 dark:text-white/85">{{ column.name }}</td>
+                                        <td class="px-2 py-2 text-surface-700 dark:text-white/85">{{ column.type }}</td>
+                                        <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.size ?? '-' }}</td>
+                                        <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.nullable === false ? 'Não' : 'Sim' }}</td>
+                                        <td class="px-2 py-2 text-center text-surface-700 dark:text-white/85">{{ column.unique ? 'Sim' : 'Não' }}</td>
+                                        <td class="px-2 py-2 text-right">
+                                            <ui-button
+                                                icon="pi pi-trash"
+                                                severity="danger"
+                                                [text]="true"
+                                                [disabled]="layerColumnsSaving"
+                                                (onClick)="confirmRemoveLayerColumn(column.name)"
+                                            />
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog
+        [header]="featureEditDialogHeader"
+        [(visible)]="featureEditDialogVisible"
+        [modal]="true"
+        [appendTo]="overlayAppendTarget"
+        [focusOnShow]="false"
+        [dismissableMask]="!featureEditSaving"
+        [closable]="!featureEditSaving"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: 'min(52rem, 94vw)' }"
+        [contentStyle]="{ 'max-height': '78vh', overflow: 'auto' }"
+        (onHide)="closeFeatureEditDialog()"
+    >
+        <div class="flex flex-col gap-4">
+            <div class="text-sm text-surface-600 dark:text-white/70">
+                Layer: <strong>{{ featureEditLayerName || '-' }}</strong> | Feição:
+                <strong>{{ featureEditFeatureLabel }}</strong>
+            </div>
+
+            <div class="overflow-x-auto rounded-md border border-surface-200 dark:border-surface-700">
+                <table class="w-full min-w-[560px] text-sm">
+                    <thead class="bg-surface-50/90 dark:bg-surface-800/70">
+                        <tr>
+                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Campo</th>
+                            <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Obrigatório</th>
+                            <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-white/75">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (column of featureEditColumns; track column.name) {
+                            <tr class="border-t border-surface-200 dark:border-surface-700">
+                                <td class="px-2 py-2 text-surface-700 dark:text-white/85">
+                                    {{ column.name }}
+                                </td>
+                                <td class="px-2 py-2 text-center">
+                                    <input type="checkbox" class="h-4 w-4 cursor-not-allowed accent-amber-600" [checked]="column.nullable === false" disabled />
+                                </td>
+                                <td class="px-2 py-2">
+                                    @if (isFeatureColumnDate(column)) {
+                                        <ui-input-date
+                                            [inputId]="'feature_attr_' + column.name"
+                                            [(ngModel)]="featureEditValues[column.name]"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            (ngModelChange)="onFeatureFieldValueChange(column.name, $event)"
+                                            [showButtonBar]="true"
+                                            [appendTo]="overlayAppendTarget"
+                                            [styleClass]="'w-full'"
+                                            [inputStyleClass]="'w-full'"
+                                        />
+                                    } @else if (isFeatureColumnNumber(column)) {
+                                        <ui-input-number
+                                            [inputId]="'feature_attr_' + column.name"
+                                            [(ngModel)]="featureEditValues[column.name]"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            (ngModelChange)="onFeatureFieldValueChange(column.name, $event)"
+                                            [useGrouping]="false"
+                                            [maxFractionDigits]="isFeatureColumnInteger(column) ? 0 : 6"
+                                        />
+                                    } @else if (isFeatureColumnBoolean(column)) {
+                                        <ui-checkbox
+                                            [inputId]="'feature_attr_' + column.name"
+                                            [(ngModel)]="featureEditValues[column.name]"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            (ngModelChange)="onFeatureFieldValueChange(column.name, $event)"
+                                        />
+                                    } @else {
+                                        <ui-input-text
+                                            [inputId]="'feature_attr_' + column.name"
+                                            [(ngModel)]="featureEditValues[column.name]"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            (ngModelChange)="onFeatureFieldValueChange(column.name, $event)"
+                                        />
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if (featureEditColumns.length === 0) {
+                            <tr class="border-t border-surface-200 dark:border-surface-700">
+                                <td colspan="3" class="px-2 py-3 text-center text-sm text-surface-500 dark:text-white/70">
+                                    Nenhum atributo extra configurado para este layer.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex items-center justify-end gap-2">
+                <ui-button
+                    label="Cancelar"
+                    severity="secondary"
+                    [text]="true"
+                    [disabled]="featureEditSaving"
+                    (onClick)="closeFeatureEditDialog()"
+                />
+                <ui-button
+                    [label]="featureEditSaveButtonLabel"
+                    icon="pi pi-check"
+                    [loading]="featureEditSaving"
+                    (onClick)="saveFeatureAttributes()"
+                />
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-dialog
+        [header]="editorConfirmDialogHeader"
+        [(visible)]="editorConfirmDialogVisible"
+        [modal]="true"
+        [appendTo]="overlayAppendTarget"
+        [dismissableMask]="true"
+        [closable]="true"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: 'min(30rem, 92vw)' }"
+        [contentStyle]="{ 'max-height': '72vh', overflow: 'auto' }"
+        (onHide)="onEditorConfirmDialogHide()"
+    >
+        <div class="flex flex-col gap-4">
+            <div class="text-sm text-surface-700 dark:text-white/85">
+                {{ editorConfirmDialogMessage }}
+            </div>
+            <div class="flex items-center justify-end gap-2">
+                <ui-button
+                    label="Cancelar"
+                    severity="secondary"
+                    [text]="true"
+                    (onClick)="onEditorConfirmDialogReject()"
+                />
+                <ui-button
+                    [label]="editorConfirmDialogAcceptLabel"
+                    [severity]="editorConfirmDialogAcceptSeverity"
+                    (onClick)="onEditorConfirmDialogAccept()"
+                />
+            </div>
+        </div>
+    </p-dialog>
+
+    <p-toast [key]="toastKey" position="top-right"></p-toast>
+</div>

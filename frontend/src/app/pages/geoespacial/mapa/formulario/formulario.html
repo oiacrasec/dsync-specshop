@@ -1,0 +1,142 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar mapa' : 'Novo mapa' }}</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">Cabeçalho do mapa com visibilidade e vinculação de store.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="flex flex-col gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+            <section class="xl:col-span-3 rounded-xl border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-4">
+                <div>
+                    <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Propriedades</h3>
+                    <p class="text-sm text-surface-500 dark:text-white/64">Ajuste regras de visibilidade do cabeçalho.</p>
+                </div>
+
+                <ui-input-text inputId="nome" formControlName="nome" [maxlength]="150" label="Nome" errorMessage="Informe o nome do mapa." />
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium text-surface-600 dark:text-white/70">Visibilidade</label>
+                    <p-select
+                        formControlName="visibilidade"
+                        [options]="visibilidadeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [placeholder]="'Selecione a visibilidade'"
+                        [class]="'w-full'"
+                    />
+                </div>
+
+                <ui-autocomplete
+                    inputId="setor"
+                    formControlName="setor"
+                    label="Setor"
+                    placeholder="Digite para buscar setor"
+                    [optionsProvider]="setorOptionsProvider"
+                    [helpText]="form.controls.visibilidade.value === 'SETOR' ? 'Obrigatório para visibilidade SETOR.' : 'Opcional para outras visibilidades.'"
+                    [errorMessage]="'Informe o setor quando a visibilidade for SETOR.'"
+                />
+
+                <ui-input-number inputId="srid" formControlName="srid" label="SRID" [min]="1" [max]="999999" [useGrouping]="false" />
+
+                <ui-multi-select
+                    inputId="setor_compartilhado_ids"
+                    formControlName="setor_compartilhado_ids"
+                    label="Setores compartilhados"
+                    [options]="setorOptions"
+                    [maxSelectedLabels]="4"
+                    [placeholder]="form.controls.visibilidade.value === 'COMPARTILHADO' ? 'Selecione os setores' : 'Disponível apenas para visibilidade compartilhada'"
+                    helpText="Use compartilhamento somente quando a visibilidade for Compartilhado."
+                />
+
+                <ui-checkbox inputId="ativo" formControlName="ativo" label="Mapa ativo" [marginTop]="22" />
+            </section>
+
+            <section class="xl:col-span-6 rounded-xl border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-4">
+                <div class="flex items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Pré-visualização</h3>
+                        <p class="text-sm text-surface-500 dark:text-white/64">Resumo do cabeçalho antes de abrir o editor OpenLayers.</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-white/80">
+                        {{ visibilidadeLabel }}
+                    </span>
+                </div>
+
+                <div class="relative min-h-[460px] overflow-hidden rounded-lg border border-surface-300 dark:border-surface-600 bg-surface-100 dark:bg-surface-900">
+                    <div class="mapa-preview-grid absolute inset-0"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-transparent via-surface-50/25 to-surface-900/15 dark:from-transparent dark:via-surface-700/20 dark:to-black/30"></div>
+
+                    <div class="absolute left-4 top-4 right-4 flex flex-wrap items-center justify-between gap-2">
+                        <span class="inline-flex items-center gap-1 rounded-md bg-white/90 dark:bg-surface-900/90 px-2 py-1 text-xs text-surface-700 dark:text-white/80 border border-surface-200 dark:border-surface-600">
+                            <i class="pi pi-map text-xs"></i>
+                            {{ preview.storeLabel }}
+                        </span>
+                        <span class="inline-flex items-center gap-1 rounded-md bg-white/90 dark:bg-surface-900/90 px-2 py-1 text-xs text-surface-700 dark:text-white/80 border border-surface-200 dark:border-surface-600">
+                            <i class="pi pi-building text-xs"></i>
+                            {{ preview.setorLabel }}
+                        </span>
+                    </div>
+
+                    <div class="absolute inset-0 flex items-center justify-center p-4">
+                        <div class="w-full max-w-lg rounded-xl border border-surface-200 dark:border-surface-700 bg-white/95 dark:bg-surface-900/95 p-4 shadow-sm backdrop-blur">
+                            <p class="text-xs uppercase tracking-widest text-surface-500 dark:text-white/64">Mapa em edição</p>
+                            <h4 class="mt-1 text-lg font-semibold text-surface-900 dark:text-surface-0">{{ form.controls.nome.value || 'Mapa sem nome' }}</h4>
+                            <div class="mt-3 grid grid-cols-1 gap-2 text-sm">
+                                <div class="rounded-md bg-surface-50 dark:bg-surface-800 px-3 py-2">
+                                    <span class="text-surface-500 dark:text-white/64">SRID</span>
+                                    <div class="font-medium text-surface-800 dark:text-surface-0">{{ form.controls.srid.value || '-' }}</div>
+                                </div>
+                            </div>
+
+                            @if (showSharedSummary) {
+                                <div class="mt-3 rounded-md border border-surface-200 dark:border-surface-700 px-3 py-2 text-sm text-surface-700 dark:text-white/80">
+                                    Compartilhado com {{ sharedSetoresSummary }}
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <small class="text-surface-500 dark:text-white/64">
+                    Após salvar o cabeçalho, use a ação "Abrir mapa" na grid para entrar no editor OpenLayers e configurar layers.
+                </small>
+            </section>
+
+            <section class="xl:col-span-3 rounded-xl border border-surface-200 dark:border-surface-700 p-4 flex flex-col gap-4">
+                <div>
+                    <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Fonte</h3>
+                    <p class="text-sm text-surface-500 dark:text-white/64">Selecione o store principal deste mapa.</p>
+                </div>
+
+                <ui-autocomplete
+                    inputId="store"
+                    formControlName="store"
+                    label="Store"
+                    placeholder="Digite para buscar store"
+                    [optionsProvider]="storeOptionsProvider"
+                    [errorMessage]="'Informe o store do mapa.'"
+                />
+
+                <div class="rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900 p-3 flex flex-col gap-2">
+                    <span class="text-xs uppercase tracking-widest text-surface-500 dark:text-white/64">Resumo da fonte</span>
+                    <div class="text-sm text-surface-700 dark:text-white/80">Store: <strong>{{ preview.storeLabel }}</strong></div>
+                    <div class="text-sm text-surface-700 dark:text-white/80">Workspace: <strong>{{ preview.workspace }}</strong></div>
+                    <div class="text-sm text-surface-700 dark:text-white/80">Schema: <strong>{{ preview.schemaName }}</strong></div>
+                    <div class="text-sm text-surface-700 dark:text-white/80">Banco: <strong>{{ preview.banco }}</strong></div>
+                    <div class="text-sm text-surface-700 dark:text-white/80">Host: <strong>{{ preview.host }}</strong></div>
+                </div>
+            </section>
+        </div>
+    </form>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving || loading" [disabled]="loading" (onClick)="save()"></ui-button>
+    </div>
+</div>

@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Bloco 6 planejado (área administrativa + frontend), nenhuma etapa iniciada |
-| Próximo passo exato | responder as 3 pendências do bloco 6 no plano e aprovar a 6.1 (copiar o datasync-gis para `frontend/`) |
-| Aguardando o usuário? | sim — aprovação da 6.1 e as pendências do plano |
+| Etapa atual | 6.1 Copiar o datasync-gis para `frontend/` — ✅ concluída |
+| Próximo passo exato | decidir os achados da 6.1 (lint quebrado, 65 arquivos fora do Prettier, bundle) e aprovar a 6.2 |
+| Aguardando o usuário? | sim |
 
 Superadmin local criado pelo usuário: `datasync_admin` (via `createsuperuser`; senha só com o usuário).
 Referências: `D:\Projetos\PycharmProjects\datasync-spatial` (backend) e `datasync-gis` (frontend).

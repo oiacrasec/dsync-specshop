@@ -1,0 +1,37 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar setor' : 'Novo setor' }}</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">Preencha os dados obrigatorios antes de salvar.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="nome" formControlName="nome" [maxlength]="100" label="Nome" errorMessage="Informe o nome do setor." />
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <ui-checkbox inputId="ativo" formControlName="ativo" label="Setor ativo" [marginTop]="22" />
+                        </div>
+                    </div>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </form>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving" (onClick)="save()"></ui-button>
+    </div>
+</div>

@@ -1,0 +1,203 @@
+:host {
+    display: block;
+}
+
+.editor-shell {
+    height: calc(100vh - 8.5rem);
+    min-height: 620px;
+}
+
+.editor-shell:fullscreen,
+.editor-shell:-webkit-full-screen {
+    height: 100vh;
+    min-height: 100vh;
+}
+
+.editor-shell:fullscreen .map-frame,
+.editor-shell:-webkit-full-screen .map-frame {
+    border: 0;
+    border-radius: 0;
+}
+
+.map-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0.85rem;
+    border: 1px solid var(--p-surface-300);
+}
+
+.ol-container {
+    height: 100%;
+    width: 100%;
+}
+
+.floating-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+}
+
+.feature-actions-floating {
+    z-index: 26;
+}
+
+.feature-actions-popover {
+    width: 230px;
+    max-width: calc(100% - 1rem);
+    pointer-events: auto;
+    backdrop-filter: blur(2px);
+}
+
+.features-drawer {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 24;
+    width: min(34rem, calc(100% - 1rem));
+    height: min(70vh, calc(100% - 1rem));
+    min-width: 20rem;
+    min-height: 13rem;
+    max-width: calc(100% - 1rem);
+    max-height: calc(100% - 1rem);
+    overflow: hidden;
+    resize: both;
+    pointer-events: auto;
+}
+
+.features-drawer.is-collapsed {
+    height: auto;
+    min-height: 0;
+    resize: none;
+}
+
+.features-drawer-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.features-drawer-card.is-collapsed {
+    height: auto;
+}
+
+.features-drawer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.features-drawer-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.features-drawer-footer {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+    .features-drawer {
+        width: calc(100% - 1rem);
+        min-width: 0;
+        height: min(62vh, calc(100% - 1rem));
+        resize: none;
+    }
+}
+
+:host ::ng-deep .map-quick-actions-menu {
+    min-width: 15.5rem;
+}
+
+:host ::ng-deep .map-quick-actions-menu .p-menu-item-link {
+    white-space: nowrap;
+}
+
+.feature-actions-popover-head {
+    line-height: 1.25;
+}
+
+:host ::ng-deep .feature-actions-popover-body p-button {
+    display: block;
+    width: 100%;
+}
+
+:host ::ng-deep .feature-actions-popover-body p-button .p-button {
+    width: 100%;
+}
+
+.drag-handle {
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+}
+
+.layers-card {
+    width: min(360px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 1rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.layers-card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.active-layer-card {
+    backdrop-filter: blur(2px);
+}
+
+.layer-row-selected {
+    border-color: rgba(59, 130, 246, 0.42);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+:host ::ng-deep .layer-draw-button.p-button,
+:host ::ng-deep .layer-features-button.p-button,
+:host ::ng-deep .layer-action-button.p-button {
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+}
+
+@media (max-width: 1024px) {
+    .editor-shell {
+        height: calc(100vh - 7rem);
+        min-height: 520px;
+    }
+}
+
+:host ::ng-deep .ol-attribution {
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: 0.35rem;
+    bottom: 0.25rem;
+    inset: auto 0.35rem 0.25rem auto;
+    max-width: calc(100% - 0.7rem);
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    z-index: 15;
+}
+
+:host ::ng-deep .ol-attribution ul {
+    margin: 0;
+    padding: 0;
+}
+
+:host ::ng-deep .ol-attribution li,
+:host ::ng-deep .ol-attribution li a {
+    font-size: 0.72rem;
+    color: rgba(15, 23, 42, 0.62);
+    text-decoration: none;
+}
+
+:host ::ng-deep .ol-attribution button {
+    display: none;
+}

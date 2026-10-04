@@ -1,0 +1,202 @@
+<ui-confirm-dialog></ui-confirm-dialog>
+
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar GeoServer' : 'Novo GeoServer' }}</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">Preencha os dados obrigatórios antes de salvar.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="flex flex-col gap-6" autocomplete="off">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+                @if (isEditing) {
+                    <p-tab value="bancos">Bancos vinculados</p-tab>
+                }
+                <p-tab value="observacao">Observação</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="nome" formControlName="nome" [maxlength]="100" label="Nome" errorMessage="Informe o nome do GeoServer." />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text
+                                inputId="base_url"
+                                formControlName="base_url"
+                                [maxlength]="255"
+                                label="URL base"
+                                placeholder="https://host/geoserver"
+                                errorMessage="Informe a URL base."
+                            />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text
+                                inputId="usuario"
+                                formControlName="admin_user"
+                                [maxlength]="100"
+                                label="Usuário"
+                                errorMessage="Informe o usuário."
+                                name="geoserver_usuario"
+                                autocomplete="new-password"
+                            />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-password
+                                inputId="senha"
+                                formControlName="admin_password"
+                                name="geoserver_senha"
+                                label="Senha"
+                                [feedback]="false"
+                                [toggleMask]="true"
+                                autocomplete="new-password"
+                                [placeholder]="isEditing ? 'Preencha apenas para alterar' : 'Informe a senha'"
+                            />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-medium text-surface-600 dark:text-white/70">Status</label>
+                            <p-select formControlName="status" [options]="statusOptions" optionLabel="label" optionValue="value" appendTo="body" [placeholder]="'Selecione o status'" [class]="'w-full'" />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-number inputId="prioridade" formControlName="prioridade" label="Prioridade" [min]="1" [useGrouping]="false" />
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-number
+                                inputId="limite_workspaces"
+                                formControlName="limite_workspaces"
+                                label="Limite de workspaces"
+                                [min]="1"
+                                [useGrouping]="false"
+                                [showButtons]="false"
+                            />
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <ui-checkbox inputId="ativo" formControlName="ativo" label="GeoServer ativo" [marginTop]="22" />
+                        </div>
+                    </div>
+                </p-tabpanel>
+
+                @if (isEditing) {
+                    <p-tabpanel value="bancos">
+                        <div class="flex flex-col gap-6">
+                            <p class="text-sm text-surface-500 dark:text-white/64">
+                                Defina quais bancos geoespaciais podem ser usados por este GeoServer.
+                            </p>
+
+                            <div [formGroup]="vinculoForm" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="flex flex-col gap-2">
+                                    <ui-autocomplete
+                                        inputId="vinculo_banco"
+                                        formControlName="banco"
+                                        label="Banco geoespacial"
+                                        placeholder="Digite para buscar banco"
+                                        [optionsProvider]="bancoOptionsProvider"
+                                        [errorMessage]="'Informe o banco geoespacial.'"
+                                    />
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <ui-checkbox inputId="vinculo_ativo" formControlName="ativo" label="Vínculo ativo" [marginTop]="22" />
+                                </div>
+                            </div>
+
+                            @if (canCreateVinculo) {
+                                <div class="flex justify-end">
+                                    <ui-button label="Vincular banco" icon="pi pi-link" [loading]="vinculoSaving" [disabled]="vinculosLoading" (onClick)="createVinculo()"></ui-button>
+                                </div>
+                            }
+
+                            @if (vinculosLoading) {
+                                <div class="text-sm text-surface-500 dark:text-white/64">Carregando vínculos...</div>
+                            } @else if (!vinculos.length) {
+                                <div class="text-sm text-surface-500 dark:text-white/64">Nenhum banco vinculado a este GeoServer.</div>
+                            } @else {
+                                <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                                    <table class="w-full table-fixed border-collapse">
+                                        <colgroup>
+                                            <col />
+                                            <col class="w-44" />
+                                            <col class="w-72" />
+                                        </colgroup>
+                                        <thead class="bg-surface-50 dark:bg-surface-800/50">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200">Banco</th>
+                                                <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200">Status</th>
+                                                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200">Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (vinculo of vinculos; track vinculo.id) {
+                                                <tr class="border-t border-surface-200 dark:border-surface-700">
+                                                    <td class="px-4 py-3 align-middle text-sm text-surface-700 dark:text-surface-100">
+                                                        {{ vinculo.banco_label ?? vinculo.banco }}
+                                                    </td>
+                                                    <td class="px-4 py-3 align-middle text-center">
+                                                        <span class="text-xs font-semibold" [class.text-green-600]="vinculo.ativo" [class.text-surface-500]="!vinculo.ativo">
+                                                            {{ vinculo.ativo ? 'ATIVO' : 'INATIVO' }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-4 py-3 align-middle">
+                                                        <div class="flex justify-end gap-2 whitespace-nowrap">
+                                                            @if (canUpdateVinculo) {
+                                                                <ui-button
+                                                                    [label]="vinculo.ativo ? 'Inativar' : 'Ativar'"
+                                                                    icon="pi pi-refresh"
+                                                                    severity="secondary"
+                                                                    text
+                                                                    [loading]="isVinculoBusy(vinculo.id)"
+                                                                    (onClick)="toggleVinculo(vinculo)"
+                                                                ></ui-button>
+                                                            }
+                                                            @if (canDeleteVinculo) {
+                                                                <ui-button
+                                                                    label="Excluir"
+                                                                    icon="pi pi-trash"
+                                                                    severity="danger"
+                                                                    text
+                                                                    [loading]="isVinculoBusy(vinculo.id)"
+                                                                    (onClick)="removeVinculo(vinculo)"
+                                                                ></ui-button>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </p-tabpanel>
+                }
+
+                <p-tabpanel value="observacao">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="observacoes" formControlName="observacoes" [maxlength]="255" label="Observações" />
+                        </div>
+                    </div>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </form>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button
+            label="Testar conexão"
+            icon="pi pi-plug"
+            severity="secondary"
+            text
+            [loading]="testingConnection"
+            [disabled]="loading || saving"
+            (onClick)="testConnection()"
+        ></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving || loading" [disabled]="loading" (onClick)="save()"></ui-button>
+    </div>
+</div>

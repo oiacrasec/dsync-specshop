@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.1: frontend copiado do datasync-gis
+
+- `git archive` do GIS para `frontend/` (só arquivos versionados); nome `datasync-core-frontend`,
+  environments sem URLs do Spatial (homol/prod vazios), Dockerfile com Node 24, AGENTS/README
+  próprios, `LICENSE.md` da PrimeTek mantido; docs do GIS reduzidos a `docs/standards/patterns-frontend.md`.
+- Angular 21 é a LTS mais recente (22 ativa) e o GIS já está nela. `npm ci` e `ng build` ok.
+- Achados herdados: ESLint sem efeito (config inválida), 65 arquivos fora do Prettier, bundle acima do orçamento.
+
 ## 2026-10-04 — OrganizationViewSet independente com leitura autorizada
 
 - Removida organizations do ContractViewSet. OrganizationViewSet herda base de

@@ -38,6 +38,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 2.4: contexto em `contextvar`, managers fail closed com `.unscoped()`, mixin de view e serializer com escopo) | concluído |
 | `backend/` (etapa 2.5: testes de isolamento genéricos para todo model, com cobertura obrigatória) | concluído |
 | `backend/` (etapa 4.1: registro de acesso do Marco Civil, `AccessLog` fora dos tipos de escopo, ADR 0018) | concluído |
+| `frontend/` (etapa 6.1: base copiada do datasync-gis, Angular 21 LTS + PrimeNG 21, build passando) | concluído |
 | `backend/` (revisão 4.1: AccessLog seletivo de autenticação, sem escrita por leitura comum; ADR 0019) | concluído |
 | `backend/` (etapa 5.1: LookupOptionsMixin, UUID/rótulo, busca declarada, paginação limitada e permissão view; sem novas rotas de produção) | concluído |
 | `backend/` (etapa 5.2: API administrativa de planos/contratos, opções/schema, organizações para entrada; services e auditoria, redução de licenças protegida) | concluído |

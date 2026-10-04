@@ -1,0 +1,42 @@
+import { Routes } from '@angular/router';
+
+export default [
+    {
+        path: 'documentation',
+        loadComponent: () => import('@/app/pages/examples/documentation/documentation').then((c) => c.Documentation)
+    },
+    {
+        path: 'administracao',
+        loadChildren: () => import('@/app/pages/administracao/administracao.routes'),
+        data: { breadcrumb: 'Administração' }
+    },
+    {
+        path: 'geoespacial',
+        loadChildren: () => import('@/app/pages/geoespacial/geoespacial.routes'),
+        data: { breadcrumb: 'Geoespacial' }
+    },
+    { path: 'crud', loadComponent: () => import('@/app/pages/examples/crud/crud').then((c) => c.Crud), data: { breadcrumb: 'Crud' } },
+    { path: 'empty', loadComponent: () => import('@/app/pages/examples/empty/empty').then((c) => c.Empty), data: { breadcrumb: 'Empty' } },
+    {
+        path: 'invoice',
+        loadComponent: () => import('@/app/pages/examples/invoice/invoice').then((c) => c.Invoice),
+        data: { breadcrumb: 'Invoice' }
+    },
+    {
+        path: 'aboutus',
+        loadComponent: () => import('@/app/pages/examples/aboutus/aboutus').then((c) => c.AboutUs),
+        data: { breadcrumb: 'About' }
+    },
+    { path: 'help', loadComponent: () => import('@/app/pages/examples/help/help').then((c) => c.Help), data: { breadcrumb: 'Help' } },
+    { path: 'faq', loadComponent: () => import('@/app/pages/examples/faq/faq').then((c) => c.Faq), data: { breadcrumb: 'FAQ' } },
+    {
+        path: 'contact',
+        loadComponent: () => import('@/app/pages/examples/contactus/contactus').then((c) => c.ContactUs),
+        data: { breadcrumb: 'Contact Us' }
+    },
+    {
+        path: 'error',
+        redirectTo: '/notfound'
+    },
+    { path: '**', redirectTo: '/notfound' }
+] as Routes;

@@ -1,0 +1,29 @@
+:root {
+    --d-sidebar-bg-color: #ffffff;
+    --d-sidebar-bg-color-alt: #ffffff;
+    --d-sidebar-border: 1px solid var(--surface-border);
+    --d-app-name-color: var(--p-surface-950);
+    --d-menu-separator-border: 1px solid var(--p-surface-300);
+    --d-menuitem-root-text-color: var(--p-surface-700);
+    --d-menuitem-text-color: var(--p-surface-700);
+    --d-menuitem-text-hover-color: var(--p-surface-950);
+    --d-menuitem-hover-bg: rgba(255, 255, 255, 0.64);
+    --d-menuitem-active-bg: color-mix(in srgb, var(--p-button-secondary-background, #e5e7eb) 72%, white 28%);
+    --d-menuitem-active-text-color: var(--p-surface-950);
+    --d-menuitem-focus-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+}
+
+.app-dark {
+    --d-sidebar-bg-color: var(--p-surface-950);
+    --d-sidebar-bg-color-alt: var(--p-surface-950);
+    --d-sidebar-border: 1px solid var(--p-surface-700);
+    --d-app-name-color: var(--p-surface-0);
+    --d-menu-separator-border: 1px solid var(--p-surface-700);
+    --d-menuitem-root-text-color: rgba(255, 255, 255, 0.48);
+    --d-menuitem-text-color: rgba(255, 255, 255, 0.48);
+    --d-menuitem-text-hover-color: rgba(255, 255, 255, 0.75);
+    --d-menuitem-hover-bg: rgba(255, 255, 255, 0.06);
+    --d-menuitem-active-bg: color-mix(in srgb, var(--p-button-secondary-background, #4b5563) 35%, black 65%);
+    --d-menuitem-active-text-color: #ffffff;
+    --d-menuitem-focus-shadow: 0 0 0 1px var(--p-primary-50);
+}

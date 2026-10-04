@@ -49,6 +49,7 @@ e só começa após aprovação do usuário.
 | 37 | Prioridade (usuário): área administrativa e frontend antes do restante do bloco 5. `contracts` continua o app do **domínio** (Plan, Contract, Organization, usado por todos); novo app `administration` só para a API do superadmin (views, serializers, services, URLs `/admin/`), sem models próprios |
 | 38 | Primeiro acesso (usuário, referência Spatial/GIS): provisionamento cria a **1ª organização + admin do contrato**; só se o contrato ainda não tem usuários; bloqueio até trocar a senha **no backend, em toda a API** (exceto trocar senha, refresh e logout); senha temporária devolvida **uma vez** na resposta (no-store, nunca em log/auditoria); escopo inclui listar admins e resetar senha; login devolve resumo do usuário. Superadmin fora do fluxo. Futuro: envio assíncrono por tabela de eventos + Celery/Dramatiq |
 | 39 | Frontend (usuário): **copiar o datasync-gis inteiro** (template Poseidon/PrimeTek, licença confirmada pelo usuário) para `frontend/` e desabilitar telas fora do escopo **comentando** rotas e menu, com a marca `// DESABILITADO: fora do escopo atual` |
+| 40 | Respostas do bloco 6 (usuário): `Contract.plan` passa a ser **opcional** (nulo = sem plano/sem limites; PROTECT mantido; migration e doc de domínio na 6.3); formulário de contrato lista planos (options), campo opcional; tela de cadastro de planos fica para o futuro. Seleção de organização pronta na 6.5 para usuários comuns (superadmin não tem organização). Reset de senha do admin revoga seus refresh tokens (6.7) |
 
 ## Bloco 0 — Fundação
 
@@ -109,22 +110,24 @@ Ordem proposta: 6.1 → 6.2 → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 → 6.8. Cad
 
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
-| 6.1 | Copiar o datasync-gis para `frontend/` (sem `.git`, `node_modules`, `dist`, `.angular`; `environment*.ts` revisados), com `AGENTS.md`, README e `Dockerfile` próprios; conferir versão LTS do Angular/PrimeNG; build e lint passando | frontend | 0001, 0003 | ⬜ |
+| 6.1 | Copiar o datasync-gis para `frontend/` (sem `.git`, `node_modules`, `dist`, `.angular`; `environment*.ts` revisados), com `AGENTS.md`, README e `Dockerfile` próprios; conferir versão LTS do Angular/PrimeNG; build e lint passando | frontend | 0001, 0003 | ✅ (lint pendente, ver abaixo) |
 | 6.2 | Desabilitar telas fora do escopo comentando rotas e menu (`// DESABILITADO: fora do escopo atual`): ficam login, primeiro acesso, seleção de organização e administração de contratos | frontend | — | ⬜ |
-| 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API | backend | novo (contracts × administration) | ⬜ |
+| 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API; `Contract.plan` opcional (decisão 40) | backend | novo (contracts × administration) | ⬜ |
 | 6.4 | Primeiro acesso: `User.must_change_password`; login devolve resumo do usuário; bloqueio global no backend até trocar; `POST` de troca de senha (atual + nova + confirmação, validadores do Django, diferente da atual) | backend | 0010 | ⬜ |
 | 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização | frontend | 0003, 0004 | ⬜ |
 | 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ⬜ |
 | 6.7 | Admins do contrato: listar e resetar senha (nova temporária + `must_change_password`), auditado | backend | 0010 | ⬜ |
 | 6.8 | Frontend: administração de contratos (lista, formulário, provisionamento, admins e reset), adaptada à API do core | frontend | 0008 | ⬜ |
 
-Pendências a decidir antes das etapas indicadas:
+Pendências do bloco 6: respondidas (decisão 40).
 
-| Antes de | Dúvida |
+Achados da 6.1 (herdados do datasync-gis, a decidir com o usuário):
+
+| Achado | Situação |
 |---|---|
-| 6.2 / 6.8 | Contrato exige plano: o GIS não tem tela de planos. Só seleção de plano no formulário de contrato (options) ou também uma tela de planos? |
-| 6.5 | Seleção de organização fica ativa já (o admin provisionado tem a 1ª organização)? |
-| 6.7 | O reset de senha deve revogar as sessões (refresh tokens) do admin? |
+| Lint | `eslint.config.js` está no formato antigo (eslintrc) com nome de flat config e sem parser TypeScript: o ESLint não analisa nenhum arquivo, nem no GIS |
+| Formatação | Prettier aponta 65 arquivos fora do padrão (além do CRLF da cópia, normalizado pelo git) |
+| Bundle | inicial 1,49 MB acima do orçamento de 1 MB; CSS do editor geoespacial acima do orçamento; `quill` CommonJS; CSS de preloading não encontrado |
 
 A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes; o que a
 6.6/6.7 cobrir sai do escopo delas. O rascunho de organizações (ADR 0032, Proposto) é

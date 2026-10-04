@@ -1,0 +1,21 @@
+<ui-confirm-dialog></ui-confirm-dialog>
+
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Setores</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">Gestao dos setores da organizacao ativa.</p>
+        </div>
+        @if (canCreate) {
+            <div class="flex items-center gap-2">
+                <ui-button label="Novo setor" icon="pi pi-plus" severity="secondary" (onClick)="create()"></ui-button>
+            </div>
+        }
+    </div>
+
+    <ui-table
+        [service]="setorService"
+        [actions]="tableActions"
+        [reloadKey]="reloadKey"
+    ></ui-table>
+</div>
