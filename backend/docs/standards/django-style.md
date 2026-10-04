@@ -148,6 +148,30 @@ Mesmo formato: os parâmetros da função alimentam o CTE/tabela `parametros`. O
 
 A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para agentes de IA.
 
+## Views administrativas com services
+
+`BaseAdminModelViewSet`, em `apps/contracts/views.py`, centraliza listagem, schema,
+options e os métodos `get_queryset`/`perform_create`/`perform_update`/`perform_destroy`.
+O recurso declara suas funções explicitamente, sem descoberta automática por nome:
+
+```python
+class ContractViewSet(BaseAdminModelViewSet):
+    serializer_class = ContractSerializer
+    queryset_selector = staticmethod(selectors.admin_contracts)
+    save_service = staticmethod(services.save_contract)
+    delete_service = staticmethod(services.delete_contract)
+```
+
+`staticmethod` impede que Python passe a view como argumento às funções do módulo.
+O selector retorna queryset lazy; o service de gravação recebe `values`, `actor` e,
+na atualização, `instance`. O service de exclusão recebe `instance` e `actor`.
+Gravação retorna a instância persistida, que a base associa ao serializer.
+
+O recurso declara `schema_columns`, `schema_filters` e `ordering_fields` e mantém
+ações específicas (ex.: organizações do contrato). Regras de negócio, transações,
+locks e auditoria continuam nos services. Essa base administrativa exige superadmin
+e não usa contexto organizacional; não deve ser usada em rotas comuns de tenant.
+
 ## Formatação e lint
 
 `pyproject.toml` preserva a formatação manual de `models.py`:

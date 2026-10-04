@@ -18,6 +18,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
 | Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view nos recursos comuns ou SuperadminPermission na administração; rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados |
 | Administração | API /admin/plans e /admin/contracts (5.2), SuperadminPermission sem organização; CRUD por services, auditoria, opções/schema e organizações do contrato; redução de licenças bloqueada abaixo dos usuários não excluídos, contando inativos |
+| Views administrativas | BaseAdminModelViewSet em contracts/views centraliza get_queryset e perform_create/update/destroy; subclasses declaram selector/save/delete como staticmethod e schema_filters; regras/locks/auditoria ficam nos services |
 | Idioma | código em inglês; rótulos/mensagens em português |
 
 Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).

@@ -3,13 +3,13 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(contracts): add superadmin plan and contract API` (este handoff entra no commit; consultar git log -1)
+- **Última alteração:** `refactor(contracts): centralize administrative view hooks` (este handoff entra no commit; consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 — ✅ concluída |
+| Etapa atual | 5.2 e revisão da base das views — ✅ concluídas |
 | Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato, após confirmação |
 | Aguardando o usuário? | sim — confirmar início da 5.3 |
 
@@ -21,6 +21,8 @@
   Listas limitadas/search/ordering/filtros, options/schema; organizations por contrato
   (organizações ativas, não excluídas), previsto na 3.5. UUIDs na API; erros RFC 9457.
 - Camadas em apps/contracts: selectors/services/serializers/permissions/views/urls.
+  BaseAdminModelViewSet centraliza get_queryset e perform_create/update/destroy;
+  recursos declaram selector/save/delete como staticmethod e schema_filters.
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
 - Licenças: usuário aprovou impedir redução abaixo dos não excluídos, contando

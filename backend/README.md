@@ -18,6 +18,8 @@ permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api
 A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contracts.md)
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
+As views herdam `BaseAdminModelViewSet` e declaram selector/services; a base executa
+os hooks de CRUD, mantendo regras, locks e auditoria nos services.
 Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
 
 | Item | Versão |

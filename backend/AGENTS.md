@@ -115,6 +115,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Escritas pelos services, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
+  `BaseAdminModelViewSet` centraliza os quatro hooks de CRUD; subclasses declaram
+  `queryset_selector`, `save_service` e `delete_service` com `staticmethod`, além
+  de schema/filtros. Não repetir delegação nem inferir nomes de funções.
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

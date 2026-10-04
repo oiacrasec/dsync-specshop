@@ -17,7 +17,13 @@ from .serializers import (
 )
 
 
-class AdminCatalogViewSet(LookupOptionsMixin, viewsets.ModelViewSet):
+class BaseAdminModelViewSet(LookupOptionsMixin, viewsets.ModelViewSet):
+    """CRUD administrativo ligado explicitamente aos selectors e services do recurso.
+
+    Declare queryset_selector, save_service e delete_service como staticmethod;
+    a base encaminha os dados validados e o ator, sem substituir regras do domínio.
+    """
+
     permission_classes = [SuperadminPermission]
     options_permission_class = SuperadminPermission
     lookup_field = 'public_id'
@@ -26,6 +32,21 @@ class AdminCatalogViewSet(LookupOptionsMixin, viewsets.ModelViewSet):
     options_search_fields = ('name',)
     ordering_fields = ('name', 'created_at', 'updated_at')
     schema_columns = ()
+    schema_filters = ()
+
+    def get_queryset(self):
+        return self.queryset_selector()
+
+    def perform_create(self, serializer):
+        serializer.instance = self.save_service(values=serializer.validated_data, actor=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.instance = self.save_service(
+            instance=serializer.instance, values=serializer.validated_data, actor=self.request.user
+        )
+
+    def perform_destroy(self, instance):
+        self.delete_service(instance=instance, actor=self.request.user)
 
     def list(self, request):
         query = AdminListQuerySerializer(data=request.query_params)
@@ -38,15 +59,7 @@ class AdminCatalogViewSet(LookupOptionsMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def schema(self, request):
         filters = [{'field': 'is_active', 'label': _('Ativo'), 'type': 'boolean'}]
-        if isinstance(self, ContractViewSet):
-            filters.append(
-                {
-                    'field': 'plan',
-                    'label': _('Plano'),
-                    'type': 'relation',
-                    'options_url': '/api/v1/admin/plans/options/',
-                }
-            )
+        filters.extend(self.schema_filters)
         return Response(
             {
                 'columns': [{'field': field, 'label': label} for field, label in self.schema_columns],
@@ -56,43 +69,29 @@ class AdminCatalogViewSet(LookupOptionsMixin, viewsets.ModelViewSet):
         )
 
 
-class PlanViewSet(AdminCatalogViewSet):
+class PlanViewSet(BaseAdminModelViewSet):
     serializer_class = PlanSerializer
+    queryset_selector = staticmethod(selectors.admin_plans)
+    save_service = staticmethod(services.save_plan)
+    delete_service = staticmethod(services.delete_plan)
     schema_columns = (('name', _('Nome')), ('is_active', _('Ativo')))
 
-    def get_queryset(self):
-        return selectors.admin_plans()
 
-    def perform_create(self, serializer):
-        serializer.instance = services.save_plan(values=serializer.validated_data, actor=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.instance = services.save_plan(
-            instance=serializer.instance, values=serializer.validated_data, actor=self.request.user
-        )
-
-    def perform_destroy(self, instance):
-        services.delete_plan(instance=instance, actor=self.request.user)
-
-
-class ContractViewSet(AdminCatalogViewSet):
+class ContractViewSet(BaseAdminModelViewSet):
     serializer_class = ContractSerializer
-    ordering_fields = (*AdminCatalogViewSet.ordering_fields, 'start_date', 'end_date', 'licenses')
+    queryset_selector = staticmethod(selectors.admin_contracts)
+    save_service = staticmethod(services.save_contract)
+    delete_service = staticmethod(services.delete_contract)
+    ordering_fields = (*BaseAdminModelViewSet.ordering_fields, 'start_date', 'end_date', 'licenses')
     schema_columns = (('name', _('Nome')), ('start_date', _('Início')), ('licenses', _('Licenças')))
-
-    def get_queryset(self):
-        return selectors.admin_contracts()
-
-    def perform_create(self, serializer):
-        serializer.instance = services.save_contract(values=serializer.validated_data, actor=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.instance = services.save_contract(
-            instance=serializer.instance, values=serializer.validated_data, actor=self.request.user
-        )
-
-    def perform_destroy(self, instance):
-        services.delete_contract(instance=instance, actor=self.request.user)
+    schema_filters = (
+        {
+            'field': 'plan',
+            'label': _('Plano'),
+            'type': 'relation',
+            'options_url': '/api/v1/admin/plans/options/',
+        },
+    )
 
     @action(detail=True, methods=['get'])
     def organizations(self, request, **kwargs):

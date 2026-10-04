@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: base das views administrativas
+
+- Usuário pediu aplicar o reaproveitamento do Spatial. BaseAdminModelViewSet
+  substitui AdminCatalogViewSet e centraliza get_queryset/perform_create/update/destroy.
+  PlanViewSet/ContractViewSet declaram queryset_selector/save_service/delete_service
+  como staticmethod; schema_filters declarado no recurso, sem isinstance na base.
+- Sem alteração de API, queries, permissões, locks ou auditoria; regras continuam
+  nos services, ações específicas na subclass. Convenção no guia Django/AGENTS.
+- Validação: 440 testes, lint/formato, migrations e checks dev/produção OK.
+  OWASP A01–A10 revisada sem novos achados; queries constantes/sem escritas nas
+  leituras e teste de concorrência preservados. Sem novas decisões legais/dados.
+
 ## 2026-10-04 — Etapa 5.2: administração de planos e contratos
 
 - CRUD em /api/v1/admin/plans e contracts, somente superadmin ativo, sem organização;

@@ -60,6 +60,10 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 
 ## Auditoria e performance
 
+Views de planos/contratos herdam `BaseAdminModelViewSet`, que centraliza os hooks
+de CRUD. Cada recurso declara selector/services e configuração do schema;
+essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
+
 Escritas usam services com validação, autoria e AuditEvent na mesma transação.
 Eventos `plan.created/updated/deleted` e `contract.created/updated/deleted` guardam
 configuração antes/depois, UUID, ator e data, sem nomes de clientes. Alterar apenas
