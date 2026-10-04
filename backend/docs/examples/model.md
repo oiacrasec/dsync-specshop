@@ -14,15 +14,15 @@ class BaseModel(models.Model, metaclass=DscModelBase):
     """Persistência comum; autoria é explícita, não inferida da requisição."""
 
     id = models.BigAutoField(primary_key=True)
-    public_id = models.UUIDField(_('identificador público'), default=uuid7, unique=True, editable=False)
-    created_at = models.DateTimeField(_('criado em'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('atualizado em'), auto_now=True)
+    public_id = models.UUIDField(verbose_name=_('identificador público'), default=uuid7, unique=True, editable=False)
+    created_at = models.DateTimeField(verbose_name=_('criado em'), auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name=_('atualizado em'), auto_now=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('criado por'),
                                    on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('atualizado por'),
                                    on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
-    is_active = models.BooleanField(_('ativo'), default=True)
-    deleted_at = models.DateTimeField(_('excluído em'), null=True, blank=True, editable=False)
+    is_active = models.BooleanField(verbose_name=_('ativo'), default=True)
+    deleted_at = models.DateTimeField(verbose_name=_('excluído em'), null=True, blank=True, editable=False)
     deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('excluído por'),
                                    on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
 ```

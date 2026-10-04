@@ -15,8 +15,9 @@ class Profile(HybridScopedModel):
     contrato usa system_key=ESSENTIAL_PROFILE_KEY e é criado pela migration rbac.0002.
     """
 
-    name = models.CharField(_('nome'), max_length=255)
-    system_key = models.CharField(_('chave de sistema'), max_length=64, blank=True, default='', editable=False)
+    name = models.CharField(verbose_name=_('nome'), max_length=255)
+    system_key = models.CharField(verbose_name=_('chave de sistema'), max_length=64, blank=True, default='',
+                                  editable=False)
 
     class Meta(HybridScopedModel.Meta):
         abstract = False
@@ -45,7 +46,7 @@ class ProfilePermission(HybridScopedModel):
 
     profile = models.ForeignKey(Profile, verbose_name=_('perfil'), on_delete=models.PROTECT,
                                 related_name='permissions',)
-    permission_code = models.CharField(_('permissão'), max_length=128)
+    permission_code = models.CharField(verbose_name=_('permissão'), max_length=128)
 
     class Meta(HybridScopedModel.Meta):
         abstract = False
@@ -68,8 +69,8 @@ class Assignment(ContractScopedModel):
                              related_name='access_assignments',)
     profile = models.ForeignKey(Profile, verbose_name=_('perfil'), on_delete=models.PROTECT,
                                 null=True, blank=True, related_name='assignments',)
-    permission_code = models.CharField(_('permissão avulsa'), max_length=128, blank=True, default='')
-    scope = models.CharField(_('escopo'), max_length=12,
+    permission_code = models.CharField(verbose_name=_('permissão avulsa'), max_length=128, blank=True, default='')
+    scope = models.CharField(verbose_name=_('escopo'), max_length=12,
                              choices=[(scope.value, scope.value) for scope in PermissionScope])
     scope_organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização do escopo'),
                                            on_delete=models.PROTECT, null=True, blank=True, related_name='+',)

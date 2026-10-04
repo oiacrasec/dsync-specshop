@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Models: verbose_name explícito
+
+- Usuário determinou usar verbose_name como argumento nomeado nos rótulos de todos
+  os campos; convertidos argumentos posicionais nos models core/contracts/rbac/audit.
+  Campos/labels/schema permanecem iguais; sem alteração de migrations.
+- Padrão compacto/alinhado e limite de 120 preservados; modelos com campos longos
+  foram quebrados onde necessário. Guia de estilo, exemplo e backend/AGENTS atualizados.
+- Validação: suíte de 477 testes, lint/formato/migrations/checks OK no workspace.
+  Sem alteração de SQL, permissões ou custos de runtime. Busca geral está em revisão
+  no mesmo workspace e será fechada em commit próprio.
+
 ## 2026-10-04 — Revisão 5.2: querysets simples diretamente nas views
 
 - Usuário determinou queries simples diretamente no queryset da view, sem selector wrapper.

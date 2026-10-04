@@ -3,15 +3,15 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): declare simple querysets directly in views` (consultar git log -1)
+- **Última alteração:** `style(backend): declare field verbose names explicitly` (consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 e revisão da base das views — ✅ concluídas |
-| Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato, após confirmação |
-| Aguardando o usuário? | sim — confirmar início da 5.3 |
+| Etapa atual | 5.2 concluída; adaptação da busca geral em andamento |
+| Próximo passo exato | fechar general_search_fields e metadata de busca/filtros; depois 5.3 após confirmação |
+| Aguardando o usuário? | não — revisão atual autorizada |
 
 ## Concluído
 
@@ -53,7 +53,9 @@
 
 ## Falta / dúvidas
 
-- Nada pendente na implementação 5.2. Aprovação da próxima etapa necessária.
+- Busca geral em andamento: core/filters/constants/mixins/tests e contracts/filters/
+  tests não commitados; suíte 477 passou, falta validar um teste novo e fechar docs/commit.
+- Models já usam verbose_name explícito nos rótulos; sem migrations pendentes.
 - ADR 0019: AccessLog só login sucesso/falha e refresh sucesso; leituras não gravam.
   Cobertura jurídica escolhida precisa de validação antes de produção; não afirmar
   que apenas login satisfaz a lei. AuditEvent e entrada de superadmin preservados.

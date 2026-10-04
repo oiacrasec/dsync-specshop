@@ -14,11 +14,13 @@ class Plan(SharedModel):
     serão implementados junto das funcionalidades correspondentes.
     """
 
-    name = models.CharField(_('nome'), max_length=255)
-    max_organizations = models.PositiveIntegerField(_('limite de organizações'), null=True, blank=True)
-    max_storage_bytes = models.PositiveBigIntegerField(_('limite de armazenamento em bytes'), null=True, blank=True)
-    max_integrations = models.PositiveIntegerField(_('limite de integrações'), null=True, blank=True)
-    max_operations_per_month = models.PositiveBigIntegerField(_('limite de operações por mês'), null=True, blank=True)
+    name = models.CharField(verbose_name=_('nome'), max_length=255)
+    max_organizations = models.PositiveIntegerField(verbose_name=_('limite de organizações'), null=True, blank=True)
+    max_storage_bytes = models.PositiveBigIntegerField(verbose_name=_('limite de armazenamento em bytes'), null=True,
+                                                       blank=True)
+    max_integrations = models.PositiveIntegerField(verbose_name=_('limite de integrações'), null=True, blank=True)
+    max_operations_per_month = models.PositiveBigIntegerField(verbose_name=_('limite de operações por mês'), null=True,
+                                                              blank=True)
 
     class Meta(SharedModel.Meta):
         abstract = False
@@ -36,13 +38,13 @@ class Contract(BaseModel):
     secretarias; a visibilidade da raiz seguirá as regras do ADR 0012.
     """
 
-    name = models.CharField(_('nome'), max_length=255)
+    name = models.CharField(verbose_name=_('nome'), max_length=255)
     plan = models.ForeignKey('Plan', verbose_name=_('plano'), on_delete=models.PROTECT, related_name='+',)
-    start_date = models.DateField(_('início da vigência'))
-    end_date = models.DateField(_('fim da vigência'), null=True, blank=True)
-    licenses = models.PositiveIntegerField(_('licenças'), validators=[MinValueValidator(1)])
-    post_termination_retention_days = models.PositiveSmallIntegerField(_('dias de retenção após encerramento'),
-                                                                      default=90, validators=[MaxValueValidator(365)])
+    start_date = models.DateField(verbose_name=_('início da vigência'))
+    end_date = models.DateField(verbose_name=_('fim da vigência'), null=True, blank=True)
+    licenses = models.PositiveIntegerField(verbose_name=_('licenças'), validators=[MinValueValidator(1)])
+    post_termination_retention_days = models.PositiveSmallIntegerField(
+        verbose_name=_('dias de retenção após encerramento'), default=90, validators=[MaxValueValidator(365)])
 
     class Meta(BaseModel.Meta):
         abstract = False
@@ -73,7 +75,7 @@ class Organization(ContractScopedModel):
     permissões de acesso serão aplicadas pelo contexto e pelas atribuições.
     """
 
-    name = models.CharField(_('nome'), max_length=255)
+    name = models.CharField(verbose_name=_('nome'), max_length=255)
 
     class Meta(ContractScopedModel.Meta):
         abstract = False

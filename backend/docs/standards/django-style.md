@@ -7,6 +7,8 @@ referência: [models](../examples/model.md). Implementações atuais:
 ## Declaração de campos
 
 - Manter campos curtos e seus argumentos na mesma linha, até **120 caracteres**.
+- Declarar rótulos com `verbose_name=_('...')`, nunca como argumento posicional,
+  mesmo nos campos que aceitam a forma abreviada.
 - Em declarações longas, agrupar vários argumentos por linha e alinhar a
   continuação aos argumentos da chamada, seguindo o exemplo de referência.
 - Fechar a chamada na linha do último argumento, preservando a vírgula final

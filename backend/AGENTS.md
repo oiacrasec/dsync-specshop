@@ -44,6 +44,8 @@ Crie cada arquivo só quando ele for necessário.
 Seguir [docs/standards/django-style.md](docs/standards/django-style.md) e o
 [exemplo de model](docs/examples/model.md): campos compactos, argumentos agrupados
 e continuação alinhada. A preferência do usuário vale para todos os models.
+Ao declarar rótulos de campos, usar sempre `verbose_name=_('...')` explicitamente,
+mesmo quando Django aceita o rótulo como argumento posicional.
 `models.py` tem formatação manual preservada, com limite obrigatório de **120
 caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 

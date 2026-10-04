@@ -47,13 +47,13 @@ class AuditEvent(HybridScopedModel):
     JSON, sem outros dados pessoais (skill lgpd).
     """
 
-    event = models.CharField(_('evento'), max_length=64, choices=AuditEventType.choices)
+    event = models.CharField(verbose_name=_('evento'), max_length=64, choices=AuditEventType.choices)
     context_organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização do contexto'),
                                              on_delete=models.PROTECT, null=True, blank=True, related_name='+',)
-    target_type = models.CharField(_('tipo do alvo'), max_length=64, blank=True, default='')
-    target_public_id = models.UUIDField(_('identificador público do alvo'), null=True, blank=True)
-    access_jti = models.CharField(_('jti do token de acesso'), max_length=255, blank=True, default='')
-    changes = models.JSONField(_('alterações'), default=dict, blank=True)
+    target_type = models.CharField(verbose_name=_('tipo do alvo'), max_length=64, blank=True, default='')
+    target_public_id = models.UUIDField(verbose_name=_('identificador público do alvo'), null=True, blank=True)
+    access_jti = models.CharField(verbose_name=_('jti do token de acesso'), max_length=255, blank=True, default='')
+    changes = models.JSONField(verbose_name=_('alterações'), default=dict, blank=True)
 
     objects = AuditManager()
     all_objects = AllAuditManager()
@@ -106,18 +106,19 @@ class AccessLog(models.Model, metaclass=DscModelBase):
     minimum_retention_months = ACCESS_LOG_MINIMUM_RETENTION_MONTHS
 
     id = models.BigAutoField(primary_key=True)
-    occurred_at = models.DateTimeField(_('data e hora (UTC)'), default=timezone.now)
+    occurred_at = models.DateTimeField(verbose_name=_('data e hora (UTC)'), default=timezone.now)
     # Registros anteriores ao ADR 0019 ficam sem classificação; não inferir seu evento.
-    action = models.CharField(_('ação'), max_length=32, choices=AccessLogAction.choices, blank=True, default='')
-    ip = models.GenericIPAddressField(_('IP de origem'))
-    port = models.PositiveIntegerField(_('porta de origem'), null=True, blank=True)
+    action = models.CharField(verbose_name=_('ação'), max_length=32, choices=AccessLogAction.choices, blank=True,
+                              default='')
+    ip = models.GenericIPAddressField(verbose_name=_('IP de origem'))
+    port = models.PositiveIntegerField(verbose_name=_('porta de origem'), null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('usuário'), on_delete=models.PROTECT,
                              null=True, blank=True, related_name='+',)
     contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
                                  null=True, blank=True, related_name='+',)
     organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização'),
                                      on_delete=models.PROTECT, null=True, blank=True, related_name='+',)
-    request_id = models.UUIDField(_('identificador da requisição'), null=True, blank=True)
+    request_id = models.UUIDField(verbose_name=_('identificador da requisição'), null=True, blank=True)
 
     objects = AccessLogManager()
     _base_objects = models.Manager.from_queryset(AccessLogQuerySet)()
