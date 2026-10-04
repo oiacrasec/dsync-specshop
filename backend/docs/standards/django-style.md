@@ -238,6 +238,36 @@ de filtros do model: django-filter acessa o manager durante a importação; noss
 managers exigem contexto. Declarar BooleanFilter/UUIDFilter etc. explicitamente,
 sem aliviar o fail closed. O queryset vem do selector e permanece lazy até paginar.
 
+Busca geral é configurada no FilterSet:
+
+```python
+class ContractFilterSet(BaseFilterSet):
+    general_search_fields = ('name',)
+```
+
+`search` pesquisa esses campos com OR; filtros individuais combinam com AND.
+O padrão da base é vazio (busca desabilitada) e o lookup padrão é icontains.
+Não reaproveitar automaticamente lookup de filtro individual: name=foo pode ser
+exact enquanto search=foo continua pesquisando por trecho, preservando o contrato.
+Para outra semântica, declarar `general_search_lookups = {'name': 'istartswith'}`.
+Só aceitar os lookups textuais permitidos em core/constants; regex não é permitido.
+
+Campos devem ser CharField/TextField ou subclasses; relações intermediárias devem
+ser FK/OneToOne diretas, sem M2M/reversa multivalorada. Não converter números/datas/
+UUID para texto nem adicionar distinct para encobrir multiplicação de linhas.
+Campos/tipos/lookups inválidos são erros de configuração, sem fallback.
+
+O schema tem bloco `general_search` com parameter/label/fields (field/label/lookup),
+separado de `filters` (controles individuais). Null indica busca geral desabilitada.
+Um campo pode ter filtro individual e participar da busca geral: seus significados
+não são alterados pelo schema. Metadados vêm do FilterSet/model, sem avaliar queryset.
+options_search_fields e o parâmetro q das seleções continuam independentes.
+
+Adicionar campos à busca exige revisar volume, JOINs/índices e planos de execução.
+Não expandir automaticamente para todos os campos textuais. O custo de icontains
+é o mesmo das buscas anteriores por nome; não declarar aprovação sob carga sem medir
+(ADR 0029).
+
 O recurso declara `schema_columns`/`schema_filters` como nomes de campos e mantém
 ações específicas (ex.: organizações do contrato). Regras de negócio, transações,
 locks e auditoria continuam nos services. Essa base administrativa exige superadmin

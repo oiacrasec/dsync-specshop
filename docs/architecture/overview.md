@@ -49,6 +49,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (revisão 5.2: schema por nomes de campos, metadados automáticos/overrides, URLs via SchemaRouter e ordenação via OrderingFilter; ADR 0026) | concluído |
 | `backend/` (revisão 5.2: classes base de selectors, selector_class nas views e ordem padronizada de configuração; ADR 0027) | concluído |
 | `backend/` (revisão 5.2: querysets simples diretamente nas views administrativas, selectors para lógica própria, DRF padrão; ADR 0028 substitui 0027) | concluído |
+| `backend/` (revisão 5.2: general_search_fields, busca OR/controles individuais AND, schema general_search separado, validação de tipos/lookups; ADR 0029) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

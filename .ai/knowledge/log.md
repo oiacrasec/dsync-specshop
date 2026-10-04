@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: busca geral e filtros individuais
+
+- search_fields do BaseFilterSet virou general_search_fields (padrão vazio);
+  apps declaram name. Busca OR continua search/icontains, controles individuais AND.
+  Lookup de filtro individual não muda o geral; overrides em general_search_lookups.
+- Schema adiciona general_search separado de filters; parameter/label/fields com
+  labels/lookups do model/FilterSet, null desabilita a busca. options não mudou.
+- Somente texto e relações singulares diretas, sem conversões/regex/joins multivalorados.
+  Metadata sem queries; busca preserva queryset com tenant e não grava dados.
+- Validação: suíte completa 477 testes/checks OK; depois adicionado teste de rejeição
+  de M2M, rodada dirigida final de 14 testes de filtros passou. Cobertura total 478.
+  OR/AND, isolamento, lookup independente, override, configuração inválida e schema
+  sem SQL cobertos. OWASP A01–A10 sem achados; busca administrativa mantém name e
+  custo SQL anterior, sem certificado de carga novo; conformidade anterior preservada.
+- Arquivos: core/constants/filters/mixins/tests, contracts/filters/tests,
+  backend/AGENTS/README/style, API/overview/plano, ADR 0029 e memória/handoff.
+
 ## 2026-10-04 — Models: verbose_name explícito
 
 - Usuário determinou usar verbose_name como argumento nomeado nos rótulos de todos

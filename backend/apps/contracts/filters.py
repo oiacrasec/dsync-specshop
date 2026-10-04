@@ -8,6 +8,7 @@ from .models import Contract, Organization, Plan
 
 
 class PlanFilterSet(BaseFilterSet):
+    general_search_fields = ('name',)
     plan = filters.UUIDFilter(method='reject_plan')
 
     def reject_plan(self, queryset, name, value):
@@ -19,6 +20,7 @@ class PlanFilterSet(BaseFilterSet):
 
 
 class ContractFilterSet(BaseFilterSet):
+    general_search_fields = ('name',)
     plan = filters.UUIDFilter(field_name='plan__public_id')
     ordering = filters.OrderingFilter(fields=('name', 'created_at', 'updated_at', 'start_date', 'end_date', 'licenses'))
 

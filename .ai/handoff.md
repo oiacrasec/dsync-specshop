@@ -3,15 +3,15 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `style(backend): declare field verbose names explicitly` (consultar git log -1)
+- **Última alteração:** `refactor(api): separate general search from individual filters` (consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 concluída; adaptação da busca geral em andamento |
-| Próximo passo exato | fechar general_search_fields e metadata de busca/filtros; depois 5.3 após confirmação |
-| Aguardando o usuário? | não — revisão atual autorizada |
+| Etapa atual | 5.2 e revisão da busca geral concluídas |
+| Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato, após confirmação |
+| Aguardando o usuário? | sim — confirmar início da 5.3 |
 
 ## Concluído
 
@@ -33,6 +33,8 @@
   view usa serializer.save() padrão (ADR 0023). Regras/locks/auditoria preservados.
   Schemas: nomes de campos, labels/tipos do model e overrides por campo; options_url
   via SchemaRouter/reverse; ordenação via OrderingFilter. Sem queries (ADR 0026).
+  general_search_fields/OR e filtros individuais/AND; schema general_search separado,
+  lookups textuais explícitos, tenant preservado e sem casts/regex/M2M (ADR 0029).
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
 - Licenças: usuário aprovou impedir redução abaixo dos não excluídos, contando
@@ -45,7 +47,8 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 464 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: suíte 477 + rodada dirigida 14 após novo teste M2M; cobertura total 478.
+  Lint/formato/migrations e checks desenvolvimento/produção OK, sem migrations.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).
@@ -53,8 +56,7 @@
 
 ## Falta / dúvidas
 
-- Busca geral em andamento: core/filters/constants/mixins/tests e contracts/filters/
-  tests não commitados; suíte 477 passou, falta validar um teste novo e fechar docs/commit.
+- Nada pendente na implementação 5.2. Aprovação da próxima etapa necessária.
 - Models já usam verbose_name explícito nos rótulos; sem migrations pendentes.
 - ADR 0019: AccessLog só login sucesso/falha e refresh sucesso; leituras não gravam.
   Cobertura jurídica escolhida precisa de validação antes de produção; não afirmar

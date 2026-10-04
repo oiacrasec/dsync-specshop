@@ -36,3 +36,15 @@ SERIALIZER_HIDDEN_FIELDS = ('id', 'contract', 'organization')
 # Seleções (ADR 0011).
 OPTIONS_DEFAULT_ROWS = 20
 OPTIONS_MAX_ROWS = 100
+
+# Busca geral: somente lookups textuais declarados (sem regex/conversão de tipos).
+GENERAL_SEARCH_LOOKUPS = (
+    'exact',
+    'iexact',
+    'contains',
+    'icontains',
+    'startswith',
+    'istartswith',
+    'endswith',
+    'iendswith',
+)

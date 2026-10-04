@@ -35,6 +35,9 @@ Selectors ficam para consultas com lógica própria. Views administrativas decla
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.
 Selectors que dependem de tenant continuam sendo chamados durante a requisição.
+Busca geral: FilterSets declaram general_search_fields, com OR e icontains padrão;
+filtros individuais combinam com AND. Schema descreve general_search separado
+de filters para o frontend montar um campo único e controles independentes (ADR 0029).
 
 | Item | Versão |
 |---|---|

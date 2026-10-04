@@ -67,6 +67,7 @@ class TableSchemaMixin:
             {
                 'columns': self.get_schema_columns(),
                 'filters': self.get_schema_filters(),
+                'general_search': self.filterset_class.get_general_search_schema(),
                 'ordering_fields': tuple(self.filterset_class.base_filters['ordering'].param_map),
             }
         )

@@ -37,6 +37,12 @@ com dados validados/ator/instância. Views usam serializer.save() do DRF; exclus
 ServiceDeleteMixin (ADRs 0023 e 0025). Sem classe específica, a base nega a gravação.
 Nas listagens, o selector fornece o queryset com escopo; FilterSet aplica filtros
 antes da paginação. Filtros continuam lazy, sem queries/escritas próprias por item.
+Busca única: declarar general_search_fields no FilterSet (padrão vazio), combinados
+com OR; filtros individuais combinam com AND. Padrão icontains; alterar lookups por
+general_search_lookups explicitamente, sem herdar lookup de filtro individual.
+Somente texto e relações singulares diretas; UUID/datas/números usam filtros próprios.
+Schema retorna general_search separado de filters; null desabilita o campo único.
+options_search_fields continua sendo configuração exclusiva de options (ADR 0029).
 Crie cada arquivo só quando ele for necessário.
 
 ## Estilo dos models

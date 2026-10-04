@@ -58,6 +58,23 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 `ordering_fields`. O filtro de relação `plan` tem `options_url` apontando para
 `/api/v1/admin/plans/options/`. Documentação OpenAPI entra na etapa 5.5.
 
+O schema também retorna `general_search`, separado dos filtros individuais:
+
+```json
+{
+  "parameter": "search",
+  "label": "Busca geral",
+  "fields": [{"field": "name", "label": "Nome", "lookup": "icontains"}]
+}
+```
+
+O frontend usa esse bloco para um campo único; `filters` continua descrevendo os
+controles individuais. General_search null indica busca desabilitada. Campos da
+busca geral combinam com OR; filtros individuais e busca combinam com AND.
+Nesta API continua pesquisa por trecho de name: não houve expansão para novos
+campos ou mudança de parâmetros. Configuração no FilterSet via general_search_fields;
+lookups específicos só por general_search_lookups explícito (ADR 0029).
+
 ## Auditoria e performance
 
 Views de planos/contratos herdam `BaseAdminModelViewSet` e usam serializer.save()
