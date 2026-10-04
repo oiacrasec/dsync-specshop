@@ -358,7 +358,7 @@ def test_auth_endpoints_have_constant_query_counts(user, api_client, django_asse
     get_user_model().objects.bulk_create(
         [get_user_model()(username=f'extra-{i}', contract=user.contract) for i in range(quantity)]
     )
-    with django_assert_num_queries(6):
+    with django_assert_num_queries(7):  # +1: contrato conferido no login (ADR 0006 §2.1).
         tokens = login_client(api_client).json()
     with django_assert_num_queries(19):
         response = api_client.post(REFRESH, {'refresh': tokens['refresh']}, format='json')

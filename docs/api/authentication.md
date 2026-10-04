@@ -57,7 +57,9 @@ rotas protegidas. A autenticação do access consulta o usuário a cada requisi�
 em uma query. O logout revoga o refresh; um access já emitido permanece válido
 até expirar, por no máximo 15 minutos, conforme ADR 0004.
 
-Contrato/organização e regras de vigência entrarão no bloco 2 do plano. O
+Contrato do usuário vencido, futuro, inativo ou excluído → 403 `contract-inactive` no login
+(após senha correta), no refresh e em toda rota autenticada; logout continua permitido
+([regras](../domain/contracts.md)). O
 armazenamento de tokens no navegador continua pendente no ADR 0003; esta etapa
 não define armazenamento no frontend.
 
@@ -68,6 +70,7 @@ Todos seguem [RFC 9457](errors.md), com `application/problem+json`.
 | Status | Caso | Tipo |
 |---|---|---|
 | 400 | JSON malformado | `malformed-request` |
+| 403 | contrato do usuário indisponível | `contract-inactive` |
 | 401 | credenciais inválidas, usuário indisponível, token inválido/expirado/revogado | `authentication-required` |
 | 422 | campo ausente, vazio ou de formato inválido | `validation-error`, com `errors` |
 | 429 | limite de login excedido | `about:blank`, com header `Retry-After` |

@@ -221,8 +221,26 @@ def test_essential_profile_has_every_code(admin, maria, orgs, essential_profile)
     assert call(maria, '/method/', orgs['obras'], method='post').status_code == 200
 
 
-def test_superadmin_passes_without_organization(admin):
-    assert call(admin, '/declared/').status_code == 200
+def test_superadmin_needs_organization_on_business_endpoints(admin):
+    assert problem(call(admin, '/declared/')) == 'context-invalid-request'
+
+
+def test_superadmin_enters_organization_of_any_contract_even_unavailable(admin, orgs, user_contract):
+    other = Contract.objects.create(
+        name='Outro', plan=user_contract.plan, start_date=user_contract.start_date, licenses=1, is_active=False
+    )
+    branch = Organization.objects.create(name='filial', contract=other)
+    for organization in (orgs['obras'], branch):  # Contrato inativo: suporte (decisão 3 da 2.3).
+        response = call(admin, '/declared/', organization)
+        assert response.status_code == 200
+        assert response.json() == {'organization': str(organization.public_id)}
+
+
+def test_superadmin_cannot_enter_inactive_organization_or_deleted_contract(admin, orgs, user_contract):
+    Organization.objects.filter(pk=orgs['saude'].pk).update(is_active=False)
+    assert problem(call(admin, '/declared/', orgs['saude'])) == 'context-forbidden'
+    user_contract.delete()
+    assert problem(call(admin, '/declared/', orgs['obras'])) == 'context-forbidden'
 
 
 def test_permission_queries_do_not_grow_with_grants(admin, maria, orgs, user_contract):

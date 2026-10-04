@@ -67,13 +67,14 @@ class RequiredPermission(BasePermission):
         if code not in permission_registry.PERMISSIONS:
             logger.warning('Permissão fora do registry declarada em %s', type(view).__name__)
             return False
-        if user.is_superuser:
-            return True  # Superadmin com organização opcional: etapa 2.3.
         # Import tardio: o DRF carrega esta classe durante a inicialização de rest_framework.views.
         from apps.core.context import resolve_organization
         from apps.core.exceptions import ContextForbidden
 
+        # Endpoint de negócio sempre exige organização, inclusive para o superadmin (400 sem header).
         organization = resolve_organization(request)
+        if user.is_superuser:
+            return True
         evaluation = access_evaluation(request, organization)
         if not evaluation.has_access:
             raise ContextForbidden()

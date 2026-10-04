@@ -72,8 +72,8 @@ PROTECT impede remoção física pelo ORM quando houver referências.
 - Sem endpoints, serializers ou serviços de contratação publicados nesta etapa.
 - Vínculo de usuário e regras de licenças: etapa 2.2 concluída, conforme
   [ADR 0015](../adr/0015-contagem-de-licencas-de-usuarios.md).
-- Validação de contrato ativo/vigência e contexto: etapas seguintes.
-- Isolamento automático de consultas e testes entre tenants: etapas 2.3–2.5.
+- Contrato ativo/vigência conferido no login, refresh e a cada requisição: etapa 2.3 (abaixo).
+- Isolamento automático de consultas e testes entre tenants: etapas 2.4–2.5.
   `objects` hoje filtra somente excluídos; não é uma barreira de autorização.
 
 ## Usuários e licenças
@@ -93,6 +93,21 @@ no banco, verifica contrato disponível/ativo e vigência (início e fim inclusi
 e grava autoria explícita. Falta de vaga gera `LicenseLimitReached` (409).
 Contrato inativo, vencido ou futuro gera `ContractInactive` (403); ausente ou
 excluído gera validação (422), pelo handler global nos futuros endpoints.
+
+## Contrato disponível a cada requisição (etapa 2.3)
+
+`Contract.is_available()`: ativo, não excluído e dentro da vigência (início e fim
+inclusivos). Usuário comum com contrato indisponível recebe 403 `contract-inactive`:
+
+| Momento | Regra |
+|---|---|
+| Login | só depois da senha correta (senha errada continua 401, sem revelar o contrato) |
+| Refresh | negado; o token continua válido e volta a funcionar se o contrato for reativado |
+| Rotas autenticadas | conferido na autenticação JWT, na mesma query do usuário |
+| Logout | continua permitido |
+
+O frontend encerra a sessão ao receber `contract-inactive`. Superadmin não tem
+contrato e não é afetado.
 
 `create_user`/`create_superuser` e suas versões assíncronas delegam a essa escrita,
 preservando normalização e hash do Django. `createsuperuser` continua sem contrato.

@@ -25,6 +25,8 @@ e só começa após aprovação do usuário.
 | 13 | Pedaço da 2.3 antecipado na 3.3 (aprovado): ler e validar `X-Organization-Id` (400) e resolver a organização do contrato do usuário (403), preenchendo `request.organization`. Contrato ativo a cada requisição e superadmin com organização opcional continuam na 2.3. O acesso total dinâmico do perfil essencial já vale no cálculo; a 3.4 fica com a fixture e a proteção do último admin |
 | 14 | 3.4 (aprovado): perfil essencial criado por migration de dados idempotente (não fixture manual); proteção do último admin cobre atribuição e também desativação/exclusão do usuário; vale inclusive para o superadmin; `User.delete()` e o lote de usuários delegam a `delete_user`; `User.save()` delega a `save_user` (aprovados) |
 | 15 | 3.5 (aprovado): publica só `GET /api/v1/me/organizations/` (filtrado pelo usuário); busca do superadmin fica em selectors, endpoint na área admin (5.2). Lista só organizações ativas e não excluídas, ordem por nome |
+| 16 | Ordem ajustada (aprovado): 2.3 antes da 3.6, porque auditar a entrada do superadmin exige o contexto. Nova ordem: 2.3 → 3.6 → 2.4 → 2.5 → 4.1 → bloco 5 |
+| 17 | 2.3 (aprovado): login com senha certa e contrato indisponível → 403 `contract-inactive`; access/refresh negados enquanto indisponível, sem revogar todos os refresh; superadmin entra em organização de contrato vencido/inativo (excluído → 403); superadmin sem header em endpoint de negócio → 400 |
 
 ## Bloco 0 — Fundação
 
@@ -47,7 +49,7 @@ e só começa após aprovação do usuário.
 |---|---|---|---|
 | 2.1 | `Plan`, `Contract` (vigência, licenças, retenção pós-contrato) e `Organization` | 0006, 0007, 0013, 0014 | ✅ |
 | 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2, 0015 | ✅ |
-| 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ⬜ |
+| 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ✅ |
 | 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ⬜ |
 | 2.5 | Testes de isolamento genéricos (camada F) | 0006 §1.3 | ⬜ |
 

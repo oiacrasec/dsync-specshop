@@ -1,7 +1,8 @@
-"""Contexto mínimo de organização (pedaço da etapa 2.3 antecipado na 3.3).
+"""Contexto de organização por requisição (ADR 0006 §3; etapas 3.3 e 2.3).
 
-Lê o header X-Organization-Id e resolve a organização dentro do contrato do usuário.
-Contrato ativo a cada requisição e superadmin com organização opcional ficam na 2.3.
+Lê o header X-Organization-Id. Usuário comum: organização do próprio contrato (o
+contrato já foi conferido na autenticação). Superadmin: organização de qualquer
+contrato não excluído, inclusive vencido ou inativo, para suporte (auditado na 3.6).
 """
 
 from uuid import UUID
@@ -28,10 +29,13 @@ def resolve_organization(request):
         public_id = UUID(raw)
     except ValueError:
         raise ContextInvalidRequest() from None
-    contract_id = getattr(request.user, 'contract_id', None)
+    user = request.user
+    organizations = Organization.objects.filter(public_id=public_id, is_active=True)
     organization = None
-    if contract_id is not None:
-        organization = Organization.objects.filter(public_id=public_id, contract_id=contract_id, is_active=True).first()
+    if user.is_superuser:
+        organization = organizations.filter(contract__deleted_at__isnull=True).first()
+    elif user.contract_id is not None:
+        organization = organizations.filter(contract_id=user.contract_id).first()
     if organization is None:
         raise ContextForbidden()
     request._dsc_organization = organization

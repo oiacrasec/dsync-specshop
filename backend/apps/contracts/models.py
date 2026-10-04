@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel, ContractScopedModel, SharedModel
@@ -57,6 +58,12 @@ class Contract(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def is_available(self, today=None):
+        """Ativo e dentro da vigência (início e fim inclusivos); ADR 0006 §2.1."""
+        today = today or timezone.localdate()
+        return (self.is_active and self.deleted_at is None and self.start_date <= today
+                and (self.end_date is None or self.end_date >= today))
 
 
 class Organization(ContractScopedModel):

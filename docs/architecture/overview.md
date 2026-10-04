@@ -33,6 +33,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 3.3: permissão efetiva em Python puro, contexto mínimo por `X-Organization-Id` e DRF negando por padrão) | concluído |
 | `backend/` (etapa 3.4: perfil essencial via migration de dados e proteção do último administrador do contrato) | concluído |
 | `backend/` (etapa 3.5: organizações acessíveis derivadas das atribuições, `GET /api/v1/me/organizations/`, selectors de busca contrato → organização do superadmin) | concluído |
+| `backend/` (etapa 2.3: contrato disponível no login/refresh/cada requisição e superadmin com organização pelo header) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

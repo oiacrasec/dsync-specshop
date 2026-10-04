@@ -112,7 +112,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view
   declara `required_permission` (código do registry ou dicionário por action/método) ou
   `permission_classes = [AllowAuthenticated]`. Contexto pelo header `X-Organization-Id`
-  (`apps/core/context.py`, preenche `request.organization`). Cálculo puro em
+  (`apps/core/context.py`, preenche `request.organization`); superadmin também precisa do
+  header em endpoint de negócio (400 sem ele). Contrato indisponível → 403 na autenticação. Cálculo puro em
   `apps/rbac/evaluation.py`; leitura em `selectors.user_grants`, uma vez por requisição.
 
 ## Antes de entregar

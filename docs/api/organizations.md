@@ -19,4 +19,4 @@ usuário pode usar no header `X-Organization-Id`, para a troca de contexto.
 | Sem login | 401 (RFC 9457) |
 | Cache | `Cache-Control: no-cache, no-store` (resposta por usuário) |
 
-Sem paginação nesta etapa. Contrato vencido/inativo a cada requisição fica na etapa 2.3.
+Sem paginação nesta etapa. Contrato indisponível → 403 `contract-inactive` (etapa 2.3).

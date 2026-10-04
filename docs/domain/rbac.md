@@ -82,7 +82,7 @@ para manutenção do perfil essencial. Os services atuais usam o banco padrão.
 |---|---|---|
 | Cálculo | `apps/rbac/evaluation.py` (Python puro) | concessões que alcançam a organização: CONTRACT alcança todas menos as exceções; ORGANIZATION só a própria. Resultado = união dos códigos do registry permitidos no escopo da concessão |
 | Leitura | `selectors.user_grants` | atribuições e perfis **ativos** e não excluídos, do contrato do usuário, em 3 queries constantes. Exceções não excluídas restringem mesmo inativas (falha fechada) |
-| Contexto mínimo | `apps/core/context.py` | header `X-Organization-Id`: ausente/malformado → 400 `context-invalid-request`; organização inexistente, excluída, inativa ou de outro contrato → 403 `context-forbidden`. Preenche `request.organization` |
+| Contexto | `apps/core/context.py` | header `X-Organization-Id`: ausente/malformado → 400 `context-invalid-request`; organização inexistente, excluída, inativa ou de outro contrato → 403 `context-forbidden`. Superadmin: organização ativa de qualquer contrato não excluído (inclusive vencido/inativo, para suporte). Preenche `request.organization` |
 | DRF | `apps/rbac/permissions.py` | padrão global `IsAuthenticated` + `RequiredPermission`: a view declara `required_permission` (código ou dicionário por action/método); sem declaração ou código fora do registry → negado. `AllowAuthenticated` é a marca explícita de endpoint aberto a autenticados |
 
 | Situação | Resposta |
@@ -90,10 +90,11 @@ para manutenção do perfil essencial. Os services atuais usam o banco padrão.
 | Nenhuma concessão alcança a organização | 403 `context-forbidden` |
 | Acessa a organização, mas não tem o código | 403 `permission-denied` |
 | Perfil essencial (`contract_admin`) | todos os códigos do registry, inclusive os criados depois |
-| Superadmin | passa sem organização; organização opcional fica na etapa 2.3 |
+| Superadmin com header | todos os códigos na organização escolhida (entrada auditada na 3.6) |
+| Superadmin sem header em endpoint de negócio | 400 `context-invalid-request`; a área admin terá endpoints próprios (bloco 5) |
+| Contrato do usuário indisponível | 403 `contract-inactive` já na autenticação (etapa 2.3, ver [contratos](contracts.md)) |
 
-O cálculo é feito uma vez por requisição. Contrato vencido/inativo a cada
-requisição e superadmin com organização opcional ficam na etapa 2.3.
+O cálculo é feito uma vez por requisição.
 
 ## Perfil essencial e etapas seguintes
 
@@ -134,7 +135,7 @@ O acesso total dinâmico do perfil essencial vale no cálculo (3.3).
 | `contracts.selectors.superadmin_contract_organizations(contract)` | 2º passo: organizações ativas do contrato. Endpoints na área admin (bloco 5) |
 
 auditoria de eventos em 3.6. Autoria nos models não substitui essa trilha.
-O restante do contexto e o isolamento automático de queries continuam nas etapas 2.3–2.5.
+O isolamento automático de queries continua nas etapas 2.4–2.5.
 
 ## Dados e finalidade
 

@@ -146,7 +146,8 @@ nunca fica sem Administrador ativo (409). `user.save()` delega a `save_user`;
 `user.delete()` e o lote, a `delete_user` (um a um).
 Etapa 3.5: `GET /api/v1/me/organizations/` lista as organizações acessíveis (sem header);
 a busca contrato → organização do superadmin fica em `apps/contracts/selectors.py`.
-Auditoria de eventos em 3.6. Ainda não há endpoints de gestão.
+Etapa 2.3: contrato conferido no login, refresh e a cada requisição (403
+`contract-inactive`); superadmin entra em organização pelo header. Auditoria de eventos em 3.6. Ainda não há endpoints de gestão.
 
 ## Configuração do PyCharm
 

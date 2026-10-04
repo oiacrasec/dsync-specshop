@@ -3,7 +3,6 @@ from uuid import UUID
 from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
 from django.db import router, transaction
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -52,12 +51,7 @@ def save_user(*, user, actor=None, using=None, **save_options):
                 contract = Contract.objects.using(database).select_for_update().get(pk=user.contract_id)
             except Contract.DoesNotExist:
                 raise ValidationError({'contract': _('Informe um contrato disponível.')}) from None
-            today = timezone.localdate()
-            if (
-                not contract.is_active
-                or contract.start_date > today
-                or (contract.end_date is not None and contract.end_date < today)
-            ):
+            if not contract.is_available():
                 raise ContractInactive()
             needs_capacity = user.deleted_at is None and (
                 current is None or current.deleted_at is not None or current.contract_id != user.contract_id
@@ -117,11 +111,23 @@ def delete_user(*, user, actor=None, using=None):
     return count
 
 
+def ensure_contract_available(user):
+    """ADR 0006 §2.1/§3: contrato vencido, futuro, inativo ou excluído → 403 (o cliente desloga).
+
+    Superadmin não tem contrato. Usa user.contract (select_related na autenticação).
+    """
+    if user.is_superuser:
+        return
+    if user.contract_id is None or not user.contract.is_available():
+        raise ContractInactive()
+
+
 @transaction.atomic
 def login(*, request, username, password):
     user = authenticate(request=request, username=username, password=password)
     if user is None or not api_settings.USER_AUTHENTICATION_RULE(user):
         raise AuthenticationFailed()
+    ensure_contract_available(user)  # Só depois da senha válida: não revela nada a quem errou.
     refresh = RefreshToken.for_user(user)
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
 
@@ -146,9 +152,15 @@ def _locked_refresh(raw_token):
 def refresh_tokens(*, refresh):
     try:
         token, user_public_id = _locked_refresh(refresh)
-        user = get_user_model().objects.select_for_update().get(public_id=user_public_id, is_active=True)
+        user = (
+            get_user_model()
+            .objects.select_related('contract')
+            .select_for_update(of=('self',))  # Trava só o usuário; o contrato vem na mesma query.
+            .get(public_id=user_public_id, is_active=True)
+        )
         if not api_settings.USER_AUTHENTICATION_RULE(user):
             raise AuthenticationFailed()
+        ensure_contract_available(user)
         token.blacklist()
         token.set_jti()
         token.set_exp()

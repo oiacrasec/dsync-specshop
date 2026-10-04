@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 2.3: contrato a cada requisição e contexto do superadmin
+
+- `Contract.is_available()`; `ensure_contract_available` no login (após senha), refresh e
+  na autenticação JWT (`get_user` com `select_related('contract')`, 1 query).
+- Superadmin: organização ativa de qualquer contrato não excluído; sem header em endpoint
+  de negócio → 400. Contrato excluído → 403 (confirmar com o usuário).
+- Corrigido `@transaction.atomic` deslocado para fora do `login` durante a edição.
+- 295 testes. Docs: api/authentication, errors/contract-inactive, api/organizations,
+  domain/contracts e rbac, overview, plano (decisões 16–17), README, AGENTS, handoff.
+
 ## 2026-10-03 — Etapa 3.5: organizações acessíveis
 
 - `accessible_organizations` filtra no banco (CONTRACT menos interseção das exceções, + diretas);

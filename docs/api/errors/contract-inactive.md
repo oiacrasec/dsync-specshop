@@ -10,8 +10,6 @@
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.
 
-O cliente deve encerrar a sessão local. A validação de vigência e situação entra
-nas etapas de contratos/contexto do plano.
-
-Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
-será implementada na etapa correspondente do plano da Entrega 1.
+O cliente deve encerrar a sessão local. Disparado no login (após senha correta), no
+refresh e na autenticação de toda rota protegida (etapa 2.3); ver
+[contratos](../../domain/contracts.md).
