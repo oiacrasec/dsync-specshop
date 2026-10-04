@@ -44,6 +44,7 @@ LOCAL_APPS = [
     'apps.core',
     'apps.users',
     'apps.contracts',
+    'apps.administration',
     'apps.rbac',
     'apps.audit',
 ]

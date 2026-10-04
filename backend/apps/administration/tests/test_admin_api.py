@@ -14,10 +14,10 @@ from rest_framework.exceptions import ValidationError as SerializerValidationErr
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.administration.serializers import ContractSerializer, PlanSerializer
 from apps.audit import services as audit_services
 from apps.audit.models import AccessLog, AuditEvent, AuditEventType
 from apps.contracts.models import Contract, Organization, Plan
-from apps.contracts.serializers import ContractSerializer, PlanSerializer
 from apps.core.exceptions import LicenseLimitReached
 
 pytestmark = pytest.mark.django_db
@@ -140,6 +140,43 @@ def test_partial_dates_are_validated_against_locked_current_state(world):
     assert world['api'].patch(url, {'end_date': '2019-01-01'}, format='json').status_code == 422
 
 
+@pytest.mark.parametrize('explicit_null', [False, True])
+def test_create_contract_without_plan_is_audited_and_readable(world, explicit_null):
+    payload = contract_payload(world)
+    if explicit_null:
+        payload['plan'] = None
+    else:
+        payload.pop('plan')
+    response = world['api'].post('/api/v1/admin/contracts/', payload, format='json')
+    assert response.status_code == 201, response.content
+    assert response.json()['plan'] is None
+    public_id = response.json()['public_id']
+    contract = Contract.objects.get(public_id=public_id)
+    assert contract.plan_id is None and contract.created_by == world['admin']
+    event = AuditEvent.objects.get(event=AuditEventType.CONTRACT_CREATED, target_public_id=public_id)
+    assert event.changes['after']['plan'] is None
+    assert world['api'].get(f'/api/v1/admin/contracts/{public_id}/').json()['plan'] is None
+    assert any(
+        row['public_id'] == public_id and row['plan'] is None
+        for row in world['api'].get('/api/v1/admin/contracts/').json()['data']
+    )
+
+
+def test_partial_update_can_remove_plan_without_weakening_license_rules(world):
+    contract = world['contract']
+    get_user_model().objects.create_user(username='inactive-without-plan', contract=contract, is_active=False)
+    url = f'/api/v1/admin/contracts/{contract.public_id}/'
+    assert world['api'].patch(url, {'plan': None, 'licenses': 1}, format='json').status_code == 422
+    contract.refresh_from_db()
+    assert contract.plan_id == world['plan'].pk
+    response = world['api'].patch(url, {'plan': None}, format='json')
+    assert response.status_code == 200 and response.json()['plan'] is None
+    event = AuditEvent.objects.get(event=AuditEventType.CONTRACT_UPDATED, target_public_id=contract.public_id)
+    assert event.changes['before']['plan'] == str(world['plan'].public_id)
+    assert event.changes['after']['plan'] is None
+    assert world['api'].patch(url, {'name': 'Ainda sem plano'}, format='json').status_code == 200
+
+
 def test_plan_negative_quotas_rejected_and_zero_null_preserved(world):
     api = world['api']
     assert api.post('/api/v1/admin/plans/', {'name': 'P', 'max_storage_bytes': -1}, format='json').status_code == 422
@@ -244,12 +281,13 @@ def test_jwt_admin_without_context_and_no_access_log(world):
 
 @pytest.mark.parametrize('count', [1, 30])
 @pytest.mark.parametrize('action', ['', 'options/'])
-def test_admin_reads_constant_queries_and_no_incidental_writes(world, count, action):
+@pytest.mark.parametrize('with_plan', [False, True])
+def test_admin_reads_constant_queries_and_no_incidental_writes(world, count, action, with_plan):
+    plan = world['plan'] if with_plan else None
+    if not with_plan:
+        Contract.objects.filter(pk=world['contract'].pk).update(plan=None)
     Contract.objects.bulk_create(
-        [
-            Contract(name=f'Cliente {i}', plan=world['plan'], start_date=date(2020, 1, 1), licenses=5)
-            for i in range(count - 1)
-        ]
+        [Contract(name=f'Cliente {i}', plan=plan, start_date=date(2020, 1, 1), licenses=5) for i in range(count - 1)]
     )
     with CaptureQueriesContext(connection) as queries:
         response = world['api'].get(f'/api/v1/admin/contracts/{action}', {'rows': 100})

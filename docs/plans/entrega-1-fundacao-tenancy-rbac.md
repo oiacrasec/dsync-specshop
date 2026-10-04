@@ -113,7 +113,7 @@ Ordem proposta: 6.1 → 6.2 → 6.2a → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 →
 | 6.1 | Copiar o datasync-gis para `frontend/` (sem `.git`, `node_modules`, `dist`, `.angular`; `environment*.ts` revisados), com `AGENTS.md`, README e `Dockerfile` próprios; conferir versão LTS do Angular/PrimeNG; build e lint passando | frontend | 0001, 0003 | ✅ (lint pendente, ver abaixo) |
 | 6.2 | Desabilitar telas fora do escopo comentando rotas e menu (`DESABILITADO: fora do escopo atual`): ficam login, primeiro acesso, seleção de organização, administração de contratos, home KPI fictícia (pedido do usuário) e páginas de erro | frontend | — | ✅ |
 | 6.2a | Qualidade herdada do GIS: ESLint funcional (`angular-eslint` 21 + `typescript-eslint` 8, `npm run lint` zerado no código ativo; telas desabilitadas ignoradas até reativar), Prettier aplicado (`npm run format:check`), `inject()`, seletores `app-*`, CSS de preloading inline e temas Lara/Nora sob demanda (bundle inicial 1,46 → 1,25 MB; ~257 KB gzip) | frontend | — | ✅ |
-| 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API; `Contract.plan` opcional (decisão 40) | backend | novo (contracts × administration) | ⬜ |
+| 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API; `Contract.plan` opcional (decisão 40) | backend | 0033 | ✅ |
 | 6.4 | Primeiro acesso: `User.must_change_password`; login devolve resumo do usuário; bloqueio global no backend até trocar; `POST` de troca de senha (atual + nova + confirmação, validadores do Django, diferente da atual) | backend | 0010 | ⬜ |
 | 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização | frontend | 0003, 0004 | ⬜ |
 | 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ⬜ |
@@ -133,4 +133,3 @@ Achados da 6.1 (herdados do datasync-gis, a decidir com o usuário):
 A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes; o que a
 6.6/6.7 cobrir sai do escopo delas. O rascunho de organizações (ADR 0032, Proposto) é
 revisado depois do bloco 6.
-

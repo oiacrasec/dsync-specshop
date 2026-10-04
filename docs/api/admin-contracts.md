@@ -1,6 +1,8 @@
 # Administração de planos e contratos
 
 Etapa 5.2; ADRs 0004, 0008 e 0020. Todas as rotas exigem JWT de superadmin ativo.
+Na 6.3, views/serializers/filters/URLs passaram a apps/administration; models
+continuam em apps/contracts. Rotas e basenames preservados (ADR 0033).
 Usuário comum recebe 403, ausência de autenticação 401. Não exigem nem usam
 `X-Organization-Id`, mesmo quando enviado. UUID inválido/desconhecido no caminho
 retorna 404; validação 422, sempre no formato [RFC 9457](errors.md).
@@ -24,6 +26,11 @@ Organizações agora usam [OrganizationViewSet próprio](organizations.md), em
 (ADR 0032). O novo endpoint também atende usuários comuns, com queryset RBAC.
 
 ## Entrada e saída
+
+Contract.plan é opcional: criação pode omitir o campo ou enviar null. Atualização
+com null remove o vínculo; omissão preserva o plano atual. Respostas de contrato
+sem plano retornam "plan": null. Plano selecionado exige UUID de plano não excluído;
+licenças/validações de vigência e auditoria continuam aplicadas (ADR 0033).
 
 Plan: `name`, `max_organizations`, `max_storage_bytes`, `max_integrations`,
 `max_operations_per_month`, `is_active`. Quotas aceitam null ou inteiros não
@@ -100,8 +107,8 @@ usando reverse. Overrides por campo preservam labels específicos ("Início").
 ordering_fields vem do OrderingFilter do FilterSet, sem duplicação na view.
 Geração usa metadados, sem queries; lista explícita preserva campos/ordem (ADR 0026).
 As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
-em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/filters.py`,
-com base/backend DRF em `core/filters.py`; selectors fornecem o queryset do domínio.
+em `core/pagination.py`. Filtros são FilterSets django-filter de `administration/filters.py`,
+com base/backend DRF em `core/filters.py`; consultas simples ficam no queryset da view.
 O backend segue a [integração oficial com DRF](https://django-filter.readthedocs.io/en/stable/guide/rest_framework.html).
 
 Escritas usam serializers com validação, autoria e AuditEvent na mesma transação.

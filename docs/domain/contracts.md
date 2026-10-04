@@ -39,7 +39,7 @@ Herda `BaseModel` diretamente: é a raiz do tenant, exceção fechada do ADR 001
 | Campo | Regra de persistência |
 |---|---|
 | `name` | nome do cliente, até 255 caracteres |
-| `plan` | FK obrigatória para Plan, com PROTECT |
+| `plan` | FK opcional para Plan, com PROTECT quando vinculada; null = sem plano |
 | `start_date` | início obrigatório da vigência |
 | `end_date` | fim opcional; quando preenchido, deve ser igual ou posterior ao início |
 | `licenses` | quantidade de licenças, obrigatória e maior ou igual a 1 |
@@ -48,6 +48,10 @@ Herda `BaseModel` diretamente: é a raiz do tenant, exceção fechada do ADR 001
 Datas, licenças e teto de retenção têm constraints no banco, inclusive para
 updates em lote que não executem validação do model. `full_clean()` valida os
 models; `save()` não o chama automaticamente, conforme o comportamento do Django.
+
+Na etapa 6.3, plan passou a aceitar null/omissão (ADR 0033). Sem plano não há quotas
+de plano configuradas; licenças continuam definidas e validadas no contrato.
+A migration contracts.0003_contract_plan_optional mantém os vínculos existentes.
 
 O campo de retenção registra a configuração contratual prevista no ADR 0007;
 não implementa expurgo, alertas, reativação ou LegalHold. A eliminação e as
@@ -69,8 +73,9 @@ PROTECT impede remoção física pelo ORM quando houver referências.
 
 - Migration `contracts.0001_initial` aplicada ao banco local autorizado.
 - Nenhum plano, contrato ou organização inicial foi cadastrado.
-- API administrativa de planos/contratos publicada na etapa 5.2, com serializers,
-  selectors e services; contrato em [administração](../api/admin-contracts.md).
+- API administrativa de planos/contratos publicada na etapa 5.2 e movida para
+  apps/administration na 6.3; models permanecem em contracts. CRUD auditado pelo
+  serializer base; contrato em [administração](../api/admin-contracts.md).
   Não implementa contratação comercial, cobrança ou assinatura.
 - Vínculo de usuário e regras de licenças: etapa 2.2 concluída, conforme
   [ADR 0015](../adr/0015-contagem-de-licencas-de-usuarios.md).

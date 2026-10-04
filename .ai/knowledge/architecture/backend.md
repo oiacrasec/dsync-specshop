@@ -1,6 +1,6 @@
 # Backend — conhecimento compilado
 
-## Estado atual (2026-10-04, após a etapa 2.5 e a reorganização dos módulos)
+## Estado atual (2026-10-04, após a etapa 6.3)
 
 Fonte de verdade das convenções: `backend/AGENTS.md` e
 `backend/docs/standards/django-style.md`. Resumo:
@@ -15,13 +15,13 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | SQL à mão | `queries/<nome>.py`; `-- NOME` em PT-BR na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
 | Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
 | Responses customizadas | core/responses.py: build_result_response preserva payload/status; build_exception_response exige request e delega ao handler RFC 9457 com rollback/headers/logging seguro; actions próprias usam try/except (ADR 0031) |
-| Organizações acessíveis | OrganizationViewSet/BaseReadOnlyModelViewSet e OrganizationSerializer em /admin/organizations; mesmo router de plans/contracts; usuário comum por accessible_organizations/RBAC, superadmin global; filtro contract na lista, sem header ativo; options/schema/detalhes, sem CRUD; action aninhada removida, /me/organizations preservado (ADR 0032) |
+| Organizações acessíveis | Rascunho OrganizationViewSet/BaseReadOnlyModelViewSet e OrganizationSerializer em contracts, /admin/organizations; router próprio para preservar a rota na 6.3; usuário comum por accessible_organizations/RBAC, superadmin global; filtro contract na lista, sem header ativo; /me/organizations preservado. Revisar após bloco 6 (ADR 0032 Proposto) |
 | Registro de acesso | `AccessLog` (ADR 0019) para login sucesso/falha e refresh sucesso; marker na view, middleware fora da transação; sem escrita em navegação comum; só inserção; expurgo antes de produção |
 | Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
 | Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view nos recursos comuns ou SuperadminPermission na administração; rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados |
-| Administração | API /admin/plans e /admin/contracts (5.2), SuperadminPermission sem organização; CRUD por serializers auditados, opções/schema e organizações do contrato; redução de licenças bloqueada abaixo dos usuários não excluídos, contando inativos |
+| Administração | API /admin/plans e /admin/contracts em apps/administration (6.3), sem models próprios; domínio em contracts, plan opcional; SuperadminPermission sem organização; serializers auditados, opções/schema e redução de licenças abaixo dos usuários não excluídos impedida, contando inativos (ADR 0033) |
 | Views base | BaseModelViewSet/BaseAdminModelViewSet em core/views, mixins/pagination/permissions no core; queryset/schema nas views; SerializerDeleteMixin chama serializer.delete(); BaseModelSerializer/BaseAdminModelSerializer usam super().create/update do DRF, autoria/auditoria e hooks extras; campos validados pelo DRF, regras no validate(), sem full_clean genérico/configuração adicional; ATOMIC_REQUESTS e lock antes da validação, uso direto exige atomic envolvendo is_valid/save; services de users/RBAC preservados (ADR 0030) |
-| Filtros | django-filter 26.2 (BSD-3), BaseFilterSet/ValidatedDjangoFilterBackend em core/filters e FilterSets explícitos em contracts/filters; filterset_class na view; sem geração automática na importação por causa de managers fail closed; filter_listing removido |
+| Filtros | django-filter 26.2 (BSD-3), BaseFilterSet/ValidatedDjangoFilterBackend em core/filters; Plan/ContractFilterSet em administration/filters, OrganizationFilterSet em contracts/filters; sem geração automática na importação/consultas a managers; filter_listing removido |
 | Busca geral | general_search_fields no FilterSet, OR entre campos/AND com filtros individuais; icontains padrão, general_search_lookups explícito; somente texto/relações singulares, sem casts/regex/M2M; schema general_search separado de filters, null se desabilitada; options_search_fields independente (ADR 0029) |
 | Schemas | schema_columns/schema_filters contêm nomes de campos; labels verbose_name/tipos do model, overrides por campo; OrderingFilter é fonte única da ordenação; SchemaRouter relaciona model/basename options e reverse resolve no namespace atual; zero queries de metadados, campos explicitamente publicados (ADR 0026) |
 | Leituras | Querysets simples diretamente nas views administrativas (unscoped explícito e JOIN do plano); ordem queryset/serializer_class/filterset_class/demais. DRF clona por requisição. Selectors para lógica própria; tenant contextual somente durante requisição; classes/mixin de selectors removidos (ADR 0028) |

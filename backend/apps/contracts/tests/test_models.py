@@ -110,11 +110,22 @@ def test_contract_date_constraint_allows_same_day_and_rejects_inverted_dates():
         contract.save()
 
 
-def test_organization_requires_existing_contract_and_plan_is_required():
+def test_organization_requires_existing_contract():
     with pytest.raises(IntegrityError), transaction.atomic():
         Organization.objects.create(name='Sem contrato')
-    with pytest.raises(IntegrityError), transaction.atomic():
-        Contract.objects.create(name='Sem plano', start_date=date(2026, 1, 1), licenses=1)
+
+
+def test_contract_accepts_no_plan_and_can_remove_existing_plan():
+    contract = Contract.objects.create(name='Sem plano', start_date=date(2026, 1, 1), licenses=1)
+    contract.full_clean()
+    contract.refresh_from_db()
+    assert contract.plan_id is None
+    with_plan = create_contract()
+    with_plan.plan = None
+    with_plan.full_clean()
+    with_plan.save()
+    with_plan.refresh_from_db()
+    assert with_plan.plan_id is None
 
 
 def test_context_and_plan_relations_protect_against_physical_deletion():

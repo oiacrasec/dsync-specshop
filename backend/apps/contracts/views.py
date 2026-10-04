@@ -1,32 +1,15 @@
 """Recursos administrativos: configuração explícita e ações do domínio."""
 
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 
-from apps.core.views import BaseAdminModelViewSet, BaseReadOnlyModelViewSet
+from apps.core.views import BaseReadOnlyModelViewSet
 from apps.rbac.permissions import AllowAuthenticated
 from apps.rbac.selectors import accessible_organizations
 
-from .filters import ContractFilterSet, OrganizationFilterSet, PlanFilterSet
-from .models import Contract, Organization, Plan
-from .serializers import ContractSerializer, OrganizationSerializer, PlanSerializer
-
-
-class PlanViewSet(BaseAdminModelViewSet):
-    queryset = Plan.objects.unscoped()
-    serializer_class = PlanSerializer
-    filterset_class = PlanFilterSet
-    schema_columns = ('name', 'is_active')
-
-
-class ContractViewSet(BaseAdminModelViewSet):
-    queryset = Contract.objects.unscoped().select_related('plan')
-    serializer_class = ContractSerializer
-    filterset_class = ContractFilterSet
-    schema_columns = ('name', 'start_date', 'licenses')
-    schema_column_overrides = {'start_date': {'label': _('Início')}}
-    schema_filters = ('plan',)
+from .filters import OrganizationFilterSet
+from .models import Organization
+from .serializers import OrganizationSerializer
 
 
 @method_decorator(never_cache, name='dispatch')

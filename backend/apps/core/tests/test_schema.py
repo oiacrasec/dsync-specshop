@@ -6,8 +6,8 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from apps.administration.views import ContractViewSet
 from apps.contracts.models import Contract, Plan
-from apps.contracts.views import ContractViewSet
 from apps.core.schema import filter_schema
 
 

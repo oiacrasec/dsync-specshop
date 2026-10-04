@@ -20,6 +20,10 @@ permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api
 A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contracts.md)
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
+Na etapa 6.3, sua API foi separada em apps/administration (views, serializers,
+FilterSets, constantes de auditoria, URLs e testes), sem models próprios. Plan,
+Contract e Organization permanecem em apps/contracts. Rotas/basenames/permissões
+preservados; Contract.plan é opcional, aceitando omissão/null (ADR 0033).
 As views herdam `BaseAdminModelViewSet` e declaram queryset diretamente; exclusão vem da base. Serializers
 herdam `BaseAdminModelSerializer`, com campos/eventos de auditoria explícitos.
 A base usa create/update do DRF, autoria e auditoria atômica; ajustes opcionais em
@@ -34,7 +38,7 @@ apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/djan
 Schemas recebem nomes de campos: labels/tipos vêm do model, URLs de relações do
 SchemaRouter e ordenação do OrderingFilter. Overrides por campo permitem trocar
 labels/URLs sem repetir metadados; geração sem consultas ao banco (ADR 0026).
-Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
+Próxima etapa prioritária: primeiro acesso e troca de senha no backend (6.4).
 Selectors ficam para consultas com lógica própria. Views administrativas declaram
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.
@@ -65,6 +69,7 @@ backend/
 │   ├── core/          → BaseModel, tipos de escopo, checks, erros e correlação
 │   ├── users/         → usuário customizado
 │   ├── contracts/     → planos, contratos e organizações
+│   ├── administration/ → API exclusiva do superadmin, sem models próprios
 │   ├── rbac/          → perfis, permissões, atribuições e exceções
 │   └── audit/         → trilha de auditoria append-only
 ├── requirements/      → base, development, production, testing

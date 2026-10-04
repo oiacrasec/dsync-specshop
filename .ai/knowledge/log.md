@@ -1,5 +1,29 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.3: API do superadmin separada do domínio
+
+- Criado apps/administration (startapp, sem models próprios). Movidos views,
+  serializers, filters, constantes de auditoria e testes de planos/contratos.
+  Models/labels/tabelas/migrations permanecem em contracts; API mantém URLs,
+  basenames, permissions, schema/options e eventos existentes (ADR 0033).
+- Contract.plan opcional (null/blank), PROTECT preservado quando vinculado.
+  Criação aceita omissão/null; atualização pode remover plano; auditoria registra
+  null. Licenças e vigência continuam validadas; nenhum enforcement de quotas novo.
+- contracts.0003_contract_plan_optional gerada e aplicada localmente. Migration
+  padrão remove NOT NULL e recria a FK, sem alterar vínculos ou preencher dados.
+  Em produção, planejar lock/validação da FK conforme volume; rollback exige
+  resolver contratos sem plano antes de retornar ao NOT NULL.
+- OrganizationViewSet/ADR 0032 continuam rascunho em contracts com comportamento
+  anterior; incluem a mesma rota /admin/organizations para preservar a API na 6.3.
+- Validação: 515 testes, lint/formato, migrations/checks dev/produção OK. Testes
+  cobrem contrato sem plano/remover vínculo/auditoria/licenças, permissão do admin,
+  FK histórica/PROTECT, concorrência e schema. OWASP A01–A10 sem achados novos.
+- List/options com/sem plano, 1/30 itens: duas consultas de dados e sem writes;
+  JOIN explícito evita N+1, locks de escrita preservados. Sem medição de carga nova.
+  Sem novos dados pessoais, logs, dependências, telas ou contratação/cobrança.
+- Docs atualizadas: ADR 0033/índice, domínio/API de contratos, AGENTS/README/standards,
+  overview/plano, memória e handoff. Próximo passo 6.4, após confirmação.
+
 ## 2026-10-04 — Etapa 6.2a: qualidade do frontend
 
 - ESLint flat config (`eslint.config.mjs`) com angular-eslint/typescript-eslint; autofix e

@@ -152,6 +152,12 @@ A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para 
 
 ## Views administrativas e serializers auditados
 
+Na 6.3, a API administrativa de planos/contratos fica em apps/administration:
+views, serializers, filters, constantes e URLs. Models e migrations permanecem
+em apps/contracts; importar os models de domínio explicitamente (ADR 0033).
+Contract.plan opcional é validado pelo DRF; verificar/bloquear plano recebido apenas
+quando não nulo, mantendo regras de licença e vigência no validate do contrato.
+
 Actions customizadas seguem o padrão do Spatial, adaptado ao contrato do Core
 (ADR 0031). Helpers em core/responses.py; sempre passar request no erro:
 

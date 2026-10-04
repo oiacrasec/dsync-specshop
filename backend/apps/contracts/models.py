@@ -39,7 +39,8 @@ class Contract(BaseModel):
     """
 
     name = models.CharField(verbose_name=_('nome'), max_length=255)
-    plan = models.ForeignKey('Plan', verbose_name=_('plano'), on_delete=models.PROTECT, related_name='+',)
+    plan = models.ForeignKey('Plan', verbose_name=_('plano'), on_delete=models.PROTECT, null=True, blank=True,
+                             related_name='+',)
     start_date = models.DateField(verbose_name=_('início da vigência'))
     end_date = models.DateField(verbose_name=_('fim da vigência'), null=True, blank=True)
     licenses = models.PositiveIntegerField(verbose_name=_('licenças'), validators=[MinValueValidator(1)])

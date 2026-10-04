@@ -96,11 +96,15 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   compatíveis, inclusive em proxies/unmanaged. Ver
   [escopos de persistência](docs/architecture/model-scopes.md).
 - `Plan`, `Contract` e `Organization` ficam em `apps/contracts` (etapa 2.1 concluída).
+  apps/administration contém somente API do superadmin, sem models próprios;
+  views/serializers/filters/URLs de planos e contratos ficam nele (ADR 0033).
   Plan guarda nome e quatro quotas opcionais, sem enforcement; modalidade pertence
   à implantação, sem campo no model (ADR 0014). Licenças e retenção ficam no Contract.
   Contrato tem constraints de vigência, licenças positivas e retenção máxima 365.
   Ver [domínio de contratos](../docs/domain/contracts.md).
-  FKs de contexto e plano usam `PROTECT` (ADR 0013). Os tipos abstratos ainda não
+  FKs de contexto e plano usam `PROTECT` (ADR 0013). Contract.plan é opcional
+  (null/blank), sem quotas de plano quando ausente; licenças continuam no contrato.
+  Os tipos abstratos ainda não
   aplicam isolamento de queries; managers/contexto entram nas próximas etapas.
 - Ao personalizar `Meta`, herdar a do tipo escolhido e preservar índices herdados.
 - Os tipos de escopo herdam `apps.core.models.BaseModel`: UUID v7 externo,
@@ -136,9 +140,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   com a mesma permissão `:view` do recurso. Rótulo SQL, sem `__str__`/serializer
   completo; relações somente singulares. Preservar inativos em `get_queryset()`.
   Contrato e cuidados de publicação em [options](../docs/api/options.md).
-- Administração de planos/contratos em `apps/contracts`, sob `/api/v1/admin/`,
+- Administração de planos/contratos em `apps/administration`, sob `/api/v1/admin/`,
   com `SuperadminPermission`, sem organização (ADR 0020). Listas limitadas e
   campos de filtro/ordenação declarados; opções usam a mesma permissão administrativa.
+  Rascunho de organizações permanece em contracts, fora do escopo da 6.3 (ADR 0032 Proposto).
   Organizações não ficam em action do contrato: OrganizationViewSet próprio,
   BaseReadOnlyModelViewSet e OrganizationSerializer em /api/v1/admin/organizations/.
   Sem header de organização; AllowAuthenticated e queryset autorizado pelo RBAC
