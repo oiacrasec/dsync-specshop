@@ -13,6 +13,12 @@ Erros da API seguem [RFC 9457](../docs/api/errors.md), com
 o mesmo identificador acompanha o corpo dos erros e os logs. Rotas desconhecidas da
 API retornam 404, inclusive em desenvolvimento.
 
+A etapa 5.1 disponibiliza `LookupOptionsMixin` para seleções com UUID/rótulo,
+paginação limitada, busca declarada e resolução de inativos por UUID. Exige a
+permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api/options.md).
+Ainda não há recursos de negócio publicados. Próxima etapa: API administrativa
+de planos e contratos (5.2).
+
 | Item | Versão |
 |---|---|
 | Python | 3.14 |

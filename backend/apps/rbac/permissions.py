@@ -62,3 +62,13 @@ class RequiredPermission(BasePermission):
         if not evaluation.has_access:
             raise ContextForbidden()
         return code in evaluation.permissions
+
+
+class LookupOptionsPermission(RequiredPermission):
+    """Options exige leitura explícita; manage/create não substituem view."""
+
+    def has_permission(self, request, view):
+        code = required_permission(request, view)
+        if not isinstance(code, str) or not code.endswith(':view'):
+            return False
+        return super().has_permission(request, view)

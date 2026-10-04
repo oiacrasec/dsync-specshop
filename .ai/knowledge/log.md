@@ -1,5 +1,24 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 5.1: infraestrutura de opções
+
+- LookupOptionsMixin em core/views, entrada em core/serializers, leitura em
+  core/selectors e proteção :view em rbac/permissions. Sem rotas de produção,
+  models, migrations ou dependências novas. Contrato em docs/api/options.md.
+- UUID/rótulo somente; campos SQL explícitos, ordenação estável, busca por trecho,
+  first/rows (20, máximo 100), UUID repetível limitado a 100. Resolução ignora q e
+  inclui inativos; nunca excluídos/fora do contexto. Erros RFC 9457.
+- Testes de isolamento contrato/organização, permissões adicionais, negação de
+  manage/ausência de view, validação, paginação, inativos e relacionadas sem __str__.
+- Performance: 1/30 itens, duas queries no selector, sete operações SQL no endpoint
+  com force_authenticate, sem escritas. Sem benchmark de carga/JWT real; busca,
+  COUNT e OFFSET exigem análise de volume/índices por recurso antes da publicação.
+- Segurança OWASP A01–A10 revisada: escopo, permissão explícita, projeção mínima,
+  ORM parametrizado, limites e falha fechada; sem achados novos. Base legal
+  preservada, sem novos dados pessoais, retenções, terceiros ou telas.
+- Validação completa: 407 testes passaram; lint, formato, migrations e checks
+  de desenvolvimento/produção aprovados. Nenhuma migration necessária.
+
 ## 2026-10-04 — Revisão 4.1: autenticação seletiva e premissa global de performance
 
 - Usuário aprovou seguir o Spatial: AccessLog só para login sucesso/falha e refresh

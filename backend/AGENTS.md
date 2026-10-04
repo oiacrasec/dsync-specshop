@@ -104,6 +104,11 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   escritas incidentais em leituras e locks amplos sem justificativa. Testar queries
   e operações com volumes distintos; medir carga quando houver risco relevante.
   Custo constante não basta para afirmar que um fluxo é eficiente.
+- Seleções usam `LookupOptionsMixin` junto ao mixin de escopo (ADR 0011): declarar
+  `options_label_field`, `options_search_fields` e `required_permission['options']`
+  com a mesma permissão `:view` do recurso. Rótulo SQL, sem `__str__`/serializer
+  completo; relações somente singulares. Preservar inativos em `get_queryset()`.
+  Contrato e cuidados de publicação em [options](../docs/api/options.md).
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

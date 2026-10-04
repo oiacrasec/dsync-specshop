@@ -79,7 +79,7 @@ e só começa após aprovação do usuário.
 
 | # | Etapa | ADR | Status |
 |---|---|---|---|
-| 5.1 | Mixin `options` | 0011 | ⬜ |
+| 5.1 | Mixin `options` | 0011 | ✅ |
 | 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008 | ⬜ |
 | 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
 | 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ⬜ |

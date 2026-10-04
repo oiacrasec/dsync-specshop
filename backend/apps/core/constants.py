@@ -32,3 +32,7 @@ UNSCOPED_RECORDS = frozenset({'audit.AccessLog'})
 
 # Serializer com escopo: contexto e id interno nunca entram nem saem (ADR 0006 §4, ADR 0007).
 SERIALIZER_HIDDEN_FIELDS = ('id', 'contract', 'organization')
+
+# Seleções (ADR 0011).
+OPTIONS_DEFAULT_ROWS = 20
+OPTIONS_MAX_ROWS = 100

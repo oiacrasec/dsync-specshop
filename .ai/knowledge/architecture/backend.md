@@ -16,6 +16,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
 | Registro de acesso | `AccessLog` (ADR 0019) para login sucesso/falha e refresh sucesso; marker na view, middleware fora da transação; sem escrita em navegação comum; só inserção; expurgo antes de produção |
 | Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
+| Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view, rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados; sem novas rotas de produção |
 | Idioma | código em inglês; rótulos/mensagens em português |
 
 Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).
