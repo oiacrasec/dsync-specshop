@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 2.5: testes de isolamento genéricos
+
+- `apps/core/tests/test_isolation.py`: cobertura obrigatória (FACTORIES/SHARED), outro contrato,
+  outra organização, Hybrid, fail closed e Shared; 30 testes. Mutação confirmou detecção.
+- Migrations só de estado da 2.4 aplicadas ao banco local (autorizado).
+
 ## 2026-10-04 — Etapa 2.4: proteção em camadas B a E
 
 - `apps/core/tenancy.py` (contextvar, middleware, `system_context`, `@system_scope`);

@@ -82,8 +82,23 @@ Camadas B a E do ADR 0006 §1.3:
 Superadmin com header age como o cliente daquela organização. Services de integridade
 (`save_user`, `delete_user`, RBAC, login/refresh/logout) rodam em `@system_scope`: a
 autorização fica em quem chama. Testes usam `system_context()` automático no `conftest`;
-o app só de testes `apps/core/tests/scoping` tem um model de cada tipo. Testes de
-isolamento genéricos (camada F) ficam na etapa 2.5.
+o app só de testes `apps/core/tests/scoping` tem um model de cada tipo.
+
+## Testes de isolamento (camada F, etapa 2.5)
+
+`apps/core/tests/test_isolation.py` percorre **todo** model concreto de `apps.*`:
+
+| Teste | Garante |
+|---|---|
+| cobertura | todo model tem fábrica em `FACTORIES` ou está em `SHARED`; model novo sem fábrica quebra a suíte |
+| outro contrato | no contexto de A, `objects` e `all_objects` não acham registros de B (nem excluídos), por pk, `public_id`, `get` ou `values_list` |
+| outra organização | model com escopo de organização não enxerga a organização irmã do mesmo contrato |
+| Hybrid | registro do sistema visível; o de outro cliente, não |
+| fail closed | sem contexto ou superadmin sem organização → `TenantContextMissing`; `unscoped()` é o único global |
+| Shared | visível em qualquer contexto |
+
+Ao criar model com escopo, registre a fábrica no mesmo commit. O teste foi validado
+com mutação (filtro de contrato desligado → 5 falhas).
 
 Os tipos abstratos não criam tabelas ou migrations. Desde a etapa 2.1, `Plan` usa
 `SharedModel`, `Organization` usa `ContractScopedModel` e `Contract` permanece

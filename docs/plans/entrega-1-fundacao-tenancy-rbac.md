@@ -53,7 +53,7 @@ e só começa após aprovação do usuário.
 | 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2, 0015 | ✅ |
 | 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ✅ |
 | 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ✅ |
-| 2.5 | Testes de isolamento genéricos (camada F) | 0006 §1.3 | ⬜ |
+| 2.5 | Testes de isolamento genéricos (camada F) | 0006 §1.3 | ✅ |
 
 ## Bloco 3 — RBAC
 
