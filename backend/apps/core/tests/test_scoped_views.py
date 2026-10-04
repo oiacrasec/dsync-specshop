@@ -9,10 +9,10 @@ from rest_framework.test import APIClient
 
 from apps.contracts.models import Contract, Organization, Plan
 from apps.core import permission_registry
+from apps.core.mixins import TenantScopedViewMixin
 from apps.core.permission_registry import PermissionDefinition, PermissionRegistry, PermissionScope
 from apps.core.serializers import ScopedModelSerializer
 from apps.core.tests.scoping.models import ScopingCategory, ScopingMovement, ScopingProduct
-from apps.core.views import TenantScopedViewMixin
 from apps.rbac import services
 from apps.rbac.models import Assignment
 

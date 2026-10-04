@@ -24,12 +24,21 @@ class ScopedModelSerializer(serializers.ModelSerializer):
         return fields
 
 
-class OptionsQuerySerializer(serializers.Serializer):
+class PageQuerySerializer(serializers.Serializer):
+    first = serializers.IntegerField(default=0, min_value=0)
+    rows = serializers.IntegerField(default=OPTIONS_DEFAULT_ROWS, min_value=1, max_value=OPTIONS_MAX_ROWS)
+
+
+class ListQuerySerializer(PageQuerySerializer):
+    search = serializers.CharField(default='', allow_blank=True, max_length=255)
+    ordering = serializers.CharField(default='name', max_length=100)
+    is_active = serializers.BooleanField(required=False, default=None, allow_null=True)
+
+
+class OptionsQuerySerializer(PageQuerySerializer):
     """Entrada do autocomplete; ListField lê public_id repetido no QueryDict."""
 
     q = serializers.CharField(required=False, allow_blank=True, default='', max_length=255)
-    first = serializers.IntegerField(default=0, min_value=0)
-    rows = serializers.IntegerField(default=OPTIONS_DEFAULT_ROWS, min_value=1, max_value=OPTIONS_MAX_ROWS)
     public_id = serializers.ListField(
         child=serializers.UUIDField(), required=False, allow_empty=False, max_length=OPTIONS_MAX_ROWS
     )

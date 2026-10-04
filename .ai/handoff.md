@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(contracts): centralize administrative view hooks` (este handoff entra no commit; consultar git log -1)
+- **Última alteração:** `refactor(api): compose core view bases with mixins and pagination` (este handoff entra no commit; consultar git log -1)
 
 ## Situação
 
@@ -21,7 +21,7 @@
   Listas limitadas/search/ordering/filtros, options/schema; organizations por contrato
   (organizações ativas, não excluídas), previsto na 3.5. UUIDs na API; erros RFC 9457.
 - Camadas em apps/contracts: selectors/services/serializers/permissions/views/urls.
-  BaseAdminModelViewSet centraliza get_queryset e perform_create/update/destroy;
+  Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
   recursos declaram selector/save/delete como staticmethod e schema_filters.
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
@@ -35,9 +35,10 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 440 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: 442 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
+  ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).
 
 ## Falta / dúvidas
 

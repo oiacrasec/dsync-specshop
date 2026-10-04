@@ -150,8 +150,29 @@ A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para 
 
 ## Views administrativas com services
 
-`BaseAdminModelViewSet`, em `apps/contracts/views.py`, centraliza listagem, schema,
-options e os métodos `get_queryset`/`perform_create`/`perform_update`/`perform_destroy`.
+`BaseModelViewSet` e `BaseAdminModelViewSet`, em `apps/core/views.py`, compõem os
+comportamentos compartilhados. Mixins ficam em `core/mixins.py`; paginação em
+`core/pagination.py`, como a organização do Spatial, com o contrato próprio do Core.
+Na declaração de uma base composta, preservar o cabeçalho compacto com mixins
+agrupados e continuação alinhada, conforme o ajuste manual em `BaseModelViewSet`.
+Usar `fmt: off/on` só nesse trecho para o Ruff não expandir o cabeçalho; lint e
+limite de 120 caracteres continuam ativos.
+
+| Componente | Responsabilidade |
+|---|---|
+| `SelectorQuerysetMixin` | leitura pelo selector declarado |
+| `ServiceWriteMixin` | create/update/delete pelo service declarado |
+| `ListFilterMixin` | entrada validada e campos permitidos de filtro/busca/ordenação |
+| `LookupOptionsMixin` | seleção UUID/rótulo |
+| `TableSchemaMixin` | schema declarado pelo recurso |
+| `TenantScopedViewMixin` | acesso/autoria com escopo nos usos existentes |
+| `StandardResultsSetPagination` | first/rows, limite 100 e resposta data/total_records |
+
+`BaseAdminModelViewSet` declara `SuperadminPermission`, compartilhada em
+`core/permissions.py`, sem organização. A base comum preserva as permissões globais
+de negação por padrão. Selectors de recursos comuns devem preservar o escopo;
+services continuam responsáveis pelas regras e escritas.
+
 O recurso declara suas funções explicitamente, sem descoberta automática por nome:
 
 ```python

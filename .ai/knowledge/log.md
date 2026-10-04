@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: composição no core, como Spatial
+
+- Usuário pediu bases no core, paginação e mixins (ADR 0021). core/views compõe
+  BaseModelViewSet/BaseAdminModelViewSet; core/mixins concentra selector/write/
+  filter/options/schema e TenantScopedViewMixin existente. SuperadminPermission
+  movida para core/permissions; paginação first/rows em core/pagination.
+- Filtro genérico lazy em core/selectors; serializers compartilhados Page/List.
+  Contratos mantêm selectors de domínio e actions/configuração nas próprias views.
+  Imports e docs atualizados; cabeçalho da base compacto/alinhado, conforme ajuste
+  manual do usuário, protegido com fmt: off/on só nesse trecho.
+- Sem mudar API/permissões/locks/auditoria/migrations. Testes adicionais confirmam
+  offset não múltiplo da página e filtros da listagem sem interferir no detalhe.
+- Validação: 442 testes passaram; lint, formato, migrations e checks dev/produção
+  aprovados. O formato manual exigiu proteção local do cabeçalho; restante segue Ruff.
+  OWASP A01–A10 sem achados novos; performance mantém duas consultas e zero escrita
+  nas leituras, sem novo trabalho por item ou benchmark repetido sem necessidade.
+
 ## 2026-10-04 — Revisão 5.2: base das views administrativas
 
 - Usuário pediu aplicar o reaproveitamento do Spatial. BaseAdminModelViewSet

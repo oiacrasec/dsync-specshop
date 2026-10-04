@@ -68,7 +68,7 @@ Camadas B a E do ADR 0006 §1.3:
 |---|---|---|
 | C. Contexto | `apps/core/tenancy.py` | `contextvar` com contrato, organização e superadmin. `TenantContextMiddleware` (`apps/core/middleware.py`) começa cada requisição sem contexto; `AllowAuthenticated`/`RequiredPermission` gravam o contrato do usuário e o header grava a organização. Fora de requisição: `use_context(...)`, `system_context()` ou `@system_scope` |
 | B. Manager | `objects` e `all_objects` | filtram pelo contexto; sem contexto → `TenantContextMissing` (500, nunca dados). Global só por `.unscoped()`. `_base_objects` (sem filtro) é o manager base do Django, para seguir FKs |
-| D. View | `apps/core/views.TenantScopedViewMixin` | `model` em vez de `queryset`; create/update gravam `contract`/`organization` do contexto e autoria, ignorando o payload; fora do contexto → 404; registro do sistema (Hybrid) → 403 para cliente |
+| D. View | `apps/core/mixins.TenantScopedViewMixin` | `model` em vez de `queryset`; create/update gravam `contract`/`organization` do contexto e autoria, ignorando o payload; fora do contexto → 404; registro do sistema (Hybrid) → 403 para cliente |
 | E. Serializer | `apps/core/serializers.ScopedModelSerializer` | FKs por `public_id` com o manager com escopo (outro contrato → "não existe", 422); sem `id`, `contract` e `organization` |
 
 | Contexto | Shared | Hybrid | Contract | Organization | `Contract` / `User` |

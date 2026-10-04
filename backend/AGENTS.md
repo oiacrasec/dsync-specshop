@@ -118,6 +118,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `BaseAdminModelViewSet` centraliza os quatro hooks de CRUD; subclasses declaram
   `queryset_selector`, `save_service` e `delete_service` com `staticmethod`, além
   de schema/filtros. Não repetir delegação nem inferir nomes de funções.
+  Bases compartilhadas em `core/views.py`, mixins em `core/mixins.py`, paginação
+  em `core/pagination.py` e permissão administrativa em `core/permissions.py`.
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

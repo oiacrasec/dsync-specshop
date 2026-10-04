@@ -1,6 +1,7 @@
 # Opções de seleção
 
-Contrato do ADR 0011, implementado na etapa 5.1 por `LookupOptionsMixin`.
+Contrato do ADR 0011, implementado na etapa 5.1 por `LookupOptionsMixin`,
+atualmente em `apps/core/mixins.py` e composto pelas bases de `core/views.py`.
 Esta etapa disponibiliza a infraestrutura; não publica recursos de negócio.
 
 ```http

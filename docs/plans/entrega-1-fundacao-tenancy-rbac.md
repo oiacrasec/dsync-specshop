@@ -33,6 +33,7 @@ e só começa após aprovação do usuário.
 | 21 | Revisão da 4.1 aprovada: seguir cobertura implementada no Spatial (login sucesso/falha e refresh sucesso), sem AccessLog por requisição comum; preservar AuditEvent e registros históricos. ADR 0019 substitui a cobertura de 0018, sem afirmar suficiência jurídica de apenas login |
 | 22 | Premissa permanente do usuário: performance forte em todo o projeto, não só AccessLog; avaliar frequência, queries, escritas, locks, CPU, memória, tráfego e concorrência, com medição conforme o risco antes de entregar |
 | 23 | 5.2: usuário aprovou impedir redução de licenças abaixo dos usuários não excluídos, contando inativos; usar lock do contrato compartilhado com cadastro de usuários (ADR 0020) |
+| 24 | Revisão 5.2: usuário pediu composição como Spatial, com bases em core/views, mixins/pagination/permissions compartilhados e recursos declarados nos apps (ADR 0021); preservar cabeçalho compacto/alinhado ajustado manualmente |
 
 ## Bloco 0 — Fundação
 

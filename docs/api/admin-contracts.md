@@ -63,6 +63,9 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 Views de planos/contratos herdam `BaseAdminModelViewSet`, que centraliza os hooks
 de CRUD. Cada recurso declara selector/services e configuração do schema;
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
+As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
+em `core/pagination.py`. Os filtros genéricos são leituras de `core/selectors.py`;
+os selectors de contratos somente fornecem os querysets do domínio.
 
 Escritas usam services com validação, autoria e AuditEvent na mesma transação.
 Eventos `plan.created/updated/deleted` e `contract.created/updated/deleted` guardam

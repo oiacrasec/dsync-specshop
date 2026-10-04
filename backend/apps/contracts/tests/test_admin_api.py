@@ -174,6 +174,22 @@ def test_filters_sorting_pagination_and_schema(world):
     assert api.get('/api/v1/admin/contracts/schema/').json()['filters'][1]['options_url'].endswith('/plans/options/')
 
 
+def test_offset_does_not_round_to_a_page_boundary(world):
+    Plan.objects.bulk_create([Plan(name=f'Page {letter}') for letter in ('A', 'B', 'C', 'D')])
+    response = world['api'].get('/api/v1/admin/plans/', {'search': 'Page', 'first': 1, 'rows': 2})
+    assert response.json()['total_records'] == 4
+    assert [item['name'] for item in response.json()['data']] == ['Page B', 'Page C']
+    beyond = world['api'].get('/api/v1/admin/plans/', {'first': 1000})
+    assert beyond.status_code == 200 and beyond.json()['data'] == []
+
+
+def test_list_filters_do_not_change_detail_lookup(world):
+    response = world['api'].get(
+        f'/api/v1/admin/contracts/{world["contract"].public_id}/', {'search': 'missing', 'ordering': 'invalid'}
+    )
+    assert response.status_code == 200
+
+
 def test_organizations_search_is_limited_to_selected_contract(world):
     contract = world['contract']
     own = Organization.objects.create(name='Filial', contract=contract)

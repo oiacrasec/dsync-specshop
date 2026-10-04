@@ -11,12 +11,12 @@ from rest_framework.routers import SimpleRouter
 from rest_framework.test import APIClient
 
 from apps.core import permission_registry
+from apps.core.mixins import LookupOptionsMixin, TenantScopedViewMixin
 from apps.core.permission_registry import PermissionDefinition, PermissionRegistry, PermissionScope
 from apps.core.selectors import lookup_options
 from apps.core.tests.scoping.models import ScopingCategory, ScopingMovement
 from apps.core.tests.test_scoped_views import client
 from apps.core.tests.test_scoped_views import world as world_fixture
-from apps.core.views import LookupOptionsMixin, TenantScopedViewMixin
 from apps.rbac import services
 from apps.rbac.models import Assignment
 from apps.rbac.permissions import AllowAuthenticated
