@@ -146,8 +146,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'apps.users.authentication.JWTAuthentication',
     ],
+    # Nega por padrão: toda view declara required_permission ou AllowAuthenticated (ADR 0009 §4).
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'apps.rbac.permissions.RequiredPermission',
     ],
 }
 

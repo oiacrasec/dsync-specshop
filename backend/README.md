@@ -139,9 +139,10 @@ Somente superadmin ativo pode escrever nesta etapa. Perfil atribuído não pode
 ser excluído; soft delete de perfil/atribuição trata seus filhos com autoria.
 Transferência de usuário exige remover suas atribuições primeiro.
 Migration inicial aplicada localmente, sem seeds. Ver [domínio RBAC](../docs/domain/rbac.md).
-O cálculo de acesso efetivo e a autorização DRF entram em 3.3; fixture e proteção
-do último Administrador do contrato em 3.4; auditoria de eventos em 3.6.
-Não há endpoints de gestão nem concessão automática de acesso nesta etapa.
+Autorização da API (3.3): toda view nega por padrão e declara `required_permission`
+(ou `AllowAuthenticated`); a permissão efetiva é calculada para a organização do header
+`X-Organization-Id`. Fixture e proteção do último Administrador do contrato em 3.4;
+auditoria de eventos em 3.6. Ainda não há endpoints de gestão.
 
 ## Configuração do PyCharm
 

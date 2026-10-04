@@ -22,6 +22,7 @@ e só começa após aprovação do usuário.
 | 10 | Licenças contam usuários ativos e inativos não excluídos; soft delete libera vaga e restauração exige disponibilidade (ADR 0015) |
 | 11 | Usuário decidiu antecipar o bloco RBAC antes do contexto, pois 2.3 depende das atribuições de 3.2. Após 2.2: 3.1 → 3.2 → demais etapas RBAC → 2.3 → 2.4 → 2.5, validando e confirmando cada etapa |
 | 12 | Usuário aprovou apps/rbac para perfis, permissões e atribuições; registry compartilhado permanece em core (ADR 0016) |
+| 13 | Pedaço da 2.3 antecipado na 3.3 (aprovado): ler e validar `X-Organization-Id` (400) e resolver a organização do contrato do usuário (403), preenchendo `request.organization`. Contrato ativo a cada requisição e superadmin com organização opcional continuam na 2.3. O acesso total dinâmico do perfil essencial já vale no cálculo; a 3.4 fica com a fixture e a proteção do último admin |
 
 ## Bloco 0 — Fundação
 
@@ -54,7 +55,7 @@ e só começa após aprovação do usuário.
 |---|---|---|---|
 | 3.1 | Registry de permissões (Python puro): escopos permitidos e reservadas | 0009 §1, §3.1 | ✅ |
 | 3.2 | `Profile`, permissões do perfil e atribuições (com exceções de organização) | 0009 §2, §3, 0016 | ✅ |
-| 3.3 | Cálculo da permissão efetiva + permissão do DRF que **nega por padrão** | 0009 §4 | ⬜ |
+| 3.3 | Cálculo da permissão efetiva + permissão do DRF que **nega por padrão** | 0009 §4 | ✅ |
 | 3.4 | Perfil essencial "Administrador do contrato" (fixture, acesso total dinâmico) | 0009 §5 | ⬜ |
 | 3.5 | Lista de organizações acessíveis + busca contrato → organização do superadmin | 0009 §6 | ⬜ |
 | 3.6 | Auditoria das mudanças de permissão e das entradas do superadmin em organização | 0009 §7 | ⬜ |

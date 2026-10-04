@@ -76,6 +76,25 @@ Não escrever via save/update/bulk direto em fluxos de gestão: as constraints n
 substituem regras entre tabelas. Fixtures/migrations controladas são a exceção
 para manutenção do perfil essencial. Os services atuais usam o banco padrão.
 
+## Permissão efetiva e autorização da API (etapa 3.3)
+
+| Peça | Onde | Regra |
+|---|---|---|
+| Cálculo | `apps/rbac/evaluation.py` (Python puro) | concessões que alcançam a organização: CONTRACT alcança todas menos as exceções; ORGANIZATION só a própria. Resultado = união dos códigos do registry permitidos no escopo da concessão |
+| Leitura | `selectors.user_grants` | atribuições e perfis **ativos** e não excluídos, do contrato do usuário, em 3 queries constantes. Exceções não excluídas restringem mesmo inativas (falha fechada) |
+| Contexto mínimo | `apps/core/context.py` | header `X-Organization-Id`: ausente/malformado → 400 `context-invalid-request`; organização inexistente, excluída, inativa ou de outro contrato → 403 `context-forbidden`. Preenche `request.organization` |
+| DRF | `apps/rbac/permissions.py` | padrão global `IsAuthenticated` + `RequiredPermission`: a view declara `required_permission` (código ou dicionário por action/método); sem declaração ou código fora do registry → negado. `AllowAuthenticated` é a marca explícita de endpoint aberto a autenticados |
+
+| Situação | Resposta |
+|---|---|
+| Nenhuma concessão alcança a organização | 403 `context-forbidden` |
+| Acessa a organização, mas não tem o código | 403 `permission-denied` |
+| Perfil essencial (`contract_admin`) | todos os códigos do registry, inclusive os criados depois |
+| Superadmin | passa sem organização; organização opcional fica na etapa 2.3 |
+
+O cálculo é feito uma vez por requisição. Contrato vencido/inativo a cada
+requisição e superadmin com organização opcional ficam na etapa 2.3.
+
 ## Perfil essencial e etapas seguintes
 
 system_key='contract_admin' identifica o Administrador do contrato. Só pode existir
@@ -86,10 +105,11 @@ ficam bloqueadas até a proteção específica da etapa 3.4; não é a implement
 final da regra de último administrador.
 
 A migration cria somente as quatro tabelas, constraints e índices; não cria
-perfil essencial ou contas. Fixture e acesso total dinâmico entram em 3.4.
-Permissão efetiva e proteção DRF entram em 3.3; organizações acessíveis em 3.5;
+perfil essencial ou contas. O acesso total dinâmico do perfil essencial já vale no
+cálculo (3.3); fixture e proteção do último administrador entram em 3.4;
+organizações acessíveis em 3.5;
 auditoria de eventos em 3.6. Autoria nos models não substitui essa trilha.
-Contexto e isolamento automático de queries continuam nas etapas 2.3–2.5.
+O restante do contexto e o isolamento automático de queries continuam nas etapas 2.3–2.5.
 
 ## Dados e finalidade
 

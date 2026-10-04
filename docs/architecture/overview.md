@@ -29,7 +29,8 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 2.1: apps/contracts com Plan e quotas opcionais sem enforcement, Contract e Organization; modalidade pertence à implantação) | concluído |
 | `backend/` (etapa 2.2: User.contract por papel, serviço de escrita e limite de licenças contando inativos, com lock no contrato) | concluído |
 | `backend/` (etapa 3.1 antecipada antes do contexto: registry RBAC Python puro, escopos e reservadas; integração DRF ainda pendente) | concluído |
-| `backend/` (etapa 3.2: apps/rbac com perfis, permissões, atribuições, exceções e services transacionais; permissão efetiva ainda pendente) | concluído |
+| `backend/` (etapa 3.2: apps/rbac com perfis, permissões, atribuições, exceções e services transacionais) | concluído |
+| `backend/` (etapa 3.3: permissão efetiva em Python puro, contexto mínimo por `X-Organization-Id` e DRF negando por padrão) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

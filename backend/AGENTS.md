@@ -96,16 +96,20 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `manage` não implica outras ações. Ver
   [registry](docs/architecture/permission-registry.md). Não aceitar código
   desconhecido; essential_profile é flag interno após verificar o perfil essencial,
-  nunca recebido do payload. Integração de autorização DRF fica na etapa 3.3.
+  nunca recebido do payload.
 - Novo campo pessoal → finalidade e base legal definidas (skill `lgpd`). Toda funcionalidade passa pela skill `conformidade-legal`.
 - Gestão de acesso em `apps/rbac` (ADR 0016): Profile, ProfilePermission, Assignment
   e AssignmentExclusion. Escritas usam services, atomic, lock de configuração e
   validações de contexto/registry; acesso direto ao ORM não substitui essas regras.
-  Atualmente somente superadmin ativo pode escrever; autorização pelo cliente e
-  permissão efetiva entram em 3.3. Perfil essencial não é editável; sua fixture e
+  Atualmente somente superadmin ativo pode escrever. Perfil essencial não é editável; sua fixture e
   proteção do último administrador entram em 3.4. Ver
   [domínio RBAC](../docs/domain/rbac.md). Transferir User de contrato exige remover
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
+- Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view
+  declara `required_permission` (código do registry ou dicionário por action/método) ou
+  `permission_classes = [AllowAuthenticated]`. Contexto pelo header `X-Organization-Id`
+  (`apps/core/context.py`, preenche `request.organization`). Cálculo puro em
+  `apps/rbac/evaluation.py`; leitura em `selectors.user_grants`, uma vez por requisição.
 
 ## Antes de entregar
 
