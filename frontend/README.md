@@ -15,7 +15,8 @@ da Entrega 1. Comunica-se com o backend **só pela API HTTP** (`/api/v1/`).
 ```bash
 npm ci
 npm start          # http://localhost:4200, API em http://localhost:8000/api/v1
-npm run lint
+npm run lint          # ESLint (código ativo; telas desabilitadas ficam fora até reativar)
+npm run format:check  # Prettier
 npm run build
 ```
 

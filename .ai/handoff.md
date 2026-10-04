@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 6.2 Desabilitar telas fora do escopo — ✅ concluída |
-| Próximo passo exato | 6.2a: ESLint (`angular-eslint`), Prettier nos 65 arquivos (commit só de formatação), bundle |
-| Aguardando o usuário? | sim — aprovação da 6.2a |
+| Etapa atual | 6.2a Qualidade do frontend — ✅ concluída |
+| Próximo passo exato | decidir o orçamento do bundle (1,25 MB vs 1 MB) e aprovar a 6.3 (app `administration` + `Contract.plan` opcional) |
+| Aguardando o usuário? | sim |
 
 Superadmin local criado pelo usuário: `datasync_admin` (via `createsuperuser`; senha só com o usuário).
 Referências: `D:\Projetos\PycharmProjects\datasync-spatial` (backend) e `datasync-gis` (frontend).

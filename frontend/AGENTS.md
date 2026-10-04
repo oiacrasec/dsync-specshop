@@ -12,5 +12,7 @@ Regras do frontend do datasync-core. As regras globais estão no `AGENTS.md` da 
   `// DESABILITADO: fora do escopo atual`. Reativar só com aprovação do usuário.
 - Preservar guards e interceptors centrais; segurança real fica no backend (o guard é UX).
 - Código em inglês nos novos arquivos; textos ao usuário em português.
-- Antes de entregar: `npm run lint` e `npm run build` sem erros.
+- Antes de entregar: `npm run lint`, `npm run format:check` e `npm run build` sem erros.
+- Ao reativar uma tela desabilitada, remova-a dos `ignores` do `eslint.config.mjs` e corrija o lint dela.
+- Indentação: 4 espaços (`.editorconfig` e `.prettierrc.json`), igual ao backend.
 - Padrões herdados: `docs/standards/patterns-frontend.md` (revisar ao adaptar cada tela).

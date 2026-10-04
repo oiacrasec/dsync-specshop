@@ -1,10 +1,8 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { booleanAttribute, Component, computed, inject, Input, model, OnInit, PLATFORM_ID, Signal } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, Input, model, OnInit, PLATFORM_ID, Signal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { $t, updatePreset, updateSurfacePalette } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
-import Lara from '@primeuix/themes/lara';
-import Nora from '@primeuix/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService, MenuMode } from '@/app/layout/service/layout.service';
@@ -13,11 +11,15 @@ import { DrawerModule } from 'primeng/drawer';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
-const presets = {
-    Aura,
-    Lara,
-    Nora
-} as const;
+type PresetName = 'Aura' | 'Lara' | 'Nora';
+
+const PRESET_NAMES: PresetName[] = ['Aura', 'Lara', 'Nora'];
+
+// Aura é o tema do app e entra no bundle inicial; Lara e Nora só carregam se escolhidos no painel (etapa 6.2a).
+const PRESET_LOADERS: Record<Exclude<PresetName, 'Aura'>, () => Promise<any>> = {
+    Lara: () => import('@primeuix/themes/lara').then((module) => module.default),
+    Nora: () => import('@primeuix/themes/nora').then((module) => module.default)
+};
 
 declare type KeyOfType<T> = keyof T extends infer U ? U : never;
 
@@ -145,7 +147,9 @@ export class AppConfigurator implements OnInit {
 
     primeng = inject(PrimeNG);
 
-    presets = Object.keys(presets);
+    presets = PRESET_NAMES;
+
+    loadedPresets = signal<Partial<Record<PresetName, any>>>({ Aura });
 
     themeOptions = [
         { name: 'Light', value: false },
@@ -165,7 +169,8 @@ export class AppConfigurator implements OnInit {
     darkTheme = computed(() => this.layoutService.layoutConfig().darkTheme);
 
     primaryColors = computed<SurfacesType[]>(() => {
-        const presetPalette = presets[this.layoutService.layoutConfig().preset as KeyOfType<typeof presets>].primitive;
+        const preset = this.loadedPresets()[this.layoutService.layoutConfig().preset as PresetName] ?? Aura;
+        const presetPalette = preset.primitive;
         const colors = ['emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
         const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
 
@@ -369,14 +374,28 @@ export class AppConfigurator implements OnInit {
         }
     }
 
-    onPresetChange(event: any) {
+    async onPresetChange(event: any) {
+        const preset = await this.loadPreset(event as PresetName);
+
         this.layoutService.layoutConfig.update((state) => ({
             ...state,
             preset: event
         }));
-        const preset = presets[event as KeyOfType<typeof presets>];
-
         $t().preset(preset).preset(this.getPresetExt()).use({ useDefaultOptions: true });
+    }
+
+    private async loadPreset(name: PresetName) {
+        const loaded = this.loadedPresets()[name];
+
+        if (loaded) {
+            return loaded;
+        }
+
+        const preset = await PRESET_LOADERS[name as Exclude<PresetName, 'Aura'>]();
+
+        this.loadedPresets.update((current) => ({ ...current, [name]: preset }));
+
+        return preset;
     }
 
     onDrawerHide() {

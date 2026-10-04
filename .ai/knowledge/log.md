@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.2a: qualidade do frontend
+
+- ESLint flat config (`eslint.config.mjs`) com angular-eslint/typescript-eslint; autofix e
+  correções manuais (inject(), seletores app-*, ordem de membros); telas desabilitadas ignoradas.
+- Prettier aplicado; scripts `lint` e `format:check`; 4 espaços confirmados.
+- Preloading CSS inline no index.html; temas Lara/Nora por import dinâmico no configurator:
+  bundle inicial 1,46 → 1,25 MB (~257 KB gzip). Orçamento de 1 MB ainda avisa.
+
 ## 2026-10-04 — Etapa 6.2: telas fora do escopo desabilitadas
 
 - Rotas e menu comentados com `/* DESABILITADO: fora do escopo atual ... */` em app.routes,
