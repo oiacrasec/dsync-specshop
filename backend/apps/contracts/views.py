@@ -13,16 +13,16 @@ from .serializers import ContractSerializer, OrganizationSummarySerializer, Plan
 
 
 class PlanViewSet(BaseAdminModelViewSet):
-    filterset_class = PlanFilterSet
+    selector_class = selectors.PlanSelector
     serializer_class = PlanSerializer
-    queryset_selector = staticmethod(selectors.admin_plans)
+    filterset_class = PlanFilterSet
     schema_columns = ('name', 'is_active')
 
 
 class ContractViewSet(BaseAdminModelViewSet):
-    filterset_class = ContractFilterSet
+    selector_class = selectors.ContractSelector
     serializer_class = ContractSerializer
-    queryset_selector = staticmethod(selectors.admin_contracts)
+    filterset_class = ContractFilterSet
     schema_columns = ('name', 'start_date', 'licenses')
     schema_column_overrides = {'start_date': {'label': _('Início')}}
     schema_filters = ('plan',)

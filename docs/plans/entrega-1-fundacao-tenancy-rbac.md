@@ -39,6 +39,7 @@ e só começa após aprovação do usuário.
 | 27 | Usuário determinou classe base de services no core e exclusão comum herdada, sem delete_service repetido nas views; classes de domínio e registro explícito por model (ADR 0024) |
 | 28 | Usuário aprovou service_class nos serializers; ServiceModelSerializer centraliza create/update chamando save_instance, sem staticmethod nos recursos (ADR 0025) |
 | 29 | Usuário determinou schema de colunas/filtros por campos do model, label/tipo/URL automáticos com sobrescrita por campo; ordenação usa OrderingFilter sem duplicação na view (ADR 0026) |
+| 30 | Usuário aprovou classes de selectors/base no core e selector_class nas views; determinou ordem selector_class, serializer_class, filterset_class e demais configurações (ADR 0027) |
 
 ## Bloco 0 — Fundação
 

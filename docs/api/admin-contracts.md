@@ -65,7 +65,10 @@ do DRF. ServiceModelSerializer.create/update chamam service_class.save_instance;
 exclusão continua em ServiceDeleteMixin, usando BaseModelService da view base.
 PlanService/ContractService herdam exclusão comum e definem gravação/autorização/
 auditoria; registro explícito no AppConfig.ready, sem queries na inicialização.
-Cada recurso declara selector/schema; serializer declara service_class (ADR 0025);
+Cada recurso declara selector/schema; serializer declara service_class (ADR 0025).
+Selectors administrativos são classes PlanSelector/ContractSelector, herdando
+BaseAdminModelSelector (unscoped explícito); view declara selector_class e a base
+chama get_queryset. ContractSelector mantém select_related do plano (ADR 0027).
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
 Colunas/filtros do schema informam nomes de campos: label vem do verbose_name,
 tipo do model e options_url das rotas options registradas pelo SchemaRouter,

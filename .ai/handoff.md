@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): generate schema metadata from model fields` (consultar git log -1)
+- **Última alteração:** `refactor(api): declare selector classes in views` (consultar git log -1)
 
 ## Situação
 
@@ -24,7 +24,9 @@
   django-filter 26.2: BaseFilterSet/backend em core/filters, FilterSets nos apps,
   filterset_class nas views. Filtros explícitos para não acessar managers na importação.
   Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
-  views declaram selector/schema; exclusão herdada via BaseModelService (ADR 0024),
+  views declaram selector_class/serializer_class/filterset_class nessa ordem;
+  PlanSelector/ContractSelector herdam BaseAdminModelSelector (global explícito),
+  BaseModelSelector preserva contexto (ADR 0027). Exclusão via BaseModelService,
   PlanService/ContractService registrados por model no AppConfig.ready, sem SQL.
   Serializers declaram service_class; ServiceModelSerializer implementa create/update
   via service_class.save_instance, sem staticmethod nos recursos (ADR 0025);
@@ -43,7 +45,7 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 464 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: 468 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).

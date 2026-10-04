@@ -18,7 +18,7 @@ permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api
 A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contracts.md)
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
-As views herdam `BaseAdminModelViewSet` e declaram selector; exclusão vem da base. Serializers
+As views herdam `BaseAdminModelViewSet` e declaram selector_class; exclusão vem da base. Serializers
 herdam `ServiceModelSerializer`, declaram `service_class` e herdam create/update
 que chamam `service_class.save_instance` (ADR 0025); regras,
 locks e auditoria continuam nos services. `BaseModelService`, no core, padroniza
@@ -31,6 +31,9 @@ Schemas recebem nomes de campos: labels/tipos vêm do model, URLs de relações 
 SchemaRouter e ordenação do OrderingFilter. Overrides por campo permitem trocar
 labels/URLs sem repetir metadados; geração sem consultas ao banco (ADR 0026).
 Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
+Selectors de model herdam BaseModelSelector (contexto atual) ou
+BaseAdminModelSelector (global explícito administrativo). Views declaram
+selector_class, serializer_class e filterset_class nessa ordem (ADR 0027).
 
 | Item | Versão |
 |---|---|

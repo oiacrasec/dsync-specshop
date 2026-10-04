@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: classes de selectors
+
+- BaseModelSelector preserva o contexto do manager e aplica select_related declarado;
+  BaseAdminModelSelector usa unscoped administrativo explícito. PlanSelector e
+  ContractSelector substituem funções admin_plans/admin_contracts; JOIN do plano mantido.
+- Views declaram selector_class, serializer_class, filterset_class e demais nessa
+  ordem, por determinação do usuário. SelectorQuerysetMixin centraliza get_queryset.
+- Validação: 468 testes, lint/formato/migrations/checks OK. Testes cobrem ausência
+  de model/contexto, isolamento de tenant, inativos/soft delete, construção sem SQL
+  e relação em uma query. OWASP A01–A10 sem achados novos; mesmas queries/locks,
+  sem trabalho/escrita de leitura adicionais. Conformidade anterior preservada.
+- Arquivos: core/selectors/mixins/tests, contracts/selectors/views,
+  backend/AGENTS/README/style, API/plano/overview, ADR 0027 e memória/handoff.
+
 ## 2026-10-04 — Revisão 5.2: schemas automáticos por campos
 
 - schema_columns/schema_filters agora contêm nomes de campos; TableSchemaMixin usa

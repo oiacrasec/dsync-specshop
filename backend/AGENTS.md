@@ -123,7 +123,11 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
   `BaseAdminModelViewSet` compõe hooks padrão e mixins; views declaram
-  `queryset_selector` com `staticmethod`, além de schema/filtros. Exclusão é herdada
+  `selector_class`, além de schema/filtros. Manter a ordem de configuração nas views:
+  selector_class, serializer_class, filterset_class e depois as demais propriedades.
+  SelectorQuerysetMixin chama selector_class.get_queryset. BaseModelSelector preserva
+  contexto/inativos e permite select_related explícito; BaseAdminModelSelector usa
+  unscoped somente em recursos administrativos autorizados (ADR 0027). Exclusão é herdada
   da base via `BaseModelService.delete_instance`; não declarar delete_service por
   recurso. Services de domínio herdam BaseModelService, definem model/regras e são
   registrados explicitamente no AppConfig.ready (ADR 0024). Não inferir nomes.

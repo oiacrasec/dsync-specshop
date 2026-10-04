@@ -43,6 +43,7 @@ um ADR novo que **substitui** o anterior.
 | [0024](0024-classe-base-de-services.md) | Classe base de services e exclusão herdada nas views | Aceito |
 | [0025](0025-classe-de-service-nos-serializers.md) | Classe de service declarada nos serializers | Aceito |
 | [0026](0026-schema-automatico-por-campos.md) | Schema por campos, metadados automáticos e overrides | Aceito |
+| [0027](0027-classes-base-de-selectors.md) | Classes base de selectors e configuração das views | Aceito |
 
 ## Modelo
 

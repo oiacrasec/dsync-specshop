@@ -1,5 +1,7 @@
 """Leituras de contratos e organizações."""
 
+from apps.core.selectors import BaseAdminModelSelector
+
 from .models import Contract, Organization, Plan
 
 
@@ -19,9 +21,10 @@ def superadmin_contract_organizations(contract):
     return Organization.objects.unscoped().filter(contract=contract, is_active=True).order_by('name', 'pk')
 
 
-def admin_plans():
-    return Plan.objects.unscoped()
+class PlanSelector(BaseAdminModelSelector):
+    model = Plan
 
 
-def admin_contracts():
-    return Contract.objects.unscoped().select_related('plan')
+class ContractSelector(BaseAdminModelSelector):
+    model = Contract
+    select_related = ('plan',)

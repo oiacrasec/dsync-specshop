@@ -175,21 +175,22 @@ limite de 120 caracteres continuam ativos.
 de negação por padrão. Selectors de recursos comuns devem preservar o escopo;
 services continuam responsáveis pelas regras e escritas.
 
-O recurso declara suas funções explicitamente, sem descoberta automática por nome:
+O recurso declara suas classes explicitamente, sem descoberta automática por nome:
 
 ```python
 class ContractViewSet(BaseAdminModelViewSet):
-    filterset_class = ContractFilterSet
+    selector_class = selectors.ContractSelector
     serializer_class = ContractSerializer
-    queryset_selector = staticmethod(selectors.admin_contracts)
+    filterset_class = ContractFilterSet
 
 
 class ContractSerializer(ServiceModelSerializer):
     service_class = services.ContractService
 ```
 
-`staticmethod` no selector impede que Python passe a view às funções do módulo.
-O selector retorna queryset lazy. A view chama `serializer.save()` pelo fluxo padrão
+Manter sempre a ordem: `selector_class`, `serializer_class`, `filterset_class` e
+depois as demais configurações. A base chama `selector_class.get_queryset()`;
+o selector retorna queryset lazy. A view chama `serializer.save()` pelo fluxo padrão
 do DRF; `ServiceModelSerializer.create/update` chama `service_class.save_instance`
 repassando `values`, `actor` e, na
 atualização, `instance` ao service. O ator vem do request no contexto do serializer,
@@ -197,6 +198,14 @@ passado explicitamente ao service, sem dependência da requisição no model.
 Cada serializer declara somente a classe do service, sem staticmethod ou métodos
 create/update próprios. A classe padrão é BaseModelService, cuja gravação falha
 sem regras de domínio implementadas (ADR 0025).
+Selectors de model herdam `BaseModelSelector`, declaram `model` e, opcionalmente,
+`select_related = ('plan',)`. A base aplica JOINs somente quando declarados, sem
+`select_related()` vazio, que incluiria relações adicionais. O manager preserva
+contexto, exclui soft deleted e mantém inativos; sem contexto falha.
+`BaseAdminModelSelector` troca somente o queryset inicial por `objects.unscoped()`;
+usar exclusivamente na administração já autorizada. PlanSelector/ContractSelector
+herdam essa base; ContractSelector mantém JOIN do plano. Não inferir classe pelo
+nome nem executar consultas ao declarar/importar selectors (ADR 0027).
 O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
 a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
 no service, inclusive quando serializer.save() é chamado sem uma view.

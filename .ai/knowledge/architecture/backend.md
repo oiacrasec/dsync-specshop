@@ -21,6 +21,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Views base | BaseModelViewSet/BaseAdminModelViewSet em core/views, mixins/pagination/permissions no core; selector/schema nas views; exclusão herdada via BaseModelService, registro explícito por model no AppConfig.ready; PlanService/ContractService herdam BaseContractService; serializers declaram service_class e herdam create/update que chamam save_instance; regras/locks/auditoria nos services |
 | Filtros | django-filter 26.2 (BSD-3), BaseFilterSet/ValidatedDjangoFilterBackend em core/filters e FilterSets explícitos em contracts/filters; filterset_class na view; sem geração automática na importação por causa de managers fail closed; filter_listing removido |
 | Schemas | schema_columns/schema_filters contêm nomes de campos; labels verbose_name/tipos do model, overrides por campo; OrderingFilter é fonte única da ordenação; SchemaRouter relaciona model/basename options e reverse resolve no namespace atual; zero queries de metadados, campos explicitamente publicados (ADR 0026) |
+| Selectors base | BaseModelSelector preserva contexto/inativos/soft delete e aplica select_related declarado; BaseAdminModelSelector usa unscoped explícito. PlanSelector/ContractSelector nas views por selector_class; ordem selector_class/serializer_class/filterset_class/demais (ADR 0027) |
 | Idioma | código em inglês; rótulos/mensagens em português |
 
 Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).

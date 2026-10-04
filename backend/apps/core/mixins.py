@@ -11,14 +11,16 @@ from apps.rbac.permissions import LookupOptionsPermission, RequiredPermission
 
 from .models import HybridScopedModel
 from .schema import column_schema, filter_schema, model_field
-from .selectors import lookup_options
+from .selectors import BaseModelSelector, lookup_options
 from .serializers import OptionsQuerySerializer
 from .utils import context_values
 
 
 class SelectorQuerysetMixin:
+    selector_class = BaseModelSelector
+
     def get_queryset(self):
-        return self.queryset_selector()
+        return self.selector_class.get_queryset()
 
 
 class ServiceDeleteMixin:
