@@ -1,4 +1,24 @@
-# Backend — estado após a etapa 3.1
+# Backend — conhecimento compilado
+
+## Estado atual (2026-10-04, após a etapa 2.5 e a reorganização dos módulos)
+
+Fonte de verdade das convenções: `backend/AGENTS.md` e
+`backend/docs/standards/django-style.md`. Resumo:
+
+| Tema | Regra atual |
+|---|---|
+| Isolamento | managers `objects`/`all_objects` filtram pelo contexto (`core/tenancy.py`) e falham sem ele; global só `unscoped()`/`system_context()`/`@system_scope`; `_base_objects` só para o Django |
+| Contexto | middleware zera; permissões do DRF gravam o contrato; header `X-Organization-Id` grava a organização |
+| Views/serializers | `TenantScopedViewMixin` (`model`, nunca `queryset` de classe) e `ScopedModelSerializer` (FKs por `public_id`) |
+| Testes | `system_context()` automático no `conftest`; fábrica obrigatória em `test_isolation.py` para todo model |
+| Módulos | `models`, `managers`, `middleware`, `utils`, `constants` (só literais), `exceptions` (só classes), módulos temáticos (`core/problems.py`) |
+| SQL à mão | `queries/<nome>.py`; `-- NOME` na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
+| Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
+| Idioma | código em inglês; rótulos/mensagens em português |
+
+Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).
+
+## Histórico
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
 `backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/{exceptions,problems}.py`,

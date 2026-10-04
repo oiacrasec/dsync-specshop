@@ -26,6 +26,8 @@ Roda: `pytest`, `ruff check`, `ruff format --check`, migrations pendentes, `chec
 ## Passo 3 — Testes da etapa
 
 - [ ] Testes novos cobrem o comportamento da etapa, incluindo caminhos de **erro**.
+- [ ] Model novo: fábrica registrada em `backend/apps/core/tests/test_isolation.py`.
+- [ ] SQL escrito à mão: teste de isolamento próprio (outro contrato e outra organização).
 - [ ] Se a etapa toca dados com escopo: teste de **isolamento entre contratos**
   (e entre organizações) (ADR 0006).
 - [ ] Se a etapa cria endpoint: teste de **permissão** (sem permissão → negado) e de
@@ -45,6 +47,10 @@ formato dela.
 - [ ] O diff respeita os ADRs aceitos (`docs/adr/README.md`). Divergência → `questionador`.
 - [ ] Leis aplicáveis checadas pela skill `conformidade-legal`.
 - [ ] Erros no padrão da skill `erros-api-rfc9457`.
+- [ ] Convenções do backend ([guia de estilo](../../../backend/docs/standards/django-style.md)):
+  organização dos módulos (`middleware`, `utils`, `constants`, `managers`, `exceptions`),
+  código em inglês, SQL à mão no formato `queries/` com `@tenant_params` + `fetch_all`,
+  queries com escopo (sem `queryset` de classe; global só com `unscoped()`/`system_scope`).
 
 ## Passo 7 — Documentação
 
