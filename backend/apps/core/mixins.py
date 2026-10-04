@@ -1,6 +1,7 @@
 """Comportamentos HTTP compartilhados, compostos pelas views base do core."""
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from apps.rbac.permissions import LookupOptionsPermission, RequiredPermission
 
 from .models import HybridScopedModel
+from .schema import column_schema, filter_schema, model_field
 from .selectors import lookup_options
 from .serializers import OptionsQuerySerializer
 from .utils import context_values
@@ -27,8 +29,6 @@ class ServiceDeleteMixin:
 
 
 class ListFilterMixin:
-    ordering_fields = ('name', 'created_at', 'updated_at')
-
     def filter_queryset(self, queryset):
         if self.action != 'list':
             return queryset
@@ -38,14 +38,41 @@ class ListFilterMixin:
 class TableSchemaMixin:
     schema_columns = ()
     schema_filters = ()
+    schema_column_overrides = {}
+    schema_filter_overrides = {}
+    schema_options_routes = {}
+
+    def get_schema_columns(self):
+        model = self.serializer_class.Meta.model
+        return [column_schema(model, name, self.schema_column_overrides.get(name, {})) for name in self.schema_columns]
+
+    def get_schema_filters(self):
+        model = self.serializer_class.Meta.model
+        result = []
+        for name in dict.fromkeys(('is_active', *self.schema_filters)):
+            if name not in self.filterset_class.base_filters:
+                raise ImproperlyConfigured(f'Declare a FilterSet filter before exposing it in schema: {name}.')
+            field = model_field(model, name)
+            overrides = self.schema_filter_overrides.get(name, {})
+            options_url = overrides.get('options_url')
+            if field.is_relation and options_url is None:
+                route = self.schema_options_routes.get(field.related_model)
+                if route is None:
+                    raise ImproperlyConfigured('Register the related options route or declare an options_url override.')
+                namespace = self.request.resolver_match.namespace
+                options_url = reverse(
+                    f'{namespace}:{route}' if namespace else route, urlconf=getattr(self.request, 'urlconf', None)
+                )
+            result.append(filter_schema(model, name, overrides, options_url))
+        return result
 
     @action(detail=False, methods=['get'])
     def schema(self, request):
         return Response(
             {
-                'columns': [{'field': field, 'label': label} for field, label in self.schema_columns],
-                'filters': [{'field': 'is_active', 'label': _('Ativo'), 'type': 'boolean'}, *self.schema_filters],
-                'ordering_fields': self.ordering_fields,
+                'columns': self.get_schema_columns(),
+                'filters': self.get_schema_filters(),
+                'ordering_fields': tuple(self.filterset_class.base_filters['ordering'].param_map),
             }
         )
 

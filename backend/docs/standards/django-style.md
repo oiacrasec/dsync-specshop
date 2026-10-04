@@ -165,7 +165,7 @@ limite de 120 caracteres continuam ativos.
 | `ServiceModelSerializer` | create/update por service_class.save_instance |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
-| `TableSchemaMixin` | schema declarado pelo recurso |
+| `TableSchemaMixin` | schema de campos declarados, metadados do model e OrderingFilter |
 | `TenantScopedViewMixin` | acesso/autoria com escopo nos usos existentes |
 | `StandardResultsSetPagination` | first/rows, limite 100 e resposta data/total_records |
 | `BaseFilterSet` / backend DRF | filtros declarados e entrada validada/normalizada |
@@ -227,10 +227,37 @@ de filtros do model: django-filter acessa o manager durante a importação; noss
 managers exigem contexto. Declarar BooleanFilter/UUIDFilter etc. explicitamente,
 sem aliviar o fail closed. O queryset vem do selector e permanece lazy até paginar.
 
-O recurso declara `schema_columns`, `schema_filters` e `ordering_fields` e mantém
+O recurso declara `schema_columns`/`schema_filters` como nomes de campos e mantém
 ações específicas (ex.: organizações do contrato). Regras de negócio, transações,
 locks e auditoria continuam nos services. Essa base administrativa exige superadmin
 e não usa contexto organizacional; não deve ser usada em rotas comuns de tenant.
+
+```python
+schema_columns = ('name', 'start_date', 'licenses')
+schema_column_overrides = {'start_date': {'label': _('Início')}}
+schema_filters = ('plan',)
+```
+
+Labels usam `capfirst(model_field.verbose_name)`; o exemplo mantém "Início" como
+sobrescrita, enquanto o padrão seria "Início da vigência". Não gerar colunas/filtros
+para todos os campos: a lista explícita controla a exposição e a ordem.
+`is_active` continua filtro comum. Tipos dos filtros vêm dos campos do model;
+o filtro precisa existir no FilterSet. `ordering_fields` da resposta usa o
+OrderingFilter do FilterSet, sem declaração duplicada na view.
+
+Registrar recursos com `core.routers.SchemaRouter`. Ele relaciona models dos
+serializers aos basenames dos endpoints options, no mesmo router. A base usa
+`reverse` com o namespace atual, sem adivinhar caminhos e sem consultas ao banco.
+Não permite duas rotas options para o mesmo model no mesmo router. Relação sem
+rota registrada exige URL explícita em `schema_filter_overrides`:
+
+```python
+schema_filter_overrides = {'plan': {'label': _('Oferta'), 'options_url': '/other/plans/options/'}}
+```
+
+`schema_column_overrides` e `schema_filter_overrides` são mapas por campo; alteram
+somente os metadados escolhidos. Campos desconhecidos/filtros não publicados/rotas
+ausentes falham como configuração inválida, sem fallback silencioso (ADR 0026).
 
 ## Formatação e lint
 

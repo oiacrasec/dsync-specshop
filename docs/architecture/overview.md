@@ -46,6 +46,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (revisão 5.2: serializers chamam services em create/update, hooks padrão DRF na view; exclusão por mixin, ADR 0023) | concluído |
 | `backend/` (revisão 5.2: BaseModelService extensível no core, exclusão herdada e registro explícito por model; ADR 0024) | concluído |
 | `backend/` (revisão 5.2: serializers declaram service_class, base resolve create/update via save_instance; ADR 0025) | concluído |
+| `backend/` (revisão 5.2: schema por nomes de campos, metadados automáticos/overrides, URLs via SchemaRouter e ordenação via OrderingFilter; ADR 0026) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

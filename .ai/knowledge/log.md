@@ -1,5 +1,23 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: schemas automáticos por campos
+
+- schema_columns/schema_filters agora contêm nomes de campos; TableSchemaMixin usa
+  verbose_name/tipos do model, com schema_column_overrides/schema_filter_overrides
+  por campo. Contract mantém label Início como exemplo; filtro is_active preservado.
+- SchemaRouter relaciona models dos serializers às rotas options por basename;
+  reverse resolve o namespace atual. Sem caminhos adivinhados, sem queries na
+  geração/registro. Override explícito para relações fora do router.
+- ordering_fields usa OrderingFilter do FilterSet; removida duplicação nas views.
+  Campos continuam explícitos; filtros precisam existir no FilterSet. Configuração
+  inválida falha, sem expor todos os campos automaticamente.
+- Validação: 464 testes e checks/lint/formato/migrations OK. Metadados/URLs gerados
+  com zero queries em teste; overrides, labels, tipos e erros de configuração cobertos.
+  OWASP A01–A10 sem achados novos; mesmas permissões/consultas dos dados, sem writes,
+  SQL ou novos custos por item de listagem. Conformidade anterior preservada.
+- Arquivos: core/schema/routers/mixins/tests, contracts/views/urls/tests,
+  backend/AGENTS/README/style, API/overview/plano, ADR 0026 e memória/handoff.
+
 ## 2026-10-04 — Revisão 5.2: service_class nos serializers
 
 - Usuário aprovou declarar a classe do service em cada serializer, sem staticmethod.

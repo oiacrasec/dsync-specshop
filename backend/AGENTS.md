@@ -132,6 +132,11 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Bases usam django-filter: BaseFilterSet/backend em `core/filters.py`, FilterSets
   do domínio em `apps/<app>/filters.py` e `filterset_class` na view (ADR 0022).
   Declarar filtros explicitamente para não consultar managers na importação.
+  Schemas: schema_columns/schema_filters contêm nomes de campos; labels vêm do
+  verbose_name e tipos do model. schema_column_overrides/schema_filter_overrides
+  sobrescrevem apenas os campos desejados. Ordenação vem do OrderingFilter, sem
+  ordering_fields na view. Usar SchemaRouter: options de relações são resolvidos
+  por model/basename registrado e reverse, sem montar URLs por convenção (ADR 0026).
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

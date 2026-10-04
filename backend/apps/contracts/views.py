@@ -16,23 +16,16 @@ class PlanViewSet(BaseAdminModelViewSet):
     filterset_class = PlanFilterSet
     serializer_class = PlanSerializer
     queryset_selector = staticmethod(selectors.admin_plans)
-    schema_columns = (('name', _('Nome')), ('is_active', _('Ativo')))
+    schema_columns = ('name', 'is_active')
 
 
 class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
-    ordering_fields = (*BaseAdminModelViewSet.ordering_fields, 'start_date', 'end_date', 'licenses')
-    schema_columns = (('name', _('Nome')), ('start_date', _('Início')), ('licenses', _('Licenças')))
-    schema_filters = (
-        {
-            'field': 'plan',
-            'label': _('Plano'),
-            'type': 'relation',
-            'options_url': '/api/v1/admin/plans/options/',
-        },
-    )
+    schema_columns = ('name', 'start_date', 'licenses')
+    schema_column_overrides = {'start_date': {'label': _('Início')}}
+    schema_filters = ('plan',)
 
     @action(detail=True, methods=['get'])
     def organizations(self, request, **kwargs):

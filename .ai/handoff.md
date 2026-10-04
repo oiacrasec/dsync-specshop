@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): declare service classes in serializers` (consultar git log -1)
+- **Última alteração:** `refactor(api): generate schema metadata from model fields` (consultar git log -1)
 
 ## Situação
 
@@ -29,6 +29,8 @@
   Serializers declaram service_class; ServiceModelSerializer implementa create/update
   via service_class.save_instance, sem staticmethod nos recursos (ADR 0025);
   view usa serializer.save() padrão (ADR 0023). Regras/locks/auditoria preservados.
+  Schemas: nomes de campos, labels/tipos do model e overrides por campo; options_url
+  via SchemaRouter/reverse; ordenação via OrderingFilter. Sem queries (ADR 0026).
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
 - Licenças: usuário aprovou impedir redução abaixo dos não excluídos, contando
@@ -41,7 +43,7 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 454 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: 464 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).

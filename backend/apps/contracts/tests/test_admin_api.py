@@ -176,6 +176,12 @@ def test_filters_sorting_pagination_and_schema(world):
     assert api.get('/api/v1/admin/contracts/schema/').json()['filters'][1]['options_url'].endswith('/plans/options/')
 
 
+def test_schema_ordering_matches_filterset_and_column_labels(world):
+    data = world['api'].get('/api/v1/admin/contracts/schema/').json()
+    assert data['ordering_fields'] == ['name', 'created_at', 'updated_at', 'start_date', 'end_date', 'licenses']
+    assert data['columns'][1] == {'field': 'start_date', 'label': 'Início'}
+
+
 @pytest.mark.parametrize('value', ['true', '1', 'yes'])
 def test_django_filter_receives_normalized_boolean(world, value):
     Plan.objects.create(name='Desativado', is_active=False)

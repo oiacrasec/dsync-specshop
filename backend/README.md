@@ -27,6 +27,9 @@ explícito no AppConfig.ready e autorização/auditoria próprias (ADR 0024).
 O `core` compõe as views base com mixins e `StandardResultsSetPagination`;
 listagens usam django-filter 26.2, BaseFilterSet no core e FilterSets nos apps.
 apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/django-style.md#views-administrativas-com-services).
+Schemas recebem nomes de campos: labels/tipos vêm do model, URLs de relações do
+SchemaRouter e ordenação do OrderingFilter. Overrides por campo permitem trocar
+labels/URLs sem repetir metadados; geração sem consultas ao banco (ADR 0026).
 Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
 
 | Item | Versão |

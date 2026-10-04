@@ -67,6 +67,11 @@ PlanService/ContractService herdam exclusão comum e definem gravação/autoriza
 auditoria; registro explícito no AppConfig.ready, sem queries na inicialização.
 Cada recurso declara selector/schema; serializer declara service_class (ADR 0025);
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
+Colunas/filtros do schema informam nomes de campos: label vem do verbose_name,
+tipo do model e options_url das rotas options registradas pelo SchemaRouter,
+usando reverse. Overrides por campo preservam labels específicos ("Início").
+ordering_fields vem do OrderingFilter do FilterSet, sem duplicação na view.
+Geração usa metadados, sem queries; lista explícita preserva campos/ordem (ADR 0026).
 As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
 em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/filters.py`,
 com base/backend DRF em `core/filters.py`; selectors fornecem o queryset do domínio.
