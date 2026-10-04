@@ -7,7 +7,7 @@ import { MultiLineChart } from '@/app/pages/examples/dashboards/examples/ui/char
     selector: 'email-data-chart-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, MultiLineChart],
-    template: ` <section-card class="flex flex-col justify-between gap-4">
+    template: ` <app-section-card class="flex flex-col justify-between gap-4">
         <ng-template #title>Email Data Chart</ng-template>
         <ng-template #action>
             <div class="flex items-center gap-2">
@@ -24,7 +24,7 @@ import { MultiLineChart } from '@/app/pages/examples/dashboards/examples/ui/char
         <div class="flex-1 min-h-72">
             <multi-line-chart [datasets]="datasets" [labels]="labels" [bgColors]="bgColors" [borderColors]="borderColors" [option]="'year'" [stepSize]="100000" [dataReduction]="false" tooltipPrefix="" />
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

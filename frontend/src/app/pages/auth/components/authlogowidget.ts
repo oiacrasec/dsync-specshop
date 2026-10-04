@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'auth-logo-widget',
+    selector: 'app-auth-logo-widget',
     standalone: true,
     template: `
         <svg xmlns="http://www.w3.org/2000/svg" width="83" height="90" viewBox="0 0 83 90" fill="none" [class]="className">

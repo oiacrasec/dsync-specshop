@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ContentChild, TemplateRef, AfterContentInit } from '@angular/core';
 
 @Component({
-    selector: 'section-card',
+    selector: 'app-section-card',
     standalone: true,
     imports: [CommonModule],
     template: `

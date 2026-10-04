@@ -23,7 +23,7 @@
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <section-card class="flex flex-col gap-4 border border-emerald-100 bg-emerald-50/70 dark:border-emerald-800/40 dark:bg-emerald-900/20">
+        <app-section-card class="flex flex-col gap-4 border border-emerald-100 bg-emerald-50/70 dark:border-emerald-800/40 dark:bg-emerald-900/20">
             <ng-template #title>Status de servicos</ng-template>
             <div class="flex flex-col gap-3">
                 @for (service of services; track service.name) {
@@ -36,9 +36,9 @@
                 </div>
                 }
             </div>
-        </section-card>
+        </app-section-card>
 
-        <section-card class="flex flex-col gap-4 border border-cyan-100 bg-cyan-50/70 dark:border-cyan-800/40 dark:bg-cyan-900/20">
+        <app-section-card class="flex flex-col gap-4 border border-cyan-100 bg-cyan-50/70 dark:border-cyan-800/40 dark:bg-cyan-900/20">
             <ng-template #title>GeoServer</ng-template>
             <ng-template #description>Indicadores de disponibilidade e estrutura.</ng-template>
             <div class="grid grid-cols-2 gap-4 text-sm rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
@@ -67,9 +67,9 @@
                     }
                 </ul>
             </div>
-        </section-card>
+        </app-section-card>
 
-        <section-card class="flex flex-col gap-4 border border-indigo-100 bg-indigo-50/70 dark:border-indigo-800/40 dark:bg-indigo-900/20">
+        <app-section-card class="flex flex-col gap-4 border border-indigo-100 bg-indigo-50/70 dark:border-indigo-800/40 dark:bg-indigo-900/20">
             <ng-template #title>Fila de sincronizacao</ng-template>
             <ng-template #description>Processos recentes e SLA estimado.</ng-template>
             <div class="flex items-center justify-between rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
@@ -100,11 +100,11 @@
                     }
                 </div>
             </div>
-        </section-card>
+        </app-section-card>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <section-card class="flex flex-col gap-4 border border-amber-100 bg-amber-50/75 dark:border-amber-800/40 dark:bg-amber-900/20">
+        <app-section-card class="flex flex-col gap-4 border border-amber-100 bg-amber-50/75 dark:border-amber-800/40 dark:bg-amber-900/20">
             <ng-template #title>Camadas criticas</ng-template>
             <ng-template #description>Monitoramento de qualidade e uso.</ng-template>
             <div class="flex flex-col gap-3">
@@ -121,9 +121,9 @@
                 </div>
                 }
             </div>
-        </section-card>
+        </app-section-card>
 
-        <section-card class="flex flex-col gap-4 border border-rose-100 bg-rose-50/75 dark:border-rose-800/40 dark:bg-rose-900/20">
+        <app-section-card class="flex flex-col gap-4 border border-rose-100 bg-rose-50/75 dark:border-rose-800/40 dark:bg-rose-900/20">
             <ng-template #title>Alertas</ng-template>
             <ng-template #description>Prioridades para o time.</ng-template>
             <div class="flex flex-col gap-3">
@@ -137,6 +137,6 @@
                 </div>
                 }
             </div>
-        </section-card>
+        </app-section-card>
     </div>
 </div>

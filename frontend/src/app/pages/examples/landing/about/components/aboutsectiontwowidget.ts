@@ -11,7 +11,7 @@ import { LayoutService } from '@/app/layout/service/layout.service';
     imports: [CommonModule, SectionCard, TableModule, GaugeChart],
     template: ` <section class="landing-container max-w-272 relative py-12 lg:py-24 flex flex-col gap-24 lg:gap-48">
         <div class="flex lg:flex-row flex-col gap-16">
-            <section-card class="flex flex-col flex-1">
+            <app-section-card class="flex flex-col flex-1">
                 <ng-template #title> Audience By Gender </ng-template>
                 <div class="flex-1 flex items-center justify-center">
                     <gauge-chart [data]="data()" [labels]="labels()" [bgColors]="bgColors()" title="All Gender" [description]="formattedTotalAudience" />
@@ -27,7 +27,7 @@ import { LayoutService } from '@/app/layout/service/layout.service';
                         </div>
                     }
                 </div>
-            </section-card>
+            </app-section-card>
             <div class="flex-1">
                 <span class="badge">Feature</span>
                 <h2 class="text-4xl lg:text-5xl font-semibold leading-none text-surface-950 dark:text-surface-0 mt-4">Audience Gender Breakdown</h2>
@@ -52,7 +52,7 @@ import { LayoutService } from '@/app/layout/service/layout.service';
                 </ul>
                 <button class="button-primary">Get Started</button>
             </div>
-            <section-card class="flex flex-col flex-1">
+            <app-section-card class="flex flex-col flex-1">
                 <ng-template #title> Global Rank </ng-template>
                 <div class="mt-4 flex-1 flex flex-col">
                     <div class="p-2 rounded-lg bg-surface-0 shadow-v1 bg-white/10 flex items-center justify-between gap-2">
@@ -86,7 +86,7 @@ import { LayoutService } from '@/app/layout/service/layout.service';
                         }
                     </div>
                 </div>
-            </section-card>
+            </app-section-card>
         </div>
     </section>`
 })

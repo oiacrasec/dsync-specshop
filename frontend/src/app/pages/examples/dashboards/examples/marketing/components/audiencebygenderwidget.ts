@@ -7,7 +7,7 @@ import { GaugeChart } from '@/app/pages/examples/dashboards/examples/ui/charts/g
     selector: 'audience-by-gender-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, GaugeChart],
-    template: ` <section-card class="flex flex-col">
+    template: ` <app-section-card class="flex flex-col">
         <ng-template #title> Audience By Gender</ng-template>
         <div class="flex-1 flex items-center justify-center">
             <gauge-chart [data]="data()" [labels]="labels()" [bgColors]="bgColors()" title="All Gender" [description]="totalAudience.toLocaleString('en-US')" />
@@ -21,7 +21,7 @@ import { GaugeChart } from '@/app/pages/examples/dashboards/examples/ui/charts/g
                 </div>
             }
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

@@ -7,7 +7,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
     selector: 'global-rank-widget',
     standalone: true,
     imports: [CommonModule, SectionCard],
-    template: ` <section-card class="flex flex-col">
+    template: ` <app-section-card class="flex flex-col">
         <ng-template #title> Global Rank</ng-template>
         <div class="mt-4 flex-1 flex flex-col">
             <div class="p-2 rounded-lg bg-surface-0 shadow-v1 bg-white/10 flex items-center justify-between gap-2">
@@ -41,7 +41,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
                 }
             </div>
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

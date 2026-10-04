@@ -8,7 +8,7 @@ import { BarChart } from '@/app/pages/examples/dashboards/examples/ui/charts/bar
     selector: 'overview-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, BarChart],
-    template: ` <section-card class="flex-1 flex flex-col">
+    template: ` <app-section-card class="flex-1 flex flex-col">
         <ng-template #title>
             <h4>Overview</h4>
         </ng-template>
@@ -23,7 +23,7 @@ import { BarChart } from '@/app/pages/examples/dashboards/examples/ui/charts/bar
         <div class="card flex-1 mt-6 w-full overflow-auto">
             <bar-chart [label]="'Revenue'" [dataset]="randomData" tooltipPrefix="$" [option]="'month'" class="min-w-[640px] max-h-80 flex-1 h-full w-full cursor-pointer" [stepSize]="10000" />
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

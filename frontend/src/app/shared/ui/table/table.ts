@@ -46,7 +46,7 @@ export interface UiTableListResponse<T> {
     filters?: UiFilterField[];
 }
 
-export interface UiTableDataService<T> {
+export interface UiTableDataService {
     list(query?: Record<string, any>): any;
 }
 
@@ -119,7 +119,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     private cdRef = inject(ChangeDetectorRef);
     private router = inject(Router);
     private tableQueryCache = inject(TableQueryCacheService);
-    @Input() service?: UiTableDataService<T>;
+    @Input() service?: UiTableDataService;
     @Input() value: T[] = [];
     @Input() columns: UiTableColumn[] = [];
     @Input() totalRecords = 0;

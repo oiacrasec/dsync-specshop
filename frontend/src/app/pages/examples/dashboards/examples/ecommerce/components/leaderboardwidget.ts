@@ -9,7 +9,7 @@ import { MenuModule } from 'primeng/menu';
     selector: 'leader-board-widget',
     standalone: true,
     imports: [CommonModule, ButtonModule, MenuModule, AvatarModule, SectionCard],
-    template: ` <section-card class="flex flex-col">
+    template: ` <app-section-card class="flex flex-col">
         <ng-template #title>Leaderboard</ng-template>
         <ng-template #action>
             <div>
@@ -35,7 +35,7 @@ import { MenuModule } from 'primeng/menu';
                 </div>
             }
         </div>
-    </section-card>`
+    </app-section-card>`
 })
 export class LeaderBoardWidget {
     leaderboard = [

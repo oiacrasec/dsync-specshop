@@ -154,29 +154,6 @@ export class AppConfigurator implements OnInit {
 
     menuThemeOptions: { name: string; value: string }[] = [];
 
-    ngOnInit() {
-        if (isPlatformBrowser(this.platformId)) {
-            this.onPresetChange(this.layoutService.layoutConfig().preset);
-        }
-
-        this.updateMenuThemeOptions();
-    }
-
-    updateMenuThemeOptions() {
-        if (this.darkTheme()) {
-            this.menuThemeOptions = [
-                { name: 'Dark', value: 'dark' },
-                { name: 'Primary', value: 'primary' }
-            ];
-        } else {
-            this.menuThemeOptions = [
-                { name: 'Light', value: 'light' },
-                { name: 'Dark', value: 'dark' },
-                { name: 'Primary', value: 'primary' }
-            ];
-        }
-    }
-
     selectedPrimaryColor = computed(() => this.layoutService.layoutConfig().primary);
 
     selectedPreset = computed(() => this.layoutService.layoutConfig().preset);
@@ -201,6 +178,29 @@ export class AppConfigurator implements OnInit {
 
         return palettes;
     });
+
+    ngOnInit() {
+        if (isPlatformBrowser(this.platformId)) {
+            this.onPresetChange(this.layoutService.layoutConfig().preset);
+        }
+
+        this.updateMenuThemeOptions();
+    }
+
+    updateMenuThemeOptions() {
+        if (this.darkTheme()) {
+            this.menuThemeOptions = [
+                { name: 'Dark', value: 'dark' },
+                { name: 'Primary', value: 'primary' }
+            ];
+        } else {
+            this.menuThemeOptions = [
+                { name: 'Light', value: 'light' },
+                { name: 'Dark', value: 'dark' },
+                { name: 'Primary', value: 'primary' }
+            ];
+        }
+    }
 
     getPresetExt() {
         const color: SurfacesType = this.primaryColors().find((c) => c.name === this.selectedPrimaryColor()) || {};

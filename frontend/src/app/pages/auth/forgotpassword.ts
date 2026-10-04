@@ -22,7 +22,7 @@ import { RouterModule } from '@angular/router';
                 >
                     <div class="pt-8 pb-8">
                         <div class="flex items-center justify-center">
-                            <auth-logo-widget />
+                            <app-auth-logo-widget />
                         </div>
                         <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Forgot Password</h1>
                         <p class="text-center lg:text-xl text-surface-500 dark:text-white/64 mt-6 max-w-sm mx-auto">Enter your email to reset your password</p>

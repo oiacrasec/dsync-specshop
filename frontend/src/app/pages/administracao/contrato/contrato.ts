@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
@@ -16,13 +16,28 @@ import { UiTable, UiTableAction } from '@/app/shared/ui/table/table';
     templateUrl: './contrato.html',
     providers: [ConfirmationService]
 })
-export class ContratoPage implements OnInit {
+export class ContratoPage {
     contratoService = inject(ContratoService);
     private router = inject(Router);
     private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     reloadKey = 0;
-    ngOnInit() {}
+
+    tableActions: UiTableAction<Contrato>[] = [
+        {
+            id: 'edit',
+            label: 'Editar',
+            icon: 'pi pi-pencil',
+            handler: (row) => this.edit(row.id)
+        },
+        {
+            id: 'delete',
+            label: 'Excluir',
+            icon: 'pi pi-trash',
+            severity: 'danger',
+            handler: (row) => this.delete(row)
+        }
+    ];
 
     create() {
         this.router.navigateByUrl('/pages/administracao/contrato/novo');
@@ -58,20 +73,4 @@ export class ContratoPage implements OnInit {
             }
         });
     }
-
-    tableActions: UiTableAction<Contrato>[] = [
-        {
-            id: 'edit',
-            label: 'Editar',
-            icon: 'pi pi-pencil',
-            handler: (row) => this.edit(row.id)
-        },
-        {
-            id: 'delete',
-            label: 'Excluir',
-            icon: 'pi pi-trash',
-            severity: 'danger',
-            handler: (row) => this.delete(row)
-        }
-    ];
 }

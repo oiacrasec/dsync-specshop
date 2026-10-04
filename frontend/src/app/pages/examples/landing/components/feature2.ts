@@ -9,7 +9,7 @@ import { Component, computed, inject } from '@angular/core';
     imports: [CommonModule, SectionCard],
     template: `
         <div class="landing-container max-w-296 py-12 lg:py-24 flex lg:flex-row flex-col gap-8 lg:gap-14">
-            <section-card class="flex-1 flex flex-col min-h-80">
+            <app-section-card class="flex-1 flex flex-col min-h-80">
                 <ng-template #title> Visit by Device </ng-template>
                 <div class="flex-1 mt-4 flex flex-col">
                     <div class="p-2 pb-3 rounded-xl bg-white/64 dark:bg-white/10 shadow-custom-shadow">
@@ -54,7 +54,7 @@ import { Component, computed, inject } from '@angular/core';
                         }
                     </div>
                 </div>
-            </section-card>
+            </app-section-card>
             <div class="flex-1">
                 <span class="badge">Feature</span>
                 <h2 class="mt-4 text-4xl lg:text-5xl font-semibold text-surface-950 dark:text-surface-0 max-w-md">User-Friendly Interface Design</h2>

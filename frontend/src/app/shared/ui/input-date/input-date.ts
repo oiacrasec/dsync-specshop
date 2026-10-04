@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Optional, Self } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { DatePickerModule } from 'primeng/datepicker';
 
@@ -84,7 +84,9 @@ export class UiInputDate implements ControlValueAccessor {
     private dateOrder: Array<'d' | 'm' | 'y'> = ['d', 'm', 'y'];
     private maskSeparator = '/';
 
-    constructor(@Optional() @Self() public ngControl: NgControl) {
+    public ngControl = inject(NgControl, { optional: true, self: true });
+
+    constructor() {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }

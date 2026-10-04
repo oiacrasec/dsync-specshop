@@ -8,7 +8,7 @@ import { MiniLineChart } from '@/app/pages/examples/dashboards/examples/ui/chart
     selector: 'stats-widget',
     standalone: true,
     imports: [SectionCard, TagModule, MiniLineChart],
-    template: ` <section-card class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-between p-0">
+    template: ` <app-section-card class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 justify-between p-0">
         @for (item of statsData; track trackByFn()) {
             <div class="sm:flex-1 flex xl:flex-row flex-col items-center gap-6 sm:odd:border-r md:last:border-none md:even:border-r p-6 md:last:mr-0 border-surface-200 dark:border-surface-800">
                 <div class="lg:flex-1 w-full">
@@ -21,7 +21,7 @@ import { MiniLineChart } from '@/app/pages/examples/dashboards/examples/ui/chart
                 <mini-line-chart class="max-h-16! min-w-[60px] h-full lg:flex-1 w-full [&_canvas]:w-full!" [data]="item.data" [bgColor]="item?.bgColor" [borderColor]="item?.borderColor" />
             </div>
         }
-    </section-card>`
+    </app-section-card>`
 })
 export class StatsWidget {
     protected readonly trackByFn = trackByFn;

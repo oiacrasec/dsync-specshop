@@ -10,7 +10,7 @@ import { MultiLineChart } from '@/app/pages/examples/dashboards/examples/ui/char
     selector: 'top-products-widget',
     standalone: true,
     imports: [CommonModule, FormsModule, SelectModule, SectionCard, MultiLineChart],
-    template: ` <section-card class="xl:flex-1 xl:col-span-2 flex flex-col">
+    template: ` <app-section-card class="xl:flex-1 xl:col-span-2 flex flex-col">
         <ng-template #title>Top Products</ng-template>
         <ng-template #action>
             <p-select [(ngModel)]="selectedTopProductChartRange" [options]="topProductChartRanges" optionLabel="name" placeholder="Select a Range" class="w-28" />
@@ -18,7 +18,7 @@ import { MultiLineChart } from '@/app/pages/examples/dashboards/examples/ui/char
         <div class="flex-1 w-full overflow-auto mt-5">
             <multi-line-chart [datasets]="randomData" [labels]="labels" [bgColors]="bgColors" [borderColors]="borderColors" [option]="selectedTopProductChartRange.unit" class="min-w-104 min-h-72" />
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents;'
     }

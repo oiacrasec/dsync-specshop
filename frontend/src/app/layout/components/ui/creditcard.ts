@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'credit-card',
+    selector: 'app-credit-card',
     standalone: true,
     imports: [CommonModule],
     template: ` <svg class="absolute z-0 top-0 right-0 w-full h-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 332 199" fill="none">

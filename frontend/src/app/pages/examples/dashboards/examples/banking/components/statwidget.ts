@@ -6,7 +6,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
     selector: 'stat-widget',
     standalone: true,
     imports: [CommonModule, SectionCard],
-    template: ` <section-card>
+    template: ` <app-section-card>
         <div class="flex flex-wrap gap-6">
             @for (item of salesStats; track item.title) {
                 <div class="flex-1 flex gap-3 min-w-44">
@@ -18,7 +18,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
                 </div>
             }
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

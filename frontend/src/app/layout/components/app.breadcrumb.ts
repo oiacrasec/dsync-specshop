@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
@@ -28,7 +28,9 @@ export class AppBreadcrumb {
         routerLink: '/'
     };
 
-    constructor(private router: Router) {
+    private router = inject(Router);
+
+    constructor() {
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
             this.updateBreadcrumbs();
         });

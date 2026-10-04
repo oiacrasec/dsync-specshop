@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
     selector: 'sales-performance-widget',
     standalone: true,
     imports: [CommonModule, SectionCard],
-    template: ` <section-card class="flex flex-col gap-6">
+    template: ` <app-section-card class="flex flex-col gap-6">
         <ng-template #title>Sales Performance</ng-template>
         <div class="flex-1 flex flex-col">
             <div class="flex flex-wrap items-center justify-between gap-4">
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
                 }
             </div>
         </div>
-    </section-card>`
+    </app-section-card>`
 })
 export class SalesPerformanceWidget {
     salesPerformanceMax = 500;

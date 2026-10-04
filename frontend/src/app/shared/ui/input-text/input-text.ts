@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Optional, Self, ViewChild } from '@angular/core';
+import { Component, inject, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { InputMask, InputMaskModule } from 'primeng/inputmask';
 import { InputTextModule } from 'primeng/inputtext';
@@ -106,7 +106,9 @@ export class UiInputText implements ControlValueAccessor {
     disabled = false;
     @ViewChild('maskRef') maskRef?: InputMask;
 
-    constructor(@Optional() @Self() public ngControl: NgControl) {
+    public ngControl = inject(NgControl, { optional: true, self: true });
+
+    constructor() {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }
@@ -200,7 +202,7 @@ export class UiInputText implements ControlValueAccessor {
             return true;
         }
 
-        const requiredTokens = (this.mask.match(/[9a\*]/g) ?? []).length;
+        const requiredTokens = (this.mask.match(/[9a*]/g) ?? []).length;
 
         if (!requiredTokens) {
             return false;

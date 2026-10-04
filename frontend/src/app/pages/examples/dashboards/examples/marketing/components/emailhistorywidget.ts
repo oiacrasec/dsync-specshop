@@ -14,7 +14,7 @@ import { AvatarModule } from 'primeng/avatar';
     selector: 'email-history-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, IconFieldModule, InputIconModule, ButtonModule, InputTextModule, FormsModule, TableModule, AvatarModule],
-    template: ` <section-card>
+    template: ` <app-section-card>
         <div class="flex flex-wrap gap-2 items-center justify-between mb-6">
             <div>
                 <h4 class="text-lg font-medium text-surface-950 dark:text-surface-0">Email History</h4>
@@ -100,7 +100,7 @@ import { AvatarModule } from 'primeng/avatar';
                 </tr>
             </ng-template>
         </p-table>
-    </section-card>`,
+    </app-section-card>`,
     styles: `
         :host ::ng-deep {
             .p-datatable-tbody > tr.p-datatable-row-selected {

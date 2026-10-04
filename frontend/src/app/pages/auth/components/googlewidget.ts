@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'google-widget',
+    selector: 'app-google-widget',
     standalone: true,
     imports: [],
     template: `

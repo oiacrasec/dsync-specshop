@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, Optional, Self, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 
@@ -73,7 +73,9 @@ export class UiInputPassword implements ControlValueAccessor, AfterViewInit {
     disabled = false;
     private hostElement = inject(ElementRef<HTMLElement>);
 
-    constructor(@Optional() @Self() public ngControl: NgControl) {
+    public ngControl = inject(NgControl, { optional: true, self: true });
+
+    constructor() {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }

@@ -26,7 +26,7 @@ import { RouterModule } from '@angular/router';
                     >
                         <div class="pt-8 pb-8">
                             <div class="flex items-center justify-center">
-                                <auth-logo-widget />
+                                <app-auth-logo-widget />
                             </div>
                             <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Register</h1>
                             <p class="text-center lg:text-xl text-surface-500 mt-6">Enter your details to create a new account.</p>
@@ -36,14 +36,14 @@ import { RouterModule } from '@angular/router';
                                 href=""
                                 class="w-full md:flex-1 px-6 py-3 rounded-full flex items-center justify-center gap-2 font-medium text-surface-700 dark:text-surface-200 border border-surface shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)] hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                             >
-                                <google-widget />
+                                <app-google-widget />
                                 Sign in with Google
                             </a>
                             <a
                                 href=""
                                 class="w-full md:flex-1 px-6 py-3 rounded-full flex items-center justify-center gap-2 font-medium text-surface-700 dark:text-surface-200 border border-surface shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)] hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
                             >
-                                <apple-widget />
+                                <app-apple-widget />
                                 Sign in with Google
                             </a>
                         </div>

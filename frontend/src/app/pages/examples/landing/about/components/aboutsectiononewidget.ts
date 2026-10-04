@@ -17,7 +17,7 @@ import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
             Seamless Banking Experience
         </h2>
         <p class="mt-6 text-lg text-surface-500 dark:text-white/64 max-w-xl mx-auto text-center">Discover a range of features designed to provide secure, efficient, and user-friendly banking services.</p>
-        <section-card class="flex-1 flex flex-col h-100 mt-14">
+        <app-section-card class="flex-1 flex flex-col h-100 mt-14">
             <ng-template #title>
                 <h4>Overview</h4>
             </ng-template>
@@ -32,13 +32,13 @@ import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
             <div class="flex-1 mt-6 w-full overflow-auto">
                 <bar-chart label="'Revenue'" [dataset]="randomData" tooltipPrefix="$" [option]="'month'" className="min-w-[560px] flex-1 h-full w-full cursor-pointer" [stepSize]="10000" />
             </div>
-        </section-card>
+        </app-section-card>
         <div class="flex items-center gap-6 my-6">
             <span class="flex-1 h-px w-full bg-primary-500/15"></span>
-            <auth-logo-widget className="w-10" />
+            <app-auth-logo-widget className="w-10" />
             <span class="flex-1 h-px w-full bg-primary-500/15"></span>
         </div>
-        <section-card class="flex-1 flex flex-col mt-14">
+        <app-section-card class="flex-1 flex flex-col mt-14">
             <ng-template #title>Account History </ng-template>
             <ng-template #description>In this area you can see the flow of account.</ng-template>
             <div class="mt-10 overflow-auto">
@@ -69,7 +69,7 @@ import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
                     </ng-template>
                 </p-table>
             </div>
-        </section-card>
+        </app-section-card>
     </section>`
 })
 export class AboutSectionOneWidget implements OnInit {

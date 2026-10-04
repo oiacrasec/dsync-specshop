@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
     selector: 'last-card-movements-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, ButtonModule],
-    template: ` <section-card class="flex flex-col justify-between gap-4">
+    template: ` <app-section-card class="flex flex-col justify-between gap-4">
         <ng-template #title>Last Card Movements</ng-template>
         <ng-template #action>
             <p-button label="View All" rounded text severity="contrast" class="py-0.5! px-1.5! text-sm!" />
@@ -34,7 +34,7 @@ import { ButtonModule } from 'primeng/button';
                 }
             }
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

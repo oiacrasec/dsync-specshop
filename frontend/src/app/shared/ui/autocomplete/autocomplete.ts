@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Optional, Output, Self, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, OnDestroy, Output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { Observable, Subject, of, timer } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -148,7 +148,9 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
     private onChange: (value: unknown) => void = () => {};
     private onTouched: () => void = () => {};
 
-    constructor(@Optional() @Self() public ngControl: NgControl) {
+    public ngControl = inject(NgControl, { optional: true, self: true });
+
+    constructor() {
         if (this.ngControl) {
             this.ngControl.valueAccessor = this;
         }

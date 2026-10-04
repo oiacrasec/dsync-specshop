@@ -33,7 +33,7 @@ import { AuthSessionService } from '@/app/core/services/auth-session.service';
                     >
                         <div class="pt-8 pb-8">
                             <div class="flex items-center justify-center">
-                                <auth-logo-widget />
+                                <app-auth-logo-widget />
                             </div>
                             <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync GIS</h1>
                         </div>

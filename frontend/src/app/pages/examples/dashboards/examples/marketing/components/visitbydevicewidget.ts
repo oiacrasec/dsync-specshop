@@ -7,7 +7,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
     selector: 'visit-by-device-widget',
     standalone: true,
     imports: [CommonModule, SectionCard],
-    template: ` <section-card>
+    template: ` <app-section-card>
         <ng-template #title> Visit by Device</ng-template>
         <div class="mt-4">
             <div class="p-2 pb-3 rounded-xl bg-white/64 dark:bg-white/10 shadow-v2">
@@ -52,7 +52,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
                 }
             </div>
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         style: 'display: contents'
     }

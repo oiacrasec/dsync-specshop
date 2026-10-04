@@ -21,6 +21,19 @@ const paddingLines = [
 
 export default tseslint.config(
     { ignores: ['dist/**', '.angular/**', 'node_modules/**', 'public/**'] },
+    // DESABILITADO: telas fora do escopo atual (etapa 6.2). Ao reativar uma tela, remova-a
+    // daqui e corrija o lint dela no mesmo commit.
+    {
+        ignores: [
+            'src/app/pages/examples/**/*',
+            '!src/app/pages/examples/dashboards/kpi/**/*',
+            '!src/app/pages/examples/notfound/**/*',
+            '!src/app/pages/examples/oops/**/*',
+            'src/app/pages/geoespacial/**/*',
+            'src/app/pages/administracao/{organizacao,setor,cidade,usuario}/**/*',
+            'src/app/pages/auth/{register,forgotpassword,newpassword,verification,lockscreen}.ts'
+        ]
+    },
     {
         files: ['**/*.ts'],
         extends: [eslint.configs.recommended, ...tseslint.configs.recommended, ...angular.configs.tsRecommended, prettier],

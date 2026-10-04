@@ -32,7 +32,7 @@ interface HeatmapData {
                 </div>
             </div>
             <div class="absolute bottom-0 z-50 w-full h-32 bg-[linear-gradient(0deg,var(--p-primary-100)_0%,rgba(234,239,249,0.00)_42.04%)] dark:bg-[linear-gradient(0deg,#09090B_-12.4%,rgba(9,9,11,0.00)_28.29%)]"></div>
-            <section-card
+            <app-section-card
                 class="flex flex-col gap-6 dark:bg-surface-950 w-[480px] h-100 backdrop-blur-xl absolute z-10 scale-50 md:scale-75 left-1/2 -translate-x-[80%] md:-translate-x-[120%] -bottom-32 rotate-[-14deg] opacity-90 shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)]"
             >
                 <ng-template #title>Sales Performance</ng-template>
@@ -69,8 +69,8 @@ interface HeatmapData {
                         }
                     </div>
                 </div>
-            </section-card>
-            <section-card
+            </app-section-card>
+            <app-section-card
                 class="flex flex-col gap-4 max-w-[500px] absolute z-20 md:scale-100 scale-[0.6] -translate-x-1/2 left-1/2 -bottom-40 lg:-bottom-32 backdrop-blur-xl bg-white dark:bg-surface-950 shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)]"
             >
                 <ng-template #title>Promotion and Campaign Performance</ng-template>
@@ -88,8 +88,8 @@ interface HeatmapData {
                         </div>
                     }
                 </div>
-            </section-card>
-            <section-card
+            </app-section-card>
+            <app-section-card
                 class="flex flex-col justify-between dark:bg-surface-950 gap-4 w-[480px] h-100 backdrop-blur-xl absolute z-10 scale-50 md:scale-75 left-1/2 translate-x-[-15%] md:translate-x-[20%] -bottom-32 rotate-14 opacity-90 shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)]"
             >
                 <ng-template #title>Email Data Chart</ng-template>
@@ -120,7 +120,7 @@ interface HeatmapData {
                         tooltipPrefix=""
                     />
                 </div>
-            </section-card>
+            </app-section-card>
 
             <pattern-widget leftClass="top-40" rightClass="top-40" />
         </section>

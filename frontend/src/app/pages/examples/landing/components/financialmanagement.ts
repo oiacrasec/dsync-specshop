@@ -20,9 +20,9 @@ import { Component } from '@angular/core';
                 </ul>
                 <button class="button-primary mt-8">Get Started</button>
             </div>
-            <section-card class="flex-1 p-4 lg:p-6">
+            <app-section-card class="flex-1 p-4 lg:p-6">
                 <div>
-                    <credit-card name="Robert Jonas" last4digit="3772" [addCard]="true" class="block max-h-64" />
+                    <app-credit-card name="Robert Jonas" last4digit="3772" [addCard]="true" class="block max-h-64" />
                 </div>
                 <div class="border border-surface border-dashed rounded-xl mt-6">
                     <div
@@ -36,7 +36,7 @@ import { Component } from '@angular/core';
                         }
                     </div>
                 </div>
-            </section-card>
+            </app-section-card>
         </div>
     `
 })

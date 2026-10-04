@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'apple-widget',
+    selector: 'app-apple-widget',
     standalone: true,
     imports: [],
     template: `

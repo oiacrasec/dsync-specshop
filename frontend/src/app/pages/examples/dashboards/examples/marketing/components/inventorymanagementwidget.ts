@@ -6,7 +6,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
     selector: 'inventory-management-widget',
     standalone: true,
     imports: [CommonModule, SectionCard],
-    template: ` <section-card class="flex flex-col gap-6 w-full">
+    template: ` <app-section-card class="flex flex-col gap-6 w-full">
         <ng-template #title>Inventory Management</ng-template>
         <div class="flex-1 flex flex-col">
             <div class="flex flex-wrap gap-4 items-center justify-between">
@@ -48,7 +48,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
                 }
             </div>
         </div>
-    </section-card>`,
+    </app-section-card>`,
     host: {
         class: 'flex h-full w-full'
     }

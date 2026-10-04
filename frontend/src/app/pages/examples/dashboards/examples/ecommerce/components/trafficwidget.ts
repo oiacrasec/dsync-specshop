@@ -9,7 +9,7 @@ import { MeterGroupModule } from 'primeng/metergroup';
     selector: 'traffic-widget',
     standalone: true,
     imports: [CommonModule, FormsModule, SectionCard, SelectModule, MeterGroupModule],
-    template: ` <section-card class="xl:col-span-1 flex flex-col">
+    template: ` <app-section-card class="xl:col-span-1 flex flex-col">
         <ng-template #title>Traffic</ng-template>
         <ng-template #action>
             <p-select [(ngModel)]="selectedTrafficMeterRange" [options]="trafficMeterRanges" optionLabel="name" placeholder="Select a Range" class="w-28" />
@@ -33,7 +33,7 @@ import { MeterGroupModule } from 'primeng/metergroup';
                 </div>
             </ng-template>
         </p-meter-group>
-    </section-card>`
+    </app-section-card>`
 })
 export class TrafficWidget {
     selectedTrafficMeterRange = { name: 'Yearly', unit: 'year' };

@@ -7,8 +7,8 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
     selector: 'credit-widget',
     standalone: true,
     imports: [CommonModule, CreditCard, SectionCard],
-    template: ` <section-card class="flex flex-col md:flex-row xl:flex-col gap-10">
-        <credit-card name="Robert Jonas" last4digit="3772" [addCard]="true" class="max-w-96 lg:max-w-none" />
+    template: ` <app-section-card class="flex flex-col md:flex-row xl:flex-col gap-10">
+        <app-credit-card name="Robert Jonas" last4digit="3772" [addCard]="true" class="max-w-96 lg:max-w-none" />
         <div class="flex-1 flex flex-col gap-4">
             @for (item of creditCardData; track item.title) {
                 <div class="inline-flex items-center justify-between gap-6">
@@ -17,7 +17,7 @@ import { SectionCard } from '@/app/layout/components/ui/sectioncard';
                 </div>
             }
         </div>
-    </section-card>`
+    </app-section-card>`
 })
 export class CreditWidget {
     creditCardData = [

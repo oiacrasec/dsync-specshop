@@ -8,7 +8,7 @@ import { TableModule } from 'primeng/table';
     selector: 'account-history-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, ButtonModule, TableModule],
-    template: ` <section-card>
+    template: ` <app-section-card>
         <ng-template #title>Account History</ng-template>
         <ng-template #action>
             <p-button label="View All" rounded text severity="contrast" class="py-0.5! px-1.5! text-sm!" />
@@ -52,7 +52,7 @@ import { TableModule } from 'primeng/table';
                 </ng-template>
             </p-table>
         </div>
-    </section-card>`,
+    </app-section-card>`,
     styles: `
         :host ::ng-deep {
             .p-datatable {

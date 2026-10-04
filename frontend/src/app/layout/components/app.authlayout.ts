@@ -4,7 +4,7 @@ import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '@/app/layout/service/layout.service';
 
 @Component({
-    selector: 'auth-layout',
+    selector: 'app-auth-layout',
     standalone: true,
     imports: [RouterModule, AppConfigurator],
     template: `

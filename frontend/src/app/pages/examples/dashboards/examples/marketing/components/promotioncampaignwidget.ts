@@ -9,7 +9,7 @@ import { HeatMapChart } from '@/app/pages/examples/dashboards/examples/ui/charts
     selector: 'promotion-campaign-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, HeatMapChart],
-    template: ` <section-card class="flex flex-col gap-4">
+    template: ` <app-section-card class="flex flex-col gap-4">
         <ng-template #title>Promotion and Campaign Performance</ng-template>
         <div class="flex-1 pt-0 pb-2 border-y border-surface dark:border-white/10">
             <heat-map-chart [dataset]="randomHeatmapData" [conditions]="heatmapConditions" />
@@ -25,7 +25,7 @@ import { HeatMapChart } from '@/app/pages/examples/dashboards/examples/ui/charts
                 </div>
             }
         </div>
-    </section-card>`
+    </app-section-card>`
 })
 export class PromotionCampaignWidget {
     layoutService = inject(LayoutService);

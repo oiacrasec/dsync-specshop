@@ -9,7 +9,7 @@ import { Menu, MenuModule } from 'primeng/menu';
     selector: 'sellers-widget',
     standalone: true,
     imports: [CommonModule, SectionCard, ButtonModule, MenuModule, AvatarModule],
-    template: ` <section-card class="flex flex-col">
+    template: ` <app-section-card class="flex flex-col">
         <ng-template #title>Seller List</ng-template>
         <ng-template #action>
             <div>
@@ -33,7 +33,7 @@ import { Menu, MenuModule } from 'primeng/menu';
                 </div>
             }
         </div>
-    </section-card>`
+    </app-section-card>`
 })
 export class SellersWidget {
     sellerList = [
