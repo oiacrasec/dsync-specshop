@@ -64,8 +64,9 @@ Views de planos/contratos herdam `BaseAdminModelViewSet`, que centraliza os hook
 de CRUD. Cada recurso declara selector/services e configuração do schema;
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
 As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
-em `core/pagination.py`. Os filtros genéricos são leituras de `core/selectors.py`;
-os selectors de contratos somente fornecem os querysets do domínio.
+em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/filters.py`,
+com base/backend DRF em `core/filters.py`; selectors fornecem o queryset do domínio.
+O backend segue a [integração oficial com DRF](https://django-filter.readthedocs.io/en/stable/guide/rest_framework.html).
 
 Escritas usam services com validação, autoria e AuditEvent na mesma transação.
 Eventos `plan.created/updated/deleted` e `contract.created/updated/deleted` guardam

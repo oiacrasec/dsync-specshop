@@ -162,11 +162,12 @@ limite de 120 caracteres continuam ativos.
 |---|---|
 | `SelectorQuerysetMixin` | leitura pelo selector declarado |
 | `ServiceWriteMixin` | create/update/delete pelo service declarado |
-| `ListFilterMixin` | entrada validada e campos permitidos de filtro/busca/ordenação |
+| `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
 | `TableSchemaMixin` | schema declarado pelo recurso |
 | `TenantScopedViewMixin` | acesso/autoria com escopo nos usos existentes |
 | `StandardResultsSetPagination` | first/rows, limite 100 e resposta data/total_records |
+| `BaseFilterSet` / backend DRF | filtros declarados e entrada validada/normalizada |
 
 `BaseAdminModelViewSet` declara `SuperadminPermission`, compartilhada em
 `core/permissions.py`, sem organização. A base comum preserva as permissões globais
@@ -177,6 +178,7 @@ O recurso declara suas funções explicitamente, sem descoberta automática por 
 
 ```python
 class ContractViewSet(BaseAdminModelViewSet):
+    filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
     save_service = staticmethod(services.save_contract)
@@ -187,6 +189,12 @@ class ContractViewSet(BaseAdminModelViewSet):
 O selector retorna queryset lazy; o service de gravação recebe `values`, `actor` e,
 na atualização, `instance`. O service de exclusão recebe `instance` e `actor`.
 Gravação retorna a instância persistida, que a base associa ao serializer.
+
+FilterSets do domínio ficam em `filters.py`, herdam `core.filters.BaseFilterSet`
+e declaram os filtros/campos de busca/OrderingFilter. Não usar geração automática
+de filtros do model: django-filter acessa o manager durante a importação; nossos
+managers exigem contexto. Declarar BooleanFilter/UUIDFilter etc. explicitamente,
+sem aliviar o fail closed. O queryset vem do selector e permanece lazy até paginar.
 
 O recurso declara `schema_columns`, `schema_filters` e `ordering_fields` e mantém
 ações específicas (ex.: organizações do contrato). Regras de negócio, transações,

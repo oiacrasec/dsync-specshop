@@ -19,6 +19,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view nos recursos comuns ou SuperadminPermission na administração; rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados |
 | Administração | API /admin/plans e /admin/contracts (5.2), SuperadminPermission sem organização; CRUD por services, auditoria, opções/schema e organizações do contrato; redução de licenças bloqueada abaixo dos usuários não excluídos, contando inativos |
 | Views base | BaseModelViewSet/BaseAdminModelViewSet em core/views, composição de SelectorQuerysetMixin/ServiceWriteMixin/ListFilterMixin/LookupOptionsMixin/TableSchemaMixin em core/mixins; pagination e permissions próprios no core; recursos declaram selector/services/schema; regras/locks/auditoria nos services |
+| Filtros | django-filter 26.2 (BSD-3), BaseFilterSet/ValidatedDjangoFilterBackend em core/filters e FilterSets explícitos em contracts/filters; filterset_class na view; sem geração automática na importação por causa de managers fail closed; filter_listing removido |
 | Idioma | código em inglês; rótulos/mensagens em português |
 
 Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).

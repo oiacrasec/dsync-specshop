@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from apps.rbac.permissions import LookupOptionsPermission, RequiredPermission
 
 from .models import HybridScopedModel
-from .selectors import filter_listing, lookup_options
-from .serializers import ListQuerySerializer, OptionsQuerySerializer
+from .selectors import lookup_options
+from .serializers import OptionsQuerySerializer
 from .utils import context_values
 
 
@@ -35,24 +35,12 @@ class ServiceWriteMixin:
 
 
 class ListFilterMixin:
-    list_query_serializer_class = ListQuerySerializer
-    search_fields = ('name',)
     ordering_fields = ('name', 'created_at', 'updated_at')
-    filter_fields = {'is_active': 'is_active'}
 
     def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
         if self.action != 'list':
             return queryset
-        query = self.list_query_serializer_class(data=self.request.query_params)
-        query.is_valid(raise_exception=True)
-        return filter_listing(
-            queryset,
-            search_fields=self.search_fields,
-            ordering_fields=self.ordering_fields,
-            filter_fields=self.filter_fields,
-            **query.validated_data,
-        )
+        return super().filter_queryset(queryset)
 
 
 class TableSchemaMixin:

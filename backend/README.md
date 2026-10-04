@@ -21,6 +21,7 @@ redução de licenças protegida por lock; quotas continuam sem enforcement.
 As views herdam `BaseAdminModelViewSet` e declaram selector/services; a base executa
 os hooks de CRUD, mantendo regras, locks e auditoria nos services.
 O `core` compõe as views base com mixins e `StandardResultsSetPagination`;
+listagens usam django-filter 26.2, BaseFilterSet no core e FilterSets nos apps.
 apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/django-style.md#views-administrativas-com-services).
 Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
 

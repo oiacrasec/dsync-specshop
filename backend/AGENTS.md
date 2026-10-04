@@ -26,9 +26,12 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 | `views.py` | camada HTTP, sempre fina |
 | `urls.py` | rotas do app |
 | `permissions.py` | autorização |
+| `filters.py` | FilterSets django-filter com filtros/busca/ordenação declarados |
 | `tests/` | testes do app (`test_*.py`) |
 
 Leitura: `View → Selector → Model`. Escrita: `Serializer → View → Service → Model`.
+Nas listagens, o selector fornece o queryset com escopo; FilterSet aplica filtros
+antes da paginação. Filtros continuam lazy, sem queries/escritas próprias por item.
 Crie cada arquivo só quando ele for necessário.
 
 ## Estilo dos models
@@ -120,6 +123,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   de schema/filtros. Não repetir delegação nem inferir nomes de funções.
   Bases compartilhadas em `core/views.py`, mixins em `core/mixins.py`, paginação
   em `core/pagination.py` e permissão administrativa em `core/permissions.py`.
+  Bases usam django-filter: BaseFilterSet/backend em `core/filters.py`, FilterSets
+  do domínio em `apps/<app>/filters.py` e `filterset_class` na view (ADR 0022).
+  Declarar filtros explicitamente para não consultar managers na importação.
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

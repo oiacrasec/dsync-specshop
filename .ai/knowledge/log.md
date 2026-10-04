@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: django-filter como Spatial
+
+- Usuário pediu django-filter. 26.2 verificado no PyPI oficial (Django 5.2/Python
+  3.14, BSD-3), instalado em requirements/base e INSTALLED_APPS. pip check OK.
+- BaseFilterSet/ValidatedDjangoFilterBackend em core/filters; FilterSets de planos,
+  contratos e organizações em contracts/filters. View declara filterset_class;
+  biblioteca aplica filtros/ordering lazy, entrada comum normalizada no backend.
+- Geração automática de filtros acessa manager na importação e falha sem tenant:
+  filtros explícitos, sem contornar o contexto. UUIDFilter para plano sem query de FK.
+- Removidos filter_listing/AdminListQuerySerializer. Detalhes/options preservados,
+  search/ordering/booleanos/UUIDs, offset exato, 422, limites e schema mantidos.
+  Sem migrations, writes em leitura ou novas regras; ADR 0022/docs/memória atualizados.
+- 446 testes, lint/formato/migrations/checks dev/produção passaram. OWASP A01–A10
+  sem achados novos: listas permitidas, querysets preservados, ORM parametrizado,
+  dependência/licença verificada e erros RFC 9457. Queries 1/30 itens constantes,
+  duas consultas de dados e zero escritas; sem novo benchmark de capacidade.
+
 ## 2026-10-04 — Assinatura compacta de filter_listing
 
 - Usuário pediu a declaração em uma linha: assinatura com 118 caracteres.

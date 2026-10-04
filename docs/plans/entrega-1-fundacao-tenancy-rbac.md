@@ -34,6 +34,7 @@ e só começa após aprovação do usuário.
 | 22 | Premissa permanente do usuário: performance forte em todo o projeto, não só AccessLog; avaliar frequência, queries, escritas, locks, CPU, memória, tráfego e concorrência, com medição conforme o risco antes de entregar |
 | 23 | 5.2: usuário aprovou impedir redução de licenças abaixo dos usuários não excluídos, contando inativos; usar lock do contrato compartilhado com cadastro de usuários (ADR 0020) |
 | 24 | Revisão 5.2: usuário pediu composição como Spatial, com bases em core/views, mixins/pagination/permissions compartilhados e recursos declarados nos apps (ADR 0021); preservar cabeçalho compacto/alinhado ajustado manualmente |
+| 25 | Usuário determinou usar django-filter como Spatial: BaseFilterSet/backend DRF no core e filterset_class/FilterSets explícitos nos apps, preservando contrato/escopo (ADR 0022) |
 
 ## Bloco 0 — Fundação
 

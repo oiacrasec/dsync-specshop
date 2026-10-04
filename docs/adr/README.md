@@ -38,6 +38,7 @@ um ADR novo que **substitui** o anterior.
 | [0019](0019-registros-de-autenticacao.md) | Registros de acesso concentrados na autenticação | Aceito (substitui parcialmente 0018) |
 | [0020](0020-administracao-de-planos-e-contratos.md) | Administração de planos/contratos e redução segura de licenças | Aceito |
 | [0021](0021-views-base-compostas-no-core.md) | Views base compostas, mixins e paginação no core | Aceito |
+| [0022](0022-django-filter-nas-listagens.md) | django-filter com FilterSets declarados nas listagens | Aceito |
 
 ## Modelo
 

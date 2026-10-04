@@ -2,26 +2,27 @@
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 
-from apps.core.selectors import filter_listing
+from apps.core.serializers import ListQuerySerializer
 from apps.core.views import BaseAdminModelViewSet
 
 from . import selectors, services
-from .serializers import AdminListQuerySerializer, ContractSerializer, OrganizationSummarySerializer, PlanSerializer
+from .filters import ContractFilterSet, OrganizationFilterSet, PlanFilterSet
+from .serializers import ContractSerializer, OrganizationSummarySerializer, PlanSerializer
 
 
 class PlanViewSet(BaseAdminModelViewSet):
+    filterset_class = PlanFilterSet
     serializer_class = PlanSerializer
     queryset_selector = staticmethod(selectors.admin_plans)
     save_service = staticmethod(services.save_plan)
     delete_service = staticmethod(services.delete_plan)
     schema_columns = (('name', _('Nome')), ('is_active', _('Ativo')))
-    list_query_serializer_class = AdminListQuerySerializer
 
 
 class ContractViewSet(BaseAdminModelViewSet):
-    list_query_serializer_class = AdminListQuerySerializer
-    filter_fields = {'is_active': 'is_active', 'plan': 'plan__public_id'}
+    filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
     save_service = staticmethod(services.save_contract)
@@ -40,14 +41,14 @@ class ContractViewSet(BaseAdminModelViewSet):
     @action(detail=True, methods=['get'])
     def organizations(self, request, **kwargs):
         contract = self.get_object()
-        query = AdminListQuerySerializer(data=request.query_params)
+        query = ListQuerySerializer(data=request.query_params)
         query.is_valid(raise_exception=True)
-        records = filter_listing(
-            selectors.superadmin_contract_organizations(contract),
-            ordering_fields=('name',),
-            search_fields=('name',),
-            filter_fields={'is_active': 'is_active'},
-            **query.validated_data,
+        filters = OrganizationFilterSet(
+            data={**request.query_params.dict(), **query.validated_data},
+            queryset=selectors.superadmin_contract_organizations(contract),
+            request=request,
         )
-        page = self.paginate_queryset(records)
+        if not filters.is_valid():
+            raise ValidationError(filters.errors)
+        page = self.paginate_queryset(filters.qs)
         return self.get_paginated_response(OrganizationSummarySerializer(page, many=True).data)

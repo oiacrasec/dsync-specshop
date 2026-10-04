@@ -174,6 +174,25 @@ def test_filters_sorting_pagination_and_schema(world):
     assert api.get('/api/v1/admin/contracts/schema/').json()['filters'][1]['options_url'].endswith('/plans/options/')
 
 
+@pytest.mark.parametrize('value', ['true', '1', 'yes'])
+def test_django_filter_receives_normalized_boolean(world, value):
+    Plan.objects.create(name='Desativado', is_active=False)
+    response = world['api'].get('/api/v1/admin/plans/', {'is_active': value})
+    assert response.status_code == 200
+    assert [item['name'] for item in response.json()['data']] == ['Plano']
+
+
+def test_django_filter_validates_uuid_and_combines_declared_filters(world):
+    other = Plan.objects.create(name='Outro')
+    Contract.objects.create(name='Outro cliente', plan=other, start_date=date(2020, 1, 1), licenses=5)
+    url = '/api/v1/admin/contracts/'
+    response = world['api'].get(url, {'plan': str(world['plan'].public_id), 'search': 'Cliente'})
+    assert response.status_code == 200 and response.json()['total_records'] == 1
+    assert response.json()['data'][0]['public_id'] == str(world['contract'].public_id)
+    assert world['api'].get(url, {'plan': 'invalid'}).status_code == 422
+    assert world['api'].get(url, {'is_active': 'invalid'}).status_code == 422
+
+
 def test_offset_does_not_round_to_a_page_boundary(world):
     Plan.objects.bulk_create([Plan(name=f'Page {letter}') for letter in ('A', 'B', 'C', 'D')])
     response = world['api'].get('/api/v1/admin/plans/', {'search': 'Page', 'first': 1, 'rows': 2})

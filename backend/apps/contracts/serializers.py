@@ -1,12 +1,6 @@
-from rest_framework import serializers
-
-from apps.core.serializers import ListQuerySerializer, ScopedModelSerializer
+from apps.core.serializers import ScopedModelSerializer
 
 from .models import Contract, Organization, Plan
-
-
-class AdminListQuerySerializer(ListQuerySerializer):
-    plan = serializers.UUIDField(required=False)
 
 
 class PlanSerializer(ScopedModelSerializer):

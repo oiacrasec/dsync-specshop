@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): compact listing filter signature` (este handoff entra no commit; consultar git log -1)
+- **Última alteração:** `refactor(api): adopt django-filter for resource lists` (este handoff entra no commit; consultar git log -1)
 
 ## Situação
 
@@ -21,6 +21,8 @@
   Listas limitadas/search/ordering/filtros, options/schema; organizations por contrato
   (organizações ativas, não excluídas), previsto na 3.5. UUIDs na API; erros RFC 9457.
 - Camadas em apps/contracts: selectors/services/serializers/permissions/views/urls.
+  django-filter 26.2: BaseFilterSet/backend em core/filters, FilterSets nos apps,
+  filterset_class nas views. Filtros explícitos para não acessar managers na importação.
   Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
   recursos declaram selector/save/delete como staticmethod e schema_filters.
   LookupOptionsMixin aceita options_permission_class; só administração usa
@@ -35,11 +37,11 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 442 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: 446 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).
-  filter_listing em uma linha (118 caracteres); ajuste validado com 35 testes da API.
+  ADR 0022: django-filter substitui filter_listing; pip check/licença BSD-3 verificados.
 
 ## Falta / dúvidas
 

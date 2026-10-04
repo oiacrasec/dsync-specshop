@@ -3,6 +3,7 @@
 from django.db import transaction
 from rest_framework import viewsets
 
+from .filters import ValidatedDjangoFilterBackend
 from .mixins import (
     ListFilterMixin,
     LookupOptionsMixin,
@@ -27,6 +28,7 @@ class BaseModelViewSet(SelectorQuerysetMixin, ServiceWriteMixin, ListFilterMixin
     lookup_field = 'public_id'
     lookup_value_converter = 'uuid'
     pagination_class = StandardResultsSetPagination
+    filter_backends = [ValidatedDjangoFilterBackend]
 
 
 class BaseAdminModelViewSet(BaseModelViewSet):
