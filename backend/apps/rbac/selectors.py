@@ -73,3 +73,30 @@ def user_grants(user):
             )
         )
     return grants
+
+
+ESSENTIAL_PROFILE_KEY = 'contract_admin'
+
+
+def active_admin_count(contract_id, *, exclude_assignment_id=None, exclude_user_id=None):
+    """Administradores ativos do contrato: atribuição essencial ativa de usuário ativo e não excluído."""
+    admins = Assignment.objects.filter(
+        contract_id=contract_id,
+        is_active=True,
+        profile__system_key=ESSENTIAL_PROFILE_KEY,
+        profile__is_active=True,
+        profile__deleted_at__isnull=True,
+        user__is_active=True,
+        user__deleted_at__isnull=True,
+    )
+    if exclude_assignment_id is not None:
+        admins = admins.exclude(pk=exclude_assignment_id)
+    if exclude_user_id is not None:
+        admins = admins.exclude(user_id=exclude_user_id)
+    return admins.count()
+
+
+def user_is_active_admin(user):
+    return user.contract_id is not None and active_admin_count(user.contract_id) != active_admin_count(
+        user.contract_id, exclude_user_id=user.pk
+    )

@@ -100,13 +100,29 @@ requisição e superadmin com organização opcional ficam na etapa 2.3.
 system_key='contract_admin' identifica o Administrador do contrato. Só pode existir
 em perfil do sistema, com chave única reservada mesmo após exclusão lógica.
 Services não criam, editam nem excluem esse perfil ou suas permissões.
-Pode receber atribuição CONTRACT, sem exceções. Edição e remoção dessas atribuições
-ficam bloqueadas até a proteção específica da etapa 3.4; não é a implementação
-final da regra de último administrador.
+Pode receber atribuição CONTRACT, sem exceções.
 
-A migration cria somente as quatro tabelas, constraints e índices; não cria
-perfil essencial ou contas. O acesso total dinâmico do perfil essencial já vale no
-cálculo (3.3); fixture e proteção do último administrador entram em 3.4;
+A migration rbac.0001 cria as tabelas; a rbac.0002 (dados, idempotente) cria o perfil
+essencial "Administrador do contrato" e o restaura se estiver excluído ou inativo.
+Não concede acesso a ninguém: o superadmin atribui o perfil.
+
+### Último administrador (etapa 3.4)
+
+Administrador ativo = atribuição essencial ativa, perfil ativo e usuário ativo e não
+excluído. Depois que o contrato tem o primeiro, nenhuma operação pode zerar a contagem;
+a regra vale também para o superadmin → 409 `last-contract-admin`.
+
+| Operação | Service |
+|---|---|
+| Remover, desativar ou trocar o perfil da atribuição essencial | `save_assignment` / `delete_assignment` |
+| Desativar o usuário | `save_user` |
+| Excluir o usuário (soft delete) | `delete_user` (nunca `user.delete()`) |
+
+Concorrência: a checagem bloqueia a linha do contrato (`select_for_update`), na ordem
+usuário → contrato; teste com duas threads prova que sobra um administrador.
+Contrato ainda sem administrador continua permitido até o primeiro ser nomeado.
+
+O acesso total dinâmico do perfil essencial vale no cálculo (3.3);
 organizações acessíveis em 3.5;
 auditoria de eventos em 3.6. Autoria nos models não substitui essa trilha.
 O restante do contexto e o isolamento automático de queries continuam nas etapas 2.3–2.5.

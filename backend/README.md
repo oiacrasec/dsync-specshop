@@ -141,7 +141,8 @@ Transferência de usuário exige remover suas atribuições primeiro.
 Migration inicial aplicada localmente, sem seeds. Ver [domínio RBAC](../docs/domain/rbac.md).
 Autorização da API (3.3): toda view nega por padrão e declara `required_permission`
 (ou `AllowAuthenticated`); a permissão efetiva é calculada para a organização do header
-`X-Organization-Id`. Fixture e proteção do último Administrador do contrato em 3.4;
+`X-Organization-Id`. Etapa 3.4: migration rbac.0002 cria o perfil essencial; o contrato
+nunca fica sem Administrador ativo (409). Excluir usuário via `delete_user`;
 auditoria de eventos em 3.6. Ainda não há endpoints de gestão.
 
 ## Configuração do PyCharm

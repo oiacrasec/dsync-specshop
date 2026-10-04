@@ -4,11 +4,17 @@ from django.db import connection, transaction
 from django.utils.translation import gettext_lazy as _
 
 from apps.contracts.models import Contract, Organization
-from apps.core.exceptions import ProfileInUse
+from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
 
 from .models import Assignment, AssignmentExclusion, Profile, ProfilePermission
-from .selectors import conflicting_profile_names, duplicate_client_contracts, profile_is_assigned
+from .selectors import (
+    ESSENTIAL_PROFILE_KEY,
+    active_admin_count,
+    conflicting_profile_names,
+    duplicate_client_contracts,
+    profile_is_assigned,
+)
 
 
 def _begin_write(actor):
@@ -18,6 +24,28 @@ def _begin_write(actor):
     # Lock de transação liberado em commit/rollback; SQL fixo e parâmetro fixo.
     with connection.cursor() as cursor:
         cursor.execute('SELECT pg_advisory_xact_lock(%s)', [0x44534352424143])
+
+
+def ensure_contract_keeps_admin(contract_id, *, exclude_assignment_id=None, exclude_user_id=None, adding=0):
+    """ADR 0009 §5: o contrato nunca fica sem administrador, nem por ação do superadmin.
+
+    Bloqueia a linha do contrato para serializar com save_user/delete_user (mesma
+    ordem de locks: usuário → contrato). `adding` conta o estado novo que continua admin.
+    """
+    Contract.objects.select_for_update().filter(pk=contract_id).first()
+    remaining = active_admin_count(
+        contract_id, exclude_assignment_id=exclude_assignment_id, exclude_user_id=exclude_user_id
+    )
+    if remaining + adding < 1:
+        raise LastContractAdmin()
+
+
+def _is_active_admin_grant(assignment):
+    if not assignment.is_active or assignment.profile_id is None:
+        return False
+    return active_admin_count(assignment.contract_id) != active_admin_count(
+        assignment.contract_id, exclude_assignment_id=assignment.pk
+    )
 
 
 def _invalid(field, message):
@@ -147,8 +175,6 @@ def save_assignment(*, assignment, actor):
     _contract(assignment.contract_id)
     if not assignment._state.adding:
         current = Assignment.objects.get(pk=assignment.pk)
-        if current.profile_id is not None and _profile(current.profile_id).system_key:
-            raise PermissionDenied(_('A edição de administradores exige a proteção específica do domínio.'))
         if current.contract_id != assignment.contract_id:
             _invalid('contract', 'O contrato de uma atribuição existente não pode ser alterado.')
     assignment.full_clean()
@@ -167,6 +193,11 @@ def save_assignment(*, assignment, actor):
     if not assignment._state.adding and AssignmentExclusion.objects.filter(assignment=assignment).exists():
         if assignment.scope != PermissionScope.CONTRACT or (profile is not None and profile.system_key):
             _invalid('scope', 'Remova as exceções antes de alterar o escopo ou atribuir o perfil essencial.')
+    if not assignment._state.adding and _is_active_admin_grant(current):
+        stays_admin = assignment.is_active and profile is not None and profile.system_key == ESSENTIAL_PROFILE_KEY
+        ensure_contract_keeps_admin(
+            assignment.contract_id, exclude_assignment_id=current.pk, adding=int(stays_admin and user.is_active)
+        )
     assignment.save(actor=actor)
     return assignment
 
@@ -175,8 +206,8 @@ def save_assignment(*, assignment, actor):
 def delete_assignment(*, assignment, actor):
     _begin_write(actor)
     current = Assignment.objects.get(pk=assignment.pk)
-    if current.profile_id is not None and _profile(current.profile_id).system_key:
-        raise PermissionDenied(_('A remoção de administradores exige a proteção específica do domínio.'))
+    if _is_active_admin_grant(current):
+        ensure_contract_keeps_admin(current.contract_id, exclude_assignment_id=current.pk)
     current.delete(actor=actor)
     AssignmentExclusion.objects.filter(assignment=current).delete(actor=actor)
     return current

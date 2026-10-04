@@ -101,8 +101,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Gestão de acesso em `apps/rbac` (ADR 0016): Profile, ProfilePermission, Assignment
   e AssignmentExclusion. Escritas usam services, atomic, lock de configuração e
   validações de contexto/registry; acesso direto ao ORM não substitui essas regras.
-  Atualmente somente superadmin ativo pode escrever. Perfil essencial não é editável; sua fixture e
-  proteção do último administrador entram em 3.4. Ver
+  Atualmente somente superadmin ativo pode escrever. Perfil essencial (`contract_admin`) é
+  criado pela migration rbac.0002 e não é editável. O contrato nunca fica sem administrador
+  ativo (`LastContractAdmin`, 409), nem por ação do superadmin: excluir usuário só via
+  `apps.users.services.delete_user`, nunca `user.delete()`. Ver
   [domínio RBAC](../docs/domain/rbac.md). Transferir User de contrato exige remover
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view

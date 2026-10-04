@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.contracts.models import Contract, Organization
 from apps.core.checks import check_model_scopes
-from apps.core.exceptions import ProfileInUse
+from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PermissionDefinition, PermissionRegistry, PermissionScope
 from apps.rbac import services
 from apps.rbac.models import Assignment, AssignmentExclusion, Profile, ProfilePermission
@@ -104,8 +104,8 @@ def test_client_profile_cannot_move_between_contracts(profile, other_contract, a
 
 
 @pytest.mark.parametrize('operation', ['create', 'edit', 'delete', 'permission'])
-def test_essential_profile_is_protected_outside_fixture(operation, admin):
-    essential = Profile.objects.create(name='Administrador do contrato', system_key='contract_admin')
+def test_essential_profile_is_protected_outside_fixture(operation, admin, essential_profile):
+    essential = essential_profile
     with pytest.raises(PermissionDenied):
         if operation == 'create':
             services.save_profile(profile=Profile(name='Essential', system_key='contract_admin'), actor=admin)
@@ -246,8 +246,8 @@ def test_exclusion_has_same_contract_and_requires_contract_scope(common, profile
         )
 
 
-def test_essential_assignment_requires_contract_without_exclusions(common, organization, admin):
-    essential = Profile.objects.create(name='Administrador do contrato', system_key='contract_admin')
+def test_essential_assignment_requires_contract_without_exclusions(common, organization, admin, essential_profile):
+    essential = essential_profile
     assignment = services.save_assignment(assignment=grant(common, essential), actor=admin)
     with pytest.raises(ValidationError):
         services.save_exclusion(
@@ -260,7 +260,7 @@ def test_essential_assignment_requires_contract_without_exclusions(common, organ
         services.save_assignment(
             assignment=grant(common, essential, scope='ORGANIZATION', scope_organization=organization), actor=admin
         )
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(LastContractAdmin):  # Etapa 3.4: proteção do último administrador.
         services.delete_assignment(assignment=assignment, actor=admin)
 
 
@@ -355,19 +355,23 @@ def test_assignment_validation_queries_are_constant_with_many_profile_permission
         services.save_assignment(assignment=grant(common, profile), actor=admin)
 
 
-@pytest.mark.parametrize('change', ['profile', 'inactive', 'user'])
-def test_existing_essential_assignment_cannot_be_removed_by_edit(change, common, profile, admin):
-    essential = Profile.objects.create(name='Administrador do contrato', system_key='contract_admin')
-    assignment = services.save_assignment(assignment=grant(common, essential), actor=admin)
+@pytest.mark.parametrize('change', ['profile', 'inactive'])
+def test_last_admin_cannot_be_removed_by_edit(change, common, profile, admin, essential_profile):
+    assignment = services.save_assignment(assignment=grant(common, essential_profile), actor=admin)
     if change == 'profile':
         assignment.profile = profile
-    elif change == 'inactive':
-        assignment.is_active = False
     else:
-        assignment.user = get_user_model().objects.create_user(username='replacement', contract=common.contract)
-    with pytest.raises(PermissionDenied):
+        assignment.is_active = False
+    with pytest.raises(LastContractAdmin):
         services.save_assignment(assignment=assignment, actor=admin)
     assignment.refresh_from_db()
-    assert assignment.profile_id == essential.pk
-    assert assignment.user_id == common.pk
+    assert assignment.profile_id == essential_profile.pk
     assert assignment.is_active
+
+
+def test_admin_assignment_can_move_to_another_user(common, admin, essential_profile):
+    assignment = services.save_assignment(assignment=grant(common, essential_profile), actor=admin)
+    assignment.user = get_user_model().objects.create_user(username='replacement', contract=common.contract)
+    services.save_assignment(assignment=assignment, actor=admin)
+    assignment.refresh_from_db()
+    assert assignment.user.username == 'replacement'

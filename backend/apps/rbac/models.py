@@ -10,7 +10,7 @@ class Profile(HybridScopedModel):
     """Perfil vinculado: Leitor do sistema ou Operador de um cliente.
 
     Contract nulo indica perfil do sistema. O perfil essencial Administrador do
-    contrato usa system_key='contract_admin' e será criado por fixture na etapa 3.4.
+    contrato usa system_key='contract_admin' e é criado pela migration rbac.0002.
     """
 
     name = models.CharField(_('nome'), max_length=255)

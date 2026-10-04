@@ -59,7 +59,42 @@ def save_user(*, user, actor=None, using=None):
                 )
                 if occupied >= contract.licenses:
                     raise LicenseLimitReached()
+            if current is not None and _leaves_contract_admin(current, user):
+                from apps.rbac.services import ensure_contract_keeps_admin
+
+                ensure_contract_keeps_admin(current.contract_id, exclude_user_id=user.pk)
         user.save(using=database, actor=actor)
+    return user
+
+
+def _leaves_contract_admin(current, user):
+    """Desativar ou excluir um usuário que hoje é administrador ativo do contrato."""
+    if not current.is_active or current.deleted_at is not None:
+        return False
+    if user.is_active and user.deleted_at is None:
+        return False
+    from apps.rbac.selectors import user_is_active_admin
+
+    return user_is_active_admin(current)
+
+
+def delete_user(*, user, actor=None, using=None):
+    """Exclusão lógica de usuário; nunca deixa o contrato sem administrador (ADR 0009 §5).
+
+    Use este service em vez de user.delete(): o model não conhece a regra do RBAC.
+    """
+    database = using or router.db_for_write(type(user), instance=user)
+    with transaction.atomic(using=database):
+        current = type(user).all_objects.using(database).select_for_update().get(pk=user.pk)
+        if not current.is_superuser and current.is_active and current.deleted_at is None:
+            from apps.rbac.selectors import user_is_active_admin
+
+            if user_is_active_admin(current):
+                from apps.rbac.services import ensure_contract_keeps_admin
+
+                ensure_contract_keeps_admin(current.contract_id, exclude_user_id=current.pk)
+        current.delete(using=database, actor=actor)
+    user.refresh_from_db(using=database)
     return user
 
 

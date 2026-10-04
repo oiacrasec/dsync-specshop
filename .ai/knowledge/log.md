@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 3.4: perfil essencial e último administrador
+
+- Migration de dados rbac.0002 (idempotente) cria/restaura o perfil `contract_admin`;
+  aplicada ao banco local.
+- `ensure_contract_keeps_admin` (lock do contrato) protege atribuições, desativação
+  em `save_user` e o novo `delete_user`; vale para o superadmin (`LastContractAdmin` 409).
+- Teste de concorrência com threads; 263 testes e validador completo passaram.
+- Arquivos: apps/rbac (migration, selectors, services, testes), apps/users/services,
+  conftest, backend/AGENTS.md, README, docs/domain/rbac.md, overview, plano, handoff.
+
 ## 2026-10-03 — Etapa 3.2: perfis e atribuições RBAC
 
 - Usuário aprovou apps/rbac (ADR 0016), separado de users/core. App gerado por

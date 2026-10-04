@@ -216,9 +216,8 @@ def test_inactive_assignment_or_profile_grants_nothing(admin, maria, orgs, user_
     assert problem(call(maria, '/declared/', orgs['obras'])) == 'context-forbidden'
 
 
-def test_essential_profile_has_every_code(admin, maria, orgs):
-    essential = Profile.objects.create(name='Administrador do contrato', system_key='contract_admin')
-    assign(admin, maria, profile=essential)
+def test_essential_profile_has_every_code(admin, maria, orgs, essential_profile):
+    assign(admin, maria, profile=essential_profile)
     assert call(maria, '/method/', orgs['obras'], method='post').status_code == 200
 
 

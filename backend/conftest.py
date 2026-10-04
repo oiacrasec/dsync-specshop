@@ -14,3 +14,11 @@ def user_contract(db):
         start_date=date(2020, 1, 1),
         licenses=100,
     )
+
+
+@pytest.fixture
+def essential_profile(db):
+    """Perfil essencial criado pela migration rbac.0002 (não criar outro: a chave é única)."""
+    from apps.rbac.models import Profile
+
+    return Profile.objects.get(system_key='contract_admin', contract__isnull=True)
