@@ -5,7 +5,7 @@
 - **Title:** Limite de licenças atingido
 - **Detail padrão:** O contrato não possui licenças disponíveis para cadastrar outro usuário.
 - **Quando:** Cadastro, transferência ou restauração de usuário sem licença disponível no contrato.
-- **Origem:** LicenseLimitReached (em `apps/core/exceptions.py` ou no framework).
+- **Origem:** LicenseLimitReached (classes em `apps/core/exceptions.py` ou do framework; resposta em `apps/core/problems.py`).
 
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.

@@ -45,7 +45,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - `AUTH_USER_MODEL = 'users.User'`: sempre use `get_user_model()` ou `settings.AUTH_USER_MODEL`.
 - API segura por padrão: `IsAuthenticated` global; libere rotas públicas explicitamente na view.
 - Rotas da API em `config/api/v1.py`, sob `/api/v1/`. Erros via exceções e handler
-  global RFC 9457 (`apps.core.exceptions`), nunca corpo de erro manual na view.
+  global RFC 9457 (classes em `apps.core.exceptions`, respostas e handler em
+  `apps.core.problems`), nunca corpo de erro manual na view.
 - Usar `serializer.is_valid(raise_exception=True)`; validação retorna 422. Mensagens
   de validação não devem incluir dados pessoais ou detalhes internos.
 - `RequestIdMiddleware` vem antes dos demais middlewares; `X-Request-Id` é gerado

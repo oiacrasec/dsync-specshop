@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.contracts.models import Contract
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
-from apps.core.models import SoftDeleteQuerySet
+from apps.core.managers import SoftDeleteQuerySet
 from apps.core.tenancy import system_scope
 
 # Campos que mexem em papel, contrato, licença ou último admin.

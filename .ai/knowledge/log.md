@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Organização dos módulos do core
+
+- `core/managers.py` (querysets/managers), `core/utils.py` (`scope_filter`, `context_values`),
+  `core/problems.py` (respostas RFC 9457 e `exception_handler`), `api_not_found` em `core/views.py`.
+  `exceptions.py` só com classes; `models.py` só com models. Sem mudança de comportamento.
+
 ## 2026-10-04 — Etapa 2.5: testes de isolamento genéricos
 
 - `apps/core/tests/test_isolation.py`: cobertura obrigatória (FACTORIES/SHARED), outro contrato,

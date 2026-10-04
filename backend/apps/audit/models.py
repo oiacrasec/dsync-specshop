@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.core.models import HybridScopedModel, ScopedManagerMixin, SoftDeleteQuerySet
+from apps.core.managers import ScopedManagerMixin, SoftDeleteQuerySet
+from apps.core.models import HybridScopedModel
 
 
 class AuditEventType(models.TextChoices):

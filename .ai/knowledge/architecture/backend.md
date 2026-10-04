@@ -1,8 +1,8 @@
 # Backend — estado após a etapa 3.1
 
 Fontes: `backend/config/settings/base.py`, `backend/config/settings/production.py`,
-`backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/exceptions.py`,
-`backend/apps/core/middleware.py`, `backend/apps/core/models.py`,
+`backend/config/urls.py`, `backend/config/api/v1.py`, `backend/apps/core/{exceptions,problems}.py`,
+`backend/apps/core/middleware.py`, `backend/apps/core/{models,managers,utils,views}.py`,
 `backend/apps/users/{models,managers,authentication,serializers,services,views,urls,throttles}.py`,
 `backend/AGENTS.md`, ADRs 0004/0007/0008
 e plano da Entrega 1.

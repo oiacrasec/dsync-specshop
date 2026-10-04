@@ -251,7 +251,7 @@ def test_django_failure_is_safe_and_correlated(client, test_routes, settings, ca
     assert response.status_code == 500
     assert PRIVATE_DETAIL not in response.content.decode()
     assert PRIVATE_DETAIL not in caplog.text
-    record = next(record for record in caplog.records if record.name == 'apps.core.exceptions')
+    record = next(record for record in caplog.records if record.name == 'apps.core.problems')
     assert record.request_id == response.json()['request_id'] == response['X-Request-Id']
     assert 'RuntimeError' in record.getMessage()
     assert 'django_error' in record.getMessage()

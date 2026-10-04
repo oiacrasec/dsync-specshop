@@ -22,9 +22,13 @@ Convenção definida pelo usuário:
 
 | Arquivo | Contém |
 |---|---|
+| `models.py` | só models (e o metaclass do BaseModel) |
+| `managers.py` | querysets e managers |
 | `middleware.py` | só classes de middleware |
 | `utils.py` | funções auxiliares do app, sem regra de negócio e sem escrita no banco |
 | `services.py` / `selectors.py` | escrita com regra de negócio / leituras |
+| `exceptions.py` | só classes de exceção |
+| módulo temático (ex.: `problems.py`) | bloco grande de um único tema, para o `utils.py` não virar gaveta |
 
 Não misturar auxiliares no módulo do middleware (ex.: `apps/audit/utils.py` marca a
 entrada do superadmin; `apps/audit/middleware.py` só grava).

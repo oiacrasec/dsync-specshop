@@ -5,7 +5,7 @@
 - **Title:** Contrato indisponível
 - **Detail padrão:** O contrato está vencido ou desativado.
 - **Quando:** Contrato vencido ou desativado.
-- **Origem:** ContractInactive (em `apps/core/exceptions.py` ou no framework).
+- **Origem:** ContractInactive (classes em `apps/core/exceptions.py` ou do framework; resposta em `apps/core/problems.py`).
 
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.

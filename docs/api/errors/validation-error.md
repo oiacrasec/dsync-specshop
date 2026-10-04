@@ -5,7 +5,7 @@
 - **Title:** Dados inválidos
 - **Detail padrão:** Corrija os campos indicados em errors.
 - **Quando:** Sintaxe correta, mas campos ou regras de validação inválidos.
-- **Origem:** DRF ValidationError ou Django ValidationError (em `apps/core/exceptions.py` ou no framework).
+- **Origem:** DRF ValidationError ou Django ValidationError (classes em `apps/core/exceptions.py` ou do framework; resposta em `apps/core/problems.py`).
 
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.

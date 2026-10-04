@@ -5,7 +5,7 @@
 - **Title:** Sem acesso à organização
 - **Detail padrão:** Você não tem acesso à organização selecionada.
 - **Quando:** Organização inexistente, fora do contrato ou sem atribuição de acesso.
-- **Origem:** ContextForbidden (em `apps/core/exceptions.py` ou no framework).
+- **Origem:** ContextForbidden (classes em `apps/core/exceptions.py` ou do framework; resposta em `apps/core/problems.py`).
 
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.

@@ -1,7 +1,8 @@
 # Erros da API — RFC 9457
 
 Contrato oficial: ADR 0004 e `.ai/skills/erros-api-rfc9457/SKILL.md`.
-Implementação: `backend/apps/core/exceptions.py` e `middleware.py`.
+Implementação: `backend/apps/core/exceptions.py` (classes), `problems.py` (respostas e
+handler do DRF) e `middleware.py`.
 Filtro de correlação dos logs: `backend/apps/core/log_filters.py`.
 
 Todo erro da API usa `Content-Type: application/problem+json`, inclusive em

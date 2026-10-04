@@ -1,24 +1,18 @@
-"""Camada D (ADR 0006 §1.3 e §4): views com escopo gravam o contexto, nunca o payload."""
+"""Views do core: fallback de rotas da API e mixin da camada D (ADR 0006 §1.3 e §4)."""
 
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import PermissionDenied
 
-from .models import ContractScopedModel, HybridScopedModel, OrganizationScopedModel
-from .tenancy import TenantContextMissing, get_context
+from .models import HybridScopedModel
+from .problems import problem_http_response
+from .utils import context_values
 
 
-def context_values(model):
-    """`contract_id`/`organization_id` do contexto validado para o tipo de escopo do model."""
-    context = get_context()
-    if context is None or context.contract_id is None:
-        raise TenantContextMissing(f'{model._meta.label} exige contrato no contexto para gravar.')
-    if issubclass(model, OrganizationScopedModel):
-        if context.organization_id is None:
-            raise TenantContextMissing(f'{model._meta.label} exige organização no contexto para gravar.')
-        return {'contract_id': context.contract_id, 'organization_id': context.organization_id}
-    if issubclass(model, ContractScopedModel | HybridScopedModel):
-        return {'contract_id': context.contract_id}
-    return {}
+@transaction.non_atomic_requests
+def api_not_found(request):
+    """Fallback de rotas: também evita a página de boas-vindas em DEBUG."""
+    return problem_http_response(request, 404)
 
 
 class TenantScopedViewMixin:

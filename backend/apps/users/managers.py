@@ -2,7 +2,7 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import transaction
 
-from apps.core.models import ScopedManagerMixin, SoftDeleteQuerySet
+from apps.core.managers import ScopedManagerMixin, SoftDeleteQuerySet
 
 
 class UserQuerySet(SoftDeleteQuerySet):
