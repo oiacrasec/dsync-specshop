@@ -15,8 +15,7 @@ from apps.core.exceptions import ContractInactive, LicenseLimitReached
 from apps.core.managers import SoftDeleteQuerySet
 from apps.core.tenancy import system_scope
 
-# Campos que mexem em papel, contrato, licença ou último admin.
-RULE_FIELDS = frozenset({'is_active', 'is_superuser', 'contract', 'contract_id', 'deleted_at'})
+from .constants import RULE_FIELDS
 
 
 @system_scope

@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
 
-PERMISSION_CODE = re.compile(r'[a-z][a-z0-9_]*:[a-z][a-z0-9_]*', re.ASCII)
+# Constantes ficam aqui, não em core/constants.py: o registry é Python puro, sem Django (ADR 0009).
+PERMISSION_CODE_PATTERN = re.compile(r'[a-z][a-z0-9_]*:[a-z][a-z0-9_]*', re.ASCII)
 STANDARD_ACTIONS = frozenset({'view', 'create', 'update', 'delete', 'manage', 'export'})
 
 
@@ -21,7 +22,7 @@ class PermissionDefinition:
     reserved: bool = False
 
     def __post_init__(self):
-        if not isinstance(self.code, str) or PERMISSION_CODE.fullmatch(self.code) is None:
+        if not isinstance(self.code, str) or PERMISSION_CODE_PATTERN.fullmatch(self.code) is None:
             raise ValueError('Invalid permission code.')
         scopes = frozenset(self.scopes)
         if not scopes or any(not isinstance(scope, PermissionScope) for scope in scopes):

@@ -28,7 +28,15 @@ Convenção definida pelo usuário:
 | `utils.py` | funções auxiliares do app, sem regra de negócio e sem escrita no banco |
 | `services.py` / `selectors.py` | escrita com regra de negócio / leituras |
 | `exceptions.py` | só classes de exceção |
+| `constants.py` | constantes do app: só valores literais (texto, número, regex, mensagem traduzível), sem importar código do próprio app |
 | módulo temático (ex.: `problems.py`) | bloco grande de um único tema, para o `utils.py` não virar gaveta |
+
+Ficam fora do `constants.py`, por motivo técnico: objetos do próprio módulo (ex.:
+`TenantContext` do sistema, `NO_ACCESS`), sentinelas privadas, tuplas de classes
+(`SCOPE_TYPES`), o catálogo `PERMISSIONS` e as constantes do `permission_registry`
+(Python puro por ADR 0009) e os literais das migrations (migration não importa o app).
+Testes mantêm literais do contrato da API (ex.: `application/problem+json`) para não
+validar a constante contra ela mesma.
 
 Não misturar auxiliares no módulo do middleware (ex.: `apps/audit/utils.py` marca a
 entrada do superadmin; `apps/audit/middleware.py` só grava).

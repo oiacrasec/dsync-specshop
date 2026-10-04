@@ -2,8 +2,7 @@
 
 from rest_framework import serializers
 
-# Contexto e id interno nunca entram nem saem pelo serializer (ADR 0006 §4, ADR 0007).
-HIDDEN_FIELDS = ('id', 'contract', 'organization')
+from .constants import SERIALIZER_HIDDEN_FIELDS
 
 
 class PublicIdRelatedField(serializers.SlugRelatedField):
@@ -20,6 +19,6 @@ class ScopedModelSerializer(serializers.ModelSerializer):
 
     def get_fields(self):
         fields = super().get_fields()
-        for name in HIDDEN_FIELDS:
+        for name in SERIALIZER_HIDDEN_FIELDS:
             fields.pop(name, None)
         return fields

@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Organização dos módulos dos apps
+
+- `audit/managers.py`; `rbac/utils.py` (`required_permission`, `access_evaluation`);
+  `audit/utils.snapshot` genérico (rbac mantém `AUDIT_FIELDS` por label).
+- `constants.py` em core, users, rbac e audit (só literais). Exceções técnicas documentadas
+  no guia de estilo. `'contract_admin'` substituído por `ESSENTIAL_PROFILE_KEY` no código.
+- `users/services.py` mantém gestão de usuário e tokens juntos (decisão do usuário).
+
 ## 2026-10-04 — Organização dos módulos do core
 
 - `core/managers.py` (querysets/managers), `core/utils.py` (`scope_filter`, `context_values`),

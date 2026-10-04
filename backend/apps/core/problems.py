@@ -15,29 +15,11 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 from rest_framework.views import set_rollback
 
+from .constants import HTTP_PROBLEMS, PROBLEM_CONTENT_TYPE, PROBLEM_TYPE_PREFIX
 from .exceptions import ProblemException
 from .log_filters import request_id_context
 
 logger = logging.getLogger(__name__)
-PROBLEM_CONTENT_TYPE = 'application/problem+json'
-
-
-# Mensagens estáveis; não repassar texto de exceções de infraestrutura ao cliente.
-HTTP_PROBLEMS = {
-    400: ('malformed-request', _('Requisição malformada'), _('Verifique a sintaxe da requisição.')),
-    401: (
-        'authentication-required',
-        _('Autenticação necessária'),
-        _('Informe credenciais válidas para acessar este recurso.'),
-    ),
-    403: (
-        'permission-denied',
-        _('Acesso negado'),
-        _('Você não tem permissão para acessar este recurso.'),
-    ),
-    404: ('not-found', _('Recurso não encontrado'), _('O recurso solicitado não foi encontrado.')),
-    422: ('validation-error', _('Dados inválidos'), _('Corrija os campos indicados em errors.')),
-}
 
 
 def problem_data(request, status_code, *, problem_type=None, title=None, detail=None, errors=None):
@@ -49,7 +31,7 @@ def problem_data(request, status_code, *, problem_type=None, title=None, detail=
         definition = HTTP_PROBLEMS.get(status_code)
         if definition:
             slug, title, detail = definition
-            problem_type = f'urn:datasync:problem:{slug}'
+            problem_type = f'{PROBLEM_TYPE_PREFIX}{slug}'
         else:
             problem_type = 'about:blank'
             # Tipos genéricos seguem a frase padrão do HTTP (RFC 9457).

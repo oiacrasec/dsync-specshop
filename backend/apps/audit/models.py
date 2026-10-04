@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.core.managers import ScopedManagerMixin, SoftDeleteQuerySet
 from apps.core.models import HybridScopedModel
+
+from .managers import AllAuditManager, AppendOnlyQuerySet, AuditManager
 
 
 class AuditEventType(models.TextChoices):
@@ -26,27 +27,6 @@ class AuditEventType(models.TextChoices):
     SUPERADMIN_DELETED = 'superadmin.deleted', _('superadmin excluído')
     SUPERADMIN_RESTORED = 'superadmin.restored', _('superadmin restaurado')
     SUPERADMIN_ENTERED_ORGANIZATION = 'superadmin.entered_organization', _('superadmin entrou em organização')
-
-
-class AppendOnlyQuerySet(SoftDeleteQuerySet):
-    """Trilha imutável: nem soft delete nem update em lote (ADR 0017)."""
-
-    def delete(self, *, actor=None):
-        raise TypeError('Eventos de auditoria não podem ser excluídos.')
-
-    def update(self, **kwargs):
-        raise TypeError('Eventos de auditoria não podem ser alterados.')
-
-    delete.queryset_only = True
-    update.queryset_only = True
-
-
-class AuditManager(ScopedManagerMixin, models.Manager.from_queryset(AppendOnlyQuerySet)):
-    pass
-
-
-class AllAuditManager(AuditManager):
-    include_deleted = True
 
 
 class AuditEvent(HybridScopedModel):

@@ -2,6 +2,7 @@ from django.db.models import Prefetch, Q
 
 from apps.core.permission_registry import PermissionScope
 
+from .constants import ESSENTIAL_PROFILE_KEY
 from .evaluation import Grant
 from .models import Assignment, AssignmentExclusion, Profile, ProfilePermission
 
@@ -62,7 +63,7 @@ def user_grants(user):
             essential = False
         else:
             codes = frozenset(item.permission_code for item in assignment.profile.permissions.all())
-            essential = assignment.profile.system_key == 'contract_admin'
+            essential = assignment.profile.system_key == ESSENTIAL_PROFILE_KEY
         grants.append(
             Grant(
                 scope=PermissionScope(assignment.scope),
@@ -73,9 +74,6 @@ def user_grants(user):
             )
         )
     return grants
-
-
-ESSENTIAL_PROFILE_KEY = 'contract_admin'
 
 
 def active_admin_count(contract_id, *, exclude_assignment_id=None, exclude_user_id=None):

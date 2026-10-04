@@ -6,7 +6,8 @@ from django.core.checks import Tags, run_checks
 from django.db import models
 from django.test.utils import isolate_apps
 
-from apps.core.checks import SCOPE_EXCEPTIONS, check_model_scopes
+from apps.core.checks import check_model_scopes
+from apps.core.constants import SCOPE_EXCEPTIONS
 from apps.core.models import BaseModel, ContractScopedModel, HybridScopedModel, OrganizationScopedModel, SharedModel
 
 

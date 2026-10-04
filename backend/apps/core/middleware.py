@@ -3,8 +3,9 @@
 import logging
 from uuid import uuid7
 
+from .constants import PROBLEM_CONTENT_TYPE
 from .log_filters import request_id_context
-from .problems import PROBLEM_CONTENT_TYPE, exception_handler, problem_http_response
+from .problems import exception_handler, problem_http_response
 from .tenancy import reset_context, set_context
 
 logger = logging.getLogger(__name__)

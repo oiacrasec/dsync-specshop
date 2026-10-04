@@ -5,14 +5,15 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.audit.models import AuditEventType as Event
 from apps.audit.services import record
+from apps.audit.utils import snapshot
 from apps.contracts.models import Contract, Organization
 from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
 from apps.core.tenancy import system_scope
 
+from .constants import AUDIT_FIELDS, ESSENTIAL_PROFILE_KEY
 from .models import Assignment, AssignmentExclusion, Profile, ProfilePermission
 from .selectors import (
-    ESSENTIAL_PROFILE_KEY,
     active_admin_count,
     conflicting_profile_names,
     duplicate_client_contracts,
@@ -52,34 +53,8 @@ def _is_active_admin_grant(assignment):
     )
 
 
-# Campos auditados de cada model (FKs pelo public_id; ADR 0017).
-AUDIT_FIELDS = {
-    Profile: {'name': 'name', 'contract': 'contract__public_id', 'is_active': 'is_active'},
-    ProfilePermission: {
-        'profile': 'profile__public_id',
-        'permission_code': 'permission_code',
-        'is_active': 'is_active',
-    },
-    Assignment: {
-        'user': 'user__public_id',
-        'profile': 'profile__public_id',
-        'permission_code': 'permission_code',
-        'scope': 'scope',
-        'scope_organization': 'scope_organization__public_id',
-        'is_active': 'is_active',
-    },
-    AssignmentExclusion: {
-        'assignment': 'assignment__public_id',
-        'excluded_organization': 'excluded_organization__public_id',
-        'is_active': 'is_active',
-    },
-}
-
-
 def _snapshot(instance):
-    fields = AUDIT_FIELDS[type(instance)]
-    row = type(instance).all_objects.filter(pk=instance.pk).values(*fields.values()).get()
-    return {name: str(row[path]) if hasattr(row[path], 'hex') else row[path] for name, path in fields.items()}
+    return snapshot(instance, AUDIT_FIELDS[instance._meta.label])
 
 
 def _audit_save(instance, actor, before, created, updated):
@@ -215,7 +190,7 @@ def _assignment_profile(assignment):
         _invalid('profile', 'Informe um perfil ativo.')
     if profile.contract_id not in (None, assignment.contract_id):
         _invalid('profile', 'O perfil não está disponível para este contrato.')
-    if profile.system_key == 'contract_admin':
+    if profile.system_key == ESSENTIAL_PROFILE_KEY:
         if assignment.scope != PermissionScope.CONTRACT:
             _invalid('scope', 'O administrador do contrato exige escopo de contrato.')
     else:

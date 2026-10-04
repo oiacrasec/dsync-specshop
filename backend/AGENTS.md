@@ -88,6 +88,7 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   com `model` e `ScopedModelSerializer` (FKs por `public_id`, sem `id`/`contract`/`organization`).
   No `User`, `is_active` mantém a semântica de autenticação do Django.
 - Módulos: `middleware.py` só com classes de middleware; auxiliares em `utils.py` do app;
+  constantes literais em `constants.py` do app; querysets/managers em `managers.py`;
   regra de negócio em services/selectors ([estilo](docs/standards/django-style.md)).
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).

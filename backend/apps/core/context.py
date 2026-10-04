@@ -7,10 +7,10 @@ contrato não excluído, inclusive vencido ou inativo, para suporte (auditado na
 
 from uuid import UUID
 
+from .constants import ORGANIZATION_HEADER
 from .exceptions import ContextForbidden, ContextInvalidRequest
 from .tenancy import TenantContext, get_context, set_context, update_context
 
-HEADER = 'X-Organization-Id'
 _UNRESOLVED = object()
 
 
@@ -37,7 +37,7 @@ def resolve_organization(request):
         return cached
     from apps.contracts.models import Organization
 
-    raw = request.headers.get(HEADER, '').strip()
+    raw = request.headers.get(ORGANIZATION_HEADER, '').strip()
     try:
         public_id = UUID(raw)
     except ValueError:

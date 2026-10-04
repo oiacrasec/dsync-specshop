@@ -1,5 +1,5 @@
+from .constants import ENTRY_ATTRIBUTE
 from .services import record_superadmin_entry
-from .utils import ENTRY_ATTRIBUTE
 
 
 class SuperadminEntryAuditMiddleware:

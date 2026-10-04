@@ -2,10 +2,10 @@ from django.apps import apps
 from django.core.checks import Error, Tags, register
 from django.db import models
 
+from .constants import SCOPE_EXCEPTIONS
 from .models import BaseModel, ContractScopedModel, HybridScopedModel, OrganizationScopedModel, SharedModel
 
 SCOPE_TYPES = (SharedModel, HybridScopedModel, ContractScopedModel, OrganizationScopedModel)
-SCOPE_EXCEPTIONS = frozenset({'users.User', 'contracts.Contract'})  # ADR 0012: lista fechada.
 
 
 def _valid_context_fields(model, scope):

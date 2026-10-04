@@ -5,12 +5,14 @@ from django.utils.translation import gettext_lazy as _
 from apps.core.models import ContractScopedModel, HybridScopedModel
 from apps.core.permission_registry import PermissionScope
 
+from .constants import ESSENTIAL_PROFILE_KEY
+
 
 class Profile(HybridScopedModel):
     """Perfil vinculado: Leitor do sistema ou Operador de um cliente.
 
     Contract nulo indica perfil do sistema. O perfil essencial Administrador do
-    contrato usa system_key='contract_admin' e é criado pela migration rbac.0002.
+    contrato usa system_key=ESSENTIAL_PROFILE_KEY e é criado pela migration rbac.0002.
     """
 
     name = models.CharField(_('nome'), max_length=255)
@@ -26,7 +28,7 @@ class Profile(HybridScopedModel):
             models.UniqueConstraint(fields=['system_key'], condition=~models.Q(system_key=''),
                                     name='dsc_profile_system_key_unique'),
             models.CheckConstraint(condition=models.Q(system_key='') |
-                                   models.Q(system_key='contract_admin', contract__isnull=True),
+                                   models.Q(system_key=ESSENTIAL_PROFILE_KEY, contract__isnull=True),
                                    name='dsc_profile_system_key_valid'),
         ]
 
