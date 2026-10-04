@@ -20,10 +20,10 @@ class SelectorQuerysetMixin:
 
 
 class ServiceDeleteMixin:
-    """Exclusão pelo service declarado; create/update ficam no serializer."""
+    """Exclusão pelo service herdado da base; create/update ficam no serializer."""
 
     def perform_destroy(self, instance):
-        self.delete_service(instance=instance, actor=self.request.user)
+        self.delete_service(instance, actor=self.request.user)
 
 
 class ListFilterMixin:

@@ -18,9 +18,11 @@ permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api
 A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contracts.md)
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
-As views herdam `BaseAdminModelViewSet` e declaram selector/exclusão. Serializers
+As views herdam `BaseAdminModelViewSet` e declaram selector; exclusão vem da base. Serializers
 herdam `ServiceModelSerializer` e chamam o service por create/update; regras,
-locks e auditoria continuam nos services.
+locks e auditoria continuam nos services. `BaseModelService`, no core, padroniza
+services de domínio: PlanService/ContractService herdam exclusão, com registro
+explícito no AppConfig.ready e autorização/auditoria próprias (ADR 0024).
 O `core` compõe as views base com mixins e `StandardResultsSetPagination`;
 listagens usam django-filter 26.2, BaseFilterSet no core e FilterSets nos apps.
 apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/django-style.md#views-administrativas-com-services).

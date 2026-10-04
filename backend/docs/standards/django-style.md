@@ -161,7 +161,7 @@ limite de 120 caracteres continuam ativos.
 | Componente | Responsabilidade |
 |---|---|
 | `SelectorQuerysetMixin` | leitura pelo selector declarado |
-| `ServiceDeleteMixin` | exclusão pelo service declarado na view |
+| `ServiceDeleteMixin` | exclusão pelo BaseModelService herdado da view base |
 | `ServiceModelSerializer` | create/update pelo service declarado no serializer |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
@@ -182,11 +182,10 @@ class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
-    delete_service = staticmethod(services.delete_contract)
 
 
 class ContractSerializer(ServiceModelSerializer):
-    save_service = staticmethod(services.save_contract)
+    save_service = staticmethod(services.ContractService.save_instance)
 ```
 
 `staticmethod` impede que Python passe a view como argumento às funções do módulo.
@@ -197,6 +196,26 @@ passado explicitamente ao service, sem dependência da requisição no model.
 O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
 a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
 no service, inclusive quando serializer.save() é chamado sem uma view.
+
+`BaseModelService`, em `core/services.py`, implementa `delete_instance` como método
+de classe e define o contrato `save_instance`. O service de domínio implementa a
+gravação e herda exclusão: autorização, lock por PK, estado anterior, soft delete e
+auditoria na mesma transação. Definir `model`, `authorize`, `state`, `audit_delete`
+e, se necessário, `write_scope` (por padrão preserva o contexto atual).
+Em contracts, `BaseContractService` compartilha autorização administrativa/auditoria;
+`PlanService` e `ContractService` definem model/evento e suas regras de gravação.
+
+Registrar classes uma vez no `AppConfig.ready`, sem consultas ao banco:
+
+```python
+BaseModelService.register(PlanService)
+BaseModelService.register(ContractService)
+```
+
+A view base já usa `BaseModelService.delete_instance`; o registro por tipo seleciona
+o service. Não repetir `delete_service` nas views nem descobrir funções por nome.
+Model não registrado ou instância incompatível falha antes da escrita. Falha da
+autorização/auditoria desfaz toda a transação (ADR 0024).
 
 FilterSets do domínio ficam em `filters.py`, herdam `core.filters.BaseFilterSet`
 e declaram os filtros/campos de busca/OrderingFilter. Não usar geração automática

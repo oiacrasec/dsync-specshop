@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from apps.core.serializers import ListQuerySerializer
 from apps.core.views import BaseAdminModelViewSet
 
-from . import selectors, services
+from . import selectors
 from .filters import ContractFilterSet, OrganizationFilterSet, PlanFilterSet
 from .serializers import ContractSerializer, OrganizationSummarySerializer, PlanSerializer
 
@@ -16,7 +16,6 @@ class PlanViewSet(BaseAdminModelViewSet):
     filterset_class = PlanFilterSet
     serializer_class = PlanSerializer
     queryset_selector = staticmethod(selectors.admin_plans)
-    delete_service = staticmethod(services.delete_plan)
     schema_columns = (('name', _('Nome')), ('is_active', _('Ativo')))
 
 
@@ -24,7 +23,6 @@ class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
-    delete_service = staticmethod(services.delete_contract)
     ordering_fields = (*BaseAdminModelViewSet.ordering_fields, 'start_date', 'end_date', 'licenses')
     schema_columns = (('name', _('Nome')), ('start_date', _('Início')), ('licenses', _('Licenças')))
     schema_filters = (

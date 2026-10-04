@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): delegate serializer writes to domain services` (este handoff entra no commit; consultar git log -1)
+- **Última alteração:** `refactor(api): centralize deletion in base model services` (consultar git log -1)
 
 ## Situação
 
@@ -24,8 +24,10 @@
   django-filter 26.2: BaseFilterSet/backend em core/filters, FilterSets nos apps,
   filterset_class nas views. Filtros explícitos para não acessar managers na importação.
   Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
-  views declaram selector/delete; ServiceModelSerializer declara save_service
-  e chama service em create/update. View usa serializer.save() padrão (ADR 0023).
+  views declaram selector/schema; exclusão herdada via BaseModelService (ADR 0024),
+  PlanService/ContractService registrados por model no AppConfig.ready, sem SQL.
+  ServiceModelSerializer chama save_instance em create/update via save_service;
+  view usa serializer.save() padrão (ADR 0023). Regras/locks/auditoria preservados.
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
 - Licenças: usuário aprovou impedir redução abaixo dos não excluídos, contando
@@ -38,7 +40,7 @@
   Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
   10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
   de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: 448 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
+- Validação: 454 testes, lint, formato, migrations e checks desenvolvimento/produção OK.
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).

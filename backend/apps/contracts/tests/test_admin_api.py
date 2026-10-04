@@ -304,7 +304,7 @@ def test_license_reduction_and_user_creation_share_contract_lock(world):
         try:
             barrier.wait(timeout=10)
             if operation == 'reduce':
-                services.save_contract(instance=contract, values={'licenses': 1}, actor=world['admin'])
+                services.ContractService.save_instance(instance=contract, values={'licenses': 1}, actor=world['admin'])
             else:
                 get_user_model().objects.create_user(username='concorrente', contract_id=contract.pk)
             return 'success'
@@ -317,3 +317,24 @@ def test_license_reduction_and_user_creation_share_contract_lock(world):
         assert sorted(pool.map(mutate, ('reduce', 'create'))) == ['blocked', 'success']
     contract.refresh_from_db()
     assert get_user_model().objects.filter(contract_id=contract.pk).count() <= contract.licenses
+
+
+@pytest.mark.parametrize('key,service', [('plan', services.PlanService), ('contract', services.ContractService)])
+def test_service_deletion_requires_superadmin_without_view(world, key, service):
+    with pytest.raises(PermissionDenied):
+        service.delete_instance(world[key], actor=world['user'])
+    assert type(world[key]).objects.filter(pk=world[key].pk).exists()
+
+
+@pytest.mark.parametrize('key,service', [('plan', services.PlanService), ('contract', services.ContractService)])
+def test_service_deletion_rolls_back_when_audit_fails(world, monkeypatch, key, service):
+    def fail(*args, **kwargs):
+        raise RuntimeError('audit unavailable')
+
+    monkeypatch.setattr(services, 'record', fail)
+    before = AuditEvent.objects.count()
+    with pytest.raises(RuntimeError, match='audit unavailable'):
+        service.delete_instance(world[key], actor=world['admin'])
+    current = type(world[key]).objects.get(pk=world[key].pk)
+    assert current.deleted_at is None and current.deleted_by_id is None
+    assert AuditEvent.objects.count() == before

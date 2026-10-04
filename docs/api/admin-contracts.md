@@ -62,7 +62,10 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 
 Views de planos/contratos herdam `BaseAdminModelViewSet` e usam serializer.save()
 do DRF. ServiceModelSerializer.create/update chamam o save_service declarado;
-exclusão continua em ServiceDeleteMixin. Cada recurso declara selector/services/schema;
+exclusão continua em ServiceDeleteMixin, usando BaseModelService da view base.
+PlanService/ContractService herdam exclusão comum e definem gravação/autorização/
+auditoria; registro explícito no AppConfig.ready, sem queries na inicialização.
+Cada recurso declara selector/schema; serializer declara save_service (ADR 0024);
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
 As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
 em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/filters.py`,

@@ -1,5 +1,21 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: classe base de services e exclusão herdada
+
+- BaseModelService em core/services implementa delete_instance e define save_instance;
+  autorização, lock por PK, estado anterior, soft delete e auditoria na mesma transação.
+- PlanService/ContractService herdam BaseContractService, com contexto de sistema
+  explícito, superadmin e auditoria próprios. Gravação migrou das funções para classes;
+  serializers apontam save_service para save_instance. Views não declaram exclusão.
+- AppConfig.ready registra as classes por model sem SQL. Ausência de registro/model
+  incompatível falha antes da escrita; não existe fallback direto ao ORM.
+- Validação: 454 testes, lint/formato, migrations e checks desenvolvimento/produção.
+  Novos testes de negação direta pelo service e rollback de exclusão se auditoria
+  falhar. OWASP A01–A10 sem achados novos; mesmo escopo/queries/locks de domínio,
+  despacho em memória, sem escrita em leituras. Nenhuma nova decisão legal.
+- Arquivos: core/services/views/mixins/tests, contracts/apps/services/serializers/
+  views/tests, backend/AGENTS/README/style, API/overview/plano, ADR 0024 e memória/handoff.
+
 ## 2026-10-04 — Revisão 5.2: services em create/update dos serializers
 
 - Usuário determinou gravar pelos serializers. ServiceModelSerializer em core

@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.audit.models import AuditEventType as Event
 from apps.audit.services import record
-from apps.core.tenancy import system_scope
+from apps.core.services import BaseModelService
+from apps.core.tenancy import system_context, system_scope
 
 from .constants import CONTRACT_AUDIT_FIELDS, PLAN_AUDIT_FIELDS
 from .models import Contract, Plan
@@ -50,59 +51,62 @@ def _audit(event, instance, actor, before):
     )
 
 
-@system_scope
-@transaction.atomic
-def save_plan(*, values, actor, instance=None):
-    _authorize(actor)
-    plan = _current(Plan, instance)
-    before = _state(plan) if instance is not None else None
-    for field, value in values.items():
-        setattr(plan, field, value)
-    plan.full_clean(exclude={'created_by', 'updated_by', 'deleted_by'})
-    plan.save(actor=actor)
-    _audit(Event.PLAN_CREATED if instance is None else Event.PLAN_UPDATED, plan, actor, before)
-    return plan
+class BaseContractService(BaseModelService):
+    """Regras administrativas comuns; escritas globais exigem superadmin."""
+
+    write_scope = staticmethod(system_context)
+    authorize = staticmethod(_authorize)
+    state = staticmethod(_state)
+    delete_event = None
+
+    @classmethod
+    def audit_delete(cls, instance, actor, before):
+        _audit(cls.delete_event, instance, actor, before)
 
 
-@system_scope
-@transaction.atomic
-def save_contract(*, values, actor, instance=None):
-    _authorize(actor)
-    contract = _current(Contract, instance)
-    before = _state(contract) if instance is not None else None
-    previous_licenses = None if instance is None else contract.licenses
-    for field, value in values.items():
-        setattr(contract, field, value)
-    if 'plan' in values:
-        # Serializa com a exclusão do plano, sem bloquear todos os contratos.
-        if not Plan.objects.select_for_update().filter(pk=contract.plan_id).exists():
-            raise ValidationError({'plan': _('Informe um plano disponível.')})
-    if previous_licenses is not None and contract.licenses < previous_licenses:
-        occupied = get_user_model().objects.filter(contract_id=contract.pk).count()
-        if contract.licenses < occupied:
-            raise ValidationError({'licenses': _('O limite não pode ser menor que os usuários não excluídos.')})
-    # A FK foi validada acima quando recebida; permite editar contratos com plano histórico excluído.
-    contract.full_clean(exclude={'plan', 'created_by', 'updated_by', 'deleted_by'})
-    contract.save(actor=actor)
-    _audit(Event.CONTRACT_CREATED if instance is None else Event.CONTRACT_UPDATED, contract, actor, before)
-    return contract
+class PlanService(BaseContractService):
+    model = Plan
+    delete_event = Event.PLAN_DELETED
+
+    @staticmethod
+    @system_scope
+    @transaction.atomic
+    def save_instance(*, values, actor, instance=None):
+        _authorize(actor)
+        plan = _current(Plan, instance)
+        before = _state(plan) if instance is not None else None
+        for field, value in values.items():
+            setattr(plan, field, value)
+        plan.full_clean(exclude={'created_by', 'updated_by', 'deleted_by'})
+        plan.save(actor=actor)
+        _audit(Event.PLAN_CREATED if instance is None else Event.PLAN_UPDATED, plan, actor, before)
+        return plan
 
 
-@system_scope
-@transaction.atomic
-def delete_plan(*, instance, actor):
-    _authorize(actor)
-    current = _current(Plan, instance)
-    before = _state(current)
-    current.delete(actor=actor)
-    _audit(Event.PLAN_DELETED, current, actor, before)
+class ContractService(BaseContractService):
+    model = Contract
+    delete_event = Event.CONTRACT_DELETED
 
-
-@system_scope
-@transaction.atomic
-def delete_contract(*, instance, actor):
-    _authorize(actor)
-    current = _current(Contract, instance)
-    before = _state(current)
-    current.delete(actor=actor)
-    _audit(Event.CONTRACT_DELETED, current, actor, before)
+    @staticmethod
+    @system_scope
+    @transaction.atomic
+    def save_instance(*, values, actor, instance=None):
+        _authorize(actor)
+        contract = _current(Contract, instance)
+        before = _state(contract) if instance is not None else None
+        previous_licenses = None if instance is None else contract.licenses
+        for field, value in values.items():
+            setattr(contract, field, value)
+        if 'plan' in values:
+            # Serializa com a exclusão do plano, sem bloquear todos os contratos.
+            if not Plan.objects.select_for_update().filter(pk=contract.plan_id).exists():
+                raise ValidationError({'plan': _('Informe um plano disponível.')})
+        if previous_licenses is not None and contract.licenses < previous_licenses:
+            occupied = get_user_model().objects.filter(contract_id=contract.pk).count()
+            if contract.licenses < occupied:
+                raise ValidationError({'licenses': _('O limite não pode ser menor que os usuários não excluídos.')})
+        # A FK foi validada acima quando recebida; permite editar contratos com plano histórico excluído.
+        contract.full_clean(exclude={'plan', 'created_by', 'updated_by', 'deleted_by'})
+        contract.save(actor=actor)
+        _audit(Event.CONTRACT_CREATED if instance is None else Event.CONTRACT_UPDATED, contract, actor, before)
+        return contract

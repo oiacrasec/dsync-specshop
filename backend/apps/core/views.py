@@ -1,4 +1,4 @@
-"""Views base compostas; cada recurso declara seus selectors e services."""
+"""Views base compostas; recursos declaram selectors e herdam exclusão comum."""
 
 from django.db import transaction
 from rest_framework import viewsets
@@ -14,6 +14,7 @@ from .mixins import (
 from .pagination import StandardResultsSetPagination
 from .permissions import SuperadminPermission
 from .problems import problem_http_response
+from .services import BaseModelService
 
 
 @transaction.non_atomic_requests
@@ -29,6 +30,7 @@ class BaseModelViewSet(SelectorQuerysetMixin, ServiceDeleteMixin, ListFilterMixi
     lookup_value_converter = 'uuid'
     pagination_class = StandardResultsSetPagination
     filter_backends = [ValidatedDjangoFilterBackend]
+    delete_service = staticmethod(BaseModelService.delete_instance)
 
 
 class BaseAdminModelViewSet(BaseModelViewSet):

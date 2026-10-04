@@ -122,8 +122,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
   `BaseAdminModelViewSet` compõe hooks padrão e mixins; views declaram
-  `queryset_selector` e `delete_service` com `staticmethod`, além
-  de schema/filtros. Não repetir delegação nem inferir nomes de funções.
+  `queryset_selector` com `staticmethod`, além de schema/filtros. Exclusão é herdada
+  da base via `BaseModelService.delete_instance`; não declarar delete_service por
+  recurso. Services de domínio herdam BaseModelService, definem model/regras e são
+  registrados explicitamente no AppConfig.ready (ADR 0024). Não inferir nomes.
   Bases compartilhadas em `core/views.py`, mixins em `core/mixins.py`, paginação
   em `core/pagination.py` e permissão administrativa em `core/permissions.py`.
   Bases usam django-filter: BaseFilterSet/backend em `core/filters.py`, FilterSets
