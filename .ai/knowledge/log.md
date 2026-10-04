@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Assinatura compacta de filter_listing
+
+- Usuário pediu a declaração em uma linha: assinatura com 118 caracteres.
+  first/rows recebidos na entrada validada são removidos dos filtros, pois a
+  paginação já é responsável por eles. Resultado e validação de filtros preservados.
+- 35 testes da API administrativa, lint e formato passaram; sem migrations.
+
 ## 2026-10-04 — Revisão 5.2: composição no core, como Spatial
 
 - Usuário pediu bases no core, paginação e mixins (ADR 0021). core/views compõe

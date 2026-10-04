@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): compose core view bases with mixins and pagination` (este handoff entra no commit; consultar git log -1)
+- **Última alteração:** `refactor(api): compact listing filter signature` (este handoff entra no commit; consultar git log -1)
 
 ## Situação
 
@@ -39,6 +39,7 @@
   OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
   dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
   ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).
+  filter_listing em uma linha (118 caracteres); ajuste validado com 35 testes da API.
 
 ## Falta / dúvidas
 

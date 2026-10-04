@@ -10,19 +10,10 @@ from rest_framework.exceptions import ValidationError
 from .constants import OPTIONS_DEFAULT_ROWS
 
 
-def filter_listing(
-    queryset,
-    *,
-    search_fields,
-    ordering_fields,
-    filter_fields,
-    search='',
-    ordering='name',
-    first=0,
-    rows=OPTIONS_DEFAULT_ROWS,
-    **filters,
-):
+def filter_listing(queryset, *, search_fields, ordering_fields, filter_fields, search='', ordering='name', **filters):
     """Filtra/ordena sem avaliar; paginação conta e limita o resultado depois."""
+    filters.pop('first', None)
+    filters.pop('rows', None)
     fields = ordering.split(',')
     if any(field.removeprefix('-') not in ordering_fields for field in fields):
         raise ValidationError({'ordering': _('Informe campos de ordenação permitidos.')})
