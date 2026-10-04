@@ -29,6 +29,9 @@ Como:
 
 1. Atualizar o `.ai/handoff.md` (formato abaixo). Escrever **fatos**: nada de "quase
    pronto" sem dizer exatamente o que falta.
+   - É um **retrato do estado atual**, curto (até ~60 linhas): substituir o conteúdo,
+     não acumular. O histórico de etapas concluídas fica no plano, nos commits e no
+     `git log`; no handoff, só a lista das etapas concluídas.
 2. Se houver trabalho **não commitado** no meio de uma etapa:
    - testes passando → commit do que está pronto (skill `git-commit`), descrevendo o
      que falta no handoff;
