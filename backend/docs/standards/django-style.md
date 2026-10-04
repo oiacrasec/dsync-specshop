@@ -51,7 +51,7 @@ queryset): ele mantém o escopo de tenant automático. SQL cru só quando o ORM 
 apps/<app>/
 ├── queries/
 │   ├── __init__.py
-│   └── movements_report.py  ← MOVEMENTS_REPORT = """-- MOVEMENTS REPORT ..."""
+│   └── movements_report.py  ← MOVEMENTS_REPORT = """-- RELATORIO DE MOVIMENTACOES ..."""
 └── selectors.py             ← importa a constante, passa o contexto e executa
 ```
 
@@ -59,7 +59,8 @@ apps/<app>/
 
 Objetivo: copiar o SQL para o DataGrip/DBeaver e depurar trocando só os valores de `parametros`.
 
-1. **1ª linha:** comentário com o nome da funcionalidade (`-- RELATORIO XPTO`, `-- DASHBOARD ABC`).
+1. **1ª linha:** comentário com o nome da funcionalidade **em PT-BR** (`-- RELATORIO XPTO`,
+   `-- DASHBOARD ABC`); o restante (constante, função, parâmetros, colunas) em inglês.
 2. **Parâmetros primeiro**, num CTE `parametros`; o restante resolve com JOIN nele:
 
 ```sql
@@ -136,7 +137,7 @@ def feedlot_batch_details(feedlot_id, diet_id, day, include_costs=False, *, tena
 Contrato e organização **nunca** são argumentos do selector (anti-IDOR, OWASP A01): vêm do
 contexto validado. Parâmetros de negócio entram como argumentos; o JOIN com `parametros`
 garante que um id de outro contrato não retorne nada. Nomes de funções, parâmetros e
-queries em inglês, como o restante do código. Exemplo testado em
+queries em inglês, como o restante do código; só o comentário da 1ª linha é em PT-BR. Exemplo testado em
 `apps/core/tests/test_raw_queries.py`.
 
 ### Funções do PostgreSQL

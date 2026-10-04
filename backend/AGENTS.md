@@ -87,11 +87,11 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Nunca declarar `queryset = Model.objects...` no nível da classe: use `TenantScopedViewMixin`
   com `model` e `ScopedModelSerializer` (FKs por `public_id`, sem `id`/`contract`/`organization`).
   No `User`, `is_active` mantém a semântica de autenticação do Django.
-- Código em inglês (models, campos, funções, parâmetros, queries e constantes); rótulos e
-  mensagens ao usuário em português com `gettext_lazy`; respostas ao usuário em PT-BR.
+- Código em inglês (models, campos, funções, parâmetros, queries e constantes); rótulos,
+  mensagens ao usuário e o comentário de nome do SQL (`-- RELATORIO X`) em português; respostas ao usuário em PT-BR.
 - Módulos: `middleware.py` só com classes de middleware; auxiliares em `utils.py` do app;
   constantes literais em `constants.py` do app; querysets/managers em `managers.py`;
-  SQL à mão (só se o ORM não resolver) em `queries/<nome>.py`: 1ª linha `-- NOME`, parâmetros
+  SQL à mão (só se o ORM não resolver) em `queries/<nome>.py`: 1ª linha `-- NOME` em PT-BR, parâmetros
   `contract`/`organization` (id interno) no CTE ou tabela temporária `parametros`, um único `execute`,
   executado só pelo selector com `@tenant_params` + `fetch_all`, com teste de isolamento próprio ([formato](docs/standards/django-style.md));
   regra de negócio em services/selectors ([estilo](docs/standards/django-style.md)).

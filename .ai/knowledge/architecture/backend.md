@@ -12,7 +12,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Views/serializers | `TenantScopedViewMixin` (`model`, nunca `queryset` de classe) e `ScopedModelSerializer` (FKs por `public_id`) |
 | Testes | `system_context()` automático no `conftest`; fábrica obrigatória em `test_isolation.py` para todo model |
 | Módulos | `models`, `managers`, `middleware`, `utils`, `constants` (só literais), `exceptions` (só classes), módulos temáticos (`core/problems.py`) |
-| SQL à mão | `queries/<nome>.py`; `-- NOME` na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
+| SQL à mão | `queries/<nome>.py`; `-- NOME` em PT-BR na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
 | Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
 | Idioma | código em inglês; rótulos/mensagens em português |
 

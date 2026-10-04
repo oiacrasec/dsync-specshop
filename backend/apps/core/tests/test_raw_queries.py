@@ -12,7 +12,7 @@ from apps.core.utils import fetch_all
 
 pytestmark = pytest.mark.django_db
 
-MOVEMENTS_REPORT = """-- MOVEMENTS REPORT
+MOVEMENTS_REPORT = """-- RELATORIO DE MOVIMENTACOES
 WITH parametros AS (
     SELECT
         %(contract)s::bigint AS contract,
@@ -26,7 +26,7 @@ WHERE m.deleted_at IS NULL AND m.quantity >= %(min_quantity)s
 ORDER BY m.quantity
 """
 
-MOVEMENTS_TEMP_REPORT = """-- MOVEMENTS TEMP REPORT
+MOVEMENTS_TEMP_REPORT = """-- RELATORIO DE MOVIMENTACOES (TEMPORARIA)
 CREATE TEMPORARY TABLE parametros ON COMMIT DROP AS
 SELECT
     %(contract)s::bigint AS contract,
