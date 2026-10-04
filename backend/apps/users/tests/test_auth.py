@@ -69,7 +69,7 @@ def assert_auth_error(response):
 
 def test_login_uses_public_uuid_and_configured_lifetimes(user, api_client):
     response = login_client(api_client)
-    assert set(response.json()) == {'access', 'refresh'}
+    assert set(response.json()) == {'access', 'refresh', 'user'}
     access = AccessToken(response.json()['access'])
     refresh = RefreshToken(response.json()['refresh'])
     for token in (access, refresh):
@@ -216,7 +216,7 @@ def test_tokens_and_credentials_do_not_appear_in_logs(user, api_client, caplog):
         tokens = login_client(api_client).json()
         api_client.post(LOGIN, {'username': 'private-user', 'password': 'private-password'}, format='json')
         api_client.post(REFRESH, {'refresh': 'private-refresh'}, format='json')
-    for private in (*tokens.values(), 'private-user', 'private-password', 'private-refresh'):
+    for private in (tokens['access'], tokens['refresh'], 'private-user', 'private-password', 'private-refresh'):
         assert private not in caplog.text
 
 

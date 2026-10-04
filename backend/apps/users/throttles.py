@@ -1,7 +1,14 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import salted_hmac
-from rest_framework.throttling import SimpleRateThrottle
+from rest_framework.throttling import SimpleRateThrottle, UserRateThrottle
+
+from .constants import AUTH_CHANGE_RATE
+
+
+class PasswordChangeThrottle(UserRateThrottle):
+    scope = 'auth_password_change'
+    rate = AUTH_CHANGE_RATE
 
 
 class LoginThrottle(SimpleRateThrottle):

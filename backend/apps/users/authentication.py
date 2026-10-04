@@ -6,12 +6,27 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidTok
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.utils import get_md5_hash_password
 
+from apps.core.exceptions import PasswordChangeRequired
+
 
 class JWTAuthentication(SimpleJWTAuthentication):
     """Mesma regra do SimpleJWT, com o contrato na mesma query e conferido a cada requisição.
 
     Contrato indisponível → 403 contract-inactive (ADR 0006 §3); o cliente encerra a sessão.
     """
+
+    def authenticate(self, request):
+        result = super().authenticate(request)
+        if result is not None:
+            user, _token = result
+            view = request.parser_context.get('view') if request.parser_context else None
+            if (
+                user.must_change_password
+                and not user.is_superuser
+                and not getattr(view, 'allow_password_change_required', False)
+            ):
+                raise PasswordChangeRequired()
+        return result
 
     def get_user(self, validated_token):
         try:

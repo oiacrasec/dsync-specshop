@@ -84,6 +84,13 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `../docs/api/authentication.md`; tokens identificam pelo `public_id` do usuário.
 - Escritas de autenticação ficam em `apps/users/services.py`. Refresh/logout
   mantêm a transação e o lock da blacklist, incluindo nova verificação após o lock.
+- Primeiro acesso (ADR 0034): JWTAuthentication bloqueia usuário comum com
+  must_change_password antes das permissões/contexto; superadmin isento.
+  Só PasswordChangeView declara allow_password_change_required=True; refresh/logout
+  seguem públicos. Troca autenticada atua somente em request.user, sem organização;
+  revalida conta/senha sob lock próprio, validadores Django, Argon2 e auditoria atômica
+  sem senha/hash. Login e troca retornam UserSummarySerializer (whitelist explícita).
+  Não adicionar consulta/escrita/hash/lock na navegação para conferir a flag.
 - Chave JWT independente via `DJANGO_JWT_SIGNING_KEY`; nunca versionar seu valor,
   logar tokens ou retornar respostas de autenticação cacheáveis.
 - Limite de login conta apenas falhas por conta: `DJANGO_AUTH_LOGIN_RATE=5/min`,

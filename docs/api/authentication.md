@@ -1,16 +1,17 @@
 # Autenticação — JWT (API v1)
 
-Implementação da etapa 0.3, conforme ADRs 0004 e 0007. A API exige autenticação
-por padrão; apenas as três rotas abaixo são públicas. Não usa sessões ou cookies
+Implementação das etapas 0.3 e 6.4, conforme ADRs 0004, 0007 e 0034. A API exige autenticação
+por padrão; apenas login, refresh e logout são públicos. Não usa sessões ou cookies
 de autenticação do Django. Entrada e saída em JSON, sob HTTPS em produção.
 
 ## Endpoints
 
 | Método e rota | Entrada | Sucesso |
 |---|---|---|
-| `POST /api/v1/auth/login/` | `username`, `password` | 200, `access` e `refresh` |
+| `POST /api/v1/auth/login/` | `username`, `password` | 200, `access`, `refresh` e `user` |
 | `POST /api/v1/auth/refresh/` | `refresh` | 200, novos `access` e `refresh` |
 | `POST /api/v1/auth/logout/` | `refresh` | 204, sem corpo |
+| `POST /api/v1/auth/change-password/` (autenticado) | `current_password`, `new_password`, `new_password_confirm` | 200, resumo `user` atualizado |
 
 Login:
 
@@ -18,7 +19,25 @@ Login:
 {"username": "usuario", "password": "senha-do-usuario"}
 ```
 
-Login e refresh retornam:
+Login retorna:
+
+```json
+{
+  "access": "<jwt-access>",
+  "refresh": "<jwt-refresh>",
+  "user": {
+    "public_id": "01a10393-161d-7432-94b7-43923f620168",
+    "username": "usuario",
+    "name": "Maria",
+    "is_superuser": false,
+    "must_change_password": true
+  }
+}
+```
+
+`name` vem de `first_name` e pode ser vazio. Os campos do resumo são explícitos;
+sem ID interno, e-mail, contrato, hash de senha ou permissões. Não acrescenta consulta.
+Refresh continua retornando somente:
 
 ```json
 {"access": "<jwt-access>", "refresh": "<jwt-refresh>"}
@@ -71,13 +90,67 @@ Todos seguem [RFC 9457](errors.md), com `application/problem+json`.
 |---|---|---|
 | 400 | JSON malformado | `malformed-request` |
 | 403 | contrato do usuário indisponível | `contract-inactive` |
+| 403 | usuário comum precisa trocar a senha | `password-change-required` |
 | 401 | credenciais inválidas, usuário indisponível, token inválido/expirado/revogado | `authentication-required` |
-| 422 | campo ausente, vazio ou de formato inválido | `validation-error`, com `errors` |
-| 429 | limite de login excedido | `about:blank`, com header `Retry-After` |
+| 422 | entrada inválida, senha atual incorreta ou nova senha rejeitada | `validation-error`, com `errors` |
+| 429 | limite de login ou troca de senha excedido | `about:blank`, com header `Retry-After` |
 
 401 devolve mensagem genérica sem revelar se a conta existe e inclui desafio
 `WWW-Authenticate: Bearer`. 429 utiliza o título HTTP padrão, sem novo slug.
 Os tipos com slug usam o prefixo `urn:datasync:problem:`.
+
+## Primeiro acesso e troca de senha (6.4)
+
+`User.must_change_password` tem default false, inclusive para as contas existentes.
+O provisionamento/reset marcará a flag nas etapas 6.6/6.7. Para o usuário comum
+marcado, login ainda emite tokens e o resumo orienta o frontend a abrir a troca.
+Toda requisição autenticada por JWT é bloqueada antes das permissões/contexto,
+inclusive options, schema e views com permissões próprias. A flag é lida no usuário
+já consultado, não em um claim que possa ficar desatualizado; sem consulta, escrita,
+hash ou lock adicional durante a navegação.
+
+Exceções: trocar a própria senha, refresh e logout. Login é público e precisa permitir
+o início da sessão restrita. Somente PasswordChangeView declara
+`allow_password_change_required=True`; payload, query string e headers não liberam
+outras views. Novos endpoints autenticados devem manter JWTAuthentication.
+Superadmin é isento: o resumo retorna false mesmo se sua flag persistida estiver true.
+
+A troca exige access válido, sem organização ou permissão de administração; o alvo
+é exclusivamente request.user. Também pode ser usada voluntariamente por uma conta
+sem flag, inclusive superadmin, como no endpoint de troca do Spatial.
+Enviar as três senhas no JSON; espaços são preservados. A confirmação deve coincidir
+e a nova senha deve diferir da atual. O serviço recarrega a conta ativa e não excluída,
+com contrato válido, sob lock somente na linha do usuário, e confere novamente a
+senha atual. Aplica os validadores configurados do Django (similaridade com atributos,
+mínimo 12 caracteres, senhas comuns e inteiramente numéricas). Usa set_password;
+o hasher principal continua Argon2. Falhas retornam 422 por campo, sem repetir a senha.
+Ver [validadores do Django](https://docs.djangoproject.com/en/5.2/topics/auth/passwords/#password-validation).
+
+Senha, flag=false, autoria e AuditEvent `user.password_changed` são gravados na mesma
+transação. O evento contém somente before/after da flag, autor/alvo e contrato;
+nenhuma senha, hash ou token. Erro desfaz toda a troca. Duas trocas concorrentes com
+a mesma senha antiga permitem somente uma gravação. A resposta é `{"user": {...}}`,
+com o mesmo resumo do login; todas as respostas da troca têm no-store.
+
+Há throttle exclusivo de troca, pelo UserRateThrottle do DRF: **5 pedidos por minuto
+por usuário autenticado**, incluindo tentativas inválidas. O limite ocorre antes do
+hash/lock, não conta falhas de login nem limita a navegação. É proteção de aplicação
+com cache, não limite estrito de concorrência; cache compartilhado e borda continuam
+necessários antes de produção. A verificação de senha e Argon2 ficam só na operação
+de autenticação/troca, nunca nas leituras comuns.
+
+A sessão atual continua com seus tokens; a troca não emite novos tokens nem revoga
+outros refresh. O access passa a ser aceito assim que a flag é limpa. Rotação/logout
+mantêm a política acima; reset com revogação de refresh será implementado na 6.7.
+A adaptação das telas/interceptors pertence à 6.5.
+
+Finalidade da flag vinculada à conta: impedir uso com senha temporária e permitir
+acesso seguro ao serviço contratado. Mantida junto à conta, limpa na troca, sem
+histórico adicional de senhas. O mapeamento técnico de tratamento considera execução
+do serviço contratado (LGPD art. 7º, V) e medidas de segurança (art. 46); deve integrar
+o inventário/política do controlador conforme sua relação com os titulares.
+O resumo só retorna dados da própria conta. Não há novo envio a terceiros ou tracking.
+Fonte: [LGPD, texto oficial](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm).
 
 ## Limite de falhas de login
 

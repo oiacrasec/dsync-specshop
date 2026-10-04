@@ -20,6 +20,7 @@ class User(AbstractUser, BaseModel):
 
     contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
                                  null=True, blank=True, related_name='+',)
+    must_change_password = models.BooleanField(verbose_name=_('deve trocar a senha'), default=False)
 
     class Meta(BaseModel.Meta):
         abstract = False

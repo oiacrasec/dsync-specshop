@@ -52,6 +52,7 @@ desconhecidos. O namespace URN `datasync` é informal (ADR 0004).
 | [context-invalid-request](errors/context-invalid-request.md) | 400 |
 | [context-forbidden](errors/context-forbidden.md) | 403 |
 | [contract-inactive](errors/contract-inactive.md) | 403 |
+| [password-change-required](errors/password-change-required.md) | 403 |
 | [permission-denied](errors/permission-denied.md) | 403 |
 | [malformed-request](errors/malformed-request.md) | 400 |
 | [validation-error](errors/validation-error.md) | 422 |

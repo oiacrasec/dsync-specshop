@@ -42,6 +42,13 @@ class LicenseLimitReached(ProblemException):
     default_detail = _('O contrato não possui licenças disponíveis para cadastrar outro usuário.')
 
 
+class PasswordChangeRequired(ProblemException):
+    status_code = 403
+    problem_type = 'urn:datasync:problem:password-change-required'
+    title = _('Troca de senha obrigatória')
+    default_detail = _('Troque a senha temporária antes de usar o sistema.')
+
+
 class ProfileInUse(ProblemException):
     status_code = 409
     problem_type = 'urn:datasync:problem:profile-in-use'

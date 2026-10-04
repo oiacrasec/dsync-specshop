@@ -38,7 +38,13 @@ apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/djan
 Schemas recebem nomes de campos: labels/tipos vêm do model, URLs de relações do
 SchemaRouter e ordenação do OrderingFilter. Overrides por campo permitem trocar
 labels/URLs sem repetir metadados; geração sem consultas ao banco (ADR 0026).
-Próxima etapa prioritária: primeiro acesso e troca de senha no backend (6.4).
+Primeiro acesso (6.4): User.must_change_password e bloqueio global por JWT antes das
+permissões/contexto, com superadmin isento. Login retorna resumo da própria conta.
+POST /api/v1/auth/change-password/ exige access, senha atual/nova/confirmação; revalida
+sob lock próprio, usa validadores Django/Argon2 e auditoria atômica sem credenciais.
+Refresh/logout e troca continuam disponíveis; nenhum custo adicional de consulta ou
+escrita nas leituras. Ver [autenticação](../docs/api/authentication.md) e ADR 0034.
+Próxima etapa prioritária: integrar autenticação e primeiro acesso no frontend (6.5).
 Selectors ficam para consultas com lógica própria. Views administrativas declaram
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.

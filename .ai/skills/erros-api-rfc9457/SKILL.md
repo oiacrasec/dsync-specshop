@@ -57,6 +57,7 @@ Cada `type` novo é cadastrado aqui **e** documentado em `docs/api/errors/<slug>
 | `context-invalid-request` | 400 | `X-Organization-Id` ausente ou malformado | ADR 0006 §3 |
 | `context-forbidden` | 403 | organização fora do contrato ou sem acesso | ADR 0006 §3 |
 | `contract-inactive` | 403 | contrato vencido ou desativado (o frontend desloga) | ADR 0006 §2.1 |
+| `password-change-required` | 403 | usuário comum precisa trocar senha; cliente mantém sessão e abre a troca | ADR 0034 |
 | `permission-denied` | 403 | sem a permissão exigida pelo endpoint | ADR 0009 |
 | `malformed-request` | 400 | sintaxe malformada (ex.: JSON quebrado) | RFC 9110 §15.5.1 |
 | `validation-error` | **422** | JSON válido, mas dados inválidos (campo obrigatório, formato, regra); traz `errors` | RFC 9110 §15.5.21 |

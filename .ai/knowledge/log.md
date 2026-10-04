@@ -1,5 +1,42 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.4: primeiro acesso e troca de senha
+
+- User.must_change_password default false; users.0004 aplicada localmente, sem
+  bloquear contas existentes. A marcação no provisionamento/reset entra na 6.6/6.7.
+- Login retorna user explícito (public_id, username, name=first_name, is_superuser,
+  must_change_password), sem novo lookup. Superadmin isento, resumo sempre false.
+- JWTAuthentication.authenticate bloqueia usuário comum marcado antes de permissões/
+  contexto, inclusive views com permission_classes próprios e actions options/schema.
+  Erro 403 password-change-required RFC 9457, catálogo/skill sincronizados.
+  Só PasswordChangeView libera flag; login/refresh/logout continuam disponíveis.
+- POST /api/v1/auth/change-password/ exige access, atua só na própria conta, sem
+  organização, aceita atual/nova/confirmação. Troca também voluntária como Spatial.
+  Recarrega conta/contrato e confere senha atual sob lock somente no usuário;
+  validadores Django, set_password/Argon2, flag=false, autoria e auditoria atômica.
+- Evento user.password_changed só guarda before/after da flag, autor/alvo/contrato.
+  audit.0006 aplicada (choices, sem SQL de alteração). Sem senha/hash/token nos
+  logs, erros ou auditoria; no-store na operação. Tokens atuais preservados;
+  revogação de refresh por reset continua na 6.7 conforme decisão 40.
+- Throttle próprio do DRF: 5 pedidos/min por usuário na troca, antes do hash/lock,
+  sem mudar falhas de login/navegação. Cache compartilhado/borda são pré-produção;
+  UserRateThrottle não representa limite estrito sob concorrência.
+- Validador completo: 555 testes, lint/formato (124 arquivos), migrations e checks
+  dev/produção OK. Novos 40 casos cobrem exceções, estado alterado após emissão do
+  JWT, superadmin, alvo em outro contrato, validação, Argon2 real, rollback e corrida
+  de duas trocas (200/422, um evento). Suíte de login/refresh/logout preservada.
+- Performance: navegação normal/bloqueada com 1/30 contas extras faz um SELECT, sem
+  writes/hash/lock. Troca faz 2 SELECT + 1 UPDATE + 1 INSERT (4 operações de dados),
+  só um FOR UPDATE OF dsc_user; sem N+1. Login/refresh/logout mantêm contagens.
+  Hash fica na operação infrequente de autenticação; memória/CPU do Argon2 já fazem
+  parte desse custo. Não houve ensaio de capacidade/latência sob carga nesta etapa.
+- OWASP A01–A10 revisadas sem achados novos no diff; política JWT existente mantida.
+  LGPD: finalidade da flag e minimização do resumo documentadas, sem terceiros ou
+  tracking novo. AccessLog mantém cobertura do ADR 0019; adequação jurídica/expurgo/
+  LegalHold/MFA/infra continuam pendências anteriores. Nenhuma tela/dependência nova.
+- Docs: ADR 0034/índice, autenticação/erro/auditoria, AGENTS/README, overview/plano,
+  conhecimento e handoff atualizados. Próxima 6.5, após confirmação.
+
 ## 2026-10-04 — Etapa 6.3: API do superadmin separada do domínio
 
 - Criado apps/administration (startapp, sem models próprios). Movidos views,

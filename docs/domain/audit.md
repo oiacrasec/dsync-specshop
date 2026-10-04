@@ -13,6 +13,7 @@ Trilha append-only do [ADR 0017](../adr/0017-trilha-de-auditoria.md), em `apps/a
 | Exceção | `exclusion.added`, `.updated`, `.removed` | `apps.rbac.services` |
 | Conta de superadmin | `superadmin.created`, `.promoted`, `.demoted`, `.deactivated`, `.reactivated`, `.deleted`, `.restored` | `save_user` / `delete_user` |
 | Entrada em organização | `superadmin.entered_organization` | `SuperadminEntryAuditMiddleware` |
+| Troca da própria senha | `user.password_changed` (só before/after de must_change_password) | `apps.users.services.change_password` |
 
 ## Campos
 
@@ -29,6 +30,8 @@ Trilha append-only do [ADR 0017](../adr/0017-trilha-de-auditoria.md), em `apps/a
 
 - Imutável: alterar ou excluir um evento (instância ou lote) levanta erro.
 - Eventos de permissão e de superadmin entram na mesma transação da mudança.
+- Troca de senha e evento são atômicos, com autor/alvo da própria conta e contrato
+  (nulo para superadmin). Nunca armazenar senha, hash ou token nesse evento (ADR 0034).
 - Entrada do superadmin: no máximo 1 por superadmin + organização + access token
   (até 1 a cada 15 minutos por organização); gravada após a resposta, fora da
   transação da view, inclusive quando a requisição falha.

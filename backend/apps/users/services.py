@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import router, transaction
 from django.utils.translation import gettext_lazy as _
@@ -234,3 +235,49 @@ def logout(*, refresh):
         token.blacklist()
     except TokenError:
         raise InvalidToken() from None
+
+
+@system_scope
+@transaction.atomic
+def change_password(*, user, current_password, new_password):
+    """Troca a própria senha com estado fresco e lock apenas na conta autenticada.
+
+    Revalida a senha sob lock: duas trocas concorrentes não podem aceitar a mesma
+    senha antiga. Não toca contratos, atribuições ou a blacklist de tokens.
+    """
+    try:
+        current = (
+            get_user_model()
+            .objects.unscoped()
+            .select_related('contract')
+            .select_for_update(of=('self',))
+            .get(pk=user.pk, is_active=True)
+        )
+    except get_user_model().DoesNotExist:
+        raise AuthenticationFailed() from None
+    ensure_contract_available(current)
+    if not current.check_password(current_password):
+        raise ValidationError({'current_password': _('Senha atual inválida.')})
+    if current_password == new_password:
+        raise ValidationError({'new_password': _('A nova senha deve ser diferente da senha atual.')})
+    try:
+        validate_password(new_password, user=current)
+    except ValidationError as exc:
+        raise ValidationError({'new_password': exc.messages}) from None
+
+    from apps.audit.models import AuditEventType
+    from apps.audit.services import record
+
+    before = {'must_change_password': current.must_change_password}
+    current.set_password(new_password)
+    current.must_change_password = False
+    current.save(actor=current, update_fields=['password', 'must_change_password'])
+    record(
+        AuditEventType.USER_PASSWORD_CHANGED,
+        actor=current,
+        contract_id=current.contract_id,
+        target=current,
+        before=before,
+        after={'must_change_password': False},
+    )
+    return current
