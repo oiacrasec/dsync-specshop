@@ -32,6 +32,7 @@ um ADR novo que **substitui** o anterior.
 | [0013](0013-dominio-de-contratos-e-relacoes-de-contexto.md) | Domínio de contratos e relações de contexto | Aceito |
 | [0014](0014-modalidade-definida-pela-implantacao.md) | Modalidade definida pela implantação, sem campo no plano | Aceito |
 | [0015](0015-contagem-de-licencas-de-usuarios.md) | Contagem de licenças, incluindo usuários inativos | Aceito |
+| [0016](0016-dominio-rbac.md) | Domínio próprio para gestão de acesso | Aceito |
 
 ## Modelo
 

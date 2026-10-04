@@ -10,5 +10,6 @@
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.
 
-Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
-será implementada na etapa correspondente do plano da Entrega 1.
+A etapa 3.2 dispara essa exceção em apps/rbac/services.py ao excluir um perfil
+com atribuições não excluídas, inclusive inativas. Remover as atribuições antes
+de tentar novamente. Ainda não existe endpoint de gestão nesta etapa.

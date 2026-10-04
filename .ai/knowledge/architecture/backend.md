@@ -97,7 +97,23 @@ e plano da Entrega 1.
   Catálogo inicial de 11 operações de gestão reservadas em CONTRACT; novos
   códigos entram com o domínio. Essential_profile somente interno após validar
   perfil essencial, nunca payload. Nenhum acesso/endpoint/autorização novo.
-- Próxima etapa: 3.2, perfis e atribuições; concluir RBAC antes de retomar 2.3.
+- Etapa 3.2 concluída: apps/rbac, aprovado pelo usuário (ADR 0016), tem Profile e
+  ProfilePermission HybridScopedModel, Assignment e AssignmentExclusion
+  ContractScopedModel. scope_organization/excluded_organization são alvos das
+  concessões, não contexto de persistência ORGANIZATION. Constraints de nomes,
+  chave essencial, concessão XOR, escopo e unicidade com NULLS NOT DISTINCT.
+  Services atomic exigem superadmin ativo consultado no banco, advisory lock
+  global para configuração RBAC, lock no usuário ao atribuir, contexto coerente,
+  registry/escopos/reservadas válidos. Perfil essencial só por fixture/migration;
+  edição/remoção de suas atribuições bloqueada até 3.4. Perfil em uso gera 409;
+  soft delete trata permissões/exceções em lote. save_user bloqueia transferência
+  enquanto houver atribuições. ORM direto/bulk não substitui essas regras.
+  Aviso de nomes de clientes retorna UUIDs em QuerySet lazy para futura paginação.
+  Migration rbac.0001 aplicada localmente, sem seeds. 39 testes novos; validação
+  completa com 227 testes. Concorrência de nomes testada no PostgreSQL; criação
+  de atribuição com perfil usa 22 queries constantes com 1/30 permissões.
+  Sem endpoints, autorização efetiva ou auditoria de eventos (3.6) nesta etapa.
+- Próxima etapa: 3.3, cálculo puro de acesso e proteção DRF; concluir RBAC antes de retomar 2.3.
   A etapa 1.1 foi antecipada com aprovação do usuário para usar UUID nos tokens.
 - Estilo compacto dos models definido pelo usuário: documentação canônica em
   `backend/docs/standards/django-style.md`, com exemplo em

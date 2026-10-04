@@ -29,7 +29,8 @@ backend/
 ├── apps/
 │   ├── core/          → BaseModel, tipos de escopo, checks, erros e correlação
 │   ├── users/         → usuário customizado
-│   └── contracts/     → planos, contratos e organizações
+│   ├── contracts/     → planos, contratos e organizações
+│   └── rbac/          → perfis, permissões, atribuições e exceções
 ├── requirements/      → base, development, production, testing
 ├── static/ templates/ scripts/
 ├── docs/              → architecture, standards, patterns, examples
@@ -129,8 +130,18 @@ Etapa 3.1 antecipada antes do contexto por decisão do usuário. O
 [registry de permissões](docs/architecture/permission-registry.md) fica em
 `apps/core/permission_registry.py`, sem Django ou banco. Declara códigos,
 escopos permitidos e reservadas; rejeita atribuições inválidas e não expande
-`manage` em outras ações. Perfis, atribuições e autorização DRF ainda serão
-implementados; não houve nova concessão de acesso nesta etapa.
+`manage` em outras ações.
+
+Etapa 3.2 concluída: `apps/rbac` guarda Profile, ProfilePermission, Assignment e
+AssignmentExclusion. Selectors fazem leituras; services validam e gravam em
+transações, com proteção contra vínculos entre contratos e códigos inválidos.
+Somente superadmin ativo pode escrever nesta etapa. Perfil atribuído não pode
+ser excluído; soft delete de perfil/atribuição trata seus filhos com autoria.
+Transferência de usuário exige remover suas atribuições primeiro.
+Migration inicial aplicada localmente, sem seeds. Ver [domínio RBAC](../docs/domain/rbac.md).
+O cálculo de acesso efetivo e a autorização DRF entram em 3.3; fixture e proteção
+do último Administrador do contrato em 3.4; auditoria de eventos em 3.6.
+Não há endpoints de gestão nem concessão automática de acesso nesta etapa.
 
 ## Configuração do PyCharm
 

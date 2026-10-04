@@ -44,13 +44,14 @@ Para permissões não reservadas, declarar os dois escopos quando aplicável,
 conforme ADR 0009 §3. A definição não oferece defaults de escopo nem registra
 permissões vindas do banco ou de requisições.
 
-As exceções ValueError/KeyError/TypeError são internas; os futuros serializers
-e services traduzirão violações para erros de domínio/RFC 9457. Não enviar
+As exceções ValueError/KeyError/TypeError são internas; services de apps/rbac
+traduzem violações para erros de validação/RFC 9457. Não enviar
 mensagens internas diretamente ao cliente.
 
 ## O que ainda falta
 
-Perfis e atribuições (3.2), cálculo da permissão efetiva e integração DRF (3.3),
+Perfis e atribuições estão em apps/rbac (3.2), conforme o
+[domínio RBAC](../../../docs/domain/rbac.md). Faltam cálculo da permissão efetiva e integração DRF (3.3),
 perfil essencial (3.4), organizações acessíveis (3.5) e auditoria (3.6).
-Depois disso, retomar o contexto (2.3). Nesta etapa não há models, migrations,
-novos endpoints, concessão automática ou mudança nos endpoints JWT.
+Depois disso, retomar o contexto (2.3). O registry permanece Python puro, sem
+models ou migrations próprios; não há concessão automática ou mudança nos endpoints JWT.

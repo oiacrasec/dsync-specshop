@@ -26,6 +26,13 @@ def save_user(*, user, actor=None, using=None):
         current = None
         if not user._state.adding:
             current = type(user).all_objects.using(database).select_for_update().get(pk=user.pk)
+            if current.contract_id != user.contract_id:
+                from apps.rbac.models import Assignment
+
+                if Assignment.objects.using(database).filter(user_id=user.pk).exists():
+                    raise ValidationError(
+                        {'contract': _('Remova as atribuições antes de alterar o contrato do usuário.')}
+                    )
         if user.is_superuser:
             if user.contract_id is not None:
                 raise ValidationError({'contract': _('Superadmin não pertence a contrato.')})

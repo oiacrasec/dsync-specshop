@@ -1,19 +1,71 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-03 20:39
+- **Atualizado em:** 2026-10-03
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `feat(auth): add pure Python permission registry` (inclui este handoff; consultar `git log -1` para o hash)
+- **Última alteração:** `feat(rbac): add profiles and scoped assignments` (inclui este handoff; consultar `git log -1` para o hash)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 3.1 registry RBAC — ✅ concluída (antecipada por decisão do usuário) |
-| Próximo passo exato | etapa 3.2: Profile, permissões do perfil e atribuições com exceções de organização; concluir RBAC antes de retomar 2.3 |
-| Aguardando o usuário? | sim — confirmação para iniciar a etapa 3.2 |
+| Etapa atual | 3.2 perfis e atribuições RBAC — ✅ concluída (antecipada antes do contexto) |
+| Próximo passo exato | etapa 3.3: cálculo puro de permissão efetiva e proteção DRF que nega por padrão; concluir RBAC antes de retomar 2.3 |
+| Aguardando o usuário? | sim — confirmação para iniciar a etapa 3.3 |
 
-## Feito nesta etapa: 3.1
+## Feito nesta etapa: 3.2
+
+- Usuário autorizou 3.2 e apps/rbac, registrado no ADR 0016. App gerado por
+  startapp, com name apps.rbac e sem admin/views vazios. Registry permanece core.
+- Profile e ProfilePermission híbridos; Assignment e AssignmentExclusion de
+  contrato. FKs PROTECT, tabelas dsc_, UUIDs v7, autoria e exclusão lógica.
+  scope_organization/excluded_organization são alvos da concessão/exceção,
+  distintos do contexto de persistência de contrato exigido pelo check core.
+- Constraints: nomes únicos por contexto, incluindo sistema com NULLS NOT
+  DISTINCT; chave essencial única e somente no sistema; atribuição XOR perfil/
+  código, scope consistente, unicidade de atribuição/permissão/exceção. Índice
+  contract/user. Nomes com comparação exata, sem normalização de caixa.
+- Selectors consultam nomes, contratos duplicados para aviso lazy/paginável em
+  UUIDs e perfil em uso. Services validam registry/escopos/reservadas, vínculos
+  de contexto, exclusões e perfis essenciais, com transações e autoria.
+  Atualmente só superadmin ativo/não excluído pode escrever, verificado no banco.
+- Advisory lock transacional global serializa configuração RBAC, inclusive nome
+  de perfil híbrido. Custo de concorrência apenas nas escritas administrativas;
+  reavaliar se houver contenção. Assignment bloqueia usuário, coordenando com
+  save_user, que agora bloqueia troca de contrato enquanto houver atribuições.
+- Perfil atribuído inclusive por grants inativos gera ProfileInUse (409).
+  Exclusão lógica trata permissões/exceções em lote, na mesma transação.
+  Não usar save/update/bulk direto em gestão: constraints não validam tudo entre
+  tabelas. Fixtures/migrations controladas mantêm perfil essencial.
+- system_key contract_admin identifica perfil essencial, sem seed nesta etapa.
+  Serviços negam criação/edição/exclusão do perfil e suas permissões; atribuição
+  exige CONTRACT sem exceções. Edição/remoção da atribuição essencial bloqueada
+  até a proteção específica de 3.4, incluindo troca de usuário/perfil/desativação.
+- 39 testes novos, incluindo isolamento de vínculos, reservas, autoria,
+  cascatas lógicas, constraints, proteção essencial, transferências e atores.
+  Concorrência de nomes PostgreSQL provada; 22 queries constantes na criação
+  de atribuição com 1/30 permissões (inclui full_clean e savepoints).
+  Validador completo: 227 testes, lint, formatação, migrations e checks de
+  desenvolvimento/produção passaram. rbac.0001 aplicada localmente, sem seeds.
+- OWASP A01/A06/A10 revisados: escrita administrativa fechada, vínculos
+  intercontratos negados, reservas/escopos validados e transações/concorrência
+  testadas. Bypass de revogação do admin por edição corrigido com testes.
+  A02/A05/A08: configuração mínima, SQL fixo parametrizado, ORM/constraints,
+  sem entrada HTTP/desserialização nova. A03/A04/A07: sem dependências, crypto
+  ou autenticação alteradas. A09: autoria presente, eventos completos em 3.6;
+  nenhum novo endpoint publicado antes dessa proteção. Sem achados residuais
+  no escopo desta etapa, sem declarar RBAC/isolamento completos.
+- Performance: sem N+1, queries constantes provadas, exists para existência,
+  códigos em uma consulta e exclusão de filhos em lote. Avisos lazy, sem carregar
+  todos os contratos. Lock global documentado; leituras de acesso não o usam.
+- Checklist legal base: vínculos para administração do acesso ao serviço, sem
+  dados cadastrais adicionais, UI, dados sensíveis, logs pessoais, terceiros ou
+  novas dependências. Retenções/expurgo seguem ADR 0007 e entrega própria;
+  soft delete não é eliminação. Não é declaração de conformidade do produto.
+- Docs domínio/registry/erro, ADR/índice, AGENTS/README, overview/plano e memória
+  atualizados. Próxima etapa 3.3 exige confirmação. Depois 3.4–3.6 e 2.3–2.5.
+
+## Etapa 3.1 anterior: registry
 
 - Usuário pediu 2.3. Verificada dependência do contexto nas atribuições de 3.2;
   o usuário escolheu antecipar RBAC antes do contexto. Nova ordem no plano:
@@ -129,7 +181,7 @@
 
 ## Feito até aqui
 
-- ADRs 0001–0015 revisados; 0003 continua Proposto para discussão do frontend.
+- ADRs 0001–0016 revisados; 0003 continua Proposto para discussão do frontend.
 - Backend Django 5.2 LTS, sem Admin, sessões ou messages; etapas 0.1/0.2 concluídas.
 - API versionada, handler RFC 9457, request ID e log_filters; logs de conclusão
   apenas para erros (4xx WARNING / 5xx ERROR), por decisão do usuário.

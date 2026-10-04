@@ -1,5 +1,25 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 3.2: perfis e atribuições RBAC
+
+- Usuário aprovou apps/rbac (ADR 0016), separado de users/core. App gerado por
+  startapp; quatro models com escopos, UUIDs, autoria, soft delete e constraints.
+- Selectors para nomes, aviso lazy de contratos e perfil em uso; services atomic
+  exigem superadmin ativo, serializam configuração via advisory lock e validam
+  contrato/organização, registry, reservas e escopos. Sem autorização de cliente
+  ou endpoints; cálculo efetivo fica em 3.3.
+- Perfil essencial protegido de edição/exclusão, sem fixture agora. Edição e
+  remoção de suas atribuições negadas até as proteções específicas de 3.4.
+  Revisão fechou bypass por substituição de perfil, usuário ou desativação.
+- save_user bloqueia troca de contrato enquanto existirem atribuições. Exclusões
+  lógicas tratam permissões/exceções em lote e bloqueiam perfil ainda atribuído.
+- 39 testes novos; 227 passaram no validador completo, junto de lint, formatação,
+  ausência de mudanças de migrations e checks desenvolvimento/produção. Teste
+  PostgreSQL de concorrência de nomes e 22 queries constantes com 1/30 permissões.
+- Migration rbac.0001_initial aplicada ao banco local autorizado, somente schema,
+  sem seeds ou backfill. Documentação de domínio/registry/erro, ADR/índice,
+  AGENTS/README, overview, plano, memória e handoff sincronizados.
+
 ## 2026-10-03 — Etapa 3.1: registry RBAC antecipado
 
 - Ao iniciar 2.3, verificada dependência das atribuições de 3.2. Usuário decidiu
