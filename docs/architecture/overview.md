@@ -40,6 +40,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 4.1: registro de acesso do Marco Civil, `AccessLog` fora dos tipos de escopo, ADR 0018) | concluído |
 | `backend/` (revisão 4.1: AccessLog seletivo de autenticação, sem escrita por leitura comum; ADR 0019) | concluído |
 | `backend/` (etapa 5.1: LookupOptionsMixin, UUID/rótulo, busca declarada, paginação limitada e permissão view; sem novas rotas de produção) | concluído |
+| `backend/` (etapa 5.2: API administrativa de planos/contratos, opções/schema, organizações para entrada; services e auditoria, redução de licenças protegida) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

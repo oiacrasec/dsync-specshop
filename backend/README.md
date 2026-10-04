@@ -4,8 +4,7 @@ API Django autônoma do monorepo.
 
 Não usa Django Admin, sessões nem messages (ADR 0008). A administração própria será
 implementada na API e no frontend; por enquanto, a manutenção usa management commands,
-como `createsuperuser`. As rotas versionadas usam `/api/v1/`, sem endpoints de negócio
-publicados nesta etapa. JWT e `IsAuthenticated` são globais. Login, refresh e
+como `createsuperuser`. As rotas versionadas usam `/api/v1/`. JWT e `IsAuthenticated` são globais. Login, refresh e
 logout ficam sob `/api/v1/auth/`; veja o [contrato de autenticação](../docs/api/authentication.md).
 
 Erros da API seguem [RFC 9457](../docs/api/errors.md), com
@@ -16,8 +15,10 @@ API retornam 404, inclusive em desenvolvimento.
 A etapa 5.1 disponibiliza `LookupOptionsMixin` para seleções com UUID/rótulo,
 paginação limitada, busca declarada e resolução de inativos por UUID. Exige a
 permissão `:view` e preserva o escopo; veja o [contrato de options](../docs/api/options.md).
-Ainda não há recursos de negócio publicados. Próxima etapa: API administrativa
-de planos e contratos (5.2).
+A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contracts.md)
+em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
+redução de licenças protegida por lock; quotas continuam sem enforcement.
+Próxima etapa: gestão administrativa de usuários/superadmins/admins de contrato (5.3).
 
 | Item | Versão |
 |---|---|

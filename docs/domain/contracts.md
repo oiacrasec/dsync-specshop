@@ -69,12 +69,15 @@ PROTECT impede remoção física pelo ORM quando houver referências.
 
 - Migration `contracts.0001_initial` aplicada ao banco local autorizado.
 - Nenhum plano, contrato ou organização inicial foi cadastrado.
-- Sem endpoints, serializers ou serviços de contratação publicados nesta etapa.
+- API administrativa de planos/contratos publicada na etapa 5.2, com serializers,
+  selectors e services; contrato em [administração](../api/admin-contracts.md).
+  Não implementa contratação comercial, cobrança ou assinatura.
 - Vínculo de usuário e regras de licenças: etapa 2.2 concluída, conforme
   [ADR 0015](../adr/0015-contagem-de-licencas-de-usuarios.md).
 - Contrato ativo/vigência conferido no login, refresh e a cada requisição: etapa 2.3 (abaixo).
 - Isolamento automático de consultas e testes entre tenants: etapas 2.4–2.5.
-  `objects` hoje filtra somente excluídos; não é uma barreira de autorização.
+  `objects` hoje filtra excluídos e contexto, falhando sem tenant; acesso global
+  administrativo é explícito e autorizado apenas ao superadmin.
 
 ## Usuários e licenças
 

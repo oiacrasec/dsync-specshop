@@ -36,6 +36,7 @@ um ADR novo que **substitui** o anterior.
 | [0017](0017-trilha-de-auditoria.md) | Trilha de auditoria append-only | Aceito |
 | [0018](0018-registro-de-acesso.md) | Registro de acesso fora dos tipos de escopo | Aceito |
 | [0019](0019-registros-de-autenticacao.md) | Registros de acesso concentrados na autenticação | Aceito (substitui parcialmente 0018) |
+| [0020](0020-administracao-de-planos-e-contratos.md) | Administração de planos/contratos e redução segura de licenças | Aceito |
 
 ## Modelo
 

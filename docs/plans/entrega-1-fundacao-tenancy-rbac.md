@@ -32,6 +32,7 @@ e só começa após aprovação do usuário.
 | 20 | 4.1 (aprovado): IP/porta reais por headers do proxy configuráveis (`check --deploy` avisa); toda requisição à `/api/` com só os campos da lei + `request_id`; `AccessLog` como exceção ao escopo (ADR 0018); retenção de 6 meses declarada, expurgo + `LegalHold` na entrega do ADR 0007 antes de produção; gravação por middleware após a resposta |
 | 21 | Revisão da 4.1 aprovada: seguir cobertura implementada no Spatial (login sucesso/falha e refresh sucesso), sem AccessLog por requisição comum; preservar AuditEvent e registros históricos. ADR 0019 substitui a cobertura de 0018, sem afirmar suficiência jurídica de apenas login |
 | 22 | Premissa permanente do usuário: performance forte em todo o projeto, não só AccessLog; avaliar frequência, queries, escritas, locks, CPU, memória, tráfego e concorrência, com medição conforme o risco antes de entregar |
+| 23 | 5.2: usuário aprovou impedir redução de licenças abaixo dos usuários não excluídos, contando inativos; usar lock do contrato compartilhado com cadastro de usuários (ADR 0020) |
 
 ## Bloco 0 — Fundação
 
@@ -80,7 +81,7 @@ e só começa após aprovação do usuário.
 | # | Etapa | ADR | Status |
 |---|---|---|---|
 | 5.1 | Mixin `options` | 0011 | ✅ |
-| 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008 | ⬜ |
+| 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008, 0020 | ✅ |
 | 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
 | 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ⬜ |
 | 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ⬜ |

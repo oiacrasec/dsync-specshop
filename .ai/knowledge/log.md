@@ -1,5 +1,29 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 5.2: administração de planos e contratos
+
+- CRUD em /api/v1/admin/plans e contracts, somente superadmin ativo, sem organização;
+  serializers/selectors/services/permissions/views/urls em apps/contracts. Listas
+  first/rows, busca por nome, filtros/ordenação permitidos, options/schema; ação de
+  organizações ativas do contrato para entrada do superadmin, prevista na 3.5.
+- Usuário aprovou impedir redução de licenças abaixo dos usuários não excluídos,
+  contando inativos (ADR 0020). Atualização com estado atual/lock do contrato;
+  teste de redução concorrente com cadastro garante ocupação <= licenças.
+- Soft delete sem cascata/expurgo. Quotas continuam configuração. Planos excluídos
+  não são selecionáveis; contrato histórico continua consultável/editável.
+- Escritas auditadas atomicamente, configuração antes/depois sem nome de cliente;
+  falha do AuditEvent desfaz alteração. audit.0005 aplicada localmente (seis escolhas).
+  Leituras administrativas/options não gravam logs/eventos; duas queries de dados,
+  constantes com 1/30 itens, JOIN do plano sem N+1.
+- Medição exploratória local com JWT e 10 chamadas sequenciais: 30 contratos,
+  medianas listagem/options 6,91/4,09 ms; 10 mil, 28,80/16,14 ms. EXPLAIN ANALYZE
+  avaliado; não é carga concorrente/certificação de capacidade. Sem novos índices
+  genéricos; reavaliar busca/contagem/offset conforme volumes reais.
+- Validação: 440 testes; lint, formato, migrations/checks desenvolvimento/produção OK.
+  OWASP A01–A10: sem novos achados, controles de acesso, ORM parametrizado, limites,
+  falha fechada e auditoria revisados. Base legal/CDC: API de configuração interna,
+  sem cobrança/aceite/assinatura, dependências/PII novos ou mudança de retenção.
+
 ## 2026-10-04 — Etapa 5.1: infraestrutura de opções
 
 - LookupOptionsMixin em core/views, entrada em core/serializers, leitura em

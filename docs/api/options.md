@@ -48,6 +48,11 @@ O código `category:view` do exemplo precisa existir no registry. Declare para
 leitura. O mixin adiciona essa exigência mesmo quando a view usa `AllowAuthenticated`
 e preserva outras restrições declaradas, como acesso exclusivo à administração.
 
+Na área administrativa (ADR 0008/0020), `options_permission_class` é
+`SuperadminPermission`: a mesma autorização da leitura administrativa, sem exigir
+organização ou conceder acesso via RBAC de cliente. Nos recursos comuns permanece
+`LookupOptionsPermission`, com a exigência de `:view` e contexto.
+
 `get_queryset()` fornece o escopo e quaisquer restrições próprias do recurso; não
 deve filtrar inativos, pois isso impediria resolver seleções existentes.
 Nunca declare queryset avaliado no nível da classe nem use `unscoped()` para
@@ -72,4 +77,5 @@ O limite de página controla resposta/memória, não limita linhas examinadas pe
 Antes de publicar cada recurso, medir busca/contagem/ordenação com volume e
 concorrência representativos, analisar EXPLAIN ANALYZE e definir índices adequados
 ao contexto e aos campos reais. Não criar índices genéricos sem uso demonstrado.
-Esta etapa não adiciona tabelas, migrations ou endpoints à URL de produção.
+A etapa 5.1 não adicionou tabelas, migrations ou endpoints à URL de produção.
+A etapa 5.2 publica as opções administrativas de planos e contratos.

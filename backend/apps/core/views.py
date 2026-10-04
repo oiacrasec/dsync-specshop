@@ -64,13 +64,14 @@ class LookupOptionsMixin:
 
     options_label_field = None
     options_search_fields = ()
+    options_permission_class = LookupOptionsPermission
 
     def get_permissions(self):
         permissions = super().get_permissions()
         if self.action == 'options':
             # Preserva restrições adicionais (por exemplo, administração).
             permissions = [permission for permission in permissions if type(permission) is not RequiredPermission]
-            permissions.append(LookupOptionsPermission())
+            permissions.append(self.options_permission_class())
         return permissions
 
     @action(detail=False, methods=['get'])

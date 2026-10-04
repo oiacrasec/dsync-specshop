@@ -10,6 +10,12 @@ from .managers import AccessLogManager, AccessLogQuerySet, AllAuditManager, Appe
 
 
 class AuditEventType(models.TextChoices):
+    PLAN_CREATED = 'plan.created', _('plano criado')
+    PLAN_UPDATED = 'plan.updated', _('plano alterado')
+    PLAN_DELETED = 'plan.deleted', _('plano excluído')
+    CONTRACT_CREATED = 'contract.created', _('contrato criado')
+    CONTRACT_UPDATED = 'contract.updated', _('contrato alterado')
+    CONTRACT_DELETED = 'contract.deleted', _('contrato excluído')
     PROFILE_CREATED = 'profile.created', _('perfil criado')
     PROFILE_UPDATED = 'profile.updated', _('perfil alterado')
     PROFILE_DELETED = 'profile.deleted', _('perfil excluído')
