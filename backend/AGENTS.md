@@ -107,7 +107,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `apps.users.services.delete_user`; `user.delete()` e `User.objects...delete()` delegam a ele
   (o lote de usuários exclui um a um, com N queries, de propósito). `User.save()` delega a
   `save_user` (só argumentos nomeados); `update_fields` sem campo de regra grava direto. Ver
-  [domínio RBAC](../docs/domain/rbac.md). Transferir User de contrato exige remover
+  [domínio RBAC](../docs/domain/rbac.md). Todo service de RBAC e as mudanças de conta de
+  superadmin gravam evento em `apps/audit` (append-only, ADR 0017); nunca alterar/excluir eventos. Transferir User de contrato exige remover
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view
   declara `required_permission` (código do registry ou dicionário por action/método) ou

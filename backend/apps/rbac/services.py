@@ -3,6 +3,8 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connection, transaction
 from django.utils.translation import gettext_lazy as _
 
+from apps.audit.models import AuditEventType as Event
+from apps.audit.services import record
 from apps.contracts.models import Contract, Organization
 from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
@@ -45,6 +47,43 @@ def _is_active_admin_grant(assignment):
         return False
     return active_admin_count(assignment.contract_id) != active_admin_count(
         assignment.contract_id, exclude_assignment_id=assignment.pk
+    )
+
+
+# Campos auditados de cada model (FKs pelo public_id; ADR 0017).
+AUDIT_FIELDS = {
+    Profile: {'name': 'name', 'contract': 'contract__public_id', 'is_active': 'is_active'},
+    ProfilePermission: {
+        'profile': 'profile__public_id',
+        'permission_code': 'permission_code',
+        'is_active': 'is_active',
+    },
+    Assignment: {
+        'user': 'user__public_id',
+        'profile': 'profile__public_id',
+        'permission_code': 'permission_code',
+        'scope': 'scope',
+        'scope_organization': 'scope_organization__public_id',
+        'is_active': 'is_active',
+    },
+    AssignmentExclusion: {
+        'assignment': 'assignment__public_id',
+        'excluded_organization': 'excluded_organization__public_id',
+        'is_active': 'is_active',
+    },
+}
+
+
+def _snapshot(instance):
+    fields = AUDIT_FIELDS[type(instance)]
+    row = type(instance).all_objects.filter(pk=instance.pk).values(*fields.values()).get()
+    return {name: str(row[path]) if hasattr(row[path], 'hex') else row[path] for name, path in fields.items()}
+
+
+def _audit_save(instance, actor, before, created, updated):
+    event = created if before is None else updated
+    record(
+        event, actor=actor, contract_id=instance.contract_id, target=instance, before=before, after=_snapshot(instance)
     )
 
 
@@ -97,7 +136,9 @@ def save_profile(*, profile, actor):
     if conflicting_profile_names(profile):
         _invalid('name', 'Já existe um perfil com esse nome no contrato ou no sistema.')
     profile.full_clean()
+    before = None if profile._state.adding else _snapshot(profile)
     profile.save(actor=actor)
+    _audit_save(profile, actor, before, Event.PROFILE_CREATED, Event.PROFILE_UPDATED)
     # Aviso de duplicados de clientes quando superadmin cria/renomeia perfil do sistema.
     return profile, duplicate_client_contracts(profile) if profile.contract_id is None else None
 
@@ -109,8 +150,19 @@ def delete_profile(*, profile, actor):
     _mutable_profile(current)
     if profile_is_assigned(current):
         raise ProfileInUse()
+    before = _snapshot(current)
+    permissions = ProfilePermission.objects.filter(profile=current)
+    removed = sorted(permissions.values_list('permission_code', flat=True))
     current.delete(actor=actor)
-    ProfilePermission.objects.filter(profile=current).delete(actor=actor)
+    permissions.delete(actor=actor)
+    record(
+        Event.PROFILE_DELETED,
+        actor=actor,
+        contract_id=current.contract_id,
+        target=current,
+        before=before,
+        removed_permissions=removed,
+    )
     return current
 
 
@@ -132,7 +184,9 @@ def save_profile_permission(*, permission, actor):
         if current.profile_id != permission.profile_id:
             _invalid('profile', 'O perfil de uma permissão existente não pode ser alterado.')
     permission.full_clean()
+    before = None if permission._state.adding else _snapshot(permission)
     permission.save(actor=actor)
+    _audit_save(permission, actor, before, Event.PROFILE_PERMISSION_ADDED, Event.PROFILE_PERMISSION_UPDATED)
     return permission
 
 
@@ -141,7 +195,11 @@ def delete_profile_permission(*, permission, actor):
     _begin_write(actor)
     current = ProfilePermission.objects.get(pk=permission.pk)
     _mutable_profile(_profile(current.profile_id))
+    before = _snapshot(current)
     current.delete(actor=actor)
+    record(
+        Event.PROFILE_PERMISSION_REMOVED, actor=actor, contract_id=current.contract_id, target=current, before=before
+    )
     return current
 
 
@@ -198,7 +256,9 @@ def save_assignment(*, assignment, actor):
         ensure_contract_keeps_admin(
             assignment.contract_id, exclude_assignment_id=current.pk, adding=int(stays_admin and user.is_active)
         )
+    before = None if assignment._state.adding else _snapshot(assignment)
     assignment.save(actor=actor)
+    _audit_save(assignment, actor, before, Event.ASSIGNMENT_CREATED, Event.ASSIGNMENT_UPDATED)
     return assignment
 
 
@@ -208,8 +268,19 @@ def delete_assignment(*, assignment, actor):
     current = Assignment.objects.get(pk=assignment.pk)
     if _is_active_admin_grant(current):
         ensure_contract_keeps_admin(current.contract_id, exclude_assignment_id=current.pk)
+    before = _snapshot(current)
+    exclusions = AssignmentExclusion.objects.filter(assignment=current)
+    removed = sorted(str(item) for item in exclusions.values_list('excluded_organization__public_id', flat=True))
     current.delete(actor=actor)
-    AssignmentExclusion.objects.filter(assignment=current).delete(actor=actor)
+    exclusions.delete(actor=actor)
+    record(
+        Event.ASSIGNMENT_DELETED,
+        actor=actor,
+        contract_id=current.contract_id,
+        target=current,
+        before=before,
+        removed_exclusions=removed,
+    )
     return current
 
 
@@ -232,7 +303,9 @@ def save_exclusion(*, exclusion, actor):
         if current.assignment_id != exclusion.assignment_id:
             _invalid('assignment', 'A atribuição de uma exceção existente não pode ser alterada.')
     exclusion.full_clean()
+    before = None if exclusion._state.adding else _snapshot(exclusion)
     exclusion.save(actor=actor)
+    _audit_save(exclusion, actor, before, Event.EXCLUSION_ADDED, Event.EXCLUSION_UPDATED)
     return exclusion
 
 
@@ -240,5 +313,7 @@ def save_exclusion(*, exclusion, actor):
 def delete_exclusion(*, exclusion, actor):
     _begin_write(actor)
     current = AssignmentExclusion.objects.get(pk=exclusion.pk)
+    before = _snapshot(current)
     current.delete(actor=actor)
+    record(Event.EXCLUSION_REMOVED, actor=actor, contract_id=current.contract_id, target=current, before=before)
     return current

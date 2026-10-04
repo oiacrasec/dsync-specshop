@@ -44,6 +44,7 @@ LOCAL_APPS = [
     'apps.users',
     'apps.contracts',
     'apps.rbac',
+    'apps.audit',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -54,6 +55,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Fora da transação da view: a entrada do superadmin fica registrada mesmo com erro.
+    'apps.audit.middleware.SuperadminEntryAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

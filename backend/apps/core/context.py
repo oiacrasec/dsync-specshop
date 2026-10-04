@@ -40,4 +40,8 @@ def resolve_organization(request):
         raise ContextForbidden()
     request._dsc_organization = organization
     request.organization = organization
+    if user.is_superuser:
+        from apps.audit.middleware import mark_superadmin_entry
+
+        mark_superadmin_entry(request, organization)
     return organization

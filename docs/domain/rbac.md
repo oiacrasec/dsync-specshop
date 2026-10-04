@@ -90,7 +90,7 @@ para manutenção do perfil essencial. Os services atuais usam o banco padrão.
 | Nenhuma concessão alcança a organização | 403 `context-forbidden` |
 | Acessa a organização, mas não tem o código | 403 `permission-denied` |
 | Perfil essencial (`contract_admin`) | todos os códigos do registry, inclusive os criados depois |
-| Superadmin com header | todos os códigos na organização escolhida (entrada auditada na 3.6) |
+| Superadmin com header | todos os códigos na organização escolhida (entrada auditada, ver [auditoria](audit.md)) |
 | Superadmin sem header em endpoint de negócio | 400 `context-invalid-request`; a área admin terá endpoints próprios (bloco 5) |
 | Contrato do usuário indisponível | 403 `contract-inactive` já na autenticação (etapa 2.3, ver [contratos](contracts.md)) |
 
@@ -134,7 +134,7 @@ O acesso total dinâmico do perfil essencial vale no cálculo (3.3).
 | `contracts.selectors.superadmin_contracts(search)` | 1º passo do superadmin: contratos não excluídos (inclui inativos/vencidos para suporte), busca por nome |
 | `contracts.selectors.superadmin_contract_organizations(contract)` | 2º passo: organizações ativas do contrato. Endpoints na área admin (bloco 5) |
 
-auditoria de eventos em 3.6. Autoria nos models não substitui essa trilha.
+Toda mudança de permissão é auditada ([auditoria](audit.md), etapa 3.6). Autoria nos models não substitui essa trilha.
 O isolamento automático de queries continua nas etapas 2.4–2.5.
 
 ## Dados e finalidade

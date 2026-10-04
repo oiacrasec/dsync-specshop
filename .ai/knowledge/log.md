@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 3.6: trilha de auditoria
+
+- ADR 0017; `apps/audit` (startapp) com `AuditEvent` Hybrid, append-only (save/delete/lote
+  levantam erro). Campo `context_organization` (o nome `organization` é reservado ao escopo).
+- Services de RBAC gravam evento com snapshot before/after na mesma transação (+2 queries).
+- `save_user`/`delete_user` auditam contas de superadmin; `createsuperuser` → autor nulo.
+- Entrada do superadmin: `resolve_organization` marca, middleware grava após a resposta
+  (fora do ATOMIC_REQUESTS), única por superadmin + organização + jti.
+- Migration audit.0001 criada; aplicação no banco local depende do usuário.
+- 304 testes. Docs: ADR 0017, domain/audit.md, rbac, README, AGENTS, overview, plano, handoff.
+
 ## 2026-10-04 — Etapa 2.3: contrato a cada requisição e contexto do superadmin
 
 - `Contract.is_available()`; `ensure_contract_available` no login (após senha), refresh e

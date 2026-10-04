@@ -351,7 +351,7 @@ def test_assignment_validation_queries_are_constant_with_many_profile_permission
             for definition in definitions
         ]
     )
-    with django_assert_num_queries(22):
+    with django_assert_num_queries(24):  # +2 da auditoria (snapshot e evento), constantes.
         services.save_assignment(assignment=grant(common, profile), actor=admin)
 
 

@@ -30,7 +30,8 @@ backend/
 │   ├── core/          → BaseModel, tipos de escopo, checks, erros e correlação
 │   ├── users/         → usuário customizado
 │   ├── contracts/     → planos, contratos e organizações
-│   └── rbac/          → perfis, permissões, atribuições e exceções
+│   ├── rbac/          → perfis, permissões, atribuições e exceções
+│   └── audit/         → trilha de auditoria append-only
 ├── requirements/      → base, development, production, testing
 ├── static/ templates/ scripts/
 ├── docs/              → architecture, standards, patterns, examples
@@ -147,7 +148,9 @@ nunca fica sem Administrador ativo (409). `user.save()` delega a `save_user`;
 Etapa 3.5: `GET /api/v1/me/organizations/` lista as organizações acessíveis (sem header);
 a busca contrato → organização do superadmin fica em `apps/contracts/selectors.py`.
 Etapa 2.3: contrato conferido no login, refresh e a cada requisição (403
-`contract-inactive`); superadmin entra em organização pelo header. Auditoria de eventos em 3.6. Ainda não há endpoints de gestão.
+`contract-inactive`); superadmin entra em organização pelo header. Etapa 3.6: `apps/audit` guarda a trilha append-only de mudanças de permissão, contas de
+superadmin e entradas do superadmin em organização ([auditoria](../docs/domain/audit.md)).
+Ainda não há endpoints de gestão.
 
 ## Configuração do PyCharm
 

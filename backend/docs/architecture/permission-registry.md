@@ -52,6 +52,6 @@ mensagens internas diretamente ao cliente.
 
 Perfis e atribuições estão em apps/rbac (3.2), conforme o
 [domínio RBAC](../../../docs/domain/rbac.md). Cálculo da permissão efetiva e integração DRF concluídos (3.3). Faltam fixture do
-perfil essencial (3.4), organizações acessíveis (3.5) e auditoria (3.6).
+perfil essencial (3.4), organizações acessíveis (3.5) e auditoria (3.6, `apps/audit`).
 Depois disso, retomar o contexto (2.3). O registry permanece Python puro, sem
 models ou migrations próprios; não há concessão automática ou mudança nos endpoints JWT.

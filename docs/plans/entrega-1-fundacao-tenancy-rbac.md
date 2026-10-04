@@ -26,7 +26,8 @@ e só começa após aprovação do usuário.
 | 14 | 3.4 (aprovado): perfil essencial criado por migration de dados idempotente (não fixture manual); proteção do último admin cobre atribuição e também desativação/exclusão do usuário; vale inclusive para o superadmin; `User.delete()` e o lote de usuários delegam a `delete_user`; `User.save()` delega a `save_user` (aprovados) |
 | 15 | 3.5 (aprovado): publica só `GET /api/v1/me/organizations/` (filtrado pelo usuário); busca do superadmin fica em selectors, endpoint na área admin (5.2). Lista só organizações ativas e não excluídas, ordem por nome |
 | 16 | Ordem ajustada (aprovado): 2.3 antes da 3.6, porque auditar a entrada do superadmin exige o contexto. Nova ordem: 2.3 → 3.6 → 2.4 → 2.5 → 4.1 → bloco 5 |
-| 17 | 2.3 (aprovado): login com senha certa e contrato indisponível → 403 `contract-inactive`; access/refresh negados enquanto indisponível, sem revogar todos os refresh; superadmin entra em organização de contrato vencido/inativo (excluído → 403); superadmin sem header em endpoint de negócio → 400 |
+| 17 | 2.3 (aprovado): login com senha certa e contrato indisponível → 403 `contract-inactive`; access/refresh negados enquanto indisponível, sem revogar todos os refresh; superadmin entra em organização de contrato vencido/inativo (excluído → 403); superadmin sem header em endpoint de negócio → 400. Usuário confirmou o 403 para contrato excluído |
+| 18 | 3.6 (aprovado): `apps/audit` + `AuditEvent` (ADR 0017); entrada do superadmin 1x por superadmin + organização + access token; "alterações de superadmin" = contas de superadmin; eventos imutáveis, com before/after só dos campos de permissão |
 
 ## Bloco 0 — Fundação
 
@@ -62,7 +63,7 @@ e só começa após aprovação do usuário.
 | 3.3 | Cálculo da permissão efetiva + permissão do DRF que **nega por padrão** | 0009 §4 | ✅ |
 | 3.4 | Perfil essencial "Administrador do contrato" (fixture, acesso total dinâmico) | 0009 §5 | ✅ |
 | 3.5 | Lista de organizações acessíveis + busca contrato → organização do superadmin | 0009 §6 | ✅ |
-| 3.6 | Auditoria das mudanças de permissão e das entradas do superadmin em organização | 0009 §7 | ⬜ |
+| 3.6 | Auditoria das mudanças de permissão e das entradas do superadmin em organização | 0009 §7 | ✅ |
 
 ## Bloco 4 — Registro de acesso
 

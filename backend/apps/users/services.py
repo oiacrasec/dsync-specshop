@@ -67,7 +67,42 @@ def save_user(*, user, actor=None, using=None, **save_options):
 
                 ensure_contract_keeps_admin(current.contract_id, exclude_user_id=user.pk)
         _base_save(user, using=database, actor=actor, **save_options)
+        _audit_superadmin(current, user, actor)
     return user
+
+
+def _superadmin_events(current, user):
+    """Mudanças nas contas de superadmin (ADR 0009 §7, decisão 3 da 3.6)."""
+    from apps.audit.models import AuditEventType as Event
+
+    was_admin = current is not None and current.is_superuser
+    if current is None:
+        return [Event.SUPERADMIN_CREATED] if user.is_superuser else []
+    if was_admin != user.is_superuser:
+        return [Event.SUPERADMIN_PROMOTED if user.is_superuser else Event.SUPERADMIN_DEMOTED]
+    if not user.is_superuser:
+        return []
+    events = []
+    if current.is_active != user.is_active:
+        events.append(Event.SUPERADMIN_REACTIVATED if user.is_active else Event.SUPERADMIN_DEACTIVATED)
+    if (current.deleted_at is None) != (user.deleted_at is None):
+        events.append(Event.SUPERADMIN_RESTORED if user.deleted_at is None else Event.SUPERADMIN_DELETED)
+    return events
+
+
+def _superadmin_state(user):
+    return {'is_superuser': user.is_superuser, 'is_active': user.is_active, 'deleted': user.deleted_at is not None}
+
+
+def _audit_superadmin(current, user, actor):
+    events = _superadmin_events(current, user)
+    if not events:
+        return
+    from apps.audit.services import record
+
+    before = None if current is None else _superadmin_state(current)
+    for event in events:
+        record(event, actor=actor, target=user, before=before, after=_superadmin_state(user))
 
 
 def _base_save(user, **kwargs):
@@ -107,6 +142,18 @@ def delete_user(*, user, actor=None, using=None):
                 ensure_contract_keeps_admin(current.contract_id, exclude_user_id=current.pk)
         base = type(user).all_objects.using(database).filter(pk=current.pk)
         count, _ = SoftDeleteQuerySet.delete(base, actor=actor)
+        if count and current.is_superuser:
+            from apps.audit.models import AuditEventType
+            from apps.audit.services import record
+
+            before = _superadmin_state(current)
+            record(
+                AuditEventType.SUPERADMIN_DELETED,
+                actor=actor,
+                target=current,
+                before=before,
+                after={**before, 'deleted': True},
+            )
     user.refresh_from_db(using=database)
     return count
 
