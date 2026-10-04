@@ -6,6 +6,9 @@ from django.urls import URLResolver, clear_url_caches, path
 from config.api import v1
 from config.urls import urlpatterns
 
+# Registro de acesso (4.1): sem transação externa do teste, como em produção.
+pytestmark = pytest.mark.django_db(transaction=True)
+
 
 @pytest.mark.parametrize('path', ['/', '/admin/', '/admin/login/'])
 def test_unpublished_routes_return_404_without_session(client, path):

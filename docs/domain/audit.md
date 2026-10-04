@@ -35,3 +35,22 @@ Trilha append-only do [ADR 0017](../adr/0017-trilha-de-auditoria.md), em `apps/a
 - Custo: +2 queries constantes por escrita de RBAC (snapshot e evento) e +1 INSERT por
   requisição do superadmin com organização.
 - Leitura pela API: bloco 5 (administração). Retenção/eliminação: entrega de expurgo (ADR 0007).
+
+## Registro de acesso (etapa 4.1)
+
+`AccessLog` (`dsc_access_log`), [ADR 0018](../adr/0018-registro-de-acesso.md), Marco Civil art. 15.
+
+| Campo | Conteúdo |
+|---|---|
+| `occurred_at` | data e hora em UTC |
+| `ip` / `port` | origem do cliente; atrás do proxy, pelos headers `DJANGO_ACCESS_LOG_IP_HEADER`/`DJANGO_ACCESS_LOG_PORT_HEADER` |
+| `user` | autenticado (no login, quem entrou); vazio se anônimo |
+| `contract` / `organization` | do contexto de tenant; sem contexto, o contrato do usuário |
+| `request_id` | correlação com `X-Request-Id` e os logs |
+
+- Toda requisição a `/api/`, inclusive anônima e com erro; gravada após a resposta, fora da
+  transação da view (`AccessLogMiddleware`).
+- Só inserção; leitura só em `system_context()`/`unscoped()` (ordem judicial, recorte por
+  usuário ou IP + período, índices `(user, occurred_at)` e `(ip, occurred_at)`).
+- Guarda mínima de 6 meses (`AccessLog.minimum_retention_months`). Expurgo e `LegalHold`:
+  entrega do ADR 0007, obrigatórios antes de produção.

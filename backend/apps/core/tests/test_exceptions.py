@@ -24,6 +24,9 @@ from apps.core.exceptions import (
 )
 from apps.core.log_filters import request_id_context
 
+# Registro de acesso (4.1): sem transação externa do teste, como em produção.
+pytestmark = pytest.mark.django_db(transaction=True)
+
 PRIVATE_DETAIL = 'secret@example.com SELECT * FROM private_table /internal/private.py'
 
 
@@ -177,8 +180,9 @@ def test_generic_problems_preserve_http_semantics(rf, error):
         assert response['Retry-After'] == '12'
 
 
-def test_authentication_required_without_database(client, test_routes):
-    response = client.get('/api/v1/protected/')
+def test_authentication_required_only_writes_the_access_log(client, test_routes, django_assert_num_queries):
+    with django_assert_num_queries(1):  # Só o INSERT do registro de acesso; a autenticação não consulta.
+        response = client.get('/api/v1/protected/')
 
     assert response.status_code == 401
     assert response.json()['type'] == 'urn:datasync:problem:authentication-required'

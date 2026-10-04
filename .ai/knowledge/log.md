@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 4.1: registro de acesso
+
+- ADR 0018; `AccessLog` em `apps/audit`, fora do BaseModel e dos tipos de escopo
+  (`UNSCOPED_RECORDS`); só inserção; leitura só em `system_context()`.
+- `AccessLogMiddleware` após a resposta (fora da transação da view); `client_address` com
+  headers do proxy configuráveis e check de deploy (audit.W001/W002); login define o usuário.
+- Testes de API passaram a precisar de banco; test_exceptions/test_urls transacionais
+  (suíte ~40 s). Migration audit.0003 criada; aplicação local aguarda autorização.
+
 ## 2026-10-04 — Padrão de queries SQL escritas à mão
 
 - `apps/<app>/queries/<nome>.py` com uma constante por arquivo; só o selector executa,

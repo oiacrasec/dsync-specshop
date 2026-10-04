@@ -13,7 +13,7 @@ e só começa após aprovação do usuário.
 | 1 | `Contract` é a **raiz do tenant** e herda direto do `BaseModel` (ADR 0012) |
 | 2 | Vínculo usuário → contrato por **campo `contract` no `User`** (vazio para superadmin) |
 | 3 | Comandos de expurgo e eliminação (ADR 0007 §4) ficam para uma entrega própria; o soft delete entra na etapa 1.1 |
-| 4 | A porta de origem do registro de acesso depende do proxy reverso: decidir na etapa 4.1 |
+| 4 | A porta de origem do registro de acesso depende do proxy reverso: resolvido na 4.1 com headers configuráveis (decisão 20) |
 | 5 | Por aprovação do usuário, executar **1.1 antes de 0.3**, para que o JWT use o `public_id` do usuário sem expor o ID interno (ADR 0007). Ordem: 0.1 → 0.2 → 1.1 → 0.3 → 1.2 → demais etapas |
 | 6 | Login: usuário aprovou contar somente falhas por conta, limite inicial 5/min e bloqueio temporário; cache compartilhado/atômico, controles de borda, recuperação e MFA administrativa devem ser tratados antes de produção |
 | 7 | Usuário aprovou `apps/contracts` para `Plan`, `Contract` e `Organization`, com `PROTECT` nas FKs de contexto (ADR 0013) |
@@ -29,6 +29,7 @@ e só começa após aprovação do usuário.
 | 17 | 2.3 (aprovado): login com senha certa e contrato indisponível → 403 `contract-inactive`; access/refresh negados enquanto indisponível, sem revogar todos os refresh; superadmin entra em organização de contrato vencido/inativo (excluído → 403); superadmin sem header em endpoint de negócio → 400. Usuário confirmou o 403 para contrato excluído |
 | 18 | 3.6 (aprovado): `apps/audit` + `AuditEvent` (ADR 0017); entrada do superadmin 1x por superadmin + organização + access token; "alterações de superadmin" = contas de superadmin; eventos imutáveis, com before/after só dos campos de permissão |
 | 19 | 2.4 (aprovado): `all_objects` também filtra pelo contexto (manager base do Django vira `_base_objects`, sem filtro); `User` e `Contract` entram no escopo (ADR 0012), autenticação usa `.unscoped()`; código fora de requisição usa `system_context()`/`@system_scope` e os testes um contexto de sistema automático; query sem contexto levanta `TenantContextMissing` |
+| 20 | 4.1 (aprovado): IP/porta reais por headers do proxy configuráveis (`check --deploy` avisa); toda requisição à `/api/` com só os campos da lei + `request_id`; `AccessLog` como exceção ao escopo (ADR 0018); retenção de 6 meses declarada, expurgo + `LegalHold` na entrega do ADR 0007 antes de produção; gravação por middleware após a resposta |
 
 ## Bloco 0 — Fundação
 
@@ -70,7 +71,7 @@ e só começa após aprovação do usuário.
 
 | # | Etapa | ADR | Status |
 |---|---|---|---|
-| 4.1 | `AccessLog` + middleware (IP, porta, data UTC, usuário, contrato, organização) + retenção mínima de 6 meses | 0006 §6, skill `marco-civil` | ⬜ |
+| 4.1 | `AccessLog` + middleware (IP, porta, data UTC, usuário, contrato, organização) + retenção mínima de 6 meses | 0006 §6, skill `marco-civil` | ✅ |
 
 ## Bloco 5 — Endpoints
 

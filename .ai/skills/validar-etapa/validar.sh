@@ -25,6 +25,7 @@ run "Formatação (ruff format)" "$PY" -m ruff format --check .
 run "Migrations pendentes" "$PY" manage.py makemigrations --check --dry-run
 run "System checks" "$PY" manage.py check
 run "Checks de produção (--deploy)" env DJANGO_ALLOWED_HOSTS=exemplo.com.br \
+  DJANGO_ACCESS_LOG_IP_HEADER=X-Real-IP DJANGO_ACCESS_LOG_PORT_HEADER=X-Real-Port \
   "$PY" manage.py check --deploy --fail-level WARNING --settings=config.settings.production
 
 printf '\n'

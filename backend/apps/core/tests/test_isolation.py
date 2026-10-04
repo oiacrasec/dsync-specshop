@@ -13,7 +13,7 @@ import pytest
 from django.apps import apps
 from django.contrib.auth import get_user_model
 
-from apps.audit.models import AuditEvent, AuditEventType
+from apps.audit.models import AccessLog, AuditEvent, AuditEventType
 from apps.contracts.models import Contract, Organization, Plan
 from apps.core.models import HybridScopedModel, OrganizationScopedModel, SharedModel
 from apps.core.tenancy import TenantContext, TenantContextMissing, use_context
@@ -79,6 +79,8 @@ FACTORIES = {
     ScopingMovement: make_movement,
 }
 SHARED = {Plan, ScopingCountry}
+# Registros fora dos tipos de escopo (ADR 0018): leitura só global explícita.
+GLOBAL_ONLY = {AccessLog}
 
 
 def own_models():
@@ -92,7 +94,8 @@ def own_models():
 
 
 def test_every_model_is_covered():
-    missing = [model._meta.label for model in own_models() if model not in FACTORIES and model not in SHARED]
+    covered = FACTORIES.keys() | SHARED | GLOBAL_ONLY
+    missing = [model._meta.label for model in own_models() if model not in covered]
     assert missing == [], f'Registre uma fábrica de isolamento para: {missing}'
     assert all(issubclass(model, SharedModel) for model in SHARED)
 
@@ -180,3 +183,14 @@ def test_shared_models_are_visible_in_any_context(model, world):
     for any_context in (None, context(world, 'a'), context(world, 'b')):
         with use_context(any_context):
             assert model.objects.filter(pk=record.pk).exists()
+
+
+@pytest.mark.parametrize('model', sorted(GLOBAL_ONLY, key=lambda m: m._meta.label), ids=lambda m: m._meta.label)
+def test_global_only_records_are_read_only_in_system_context(model, world):
+    AccessLog(ip='203.0.113.7', contract=world['a']['contract']).save()
+    for any_context in (None, context(world, 'a'), TenantContext(superuser=True)):
+        with use_context(any_context), pytest.raises(TenantContextMissing):
+            model.objects.exists()
+    with use_context(None):
+        assert model.objects.unscoped().count() == 1
+    assert model.objects.count() == 1  # system_context do conftest.

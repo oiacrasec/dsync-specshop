@@ -2,7 +2,7 @@ from django.apps import apps
 from django.core.checks import Error, Tags, register
 from django.db import models
 
-from .constants import SCOPE_EXCEPTIONS
+from .constants import SCOPE_EXCEPTIONS, UNSCOPED_RECORDS
 from .models import BaseModel, ContractScopedModel, HybridScopedModel, OrganizationScopedModel, SharedModel
 
 SCOPE_TYPES = (SharedModel, HybridScopedModel, ContractScopedModel, OrganizationScopedModel)
@@ -49,6 +49,8 @@ def check_model_scopes(app_configs, **kwargs):
                 continue
             scopes = [scope for scope in SCOPE_TYPES if issubclass(model, scope)]
             if model._meta.label in SCOPE_EXCEPTIONS and issubclass(model, BaseModel) and not scopes:
+                continue
+            if model._meta.label in UNSCOPED_RECORDS and not issubclass(model, BaseModel):
                 continue
             if not scopes:
                 errors.append(

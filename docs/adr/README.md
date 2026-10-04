@@ -34,6 +34,7 @@ um ADR novo que **substitui** o anterior.
 | [0015](0015-contagem-de-licencas-de-usuarios.md) | Contagem de licenças, incluindo usuários inativos | Aceito |
 | [0016](0016-dominio-rbac.md) | Domínio próprio para gestão de acesso | Aceito |
 | [0017](0017-trilha-de-auditoria.md) | Trilha de auditoria append-only | Aceito |
+| [0018](0018-registro-de-acesso.md) | Registro de acesso fora dos tipos de escopo | Aceito |
 
 ## Modelo
 

@@ -95,6 +95,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `contract`/`organization` (id interno) no CTE ou tabela temporária `parametros`, um único `execute`,
   executado só pelo selector com `@tenant_params` + `fetch_all`, com teste de isolamento próprio ([formato](docs/standards/django-style.md));
   regra de negócio em services/selectors ([estilo](docs/standards/django-style.md)).
+- Toda requisição à `/api/` grava `AccessLog` (Marco Civil art. 15, ADR 0018): só inserção, leitura
+  só em `system_context()`; testes de API precisam de banco (views fora de transação: `transaction=True`).
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema

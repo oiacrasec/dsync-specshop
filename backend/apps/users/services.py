@@ -178,6 +178,7 @@ def login(*, request, username, password):
     if user is None or not api_settings.USER_AUTHENTICATION_RULE(user):
         raise AuthenticationFailed()
     ensure_contract_available(user)  # Só depois da senha válida: não revela nada a quem errou.
+    request.user = user  # O registro de acesso (Marco Civil art. 15) identifica quem entrou.
     refresh = RefreshToken.for_user(user)
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
 

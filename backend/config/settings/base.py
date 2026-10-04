@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Fora da transação da view: a entrada do superadmin fica registrada mesmo com erro.
     'apps.audit.middleware.SuperadminEntryAuditMiddleware',
+    # Marco Civil art. 15: depois do TenantContextMiddleware, ainda com o contexto da requisição.
+    'apps.audit.middleware.AccessLogMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -157,6 +159,11 @@ REST_FRAMEWORK = {
         'apps.rbac.permissions.RequiredPermission',
     ],
 }
+
+# Registro de acesso: headers do proxy reverso com IP e porta reais do cliente (ADR 0018).
+# Vazios = conexão direta (desenvolvimento). Em produção, o check --deploy exige configurar.
+ACCESS_LOG_CLIENT_IP_HEADER = env('DJANGO_ACCESS_LOG_IP_HEADER', default='')
+ACCESS_LOG_CLIENT_PORT_HEADER = env('DJANGO_ACCESS_LOG_PORT_HEADER', default='')
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

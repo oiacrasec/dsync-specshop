@@ -37,6 +37,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 3.6: `apps/audit`, trilha append-only de permissões, contas de superadmin e entradas do superadmin, ADR 0017) | concluído |
 | `backend/` (etapa 2.4: contexto em `contextvar`, managers fail closed com `.unscoped()`, mixin de view e serializer com escopo) | concluído |
 | `backend/` (etapa 2.5: testes de isolamento genéricos para todo model, com cobertura obrigatória) | concluído |
+| `backend/` (etapa 4.1: registro de acesso do Marco Civil, `AccessLog` fora dos tipos de escopo, ADR 0018) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

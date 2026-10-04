@@ -5,7 +5,10 @@ mudança: se ela for desfeita, o evento também é. A entrada do superadmin em o
 é gravada pelo middleware, fora da transação da view.
 """
 
-from .models import AuditEvent, AuditEventType
+from apps.core.tenancy import get_context
+
+from .models import AccessLog, AuditEvent, AuditEventType
+from .utils import client_address
 
 
 def record(event, *, actor, contract_id=None, organization_id=None, target=None, before=None, after=None, **extra):
@@ -36,3 +39,28 @@ def record_superadmin_entry(*, superadmin, organization, access_jti=''):
         updated_by=superadmin,
     )
     AuditEvent.objects.unscoped().bulk_create([entry], ignore_conflicts=True)
+
+
+def record_access(request):
+    """Grava o registro de acesso da requisição (Marco Civil art. 15), após a resposta.
+
+    Usuário: o autenticado pelo DRF (ou o do login). Contrato e organização: os do
+    contexto de tenant validado; superadmin sem organização e anônimo ficam sem eles.
+    """
+    ip, port = client_address(request)
+    user = getattr(request, 'user', None)
+    context = get_context()
+    tenant = context if context is not None and not context.system else None
+    known_user = user if user is not None and user.is_authenticated else None
+    # Sem contexto (ex.: login), o contrato é o do próprio usuário identificado.
+    contract_id = tenant.contract_id if tenant else getattr(known_user, 'contract_id', None)
+    access = AccessLog(
+        ip=ip,
+        port=port,
+        user=known_user,
+        contract_id=contract_id,
+        organization_id=tenant.organization_id if tenant else None,
+        request_id=getattr(request, 'request_id', None),
+    )
+    access.save()  # Inserção direta: o manager só lê em system_context().
+    return access

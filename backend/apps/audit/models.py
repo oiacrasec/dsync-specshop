@@ -1,9 +1,12 @@
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from apps.core.models import HybridScopedModel
+from apps.core.models import DscModelBase, HybridScopedModel
 
-from .managers import AllAuditManager, AppendOnlyQuerySet, AuditManager
+from .constants import ACCESS_LOG_MINIMUM_RETENTION_MONTHS
+from .managers import AccessLogManager, AccessLogQuerySet, AllAuditManager, AppendOnlyQuerySet, AuditManager
 
 
 class AuditEventType(models.TextChoices):
@@ -75,5 +78,62 @@ class AuditEvent(HybridScopedModel):
 
     def delete(self, *args, **kwargs):
         raise TypeError('Eventos de auditoria não podem ser excluídos.')
+
+    delete.alters_data = True
+
+
+class AccessLog(models.Model, metaclass=DscModelBase):
+    """Registro de acesso a aplicação (Marco Civil art. 15; ADR 0006 §6, ADR 0018).
+
+    Uma linha por requisição à API: data e hora (UTC), IP e porta de origem, usuário,
+    contrato e organização do contexto e o request_id. Sem BaseModel: volume alto, só
+    inserção, sem soft delete nem autoria. Guarda mínima de 6 meses; o expurgo e o
+    LegalHold vêm na entrega do ADR 0007. Sob sigilo: leitura só global explícita.
+    """
+
+    minimum_retention_months = ACCESS_LOG_MINIMUM_RETENTION_MONTHS
+
+    id = models.BigAutoField(primary_key=True)
+    occurred_at = models.DateTimeField(_('data e hora (UTC)'), default=timezone.now)
+    ip = models.GenericIPAddressField(_('IP de origem'))
+    port = models.PositiveIntegerField(_('porta de origem'), null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('usuário'), on_delete=models.PROTECT,
+                             null=True, blank=True, related_name='+',)
+    contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
+                                 null=True, blank=True, related_name='+',)
+    organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização'),
+                                     on_delete=models.PROTECT, null=True, blank=True, related_name='+',)
+    request_id = models.UUIDField(_('identificador da requisição'), null=True, blank=True)
+
+    objects = AccessLogManager()
+    _base_objects = models.Manager.from_queryset(AccessLogQuerySet)()
+
+    class Meta:
+        verbose_name = _('registro de acesso')
+        verbose_name_plural = _('registros de acesso')
+        base_manager_name = '_base_objects'
+        indexes = [
+            # Ordem judicial pede usuário ou IP + período (art. 22); o expurgo usa a data.
+            models.Index(fields=['occurred_at'], name='dsc_access_log_occurred'),
+            models.Index(fields=['user', 'occurred_at'], name='dsc_access_log_user'),
+            models.Index(fields=['ip', 'occurred_at'], name='dsc_access_log_ip'),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(port__isnull=True) | models.Q(port__lte=65535),
+                                   name='dsc_access_log_valid_port'),
+        ]
+
+    def __str__(self):
+        return f'acesso {self.pk} em {self.occurred_at:%Y-%m-%d %H:%M:%S}'  # Sem IP: dado pessoal (LGPD).
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise TypeError('Registros de acesso não podem ser alterados.')
+        return super().save(*args, **kwargs)
+
+    save.alters_data = True
+
+    def delete(self, *args, **kwargs):
+        raise TypeError('Registros de acesso não podem ser excluídos fora do expurgo.')
 
     delete.alters_data = True
