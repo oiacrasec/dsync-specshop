@@ -75,9 +75,7 @@ export class WorkspaceFormPage implements OnInit {
         const payload = this.buildPayload();
         this.saving = true;
 
-        const request = this.isEditing && this.workspaceId
-            ? this.workspaceService.update(this.workspaceId, payload)
-            : this.workspaceService.create(payload);
+        const request = this.isEditing && this.workspaceId ? this.workspaceService.update(this.workspaceId, payload) : this.workspaceService.create(payload);
 
         request.subscribe({
             next: () => {

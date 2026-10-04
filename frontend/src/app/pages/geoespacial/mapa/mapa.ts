@@ -106,9 +106,6 @@ export class MapaPage implements OnInit {
             });
         }
 
-        this.tableActions = [
-            ...actions,
-            ...permissionState.actions
-        ];
+        this.tableActions = [...actions, ...permissionState.actions];
     }
 }

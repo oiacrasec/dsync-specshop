@@ -7,15 +7,11 @@
             <p class="text-sm text-surface-500 dark:text-white/64">Gestao dos setores da organizacao ativa.</p>
         </div>
         @if (canCreate) {
-            <div class="flex items-center gap-2">
-                <ui-button label="Novo setor" icon="pi pi-plus" severity="secondary" (onClick)="create()"></ui-button>
-            </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Novo setor" icon="pi pi-plus" severity="secondary" (onClick)="create()"></ui-button>
+        </div>
         }
     </div>
 
-    <ui-table
-        [service]="setorService"
-        [actions]="tableActions"
-        [reloadKey]="reloadKey"
-    ></ui-table>
+    <ui-table [service]="setorService" [actions]="tableActions" [reloadKey]="reloadKey"></ui-table>
 </div>

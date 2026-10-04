@@ -2,15 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
 import { API_BASE_URL } from '../tokens/api-base-url';
-import {
-    FirstAccessPasswordChangeRequest,
-    FirstAccessPasswordChangeResponse,
-    LoginRequest,
-    LoginResponse,
-    TokenRefreshRequest,
-    TokenRefreshResponse,
-    TokenVerifyRequest
-} from '../../types/auth';
+import { FirstAccessPasswordChangeRequest, FirstAccessPasswordChangeResponse, LoginRequest, LoginResponse, TokenRefreshRequest, TokenRefreshResponse, TokenVerifyRequest } from '../../types/auth';
 import { UserContextsResponse } from '../../types/context';
 import { PermissionContextResponse } from '@/app/types/permission';
 

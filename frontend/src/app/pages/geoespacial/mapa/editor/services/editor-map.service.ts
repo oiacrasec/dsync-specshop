@@ -484,10 +484,7 @@ export class EditorMapService {
             const dy = closestPoint[1] - coordinate[1];
             const distance = dx * dx + dy * dy;
 
-            const shouldReplace =
-                selected === null ||
-                (intersects && !selectedIntersects) ||
-                (intersects === selectedIntersects && distance < selectedDistance);
+            const shouldReplace = selected === null || (intersects && !selectedIntersects) || (intersects === selectedIntersects && distance < selectedDistance);
 
             if (shouldReplace) {
                 selected = candidate;
@@ -613,8 +610,7 @@ export class EditorMapService {
                 TRANSPARENT: 'true'
             },
             transition: 0,
-            tileLoadFunction: (tile, src) =>
-                this.loadAuthenticatedTile(tile as unknown as AuthenticatedTile, src)
+            tileLoadFunction: (tile, src) => this.loadAuthenticatedTile(tile as unknown as AuthenticatedTile, src)
         });
     }
 
@@ -731,7 +727,9 @@ export class EditorMapService {
     }
 
     private resolveDrawType(geomType: string): DrawType | null {
-        const normalizedType = String(geomType || '').trim().toUpperCase();
+        const normalizedType = String(geomType || '')
+            .trim()
+            .toUpperCase();
         if (!normalizedType) {
             return null;
         }

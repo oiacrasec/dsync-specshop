@@ -14,15 +14,7 @@ import { UiInputText } from '@/app/shared/ui/input-text/input-text';
 import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
-import {
-    ContratoAdministrador,
-    ContratoAdministradorResetSenhaResult,
-    Contrato,
-    ContratoAdministradoresResponse,
-    ContratoCreate,
-    ContratoProvisionamentoInicialCreate,
-    ContratoProvisionamentoInicialResult
-} from '@/app/types/contrato';
+import { ContratoAdministrador, ContratoAdministradorResetSenhaResult, Contrato, ContratoAdministradoresResponse, ContratoCreate, ContratoProvisionamentoInicialCreate, ContratoProvisionamentoInicialResult } from '@/app/types/contrato';
 
 @Component({
     selector: 'app-contrato-formulario',
@@ -110,9 +102,7 @@ export class ContratoFormPage implements OnInit {
         const payload = this.buildPayload();
         this.saving = true;
 
-        const request = this.isEditing && this.contratoId
-            ? this.contratoService.update(this.contratoId, payload)
-            : this.contratoService.create(payload);
+        const request = this.isEditing && this.contratoId ? this.contratoService.update(this.contratoId, payload) : this.contratoService.create(payload);
 
         request.subscribe({
             next: (contrato: Contrato) => {
@@ -129,10 +119,7 @@ export class ContratoFormPage implements OnInit {
                     return;
                 }
 
-                this.router.navigate(
-                    ['/pages/administracao/contrato', contrato.id],
-                    { queryParams: { tab: 'primeiro-acesso' } }
-                );
+                this.router.navigate(['/pages/administracao/contrato', contrato.id], { queryParams: { tab: 'primeiro-acesso' } });
             },
             error: (error: unknown) => {
                 this.saving = false;

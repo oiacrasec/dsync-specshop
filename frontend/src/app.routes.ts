@@ -105,7 +105,7 @@ export const appRoutes: Routes = [
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/pages.routes'),
                 data: { breadcrumb: 'Páginas', breadcrumbHidden: true }
-            },
+            }
             /* DESABILITADO: fora do escopo atual
             {
                 path: 'apps',

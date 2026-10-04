@@ -20,13 +20,7 @@ import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
 import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
 import { UiInputNumber } from '@/app/shared/ui/input-number/input-number';
 import { UiInputText } from '@/app/shared/ui/input-text/input-text';
-import {
-    Mapa,
-    MapaLayerColumn,
-    MapaLayerCreate,
-    MapaLayerFeature,
-    MapaLayerFeatureUpdatePayload,
-} from '@/app/types/mapa';
+import { Mapa, MapaLayerColumn, MapaLayerCreate, MapaLayerFeature, MapaLayerFeatureUpdatePayload } from '@/app/types/mapa';
 
 import { FloatingPanelId, PanelSize } from './editor.models';
 import { EditorMapClickEvent, EditorMapService } from './services/editor-map.service';
@@ -52,24 +46,7 @@ type EditorConfirmAcceptSeverity = 'primary' | 'secondary' | 'danger';
 @Component({
     selector: 'app-mapa-editor',
     standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        UiButton,
-        UiInputText,
-        UiInputNumber,
-        UiInputDate,
-        UiCheckbox,
-        DragDropModule,
-        MenuModule,
-        ButtonModule,
-        DialogModule,
-        SelectModule,
-        TabsModule,
-        ToastModule,
-        TooltipModule
-    ],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, UiButton, UiInputText, UiInputNumber, UiInputDate, UiCheckbox, DragDropModule, MenuModule, ButtonModule, DialogModule, SelectModule, TabsModule, ToastModule, TooltipModule],
     templateUrl: './editor.html',
     styleUrls: ['./editor.css'],
     providers: [EditorMapService, EditorLayoutState, EditorLayersState]
@@ -369,11 +346,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         if (!this.featureQuickActionsLayerId || !this.featureQuickActionsFeatureData) {
             return;
         }
-        this.openFeatureEditDialogByLayerFeature(
-            this.featureQuickActionsLayerId,
-            this.featureQuickActionsLayerName,
-            this.featureQuickActionsFeatureData
-        );
+        this.openFeatureEditDialogByLayerFeature(this.featureQuickActionsLayerId, this.featureQuickActionsLayerName, this.featureQuickActionsFeatureData);
     }
 
     confirmRemoveFeatureFromQuickActions() {
@@ -514,7 +487,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
 
         this.drawingModeEnabled = true;
         this.messageService.add({
-                key: this.toastKey,
+            key: this.toastKey,
             severity: 'info',
             summary: 'Modo desenho ativo',
             detail: `Desenhe no mapa para criar feições no layer "${layer.nome}".`
@@ -548,7 +521,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             const closedNow = this.closeActiveFeatureGeometryEdit({ silent: true });
             if (!closedNow) {
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'info',
                     summary: 'Finalizando edição',
                     detail: 'Aguarde a finalização da edição da geometria para alterar a visibilidade do layer.'
@@ -581,7 +554,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.layersState.setVisibilityPending(layerId, false);
                 this.syncMapLayerRendering();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao atualizar layer',
                     detail: getBackendErrorMessage(error, 'Não foi possível atualizar a visibilidade do layer.')
@@ -671,7 +644,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 }
                 this.syncMapLayerRendering();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'success',
                     summary: 'Layer criado',
                     detail: `Layer "${layer.nome}" criado com sucesso.`
@@ -683,7 +656,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.layersState.removeLayer(provisionalLayerId);
                 this.syncMapLayerRendering();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao criar layer',
                     detail: getBackendErrorMessage(error, 'Não foi possível criar o layer.')
@@ -775,7 +748,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.layerColumnsData = columns;
                 this.resetLayerColumnForm();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'success',
                     summary: 'Coluna adicionada',
                     detail: `A coluna "${column.name}" foi adicionada ao layer.`
@@ -785,7 +758,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.layerColumnsSaving = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao adicionar coluna',
                     detail: getBackendErrorMessage(error, 'Não foi possível adicionar a coluna ao layer.')
@@ -969,7 +942,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                         return;
                     }
                     this.messageService.add({
-                key: this.toastKey,
+                        key: this.toastKey,
                         severity: 'error',
                         summary: 'Falha ao selecionar feição',
                         detail: getBackendErrorMessage(error, 'Não foi possível identificar a feição clicada no mapa.')
@@ -1047,34 +1020,32 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         this.activeGeometryEditSaving = true;
-        this.mapaService
-            .updateLayerFeature(this.mapaId, currentEdit.layerId, currentEdit.featureId, { geometry })
-            .subscribe({
-                next: (feature) => {
-                    this.mapService.refreshWmsLayer(currentEdit.layerId);
-                    this.upsertFeatureInDialog(feature);
-                    this.resetActiveGeometryEditState();
-                    if (!silent) {
-                        this.messageService.add({
-                key: this.toastKey,
-                            severity: 'success',
-                            summary: 'Geometria atualizada',
-                            detail: `Feição #${feature.id} atualizada no mapa.`
-                        });
-                    }
-                    this.refreshView();
-                },
-                error: (error: unknown) => {
-                    this.activeGeometryEditSaving = false;
+        this.mapaService.updateLayerFeature(this.mapaId, currentEdit.layerId, currentEdit.featureId, { geometry }).subscribe({
+            next: (feature) => {
+                this.mapService.refreshWmsLayer(currentEdit.layerId);
+                this.upsertFeatureInDialog(feature);
+                this.resetActiveGeometryEditState();
+                if (!silent) {
                     this.messageService.add({
-                key: this.toastKey,
-                        severity: 'error',
-                        summary: 'Falha ao salvar geometria',
-                        detail: getBackendErrorMessage(error, 'Não foi possível salvar a geometria editada.')
+                        key: this.toastKey,
+                        severity: 'success',
+                        summary: 'Geometria atualizada',
+                        detail: `Feição #${feature.id} atualizada no mapa.`
                     });
-                    this.refreshView();
                 }
-            });
+                this.refreshView();
+            },
+            error: (error: unknown) => {
+                this.activeGeometryEditSaving = false;
+                this.messageService.add({
+                    key: this.toastKey,
+                    severity: 'error',
+                    summary: 'Falha ao salvar geometria',
+                    detail: getBackendErrorMessage(error, 'Não foi possível salvar a geometria editada.')
+                });
+                this.refreshView();
+            }
+        });
 
         return false;
     }
@@ -1167,7 +1138,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.featureEditSaving = false;
                 this.closeFeatureEditDialog(true);
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao criar feição',
                     detail: 'A geometria desenhada não está disponível para envio.'
@@ -1186,7 +1157,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                         this.featureEditSaving = false;
                         this.closeFeatureEditDialog(true);
                         this.messageService.add({
-                key: this.toastKey,
+                            key: this.toastKey,
                             severity: 'success',
                             summary: 'Feição criada',
                             detail: `Feição #${feature.id} criada com sucesso.`
@@ -1203,7 +1174,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     error: (error: unknown) => {
                         this.featureEditSaving = false;
                         this.messageService.add({
-                key: this.toastKey,
+                            key: this.toastKey,
                             severity: 'error',
                             summary: 'Falha ao criar feição',
                             detail: getBackendErrorMessage(error, 'Não foi possível salvar a feição desenhada.')
@@ -1217,36 +1188,34 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         const payload: MapaLayerFeatureUpdatePayload = {
             attributes: normalizedAttributes
         };
-        this.mapaService
-            .updateLayerFeature(this.mapaId, layerId, this.featureEditFeatureId, payload)
-            .subscribe({
-                next: (feature) => {
-                    this.featureEditSaving = false;
-                    this.closeFeatureEditDialog(true);
-                    this.messageService.add({
-                key: this.toastKey,
-                        severity: 'success',
-                        summary: 'Feição atualizada',
-                        detail: 'Atributos da feição salvos com sucesso.'
-                    });
-                    this.upsertFeatureInDialog(feature);
-                    if (this.mapa) {
-                        this.mapService.highlightGeometry(feature.geometry, this.mapa.srid);
-                    }
-                    this.mapService.refreshWmsLayer(layerId);
-                    this.refreshView();
-                },
-                error: (error: unknown) => {
-                    this.featureEditSaving = false;
-                    this.messageService.add({
-                key: this.toastKey,
-                        severity: 'error',
-                        summary: 'Falha ao salvar feição',
-                        detail: getBackendErrorMessage(error, 'Não foi possível atualizar os atributos da feição.')
-                    });
-                    this.refreshView();
+        this.mapaService.updateLayerFeature(this.mapaId, layerId, this.featureEditFeatureId, payload).subscribe({
+            next: (feature) => {
+                this.featureEditSaving = false;
+                this.closeFeatureEditDialog(true);
+                this.messageService.add({
+                    key: this.toastKey,
+                    severity: 'success',
+                    summary: 'Feição atualizada',
+                    detail: 'Atributos da feição salvos com sucesso.'
+                });
+                this.upsertFeatureInDialog(feature);
+                if (this.mapa) {
+                    this.mapService.highlightGeometry(feature.geometry, this.mapa.srid);
                 }
-            });
+                this.mapService.refreshWmsLayer(layerId);
+                this.refreshView();
+            },
+            error: (error: unknown) => {
+                this.featureEditSaving = false;
+                this.messageService.add({
+                    key: this.toastKey,
+                    severity: 'error',
+                    summary: 'Falha ao salvar feição',
+                    detail: getBackendErrorMessage(error, 'Não foi possível atualizar os atributos da feição.')
+                });
+                this.refreshView();
+            }
+        });
     }
 
     confirmRemoveFeature(feature: MapaLayerFeature, event?: Event) {
@@ -1340,7 +1309,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.loading = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao carregar mapa',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar o cabeçalho do mapa.')
@@ -1368,7 +1337,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.layersState.loading = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao carregar layers',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar os layers do mapa.')
@@ -1584,7 +1553,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 }
                 this.syncMapLayerRendering();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'success',
                     summary: 'Layer removido',
                     detail: `Layer "${layerName}" removido com sucesso.`
@@ -1595,7 +1564,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.layersState.setDeletePending(layerId, false);
                 this.syncMapLayerRendering();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao remover layer',
                     detail: getBackendErrorMessage(error, 'Não foi possível remover o layer.')
@@ -1616,7 +1585,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 this.layerColumnsSaving = false;
                 this.layerColumnsData = columns;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'success',
                     summary: 'Coluna removida',
                     detail: `A coluna "${columnName}" foi removida do layer.`
@@ -1626,7 +1595,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.layerColumnsSaving = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao remover coluna',
                     detail: getBackendErrorMessage(error, 'Não foi possível remover a coluna do layer.')
@@ -1651,7 +1620,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.layerColumnsLoading = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao carregar colunas',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar as colunas do layer.')
@@ -1701,7 +1670,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.mapService.clearDrawPreview();
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao preparar feição',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar os atributos do layer. O desenho foi descartado.')
@@ -1717,8 +1686,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
         this.featureDeletePending = true;
-        const isActiveMapEditTarget =
-            this.activeGeometryEditFeatureRef?.layerId === layerId && this.activeGeometryEditFeatureRef.featureId === featureId;
+        const isActiveMapEditTarget = this.activeGeometryEditFeatureRef?.layerId === layerId && this.activeGeometryEditFeatureRef.featureId === featureId;
 
         this.mapaService.removeLayerFeature(this.mapaId, layerId, featureId).subscribe({
             next: () => {
@@ -1730,7 +1698,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                     this.closeFeatureEditDialog();
                 }
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'success',
                     summary: 'Feição removida',
                     detail: `Feição #${featureId} removida com sucesso. Geometria e atributos relacionados foram excluídos.`
@@ -1743,7 +1711,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.featureDeletePending = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao remover feição',
                     detail: getBackendErrorMessage(error, 'Não foi possível remover a feição.')
@@ -1803,14 +1771,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
         onReject?.();
     }
 
-    private openEditorConfirmDialog(options: {
-        header: string;
-        message: string;
-        acceptLabel?: string;
-        acceptSeverity?: EditorConfirmAcceptSeverity;
-        onAccept: () => void;
-        onReject?: () => void;
-    }) {
+    private openEditorConfirmDialog(options: { header: string; message: string; acceptLabel?: string; acceptSeverity?: EditorConfirmAcceptSeverity; onAccept: () => void; onReject?: () => void }) {
         if (this.editorConfirmDialogVisible) {
             return;
         }
@@ -2007,7 +1968,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             },
             error: (error: unknown) => {
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao abrir atributos',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar os metadados do layer para editar a feição.')
@@ -2180,7 +2141,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             error: (error: unknown) => {
                 this.featuresDialogLoading = false;
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'error',
                     summary: 'Falha ao carregar colunas',
                     detail: getBackendErrorMessage(error, 'Não foi possível carregar as colunas de metadados do layer.')
@@ -2213,7 +2174,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
                 error: (error: unknown) => {
                     this.featuresDialogLoading = false;
                     this.messageService.add({
-                key: this.toastKey,
+                        key: this.toastKey,
                         severity: 'error',
                         summary: 'Falha ao carregar feições',
                         detail: getBackendErrorMessage(error, 'Não foi possível carregar os dados do layer.')
@@ -2369,7 +2330,7 @@ export class MapaEditorPage implements OnInit, AfterViewInit, OnDestroy {
             const size = raw.size ?? 255;
             if (!Number.isFinite(size) || size <= 0) {
                 this.messageService.add({
-                key: this.toastKey,
+                    key: this.toastKey,
                     severity: 'warn',
                     summary: 'Tamanho inválido',
                     detail: 'Informe um tamanho válido para coluna string.'

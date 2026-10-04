@@ -9,16 +9,16 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         @for (tile of kpiTiles; track tile.label) {
-            <div class="card flex flex-col gap-3 transition-colors" [ngClass]="tile.tone">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ tile.label }}</span>
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg border" [ngClass]="tile.iconTone">
-                        <i class="pi text-sm" [ngClass]="tile.icon"></i>
-                    </span>
-                </div>
-                <div class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ tile.value }}</div>
-                <div class="text-xs text-surface-600 dark:text-surface-300">{{ tile.note }}</div>
+        <div class="card flex flex-col gap-3 transition-colors" [ngClass]="tile.tone">
+            <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ tile.label }}</span>
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg border" [ngClass]="tile.iconTone">
+                    <i class="pi text-sm" [ngClass]="tile.icon"></i>
+                </span>
             </div>
+            <div class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ tile.value }}</div>
+            <div class="text-xs text-surface-600 dark:text-surface-300">{{ tile.note }}</div>
+        </div>
         }
     </div>
 
@@ -27,13 +27,13 @@
             <ng-template #title>Status de servicos</ng-template>
             <div class="flex flex-col gap-3">
                 @for (service of services; track service.name) {
-                    <div class="flex items-center justify-between gap-4 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
-                        <div class="flex flex-col">
-                            <span class="font-medium text-surface-900 dark:text-surface-0">{{ service.name }}</span>
-                            <span class="text-sm text-surface-600 dark:text-surface-300">{{ service.detail }}</span>
-                        </div>
-                        <p-tag [severity]="service.severity" [value]="service.status"></p-tag>
+                <div class="flex items-center justify-between gap-4 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
+                    <div class="flex flex-col">
+                        <span class="font-medium text-surface-900 dark:text-surface-0">{{ service.name }}</span>
+                        <span class="text-sm text-surface-600 dark:text-surface-300">{{ service.detail }}</span>
                     </div>
+                    <p-tag [severity]="service.severity" [value]="service.status"></p-tag>
+                </div>
                 }
             </div>
         </section-card>
@@ -63,7 +63,7 @@
                 <div class="text-sm text-surface-500 dark:text-white/64">Ultimas verificacoes</div>
                 <ul class="list-disc list-inside text-sm text-surface-700 dark:text-white/70">
                     @for (item of geoserver.checks; track item) {
-                        <li>{{ item }}</li>
+                    <li>{{ item }}</li>
                     }
                 </ul>
             </div>
@@ -90,13 +90,13 @@
                 <div class="text-sm text-surface-500 dark:text-white/64">Ultimos eventos</div>
                 <div class="flex flex-col gap-2">
                     @for (event of syncQueue.events; track event.title) {
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <div class="font-medium text-surface-900 dark:text-surface-0">{{ event.title }}</div>
-                                <div class="text-xs text-surface-500 dark:text-white/64">{{ event.detail }}</div>
-                            </div>
-                            <span class="text-xs text-surface-500 dark:text-white/64">{{ event.time }}</span>
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="font-medium text-surface-900 dark:text-surface-0">{{ event.title }}</div>
+                            <div class="text-xs text-surface-500 dark:text-white/64">{{ event.detail }}</div>
                         </div>
+                        <span class="text-xs text-surface-500 dark:text-white/64">{{ event.time }}</span>
+                    </div>
                     }
                 </div>
             </div>
@@ -109,16 +109,16 @@
             <ng-template #description>Monitoramento de qualidade e uso.</ng-template>
             <div class="flex flex-col gap-3">
                 @for (layer of layers; track layer.name) {
-                    <div class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
-                        <div class="flex flex-col">
-                            <span class="font-medium text-surface-900 dark:text-surface-0">{{ layer.name }}</span>
-                            <span class="text-xs text-surface-500 dark:text-white/64">{{ layer.detail }}</span>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0">{{ layer.records }}</div>
-                            <div class="text-xs text-surface-500 dark:text-white/64">{{ layer.usage }}</div>
-                        </div>
+                <div class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
+                    <div class="flex flex-col">
+                        <span class="font-medium text-surface-900 dark:text-surface-0">{{ layer.name }}</span>
+                        <span class="text-xs text-surface-500 dark:text-white/64">{{ layer.detail }}</span>
                     </div>
+                    <div class="text-right">
+                        <div class="text-sm font-medium text-surface-900 dark:text-surface-0">{{ layer.records }}</div>
+                        <div class="text-xs text-surface-500 dark:text-white/64">{{ layer.usage }}</div>
+                    </div>
+                </div>
                 }
             </div>
         </section-card>
@@ -128,13 +128,13 @@
             <ng-template #description>Prioridades para o time.</ng-template>
             <div class="flex flex-col gap-3">
                 @for (alert of alerts; track alert.title) {
-                    <div class="flex items-start justify-between gap-4 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
-                        <div class="flex flex-col">
-                            <span class="font-medium text-surface-900 dark:text-surface-0">{{ alert.title }}</span>
-                            <span class="text-xs text-surface-500 dark:text-white/64">{{ alert.detail }}</span>
-                        </div>
-                        <p-tag [severity]="alert.severity" [value]="alert.level"></p-tag>
+                <div class="flex items-start justify-between gap-4 rounded-lg px-3 py-2 bg-white/75 border border-white/90 dark:bg-surface-950/40 dark:border-surface-700/70">
+                    <div class="flex flex-col">
+                        <span class="font-medium text-surface-900 dark:text-surface-0">{{ alert.title }}</span>
+                        <span class="text-xs text-surface-500 dark:text-white/64">{{ alert.detail }}</span>
                     </div>
+                    <p-tag [severity]="alert.severity" [value]="alert.level"></p-tag>
+                </div>
                 }
             </div>
         </section-card>

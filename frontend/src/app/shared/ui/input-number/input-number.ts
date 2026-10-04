@@ -47,9 +47,9 @@ import { InputNumberModule } from 'primeng/inputnumber';
     providers: [],
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })

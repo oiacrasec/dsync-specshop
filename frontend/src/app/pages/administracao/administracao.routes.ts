@@ -37,7 +37,7 @@ export default [
             requireContext: false,
             requiredPermission: PERMISSION_KEYS.CONTRATO_UPDATE
         }
-    },
+    }
     /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao',

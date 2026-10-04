@@ -16,14 +16,7 @@ import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
 import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
 import { UiInputText } from '@/app/shared/ui/input-text/input-text';
 import { UiMultiSelect, UiMultiSelectOption } from '@/app/shared/ui/multi-select/multi-select';
-import {
-    Usuario,
-    UsuarioConfiguracao,
-    UsuarioConfiguracaoUpdate,
-    UsuarioOrganizacaoResumo,
-    UsuarioPermissaoCatalogoItem,
-    UsuarioPermissaoPreset
-} from '@/app/types/usuario';
+import { Usuario, UsuarioConfiguracao, UsuarioConfiguracaoUpdate, UsuarioOrganizacaoResumo, UsuarioPermissaoCatalogoItem, UsuarioPermissaoPreset } from '@/app/types/usuario';
 
 @Component({
     selector: 'app-usuario-formulario',
@@ -119,46 +112,42 @@ export class UsuarioFormPage implements OnInit {
         }
 
         this.saving = true;
-        const request: Observable<Usuario | UsuarioConfiguracao> = this.isEditing && this.usuarioId
-            ? this.usuarioService.updateConfiguracao(this.usuarioId, this.buildConfigurationPayload())
-            : this.usuarioService.create(this.form.getRawValue());
+        const request: Observable<Usuario | UsuarioConfiguracao> = this.isEditing && this.usuarioId ? this.usuarioService.updateConfiguracao(this.usuarioId, this.buildConfigurationPayload()) : this.usuarioService.create(this.form.getRawValue());
 
-        request
-            .pipe(finalize(() => (this.saving = false)))
-            .subscribe({
-                next: (response: Usuario | UsuarioConfiguracao) => {
-                    if (this.isEditing) {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Usuario atualizado',
-                            detail: 'Alteracoes salvas com sucesso.'
-                        });
-                        this.goBack();
-                        return;
-                    }
-
-                    this.createdUser = response as Usuario;
-                    this.form.reset({
-                        nome: '',
-                        sobrenome: '',
-                        username: '',
-                        email: '',
-                        organizacao_ids: []
-                    });
+        request.pipe(finalize(() => (this.saving = false))).subscribe({
+            next: (response: Usuario | UsuarioConfiguracao) => {
+                if (this.isEditing) {
                     this.messageService.add({
                         severity: 'success',
-                        summary: 'Usuario criado',
-                        detail: 'Cadastro concluido. Guarde a senha temporaria exibida abaixo.'
+                        summary: 'Usuario atualizado',
+                        detail: 'Alteracoes salvas com sucesso.'
                     });
-                },
-                error: (error: unknown) => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: this.isEditing ? 'Falha ao atualizar usuario' : 'Falha ao criar usuario',
-                        detail: getBackendErrorMessage(error, 'Nao foi possivel salvar o usuario.')
-                    });
+                    this.goBack();
+                    return;
                 }
-            });
+
+                this.createdUser = response as Usuario;
+                this.form.reset({
+                    nome: '',
+                    sobrenome: '',
+                    username: '',
+                    email: '',
+                    organizacao_ids: []
+                });
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Usuario criado',
+                    detail: 'Cadastro concluido. Guarde a senha temporaria exibida abaixo.'
+                });
+            },
+            error: (error: unknown) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: this.isEditing ? 'Falha ao atualizar usuario' : 'Falha ao criar usuario',
+                    detail: getBackendErrorMessage(error, 'Nao foi possivel salvar o usuario.')
+                });
+            }
+        });
     }
 
     copyTemporaryPassword() {

@@ -10,23 +10,9 @@
     </div>
 
     <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ui-autocomplete
-            inputId="geoserver"
-            formControlName="geoserver"
-            label="GeoServer"
-            placeholder="Digite para buscar GeoServer"
-            [optionsProvider]="geoserverOptionsProvider"
-            [errorMessage]="'Informe o GeoServer.'"
-        />
+        <ui-autocomplete inputId="geoserver" formControlName="geoserver" label="GeoServer" placeholder="Digite para buscar GeoServer" [optionsProvider]="geoserverOptionsProvider" [errorMessage]="'Informe o GeoServer.'" />
 
-        <ui-autocomplete
-            inputId="banco"
-            formControlName="banco"
-            label="Banco geoespacial"
-            placeholder="Digite para buscar banco"
-            [optionsProvider]="bancoOptionsProvider"
-            [errorMessage]="'Informe o banco geoespacial.'"
-        />
+        <ui-autocomplete inputId="banco" formControlName="banco" label="Banco geoespacial" placeholder="Digite para buscar banco" [optionsProvider]="bancoOptionsProvider" [errorMessage]="'Informe o banco geoespacial.'" />
 
         <div class="flex items-center gap-2">
             <ui-checkbox inputId="ativo" formControlName="ativo" label="Vínculo ativo" [marginTop]="22" />

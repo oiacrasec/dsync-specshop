@@ -69,9 +69,7 @@ export class SetorFormPage implements OnInit {
         const payload = this.buildPayload();
         this.saving = true;
 
-        const request = this.isEditing && this.setorId
-            ? this.setorService.update(this.setorId, payload)
-            : this.setorService.create(payload);
+        const request = this.isEditing && this.setorId ? this.setorService.update(this.setorId, payload) : this.setorService.create(payload);
 
         request.subscribe({
             next: () => {

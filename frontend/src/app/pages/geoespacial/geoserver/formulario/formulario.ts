@@ -25,19 +25,7 @@ import { GeoServerCreate, GeoServerStatus, GeoServerTestConnectionPayload, GeoSe
 @Component({
     selector: 'app-geoserver-formulario',
     standalone: true,
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        UiInputText,
-        UiInputPassword,
-        UiInputNumber,
-        UiCheckbox,
-        UiButton,
-        UiAutocomplete,
-        UiConfirmDialog,
-        SelectModule,
-        TabsModule
-    ],
+    imports: [CommonModule, ReactiveFormsModule, UiInputText, UiInputPassword, UiInputNumber, UiCheckbox, UiButton, UiAutocomplete, UiConfirmDialog, SelectModule, TabsModule],
     templateUrl: './formulario.html',
     providers: [ConfirmationService]
 })
@@ -137,10 +125,7 @@ export class GeoServerFormPage implements OnInit {
 
         this.saving = true;
 
-        const request =
-            this.isEditing && this.geoserverId
-                ? this.geoserverService.update(this.geoserverId, this.buildUpdatePayload())
-                : this.geoserverService.create(this.buildCreatePayload());
+        const request = this.isEditing && this.geoserverId ? this.geoserverService.update(this.geoserverId, this.buildUpdatePayload()) : this.geoserverService.create(this.buildCreatePayload());
 
         request.subscribe({
             next: () => {
@@ -346,29 +331,25 @@ export class GeoServerFormPage implements OnInit {
         }
 
         this.vinculoActionId = vinculo.id;
-        this.geoserverBancoService
-            .update(vinculo.id, { ativo: !vinculo.ativo })
-            .subscribe({
-                next: () => {
-                    this.vinculoActionId = null;
-                    this.vinculos = this.vinculos.map((item) =>
-                        item.id === vinculo.id ? { ...item, ativo: !item.ativo } : item
-                    );
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Vínculo atualizado',
-                        detail: 'Status do vínculo atualizado com sucesso.'
-                    });
-                },
-                error: (error: unknown) => {
-                    this.vinculoActionId = null;
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Falha ao atualizar vínculo',
-                        detail: getBackendErrorMessage(error, 'Não foi possível atualizar o status do vínculo.')
-                    });
-                }
-            });
+        this.geoserverBancoService.update(vinculo.id, { ativo: !vinculo.ativo }).subscribe({
+            next: () => {
+                this.vinculoActionId = null;
+                this.vinculos = this.vinculos.map((item) => (item.id === vinculo.id ? { ...item, ativo: !item.ativo } : item));
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Vínculo atualizado',
+                    detail: 'Status do vínculo atualizado com sucesso.'
+                });
+            },
+            error: (error: unknown) => {
+                this.vinculoActionId = null;
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Falha ao atualizar vínculo',
+                    detail: getBackendErrorMessage(error, 'Não foi possível atualizar o status do vínculo.')
+                });
+            }
+        });
     }
 
     removeVinculo(vinculo: GeoServerBanco) {

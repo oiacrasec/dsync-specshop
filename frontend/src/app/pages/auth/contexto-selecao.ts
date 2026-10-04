@@ -19,9 +19,7 @@ import { UserContextsResponse } from '@/app/types/context';
         <section class="card max-w-3xl mx-auto">
             <div class="flex flex-col gap-2">
                 <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Selecionar organização</h1>
-                <p class="text-surface-600 dark:text-surface-300">
-                    Escolha a organização para definir o contexto de trabalho desta sessão.
-                </p>
+                <p class="text-surface-600 dark:text-surface-300">Escolha a organização para definir o contexto de trabalho desta sessão.</p>
             </div>
 
             @if (loading()) {
@@ -41,9 +39,7 @@ import { UserContextsResponse } from '@/app/types/context';
                 </div>
             } @else if (!(contexts()?.organizacoes?.length ?? 0)) {
                 <div class="mt-8 flex flex-col gap-4">
-                    <p class="text-surface-600 dark:text-surface-300">
-                        Seu usuário não possui organizações ativas vinculadas neste contrato.
-                    </p>
+                    <p class="text-surface-600 dark:text-surface-300">Seu usuário não possui organizações ativas vinculadas neste contrato.</p>
                     <div class="flex items-center justify-between w-full gap-3">
                         <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" (click)="logout()"></button>
                         <button pButton type="button" label="Tentar novamente" class="!w-auto" (click)="loadContexts()"></button>
@@ -80,15 +76,7 @@ import { UserContextsResponse } from '@/app/types/context';
 
                     <div class="flex items-center justify-between w-full gap-3">
                         <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" [disabled]="saving()" (click)="logout()"></button>
-                        <button
-                            pButton
-                            type="button"
-                            label="Confirmar contexto"
-                            class="!w-auto"
-                            [loading]="saving()"
-                            [disabled]="selectedOrganizationId() === null"
-                            (click)="confirmContext()"
-                        ></button>
+                        <button pButton type="button" label="Confirmar contexto" class="!w-auto" [loading]="saving()" [disabled]="selectedOrganizationId() === null" (click)="confirmContext()"></button>
                     </div>
                 </div>
             }

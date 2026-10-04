@@ -69,32 +69,23 @@ export class MapaService extends BaseCrudService {
     }
 
     removeLayer(mapaId: number, layerId: number) {
-        return this.http
-            .delete<{ detail?: string }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/`)
-            .pipe(tap(() => this.invalidateTableCache()));
+        return this.http.delete<{ detail?: string }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/`).pipe(tap(() => this.invalidateTableCache()));
     }
 
     listLayerColumns(mapaId: number, layerId: number) {
-        return this.http
-            .get<{ data: MapaLayerColumn[] }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/`)
-            .pipe(map((response) => response.data ?? []));
+        return this.http.get<{ data: MapaLayerColumn[] }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/`).pipe(map((response) => response.data ?? []));
     }
 
     addLayerColumn(mapaId: number, layerId: number, payload: MapaLayerColumn) {
-        return this.http
-            .post<{ data: MapaLayerColumn[] }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/`, payload)
-            .pipe(map((response) => response.data ?? []));
+        return this.http.post<{ data: MapaLayerColumn[] }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/`, payload).pipe(map((response) => response.data ?? []));
     }
 
     removeLayerColumn(mapaId: number, layerId: number, columnName: string, confirmIrreversible = true) {
         const encodedColumn = encodeURIComponent(columnName);
         return this.http
-            .delete<{ data: MapaLayerColumn[]; detail?: string }>(
-                `${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/${encodedColumn}/`,
-                {
-                    params: this.buildParams({ confirm_irreversible: confirmIrreversible })
-                }
-            )
+            .delete<{ data: MapaLayerColumn[]; detail?: string }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/colunas/${encodedColumn}/`, {
+                params: this.buildParams({ confirm_irreversible: confirmIrreversible })
+            })
             .pipe(map((response) => response.data ?? []));
     }
 
@@ -103,12 +94,9 @@ export class MapaService extends BaseCrudService {
     }
 
     listLayerFeatures(mapaId: number, layerId: number, query: MapaLayerFeatureListQuery = {}) {
-        return this.http.get<MapaLayerFeatureListResponse>(
-            `${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/features/`,
-            {
-                params: this.buildParams(query)
-            }
-        );
+        return this.http.get<MapaLayerFeatureListResponse>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/features/`, {
+            params: this.buildParams(query)
+        });
     }
 
     getLayerFeature(mapaId: number, layerId: number, featureId: number) {
@@ -124,8 +112,6 @@ export class MapaService extends BaseCrudService {
     }
 
     removeLayerFeature(mapaId: number, layerId: number, featureId: number) {
-        return this.http.delete<{ detail?: string }>(
-            `${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/features/${featureId}/`
-        );
+        return this.http.delete<{ detail?: string }>(`${this.baseUrl}/mapeditor/mapas/${mapaId}/layers/${layerId}/features/${featureId}/`);
     }
 }

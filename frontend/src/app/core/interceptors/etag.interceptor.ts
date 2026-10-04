@@ -61,4 +61,3 @@ export const etagInterceptor: HttpInterceptorFn = (req, next) => {
         })
     );
 };
-

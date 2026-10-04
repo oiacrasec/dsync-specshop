@@ -18,39 +18,20 @@ import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
         <section class="card max-w-2xl mx-auto flex flex-col gap-6">
             <div class="flex flex-col gap-2">
                 <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Primeiro acesso</h1>
-                <p class="text-surface-600 dark:text-surface-300">
-                    Para continuar, troque a senha temporaria recebida no cadastro.
-                </p>
+                <p class="text-surface-600 dark:text-surface-300">Para continuar, troque a senha temporaria recebida no cadastro.</p>
             </div>
 
             <form [formGroup]="form" class="grid grid-cols-1 gap-5">
                 <div class="flex flex-col gap-2">
-                    <ui-input-password
-                        inputId="current_password"
-                        formControlName="current_password"
-                        label="Senha temporaria"
-                        [feedback]="false"
-                        errorMessage="Informe a senha temporaria."
-                    />
+                    <ui-input-password inputId="current_password" formControlName="current_password" label="Senha temporaria" [feedback]="false" errorMessage="Informe a senha temporaria." />
                 </div>
 
                 <div class="flex flex-col gap-2">
-                    <ui-input-password
-                        inputId="new_password"
-                        formControlName="new_password"
-                        label="Nova senha"
-                        errorMessage="Informe uma nova senha valida."
-                    />
+                    <ui-input-password inputId="new_password" formControlName="new_password" label="Nova senha" errorMessage="Informe uma nova senha valida." />
                 </div>
 
                 <div class="flex flex-col gap-2">
-                    <ui-input-password
-                        inputId="new_password_confirm"
-                        formControlName="new_password_confirm"
-                        label="Confirmar nova senha"
-                        [feedback]="false"
-                        errorMessage="Confirme a nova senha."
-                    />
+                    <ui-input-password inputId="new_password_confirm" formControlName="new_password_confirm" label="Confirmar nova senha" [feedback]="false" errorMessage="Confirme a nova senha." />
                 </div>
             </form>
 
@@ -102,12 +83,7 @@ export class PrimeiroAcessoTrocarSenhaPage {
                     this.router.navigateByUrl('/contexto/selecao');
                 },
                 error: (error) => {
-                    const detail =
-                        error?.error?.detail ??
-                        error?.error?.current_password?.[0] ??
-                        error?.error?.new_password?.[0] ??
-                        error?.error?.new_password_confirm?.[0] ??
-                        'Nao foi possivel trocar a senha.';
+                    const detail = error?.error?.detail ?? error?.error?.current_password?.[0] ?? error?.error?.new_password?.[0] ?? error?.error?.new_password_confirm?.[0] ?? 'Nao foi possivel trocar a senha.';
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Falha ao trocar senha',

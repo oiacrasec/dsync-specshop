@@ -33,9 +33,9 @@ type ButtonSeverity = 'success' | 'info' | 'warn' | 'danger' | 'help' | 'primary
     `,
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })

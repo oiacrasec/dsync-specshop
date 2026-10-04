@@ -45,9 +45,9 @@ import { DatePickerModule } from 'primeng/datepicker';
     providers: [],
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })
@@ -147,13 +147,7 @@ export class UiInputDate implements ControlValueAccessor {
             return;
         }
 
-        const rawValue =
-            typeof event === 'string'
-                ? event
-                : event?.value ??
-                  event?.target?.value ??
-                  event?.originalEvent?.target?.value ??
-                  '';
+        const rawValue = typeof event === 'string' ? event : (event?.value ?? event?.target?.value ?? event?.originalEvent?.target?.value ?? '');
 
         if (typeof rawValue !== 'string') {
             return;

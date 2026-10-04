@@ -171,10 +171,7 @@ export class StoreFormPage implements OnInit, OnDestroy {
     }
 
     private persistStore() {
-        const request =
-            this.isEditing && this.storeId
-                ? this.storeService.update(this.storeId, this.buildUpdatePayload())
-                : this.storeService.create(this.buildCreatePayload());
+        const request = this.isEditing && this.storeId ? this.storeService.update(this.storeId, this.buildUpdatePayload()) : this.storeService.create(this.buildCreatePayload());
 
         request.subscribe({
             next: () => {
@@ -293,16 +290,18 @@ export class StoreFormPage implements OnInit, OnDestroy {
               });
 
         return request.pipe(
-            map((response): UiLookupOptionsResponse => ({
-                data: response.data.map((item) => ({
-                    value: item.banco,
-                    label: item.banco_label ?? String(item.banco)
-                })),
-                totalRecords: response.totalRecords,
-                first: response.first,
-                rows: response.rows,
-                hasNext: response.hasNext
-            }))
+            map(
+                (response): UiLookupOptionsResponse => ({
+                    data: response.data.map((item) => ({
+                        value: item.banco,
+                        label: item.banco_label ?? String(item.banco)
+                    })),
+                    totalRecords: response.totalRecords,
+                    first: response.first,
+                    rows: response.rows,
+                    hasNext: response.hasNext
+                })
+            )
         );
     }
 

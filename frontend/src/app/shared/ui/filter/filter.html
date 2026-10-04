@@ -1,106 +1,51 @@
 <div class="flex flex-col gap-3 mb-4">
     <div class="flex flex-col md:flex-row gap-2 md:items-center">
         @if (hasGeneralFilters) {
-            <div class="flex-1">
-                <p-iconfield class="w-full">
-                    <p-inputicon class="pi pi-search" />
-                    <input
-                        pInputText
-                        type="text"
-                        class="w-full"
-                        [placeholder]="generalPlaceholder"
-                        [ngModel]="generalTerm"
-                        (ngModelChange)="onGeneralInput($event)"
-                    />
-                </p-iconfield>
-            </div>
-        }
-        @if (hasAnyFilters) {
-            <div class="flex items-center gap-2 md:justify-end">
-                @if (hasAdvancedFilters) {
-                    <ui-button
-                        label="Filtros avançados"
-                        icon="pi pi-sliders-h"
-                        severity="secondary"
-                        text
-                        (onClick)="toggleAdvanced()"
-                    ></ui-button>
-                }
-                <ui-button
-                    label="Limpar"
-                    icon="pi pi-filter-slash"
-                    severity="secondary"
-                    text
-                    (onClick)="clear()"
-                ></ui-button>
-            </div>
+        <div class="flex-1">
+            <p-iconfield class="w-full">
+                <p-inputicon class="pi pi-search" />
+                <input pInputText type="text" class="w-full" [placeholder]="generalPlaceholder" [ngModel]="generalTerm" (ngModelChange)="onGeneralInput($event)" />
+            </p-iconfield>
+        </div>
+        } @if (hasAnyFilters) {
+        <div class="flex items-center gap-2 md:justify-end">
+            @if (hasAdvancedFilters) {
+            <ui-button label="Filtros avançados" icon="pi pi-sliders-h" severity="secondary" text (onClick)="toggleAdvanced()"></ui-button>
+            }
+            <ui-button label="Limpar" icon="pi pi-filter-slash" severity="secondary" text (onClick)="clear()"></ui-button>
+        </div>
         }
     </div>
 
     @if (advancedOpen && hasAdvancedFilters) {
-        <div class="card rounded-md border border-surface-200 dark:border-surface-700 p-4 ui-filter-advanced-panel">
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                @for (filter of advancedFilters; track filter.field) {
-                    <div class="flex flex-col gap-2">
-                        <label class="text-sm font-medium text-surface-600 dark:text-white/70">{{ filter.header }}</label>
+    <div class="card rounded-md border border-surface-200 dark:border-surface-700 p-4 ui-filter-advanced-panel">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            @for (filter of advancedFilters; track filter.field) {
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-medium text-surface-600 dark:text-white/70">{{ filter.header }}</label>
 
-                        @switch (filter.type) {
-                            @case ('text') {
-                                <input
-                                    pInputText
-                                    type="text"
-                                    [ngModel]="advancedValues[filter.field]"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                />
-                            }
-                            @case ('number') {
-                                <p-inputnumber
-                                    [useGrouping]="false"
-                                    [ngModel]="advancedValues[filter.field]"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                ></p-inputnumber>
-                            }
-                            @case ('boolean') {
-                                <p-select
-                                    [options]="booleanOptions"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    appendTo="body"
-                                    [ngModel]="advancedValues[filter.field] ?? null"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                ></p-select>
-                            }
-                            @case ('choice') {
-                                <p-select
-                                    [options]="filter.choices || []"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    appendTo="body"
-                                    [ngModel]="advancedValues[filter.field]"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                ></p-select>
-                            }
-                            @case ('relation') {
-                                <ui-autocomplete
-                                    [inputId]="filter.field"
-                                    [placeholder]="'Selecione ' + filter.header.toLowerCase()"
-                                    [optionsProvider]="getRelationOptionsProvider(filter)"
-                                    [ngModel]="advancedValues[filter.field]"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                />
-                            }
-                            @default {
-                                <input
-                                    pInputText
-                                    type="text"
-                                    [ngModel]="advancedValues[filter.field]"
-                                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
-                                />
-                            }
-                        }
-                    </div>
-                }
+                @switch (filter.type) { @case ('text') {
+                <input pInputText type="text" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()" />
+                } @case ('number') {
+                <p-inputnumber [useGrouping]="false" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"></p-inputnumber>
+                } @case ('boolean') {
+                <p-select [options]="booleanOptions" optionLabel="label" optionValue="value" appendTo="body" [ngModel]="advancedValues[filter.field] ?? null" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"></p-select>
+                } @case ('choice') {
+                <p-select [options]="filter.choices || []" optionLabel="label" optionValue="value" appendTo="body" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"></p-select>
+                } @case ('relation') {
+                <ui-autocomplete
+                    [inputId]="filter.field"
+                    [placeholder]="'Selecione ' + filter.header.toLowerCase()"
+                    [optionsProvider]="getRelationOptionsProvider(filter)"
+                    [ngModel]="advancedValues[filter.field]"
+                    (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
+                />
+                } @default {
+                <input pInputText type="text" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()" />
+                } }
             </div>
+            }
         </div>
+    </div>
     }
 </div>

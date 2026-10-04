@@ -47,9 +47,9 @@ export interface UiMultiSelectOption {
     `,
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })

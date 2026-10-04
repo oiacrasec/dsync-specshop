@@ -88,10 +88,7 @@ export class BancoGeoespacialFormPage implements OnInit {
 
         this.saving = true;
 
-        const request =
-            this.isEditing && this.bancoId
-                ? this.bancoService.update(this.bancoId, this.buildUpdatePayload())
-                : this.bancoService.create(this.buildCreatePayload());
+        const request = this.isEditing && this.bancoId ? this.bancoService.update(this.bancoId, this.buildUpdatePayload()) : this.bancoService.create(this.buildCreatePayload());
 
         request.subscribe({
             next: () => {

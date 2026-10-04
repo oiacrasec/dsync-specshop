@@ -21,14 +21,7 @@
                 <p-tabpanel value="principal">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="flex flex-col gap-2">
-                            <ui-autocomplete
-                                inputId="workspace"
-                                formControlName="workspace"
-                                label="Workspace"
-                                placeholder="Digite para buscar workspace"
-                                [optionsProvider]="workspaceOptionsProvider"
-                                [errorMessage]="'Informe o workspace.'"
-                            />
+                            <ui-autocomplete inputId="workspace" formControlName="workspace" label="Workspace" placeholder="Digite para buscar workspace" [optionsProvider]="workspaceOptionsProvider" [errorMessage]="'Informe o workspace.'" />
                         </div>
 
                         <div class="flex flex-col gap-2">
@@ -46,15 +39,7 @@
 
                         <div class="flex flex-col gap-2">
                             <label class="text-sm font-medium text-surface-600 dark:text-white/70">Tipo</label>
-                            <p-select
-                                formControlName="tipo"
-                                [options]="tipoOptions"
-                                optionLabel="label"
-                                optionValue="value"
-                                appendTo="body"
-                                [placeholder]="'Selecione o tipo'"
-                                [class]="'w-full'"
-                            />
+                            <p-select formControlName="tipo" [options]="tipoOptions" optionLabel="label" optionValue="value" appendTo="body" [placeholder]="'Selecione o tipo'" [class]="'w-full'" />
                         </div>
 
                         <div class="flex flex-col gap-2">

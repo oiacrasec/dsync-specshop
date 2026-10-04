@@ -12,10 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const token = session.getAccessToken();
     const user = session.getUser();
     const isApiRequest = req.url.startsWith(baseUrl);
-    const skipContextHeaders =
-        req.url.includes('/autenticacao/token/') ||
-        req.url.endsWith('/autenticacao/contextos/') ||
-        req.url.endsWith('/autenticacao/primeiro-acesso/trocar-senha/');
+    const skipContextHeaders = req.url.includes('/autenticacao/token/') || req.url.endsWith('/autenticacao/contextos/') || req.url.endsWith('/autenticacao/primeiro-acesso/trocar-senha/');
 
     if (token && isApiRequest) {
         const headers: Record<string, string> = {

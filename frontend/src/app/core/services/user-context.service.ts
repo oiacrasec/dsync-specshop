@@ -39,9 +39,7 @@ export class UserContextService {
             organizacao_nome: matchedOrganization.nome
         };
 
-        const shouldUpdate =
-            nextContext.contrato_nome !== activeContext.contrato_nome ||
-            nextContext.organizacao_nome !== activeContext.organizacao_nome;
+        const shouldUpdate = nextContext.contrato_nome !== activeContext.contrato_nome || nextContext.organizacao_nome !== activeContext.organizacao_nome;
 
         if (!shouldUpdate) {
             return;
@@ -98,12 +96,7 @@ export class UserContextService {
 
         try {
             const parsed = JSON.parse(raw) as ActiveUserContext;
-            if (
-                Number.isFinite(parsed.contrato_id) &&
-                Number.isFinite(parsed.organizacao_id) &&
-                typeof parsed.contrato_nome === 'string' &&
-                typeof parsed.organizacao_nome === 'string'
-            ) {
+            if (Number.isFinite(parsed.contrato_id) && Number.isFinite(parsed.organizacao_id) && typeof parsed.contrato_nome === 'string' && typeof parsed.organizacao_nome === 'string') {
                 return parsed;
             }
             return null;

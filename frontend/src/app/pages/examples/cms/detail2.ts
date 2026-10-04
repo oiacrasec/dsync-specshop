@@ -112,11 +112,11 @@ interface Section {
                                 <div class="flex flex-col gap-4">
                                     <h2 class="text-surface-900 dark:text-surface-0 text-2xl font-medium leading-relaxed">Key Drivers of Manufacturing-Led Economic Growth</h2>
                                     <ul class="flex flex-col gap-3 list-disc pl-5">
-                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Job Creation (40%)  Manufacturing provides direct employment and supports service sector growth.</li>
-                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Capital Investment (25%)  Infrastructure and equipment investments stimulate economic activity.</li>
-                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Export Revenue (20%)  Manufactured goods generate foreign exchange and trade surplus.</li>
-                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Technology Transfer (10%)  Innovation and skill development enhance productivity.</li>
-                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Regional Development (5%)  Industrial clusters create economic hubs and attract investment.</li>
+                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Job Creation (40%) Manufacturing provides direct employment and supports service sector growth.</li>
+                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Capital Investment (25%) Infrastructure and equipment investments stimulate economic activity.</li>
+                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Export Revenue (20%) Manufactured goods generate foreign exchange and trade surplus.</li>
+                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Technology Transfer (10%) Innovation and skill development enhance productivity.</li>
+                                        <li class="text-surface-500 dark:text-surface-300 text-lg leading-relaxed">Regional Development (5%) Industrial clusters create economic hubs and attract investment.</li>
                                     </ul>
                                 </div>
                             </div>

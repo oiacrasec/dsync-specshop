@@ -16,8 +16,7 @@ const MAX_ORGANIZATION_LABEL_LENGTH = 20;
     selector: '[app-sidebar]',
     standalone: true,
     imports: [CommonModule, AppMenu, RouterModule, AppTopbar],
-    template: `
-        <div class="sidebar-header">
+    template: ` <div class="sidebar-header">
             <a class="logo" [routerLink]="['/']">
                 <img class="logo-image" src="/layout/images/logo-{{ layoutService.isDarkTheme() ? 'white' : 'dark' }}.svg" alt="logo" />
                 <div class="brand-block">

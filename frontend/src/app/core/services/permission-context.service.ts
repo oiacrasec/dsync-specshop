@@ -170,13 +170,7 @@ export class PermissionContextService {
 
         try {
             const parsed = JSON.parse(raw) as PermissionContextCacheEntry;
-            if (
-                typeof parsed?.user_uuid === 'string' &&
-                typeof parsed?.context_key === 'string' &&
-                parsed?.payload &&
-                Array.isArray(parsed.payload.permissoes) &&
-                Array.isArray(parsed.payload.papeis_ativos)
-            ) {
+            if (typeof parsed?.user_uuid === 'string' && typeof parsed?.context_key === 'string' && parsed?.payload && Array.isArray(parsed.payload.permissoes) && Array.isArray(parsed.payload.papeis_ativos)) {
                 return parsed;
             }
             return null;

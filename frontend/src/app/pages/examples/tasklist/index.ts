@@ -131,7 +131,7 @@ interface Task {
                                         <h2 class="text-surface-900 dark:text-surface-0 text-lg font-semibold">{{ pendingTasks().length }} Tasks Pending</h2>
                                     </div>
                                 </p-accordionheader>
-                                <p-accordioncontent [pt]="{'root': { class: 'overflow-hidden' } }">
+                                <p-accordioncontent [pt]="{ root: { class: 'overflow-hidden' } }">
                                     <div class="flex flex-col">
                                         @for (task of pendingTasks(); track task.id; let i = $index; let last = $last) {
                                             <ng-container *ngTemplateOutlet="taskItem; context: { task: task, isLast: last }"></ng-container>
@@ -149,7 +149,7 @@ interface Task {
                                         <h2 class="text-surface-900 dark:text-surface-0 text-lg font-semibold">{{ inProgressTasks().length }} Tasks In Progress</h2>
                                     </div>
                                 </p-accordionheader>
-                                <p-accordioncontent [pt]="{'root': { class: 'overflow-hidden' } }">
+                                <p-accordioncontent [pt]="{ root: { class: 'overflow-hidden' } }">
                                     <div class="flex flex-col">
                                         @for (task of inProgressTasks(); track task.id; let i = $index; let last = $last) {
                                             <ng-container *ngTemplateOutlet="taskItem; context: { task: task, isLast: last }"></ng-container>
@@ -167,7 +167,7 @@ interface Task {
                                         <h2 class="text-surface-900 dark:text-surface-0 text-lg font-semibold">{{ completedTasks().length }} Tasks Completed</h2>
                                     </div>
                                 </p-accordionheader>
-                                <p-accordioncontent [pt]="{'root': { class: 'overflow-hidden' } }">
+                                <p-accordioncontent [pt]="{ root: { class: 'overflow-hidden' } }">
                                     <div class="flex flex-col">
                                         @for (task of completedTasks(); track task.id; let i = $index; let last = $last) {
                                             <ng-container *ngTemplateOutlet="taskItemCompleted; context: { task: task, isLast: last }"></ng-container>

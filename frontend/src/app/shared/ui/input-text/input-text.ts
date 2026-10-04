@@ -67,9 +67,9 @@ import { InputTextModule } from 'primeng/inputtext';
     providers: [],
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })
@@ -144,10 +144,7 @@ export class UiInputText implements ControlValueAccessor {
     }
 
     handleMaskInput(event: { value?: string | null } | Event) {
-        const nextValue =
-            typeof event === 'object' && event !== null && 'value' in event
-                ? (event.value ?? '')
-                : this.value ?? '';
+        const nextValue = typeof event === 'object' && event !== null && 'value' in event ? (event.value ?? '') : (this.value ?? '');
         this.value = String(nextValue);
         this.onChange(this.value);
     }

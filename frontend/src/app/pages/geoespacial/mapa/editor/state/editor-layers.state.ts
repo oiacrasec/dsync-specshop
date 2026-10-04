@@ -81,9 +81,7 @@ export class EditorLayersState {
     }
 
     setLayerVisibility(layerId: number, visivel: boolean) {
-        this.layers = this.layers.map((layer) =>
-            layer.id === layerId ? { ...layer, visivel } : layer
-        );
+        this.layers = this.layers.map((layer) => (layer.id === layerId ? { ...layer, visivel } : layer));
     }
 
     removeLayer(layerId: number) {

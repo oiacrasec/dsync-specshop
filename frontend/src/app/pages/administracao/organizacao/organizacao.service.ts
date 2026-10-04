@@ -20,7 +20,6 @@ export interface OrganizacaoQuery {
 
 @Injectable({ providedIn: 'root' })
 export class OrganizacaoService extends BaseCrudService {
-
     list(query: OrganizacaoQuery = {}) {
         const params = this.buildParams(query);
         return this.http.get<PaginatedResponse<Organizacao>>(`${this.baseUrl}/administracao/organizacao/`, { params });

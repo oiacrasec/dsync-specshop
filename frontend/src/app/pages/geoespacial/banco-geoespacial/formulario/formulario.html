@@ -34,14 +34,7 @@
                             <ui-input-text inputId="usuario" formControlName="usuario" [maxlength]="100" label="Usuário" errorMessage="Informe o usuário." />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <ui-input-password
-                                inputId="senha"
-                                formControlName="senha"
-                                label="Senha"
-                                [feedback]="false"
-                                [toggleMask]="true"
-                                [placeholder]="isEditing ? 'Preencha apenas para alterar' : 'Informe a senha do banco'"
-                            />
+                            <ui-input-password inputId="senha" formControlName="senha" label="Senha" [feedback]="false" [toggleMask]="true" [placeholder]="isEditing ? 'Preencha apenas para alterar' : 'Informe a senha do banco'" />
                         </div>
                         <div class="flex items-center gap-2">
                             <ui-checkbox inputId="ativo" formControlName="ativo" label="Banco ativo" [marginTop]="22" />
@@ -62,15 +55,7 @@
 
     <div class="flex flex-wrap items-center justify-end gap-3">
         <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
-        <ui-button
-            label="Testar conexão"
-            icon="pi pi-plug"
-            severity="secondary"
-            text
-            [loading]="testingConnection"
-            [disabled]="loading || saving"
-            (onClick)="testConnection()"
-        ></ui-button>
+        <ui-button label="Testar conexão" icon="pi pi-plug" severity="secondary" text [loading]="testingConnection" [disabled]="loading || saving" (onClick)="testConnection()"></ui-button>
         <ui-button label="Salvar" icon="pi pi-check" [loading]="saving || loading" [disabled]="loading" (onClick)="save()"></ui-button>
     </div>
 </div>

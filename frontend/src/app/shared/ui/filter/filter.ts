@@ -36,13 +36,13 @@ export interface UiFilterField {
     templateUrl: './filter.html',
     styles: [
         `
-        .ui-filter-advanced-panel {
-            background: color-mix(in srgb, var(--p-button-secondary-background, #e5e7eb) 18%, white 82%);
-        }
+            .ui-filter-advanced-panel {
+                background: color-mix(in srgb, var(--p-button-secondary-background, #e5e7eb) 18%, white 82%);
+            }
 
-        :host-context(.app-dark) .ui-filter-advanced-panel {
-            background: color-mix(in srgb, var(--p-button-secondary-background, #4b5563) 24%, black 76%);
-        }
+            :host-context(.app-dark) .ui-filter-advanced-panel {
+                background: color-mix(in srgb, var(--p-button-secondary-background, #4b5563) 24%, black 76%);
+            }
         `
     ]
 })
@@ -68,9 +68,7 @@ export class UiFilter implements OnChanges, OnDestroy {
     ];
 
     constructor() {
-        this.generalSearch$
-            .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-            .subscribe(() => this.emitFilters());
+        this.generalSearch$.pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(() => this.emitFilters());
     }
 
     ngOnChanges(changes: SimpleChanges) {

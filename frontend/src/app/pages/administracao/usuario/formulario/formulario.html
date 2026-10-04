@@ -5,11 +5,7 @@
         <div>
             <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar usuário' : 'Novo usuário' }}</h2>
             <p class="text-sm text-surface-500 dark:text-white/64">
-                @if (isEditing) {
-                    Atualize os dados cadastrais do usuário no contrato ativo.
-                } @else {
-                    Cadastro para o contrato ativo com senha temporaria e troca obrigatoria no primeiro acesso.
-                }
+                @if (isEditing) { Atualize os dados cadastrais do usuário no contrato ativo. } @else { Cadastro para o contrato ativo com senha temporaria e troca obrigatoria no primeiro acesso. }
             </p>
         </div>
         <div class="flex items-center gap-2">
@@ -22,53 +18,26 @@
             <p-tablist>
                 <p-tab value="principal">Principal</p-tab>
                 @if (isEditing) {
-                    <p-tab value="permissoes">Permissões</p-tab>
+                <p-tab value="permissoes">Permissões</p-tab>
                 }
             </p-tablist>
             <p-tabpanels>
                 <p-tabpanel value="principal">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="flex flex-col gap-2">
-                            <ui-input-text
-                                inputId="username"
-                                formControlName="username"
-                                [maxlength]="150"
-                                label="Usuário"
-                                autocomplete="off"
-                                errorMessage="Informe o usuário."
-                            />
+                            <ui-input-text inputId="username" formControlName="username" [maxlength]="150" label="Usuário" autocomplete="off" errorMessage="Informe o usuário." />
                         </div>
 
                         <div class="flex flex-col gap-2">
-                            <ui-input-text
-                                inputId="email"
-                                formControlName="email"
-                                [maxlength]="255"
-                                label="Email"
-                                type="email"
-                                autocomplete="off"
-                                errorMessage="Informe um email valido."
-                            />
+                            <ui-input-text inputId="email" formControlName="email" [maxlength]="255" label="Email" type="email" autocomplete="off" errorMessage="Informe um email valido." />
                         </div>
 
                         <div class="flex flex-col gap-2">
-                            <ui-input-text
-                                inputId="nome"
-                                formControlName="nome"
-                                [maxlength]="150"
-                                label="Nome"
-                                errorMessage="Informe o nome."
-                            />
+                            <ui-input-text inputId="nome" formControlName="nome" [maxlength]="150" label="Nome" errorMessage="Informe o nome." />
                         </div>
 
                         <div class="flex flex-col gap-2">
-                            <ui-input-text
-                                inputId="sobrenome"
-                                formControlName="sobrenome"
-                                [maxlength]="150"
-                                label="Sobrenome"
-                                errorMessage="Informe o sobrenome."
-                            />
+                            <ui-input-text inputId="sobrenome" formControlName="sobrenome" [maxlength]="150" label="Sobrenome" errorMessage="Informe o sobrenome." />
                         </div>
 
                         <div class="flex flex-col gap-2 lg:col-span-2">
@@ -87,116 +56,99 @@
                 </p-tabpanel>
 
                 @if (isEditing) {
-                    <p-tabpanel value="permissoes">
-                        <div class="flex flex-col gap-6">
-                            @if (organizacoesVinculadas.length) {
-                                <div class="rounded-none border border-surface-200 dark:border-surface-700 overflow-hidden bg-surface-0 dark:bg-surface-900">
-                                    <div class="grid grid-cols-1 xl:grid-cols-[280px_1fr]">
-                                        <aside class="border-b xl:border-b-0 xl:border-r border-surface-200 dark:border-surface-700">
-                                            <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-700">
-                                                <div class="text-base font-semibold text-surface-900 dark:text-surface-0">Organizações</div>
-                                            </div>
-                                            <div class="p-4 flex flex-col gap-2 max-h-[560px] overflow-y-auto">
-                                                @for (organizacao of organizacoesVinculadas; track organizacao.id) {
-                                                    <button
-                                                        type="button"
-                                                        class="w-full text-left px-3 py-2.5 rounded-xl border transition-colors"
-                                                        [ngClass]="{
+                <p-tabpanel value="permissoes">
+                    <div class="flex flex-col gap-6">
+                        @if (organizacoesVinculadas.length) {
+                        <div class="rounded-none border border-surface-200 dark:border-surface-700 overflow-hidden bg-surface-0 dark:bg-surface-900">
+                            <div class="grid grid-cols-1 xl:grid-cols-[280px_1fr]">
+                                <aside class="border-b xl:border-b-0 xl:border-r border-surface-200 dark:border-surface-700">
+                                    <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-700">
+                                        <div class="text-base font-semibold text-surface-900 dark:text-surface-0">Organizações</div>
+                                    </div>
+                                    <div class="p-4 flex flex-col gap-2 max-h-[560px] overflow-y-auto">
+                                        @for (organizacao of organizacoesVinculadas; track organizacao.id) {
+                                        <button
+                                            type="button"
+                                            class="w-full text-left px-3 py-2.5 rounded-xl border transition-colors"
+                                            [ngClass]="{
                                                             'bg-primary-50 dark:bg-primary-900/20 border-primary-300 dark:border-primary-700 text-primary-700 dark:text-primary-200': selectedOrganizacaoId === organizacao.id,
                                                             'border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-100 hover:bg-surface-50 dark:hover:bg-surface-800/60': selectedOrganizacaoId !== organizacao.id
                                                         }"
-                                                        (click)="selectOrganizacao(organizacao.id)"
-                                                    >
-                                                        {{ organizacao.nome }}
-                                                    </button>
-                                                }
-                                            </div>
-                                        </aside>
-
-                                        <section class="flex flex-col">
-                                            <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-700">
-                                                <div class="text-base font-semibold text-surface-900 dark:text-surface-0">Permissões por organização</div>
-                                                <div class="text-sm text-surface-500 dark:text-surface-400">Aplique presets e/ou ajuste as permissões por tela.</div>
-                                            </div>
-
-                                            <div class="p-4 lg:p-5 flex flex-col gap-5">
-                                                <div class="flex flex-col gap-4">
-                                                    <div class="flex flex-col lg:flex-row items-start gap-4 lg:gap-8">
-                                                        <div class="flex-1 w-full grid grid-cols-1 lg:grid-cols-[minmax(0,320px)_1fr] gap-3 items-end">
-                                                            <div class="flex flex-col gap-2">
-                                                                <label class="text-sm font-semibold text-surface-700 dark:text-surface-100">Preset</label>
-                                                                <p-select
-                                                                    [options]="presetOptions"
-                                                                    optionLabel="label"
-                                                                    optionValue="value"
-                                                                    appendTo="body"
-                                                                    [placeholder]="'Selecione um preset'"
-                                                                    [class]="'w-full'"
-                                                                    [(ngModel)]="selectedPresetCode"
-                                                                    [ngModelOptions]="{ standalone: true }"
-                                                                />
-                                                            </div>
-                                                            <div class="flex flex-wrap items-center gap-3 justify-start">
-                                                                <ui-button
-                                                                    label="Aplicar na organização"
-                                                                    severity="secondary"
-                                                                    [disabled]="!selectedOrganizacaoId || !selectedPresetCode"
-                                                                    (onClick)="applyPresetToSelectedOrganizacao()"
-                                                                ></ui-button>
-                                                                <ui-button
-                                                                    label="Aplicar em todas"
-                                                                    severity="secondary"
-                                                                    [disabled]="!selectedPresetCode"
-                                                                    (onClick)="confirmApplyPresetToAllOrganizacoes()"
-                                                                ></ui-button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="w-full lg:w-auto lg:ml-auto lg:self-end lg:h-10 flex items-center justify-start lg:justify-end">
-                                                            <ui-checkbox
-                                                                inputId="contrato_admin"
-                                                                [(ngModel)]="contratoAdmin"
-                                                                [ngModelOptions]="{ standalone: true }"
-                                                                label="Administrador do contrato"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="h-0 border-t border-dashed border-surface-200 dark:border-surface-700"></div>
-                                                </div>
-
-                                                <div class="flex flex-col gap-3">
-                                                    @for (group of catalogoPermissoes; track group.resource) {
-                                                        <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
-                                                            <div class="px-4 py-3 border-b border-surface-200 dark:border-surface-700">
-                                                                <div class="text-sm font-semibold text-surface-700 dark:text-surface-100">{{ group.label }}</div>
-                                                            </div>
-                                                            <div class="p-4 overflow-x-auto">
-                                                                <div class="grid grid-cols-4 gap-3 min-w-[560px]">
-                                                                    @for (permission of group.permissions; track permission.key) {
-                                                                        <ui-checkbox
-                                                                            [inputId]="'perm_' + group.resource + '_' + permission.action + '_' + selectedOrganizacaoId"
-                                                                            [label]="permission.label"
-                                                                            [ngModel]="hasPermissaoSelecionada(permission.key)"
-                                                                            (ngModelChange)="setPermissaoSelecionada(permission.key, $event)"
-                                                                            [ngModelOptions]="{ standalone: true }"
-                                                                        />
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </section>
+                                            (click)="selectOrganizacao(organizacao.id)"
+                                        >
+                                            {{ organizacao.nome }}
+                                        </button>
+                                        }
                                     </div>
-                                </div>
-                            } @else {
-                                <small class="text-surface-500 dark:text-white/64">
-                                    Usuário sem organizações vinculadas no contrato ativo.
-                                </small>
-                            }
+                                </aside>
+
+                                <section class="flex flex-col">
+                                    <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-700">
+                                        <div class="text-base font-semibold text-surface-900 dark:text-surface-0">Permissões por organização</div>
+                                        <div class="text-sm text-surface-500 dark:text-surface-400">Aplique presets e/ou ajuste as permissões por tela.</div>
+                                    </div>
+
+                                    <div class="p-4 lg:p-5 flex flex-col gap-5">
+                                        <div class="flex flex-col gap-4">
+                                            <div class="flex flex-col lg:flex-row items-start gap-4 lg:gap-8">
+                                                <div class="flex-1 w-full grid grid-cols-1 lg:grid-cols-[minmax(0,320px)_1fr] gap-3 items-end">
+                                                    <div class="flex flex-col gap-2">
+                                                        <label class="text-sm font-semibold text-surface-700 dark:text-surface-100">Preset</label>
+                                                        <p-select
+                                                            [options]="presetOptions"
+                                                            optionLabel="label"
+                                                            optionValue="value"
+                                                            appendTo="body"
+                                                            [placeholder]="'Selecione um preset'"
+                                                            [class]="'w-full'"
+                                                            [(ngModel)]="selectedPresetCode"
+                                                            [ngModelOptions]="{ standalone: true }"
+                                                        />
+                                                    </div>
+                                                    <div class="flex flex-wrap items-center gap-3 justify-start">
+                                                        <ui-button label="Aplicar na organização" severity="secondary" [disabled]="!selectedOrganizacaoId || !selectedPresetCode" (onClick)="applyPresetToSelectedOrganizacao()"></ui-button>
+                                                        <ui-button label="Aplicar em todas" severity="secondary" [disabled]="!selectedPresetCode" (onClick)="confirmApplyPresetToAllOrganizacoes()"></ui-button>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full lg:w-auto lg:ml-auto lg:self-end lg:h-10 flex items-center justify-start lg:justify-end">
+                                                    <ui-checkbox inputId="contrato_admin" [(ngModel)]="contratoAdmin" [ngModelOptions]="{ standalone: true }" label="Administrador do contrato" />
+                                                </div>
+                                            </div>
+
+                                            <div class="h-0 border-t border-dashed border-surface-200 dark:border-surface-700"></div>
+                                        </div>
+
+                                        <div class="flex flex-col gap-3">
+                                            @for (group of catalogoPermissoes; track group.resource) {
+                                            <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                                                <div class="px-4 py-3 border-b border-surface-200 dark:border-surface-700">
+                                                    <div class="text-sm font-semibold text-surface-700 dark:text-surface-100">{{ group.label }}</div>
+                                                </div>
+                                                <div class="p-4 overflow-x-auto">
+                                                    <div class="grid grid-cols-4 gap-3 min-w-[560px]">
+                                                        @for (permission of group.permissions; track permission.key) {
+                                                        <ui-checkbox
+                                                            [inputId]="'perm_' + group.resource + '_' + permission.action + '_' + selectedOrganizacaoId"
+                                                            [label]="permission.label"
+                                                            [ngModel]="hasPermissaoSelecionada(permission.key)"
+                                                            (ngModelChange)="setPermissaoSelecionada(permission.key, $event)"
+                                                            [ngModelOptions]="{ standalone: true }"
+                                                        />
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
                         </div>
-                    </p-tabpanel>
+                        } @else {
+                        <small class="text-surface-500 dark:text-white/64"> Usuário sem organizações vinculadas no contrato ativo. </small>
+                        }
+                    </div>
+                </p-tabpanel>
                 }
             </p-tabpanels>
         </p-tabs>
@@ -204,22 +156,16 @@
 
     <div class="flex flex-wrap items-center justify-end gap-3">
         <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
-        <ui-button
-            label="Salvar"
-            icon="pi pi-check"
-            [loading]="saving || loading"
-            [disabled]="loading"
-            (onClick)="submit()"
-        ></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving || loading" [disabled]="loading" (onClick)="submit()"></ui-button>
     </div>
 
     @if (createdUser?.senha_temporaria) {
-        <div class="border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
-            <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporaria (exibida uma unica vez)</div>
-            <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ createdUser?.senha_temporaria }}</div>
-            <div>
-                <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyTemporaryPassword()"></ui-button>
-            </div>
+    <div class="border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
+        <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporaria (exibida uma unica vez)</div>
+        <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ createdUser?.senha_temporaria }}</div>
+        <div>
+            <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyTemporaryPassword()"></ui-button>
         </div>
+    </div>
     }
 </div>

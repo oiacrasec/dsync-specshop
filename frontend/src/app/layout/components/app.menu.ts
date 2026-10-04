@@ -52,7 +52,7 @@ export class AppMenu {
                     icon: 'pi pi-fw pi-file',
                     visible: () => this.canViewContratos(),
                     routerLink: ['/pages/administracao/contrato']
-                },
+                }
                 /* DESABILITADO: fora do escopo atual
                 {
                     label: 'Organizações',
@@ -78,7 +78,7 @@ export class AppMenu {
                 }
                 */
             ]
-        },
+        }
         // DESABILITADO: separador do bloco Geoespacial
         // { separator: true },
         /* DESABILITADO: fora do escopo atual

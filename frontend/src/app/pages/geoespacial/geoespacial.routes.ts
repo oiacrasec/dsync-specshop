@@ -20,8 +20,7 @@ export default [
     {
         path: 'bancos/novo',
         canActivate: [accessGuard, permissionGuard],
-        loadComponent: () =>
-            import('@/app/pages/geoespacial/banco-geoespacial/formulario/formulario').then((c) => c.BancoGeoespacialFormPage),
+        loadComponent: () => import('@/app/pages/geoespacial/banco-geoespacial/formulario/formulario').then((c) => c.BancoGeoespacialFormPage),
         data: {
             breadcrumb: 'Novo banco geoespacial',
             audience: ACCESS_AUDIENCE.COMMON,
@@ -32,8 +31,7 @@ export default [
     {
         path: 'bancos/:id',
         canActivate: [accessGuard, permissionGuard],
-        loadComponent: () =>
-            import('@/app/pages/geoespacial/banco-geoespacial/formulario/formulario').then((c) => c.BancoGeoespacialFormPage),
+        loadComponent: () => import('@/app/pages/geoespacial/banco-geoespacial/formulario/formulario').then((c) => c.BancoGeoespacialFormPage),
         data: {
             breadcrumb: 'Editar banco geoespacial',
             audience: ACCESS_AUDIENCE.COMMON,
@@ -88,8 +86,7 @@ export default [
     {
         path: 'geoserver-bancos/novo',
         canActivate: [accessGuard, permissionGuard],
-        loadComponent: () =>
-            import('@/app/pages/geoespacial/geoserver-banco/formulario/formulario').then((c) => c.GeoServerBancoFormPage),
+        loadComponent: () => import('@/app/pages/geoespacial/geoserver-banco/formulario/formulario').then((c) => c.GeoServerBancoFormPage),
         data: {
             breadcrumb: 'Novo vínculo GeoServer x Banco',
             audience: ACCESS_AUDIENCE.COMMON,
@@ -100,8 +97,7 @@ export default [
     {
         path: 'geoserver-bancos/:id',
         canActivate: [accessGuard, permissionGuard],
-        loadComponent: () =>
-            import('@/app/pages/geoespacial/geoserver-banco/formulario/formulario').then((c) => c.GeoServerBancoFormPage),
+        loadComponent: () => import('@/app/pages/geoespacial/geoserver-banco/formulario/formulario').then((c) => c.GeoServerBancoFormPage),
         data: {
             breadcrumb: 'Editar vínculo GeoServer x Banco',
             audience: ACCESS_AUDIENCE.COMMON,

@@ -57,61 +57,61 @@ export interface UiTableDataService<T> {
     templateUrl: './table.html',
     styles: [
         `
-        :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        .ui-table-actions-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            width: 100%;
-        }
+            .ui-table-actions-wrapper {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                width: 100%;
+            }
 
-        .ui-table-actions-wrapper--compact {
-            justify-content: center;
-        }
+            .ui-table-actions-wrapper--compact {
+                justify-content: center;
+            }
 
-        :host ::ng-deep th.ui-table-actions-col--compact,
-        :host ::ng-deep td.ui-table-actions-col--compact {
-            width: 50px;
-            min-width: 50px;
-            max-width: 50px;
-            text-align: center;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-        }
+            :host ::ng-deep th.ui-table-actions-col--compact,
+            :host ::ng-deep td.ui-table-actions-col--compact {
+                width: 50px;
+                min-width: 50px;
+                max-width: 50px;
+                text-align: center;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
 
-        :host ::ng-deep .ui-table-paginator {
-            justify-content: center;
-            position: relative;
-        }
-
-        :host ::ng-deep .ui-table-paginator .p-paginator-current {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            margin: 0;
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
             :host ::ng-deep .ui-table-paginator {
-                flex-wrap: wrap;
-                row-gap: 0.5rem;
+                justify-content: center;
+                position: relative;
             }
 
             :host ::ng-deep .ui-table-paginator .p-paginator-current {
-                position: static;
-                transform: none;
-                order: 99;
-                flex: 0 0 100%;
-                margin-top: 0.25rem;
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                margin: 0;
                 text-align: right;
+                white-space: nowrap;
             }
-        }
+
+            @media (max-width: 768px) {
+                :host ::ng-deep .ui-table-paginator {
+                    flex-wrap: wrap;
+                    row-gap: 0.5rem;
+                }
+
+                :host ::ng-deep .ui-table-paginator .p-paginator-current {
+                    position: static;
+                    transform: none;
+                    order: 99;
+                    flex: 0 0 100%;
+                    margin-top: 0.25rem;
+                    text-align: right;
+                }
+            }
         `
     ]
 })
@@ -301,7 +301,6 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         this.filtersSchemaKey = nextKey;
         this.internalFilters = nextFilters;
     }
-
 
     getCellValue(row: Record<string, any>, column: UiTableColumn) {
         if (column.displayField) {

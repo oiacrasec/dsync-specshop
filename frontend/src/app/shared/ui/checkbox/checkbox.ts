@@ -9,15 +9,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     imports: [CommonModule, FormsModule, CheckboxModule],
     template: `
         <div class="flex items-center gap-2" [style.margin-top]="marginTopStyle">
-            <p-checkbox
-                [inputId]="inputId ?? id"
-                [binary]="binary"
-                [disabled]="disabled"
-                [(ngModel)]="value"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="handleChange($event)"
-                (onBlur)="markTouched()"
-            />
+            <p-checkbox [inputId]="inputId ?? id" [binary]="binary" [disabled]="disabled" [(ngModel)]="value" [ngModelOptions]="{ standalone: true }" (ngModelChange)="handleChange($event)" (onBlur)="markTouched()" />
             @if (label) {
                 <label [for]="inputId ?? id" [ngClass]="labelClass">{{ label }}</label>
             }
@@ -31,9 +23,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     `,
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })

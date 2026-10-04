@@ -95,9 +95,9 @@ interface UiAutocompleteNormalizedQuery {
     `,
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })
@@ -155,17 +155,16 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
 
         this.search$
             .pipe(
-                distinctUntilChanged((previous, current) =>
-                    previous.query.q === current.query.q &&
-                    previous.query.pk === current.query.pk &&
-                    previous.query.first === current.query.first &&
-                    previous.query.rows === current.query.rows &&
-                    previous.debounceMs === current.debounceMs &&
-                    previous.triggerId === current.triggerId
+                distinctUntilChanged(
+                    (previous, current) =>
+                        previous.query.q === current.query.q &&
+                        previous.query.pk === current.query.pk &&
+                        previous.query.first === current.query.first &&
+                        previous.query.rows === current.query.rows &&
+                        previous.debounceMs === current.debounceMs &&
+                        previous.triggerId === current.triggerId
                 ),
-                switchMap((request) =>
-                    (request.debounceMs > 0 ? timer(request.debounceMs) : of(0)).pipe(map(() => request.query))
-                ),
+                switchMap((request) => (request.debounceMs > 0 ? timer(request.debounceMs) : of(0)).pipe(map(() => request.query))),
                 switchMap((query) => this.fetchOptions(query)),
                 takeUntil(this.destroy$)
             )
@@ -218,10 +217,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
                 if (requestId !== this.resolveRequestSeq) {
                     return;
                 }
-                this.selectedOption =
-                    response.data.find((option) => this.compareValues(this.resolveOptionValue(option), primitiveValue)) ??
-                    response.data[0] ??
-                    null;
+                this.selectedOption = response.data.find((option) => this.compareValues(this.resolveOptionValue(option), primitiveValue)) ?? response.data[0] ?? null;
                 queueMicrotask(() => this.cdRef.detectChanges());
             });
     }

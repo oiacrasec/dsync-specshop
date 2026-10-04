@@ -85,9 +85,7 @@ export class OrganizacaoFormPage implements OnInit {
         const payload = this.buildPayload();
         this.saving = true;
 
-        const request = this.isEditing && this.organizacaoId
-            ? this.organizacaoService.update(this.organizacaoId, payload)
-            : this.organizacaoService.create(payload);
+        const request = this.isEditing && this.organizacaoId ? this.organizacaoService.update(this.organizacaoId, payload) : this.organizacaoService.create(payload);
 
         request.subscribe({
             next: (organizacao: Organizacao) => {

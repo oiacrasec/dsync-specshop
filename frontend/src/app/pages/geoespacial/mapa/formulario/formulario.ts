@@ -38,24 +38,12 @@ interface StoreSummaryState {
 @Component({
     selector: 'app-mapa-formulario',
     standalone: true,
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        UiAutocomplete,
-        UiInputText,
-        UiInputNumber,
-        UiCheckbox,
-        UiButton,
-        UiMultiSelect,
-        SelectModule
-    ],
+    imports: [CommonModule, ReactiveFormsModule, UiAutocomplete, UiInputText, UiInputNumber, UiCheckbox, UiButton, UiMultiSelect, SelectModule],
     templateUrl: './formulario.html',
     styles: [
         `
             .mapa-preview-grid {
-                background-image:
-                    linear-gradient(rgba(71, 85, 105, 0.14) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(71, 85, 105, 0.14) 1px, transparent 1px);
+                background-image: linear-gradient(rgba(71, 85, 105, 0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(71, 85, 105, 0.14) 1px, transparent 1px);
                 background-size: 36px 36px;
             }
         `
@@ -198,9 +186,7 @@ export class MapaFormPage implements OnInit {
         const payload = this.buildPayload();
         this.saving = true;
 
-        const request = this.isEditing && this.mapaId
-            ? this.mapaService.update(this.mapaId, payload)
-            : this.mapaService.create(payload);
+        const request = this.isEditing && this.mapaId ? this.mapaService.update(this.mapaId, payload) : this.mapaService.create(payload);
 
         request.subscribe({
             next: () => {
@@ -283,7 +269,7 @@ export class MapaFormPage implements OnInit {
     private buildPayload() {
         const raw = this.form.getRawValue();
         const visibilidade = raw.visibilidade ?? 'SETOR';
-        const sharedIds = visibilidade === 'COMPARTILHADO' ? raw.setor_compartilhado_ids ?? [] : [];
+        const sharedIds = visibilidade === 'COMPARTILHADO' ? (raw.setor_compartilhado_ids ?? []) : [];
 
         return {
             nome: (raw.nome ?? '').trim(),

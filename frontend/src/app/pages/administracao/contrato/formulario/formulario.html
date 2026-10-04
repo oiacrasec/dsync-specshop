@@ -14,10 +14,9 @@
             <p-tablist>
                 <p-tab value="principal">Principal</p-tab>
                 @if (exibirPrimeiroAcessoTab) {
-                    <p-tab value="primeiro-acesso">Primeiro acesso</p-tab>
-                }
-                @if (exibirAdministradoresTab) {
-                    <p-tab value="administradores">Administradores</p-tab>
+                <p-tab value="primeiro-acesso">Primeiro acesso</p-tab>
+                } @if (exibirAdministradoresTab) {
+                <p-tab value="administradores">Administradores</p-tab>
                 }
             </p-tablist>
             <p-tabpanels>
@@ -46,115 +45,67 @@
                 </p-tabpanel>
 
                 @if (exibirPrimeiroAcessoTab) {
-                    <p-tabpanel value="primeiro-acesso">
-                        <form [formGroup]="primeiroAcessoForm" class="flex flex-col gap-6">
-                            <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 text-sm text-surface-600 dark:text-surface-300">
-                                Use esta aba para configurar o primeiro acesso do cliente no contrato: uma organização inicial e um usuário
-                                administrador do contrato com troca obrigatória de senha no primeiro login.
+                <p-tabpanel value="primeiro-acesso">
+                    <form [formGroup]="primeiroAcessoForm" class="flex flex-col gap-6">
+                        <div class="rounded-xl border border-surface-200 dark:border-surface-700 p-4 text-sm text-surface-600 dark:text-surface-300">
+                            Use esta aba para configurar o primeiro acesso do cliente no contrato: uma organização inicial e um usuário administrador do contrato com troca obrigatória de senha no primeiro login.
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-2">
+                                <ui-input-text inputId="organizacao_nome" formControlName="organizacao_nome" [maxlength]="150" label="Nome da organização" errorMessage="Informe o nome da organização." />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-2">
+                                <ui-input-text inputId="usuario_username" formControlName="usuario_username" [maxlength]="150" label="Usuário de acesso" autocomplete="off" errorMessage="Informe o usuário de acesso." />
                             </div>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div class="flex flex-col gap-2">
-                                    <ui-input-text
-                                        inputId="organizacao_nome"
-                                        formControlName="organizacao_nome"
-                                        [maxlength]="150"
-                                        label="Nome da organização"
-                                        errorMessage="Informe o nome da organização."
-                                    />
-                                </div>
+                            <div class="flex flex-col gap-2">
+                                <ui-input-text inputId="usuario_email" formControlName="usuario_email" [maxlength]="255" label="Email" type="email" autocomplete="off" errorMessage="Informe um email válido." />
                             </div>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div class="flex flex-col gap-2">
-                                    <ui-input-text
-                                        inputId="usuario_username"
-                                        formControlName="usuario_username"
-                                        [maxlength]="150"
-                                        label="Usuário de acesso"
-                                        autocomplete="off"
-                                        errorMessage="Informe o usuário de acesso."
-                                    />
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <ui-input-text
-                                        inputId="usuario_email"
-                                        formControlName="usuario_email"
-                                        [maxlength]="255"
-                                        label="Email"
-                                        type="email"
-                                        autocomplete="off"
-                                        errorMessage="Informe um email válido."
-                                    />
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <ui-input-text
-                                        inputId="usuario_nome"
-                                        formControlName="usuario_nome"
-                                        [maxlength]="150"
-                                        label="Nome"
-                                        errorMessage="Informe o nome do usuário."
-                                    />
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <ui-input-text
-                                        inputId="usuario_sobrenome"
-                                        formControlName="usuario_sobrenome"
-                                        [maxlength]="150"
-                                        label="Sobrenome"
-                                        errorMessage="Informe o sobrenome do usuário."
-                                    />
-                                </div>
+                            <div class="flex flex-col gap-2">
+                                <ui-input-text inputId="usuario_nome" formControlName="usuario_nome" [maxlength]="150" label="Nome" errorMessage="Informe o nome do usuário." />
                             </div>
 
-                            <div class="flex justify-end">
-                                <ui-button
-                                    label="Provisionar primeiro acesso"
-                                    icon="pi pi-user-plus"
-                                    [loading]="provisionandoPrimeiroAcesso"
-                                    (onClick)="provisionarPrimeiroAcesso()"
-                                ></ui-button>
+                            <div class="flex flex-col gap-2">
+                                <ui-input-text inputId="usuario_sobrenome" formControlName="usuario_sobrenome" [maxlength]="150" label="Sobrenome" errorMessage="Informe o sobrenome do usuário." />
                             </div>
-                        </form>
+                        </div>
 
-                    </p-tabpanel>
-                }
+                        <div class="flex justify-end">
+                            <ui-button label="Provisionar primeiro acesso" icon="pi pi-user-plus" [loading]="provisionandoPrimeiroAcesso" (onClick)="provisionarPrimeiroAcesso()"></ui-button>
+                        </div>
+                    </form>
+                </p-tabpanel>
+                } @if (exibirAdministradoresTab) {
+                <p-tabpanel value="administradores">
+                    <div class="flex flex-col gap-6">
+                        @if (loadingAdministradores) {
+                        <div class="text-sm text-surface-500 dark:text-white/64">Carregando administradores...</div>
+                        } @else if (!administradores.length) {
+                        <div class="text-sm text-surface-500 dark:text-white/64">Nenhum administrador encontrado para este contrato.</div>
+                        } @else {
+                        <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                            <div class="grid grid-cols-[1fr_auto] gap-4 px-4 py-3 bg-surface-50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-700">
+                                <div class="text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200">Login</div>
+                                <div class="text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200 text-right">Ação</div>
+                            </div>
 
-                @if (exibirAdministradoresTab) {
-                    <p-tabpanel value="administradores">
-                        <div class="flex flex-col gap-6">
-                            @if (loadingAdministradores) {
-                                <div class="text-sm text-surface-500 dark:text-white/64">Carregando administradores...</div>
-                            } @else if (!administradores.length) {
-                                <div class="text-sm text-surface-500 dark:text-white/64">Nenhum administrador encontrado para este contrato.</div>
-                            } @else {
-                                <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
-                                    <div class="grid grid-cols-[1fr_auto] gap-4 px-4 py-3 bg-surface-50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-700">
-                                        <div class="text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200">Login</div>
-                                        <div class="text-xs font-semibold uppercase tracking-wide text-surface-600 dark:text-surface-200 text-right">Ação</div>
-                                    </div>
-
-                                    @for (administrador of administradores; track administrador.id) {
-                                        <div class="grid grid-cols-[1fr_auto] gap-4 items-center px-4 py-3 border-b border-surface-200 dark:border-surface-700 last:border-b-0">
-                                            <div class="font-mono text-sm text-surface-700 dark:text-surface-100">{{ administrador.username }}</div>
-                                            <div>
-                                                <ui-button
-                                                    label="Resetar senha"
-                                                    icon="pi pi-key"
-                                                    severity="secondary"
-                                                    [loading]="isResetandoAdministrador(administrador.id)"
-                                                    (onClick)="resetarSenhaAdministrador(administrador)"
-                                                ></ui-button>
-                                            </div>
-                                        </div>
-                                    }
+                            @for (administrador of administradores; track administrador.id) {
+                            <div class="grid grid-cols-[1fr_auto] gap-4 items-center px-4 py-3 border-b border-surface-200 dark:border-surface-700 last:border-b-0">
+                                <div class="font-mono text-sm text-surface-700 dark:text-surface-100">{{ administrador.username }}</div>
+                                <div>
+                                    <ui-button label="Resetar senha" icon="pi pi-key" severity="secondary" [loading]="isResetandoAdministrador(administrador.id)" (onClick)="resetarSenhaAdministrador(administrador)"></ui-button>
                                 </div>
+                            </div>
                             }
                         </div>
-                    </p-tabpanel>
+                        }
+                    </div>
+                </p-tabpanel>
                 }
             </p-tabpanels>
         </p-tabs>
@@ -166,29 +117,21 @@
     </div>
 
     @if (provisionamentoResult?.senha_temporaria) {
-        <div class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
-            <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária (exibida uma única vez)</div>
-            <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">
-                {{ provisionamentoResult?.senha_temporaria }}
-            </div>
-            <div>
-                <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyTemporaryPassword()"></ui-button>
-            </div>
+    <div class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
+        <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária (exibida uma única vez)</div>
+        <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ provisionamentoResult?.senha_temporaria }}</div>
+        <div>
+            <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyTemporaryPassword()"></ui-button>
         </div>
-    }
-
-    @if (resetSenhaResult?.senha_temporaria) {
-        <div class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
-            <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária resetada (exibida uma única vez)</div>
-            <div class="text-sm text-amber-900 dark:text-amber-100">
-                Usuário: <strong>{{ resetSenhaResult?.usuario?.username }}</strong>
-            </div>
-            <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">
-                {{ resetSenhaResult?.senha_temporaria }}
-            </div>
-            <div>
-                <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyResetTemporaryPassword()"></ui-button>
-            </div>
+    </div>
+    } @if (resetSenhaResult?.senha_temporaria) {
+    <div class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
+        <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária resetada (exibida uma única vez)</div>
+        <div class="text-sm text-amber-900 dark:text-amber-100">Usuário: <strong>{{ resetSenhaResult?.usuario?.username }}</strong></div>
+        <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ resetSenhaResult?.senha_temporaria }}</div>
+        <div>
+            <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyResetTemporaryPassword()"></ui-button>
         </div>
+    </div>
     }
 </div>

@@ -41,9 +41,9 @@ import { PasswordModule } from 'primeng/password';
     `,
     styles: [
         `
-        :host {
-            display: contents;
-        }
+            :host {
+                display: contents;
+            }
         `
     ]
 })

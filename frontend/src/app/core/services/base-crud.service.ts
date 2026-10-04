@@ -26,4 +26,3 @@ export abstract class BaseCrudService {
         this.tableCache.clearPrefix(this.cachePrefix);
     }
 }
-

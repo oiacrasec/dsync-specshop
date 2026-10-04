@@ -87,16 +87,7 @@ interface StatusOption {
 
                 <div class="flex flex-col gap-2">
                     <label for="team-members" class="text-surface-900 dark:text-surface-0 font-medium text-sm">Team Members</label>
-                    <p-autocomplete
-                        id="team-members"
-                        [(ngModel)]="formData.members"
-                        [suggestions]="filteredMembers"
-                        optionLabel="name"
-                        [multiple]="true"
-                        placeholder="Search team members..."
-                        (completeMethod)="filterMembers($event)"
-                        class="w-full"
-                    >
+                    <p-autocomplete id="team-members" [(ngModel)]="formData.members" [suggestions]="filteredMembers" optionLabel="name" [multiple]="true" placeholder="Search team members..." (completeMethod)="filterMembers($event)" class="w-full">
                         <ng-template #selecteditem let-value>
                             <div class="flex items-center gap-2 bg-surface-50 dark:bg-surface-900 px-2 py-1 rounded">
                                 <img [src]="'/demo/images/avatar/' + value.image" [alt]="value.name" class="w-5 h-5 rounded-full border border-surface-200 dark:border-surface-700" />
