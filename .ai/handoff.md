@@ -1,80 +1,63 @@
 # Handoff
 
 - **Atualizado em:** 2026-10-04
-- **Agente:** Claude (retomou do Codex)
-- **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Último commit funcional:** 6991ea8 — refactor(api): standardize custom action responses
+- **Agente:** Claude
+- **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 6 = prioridade)
+- **Último commit:** etapa 6.2a + orçamento do bundle (`chore(frontend): set the initial bundle budget...`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 6.2a Qualidade do frontend — ✅ concluída |
-| Próximo passo exato | decidir o orçamento do bundle (1,25 MB vs 1 MB) e aprovar a 6.3 (app `administration` + `Contract.plan` opcional) |
-| Aguardando o usuário? | sim |
+| Etapa atual | 6.2a Qualidade do frontend — ✅ concluída (orçamento do bundle: aviso 1,3 MB, aprovado) |
+| Próximo passo exato | **6.3**: criar `backend/apps/administration` (API do superadmin), mover para ele a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs) **sem mudar o contrato da API**; `Contract.plan` opcional (migration + `docs/domain/contracts.md`) |
+| Aguardando o usuário? | sim — confirmar o início da 6.3 |
 
-Superadmin local criado pelo usuário: `datasync_admin` (via `createsuperuser`; senha só com o usuário).
-Referências: `D:\Projetos\PycharmProjects\datasync-spatial` (backend) e `datasync-gis` (frontend).
+## Concluído na entrega 1
 
-## Concluído e commitado
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1 · 6.2 · 6.2a.
+Ordem do Bloco 6: 6.3 → 6.4 → 6.5 → 6.6 → 6.7 → 6.8 (detalhes e decisões 37–40 no plano).
 
-0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1–3.6 · 2.3–2.5 · 4.1 · 5.1–5.2.
+## Decisões vigentes do Bloco 6 (resumo; fonte: plano, decisões 37–40)
 
-- dcf1106: BaseModelSerializer/BaseAdminModelSerializer usam super().create/update
-  do DRF, autoria/auditoria atômica, create_extra/update_extra; validate próprio.
-  Usuário dispensou full_clean genérico e model_validation_fields/exclude.
-  get_audit_contract_id centralizado na base. Services próprios users/RBAC preservados.
-- ATOMIC_REQUESTS cobre is_valid/save; view trava update/delete antes de validar;
-  uso direto exige atomic externo. Licenças incluem inativos não excluídos; concorrência
-  protegida pelo lock do contrato. FK histórica de plano excluído permanece válida.
-- 6991ea8: core/responses.py, build_result_response e build_exception_response.
-  Actions próprias usam try/except; erro recebe exception/request e delega ao handler
-  RFC 9457, com rollback, headers, request_id e logging seguro. options/schema adaptados.
-- Login sem style HTML; write_only/espaços preservados. OpenAPI na 5.5.
-- Views: queryset, serializer_class, filterset_class, demais; selectors só leitura própria.
-  Models com verbose_name explícito e limite 120. Cabeçalhos compactos/audit_events
-  multiline preservados localmente por fmt off/on; Ruff não configura esse estilo.
+- `contracts` = domínio (Plan, Contract, Organization, usado por todos); `administration` =
+  só a API do superadmin (`/api/v1/admin/…`), sem models próprios. Exige ADR novo na 6.3.
+- Primeiro acesso (referência Spatial/GIS): provisionamento cria 1ª organização + admin do
+  contrato (perfil essencial), só se o contrato não tem usuários; senha temporária devolvida
+  uma vez (no-store, nunca em log/auditoria); bloqueio **no backend** até trocar a senha
+  (exceto troca, refresh, logout); login devolve resumo do usuário; listar admins e resetar
+  senha (reset revoga refresh tokens). Superadmin fora do fluxo. Futuro: envio assíncrono
+  (tabela de eventos + Celery/Dramatiq).
+- `Contract.plan` opcional; formulário lista planos (vazio por ora); tela de planos no futuro.
+- Seleção de organização pronta na 6.5 para usuários comuns (superadmin não tem organização).
 
-## Organizações: commitado como rascunho (revisão pendente)
+## Frontend (`frontend/`, copiado do datasync-gis)
 
-Usuário autorizou commitar para seguir com a área administrativa; ADR 0032 = Proposto.
+- Angular 21 LTS + PrimeNG 21; Node 24 no Docker. `npm run lint`, `npm run format:check`,
+  `npm run build` passando. 4 espaços.
+- Telas ativas: login, primeiro acesso, seleção de organização, administração de contratos,
+  home KPI fictícia (usuário pediu manter) e páginas de erro. O resto está comentado com
+  `DESABILITADO: fora do escopo atual` (rotas, menu e `ignores` do `eslint.config.mjs`).
+- Services/types das telas ainda falam a API do **Spatial** (português, `id` inteiro):
+  adaptar na 6.5/6.8. Environments homol/prod com URL vazia (definir no deploy).
+- Referências: `D:\Projetos\PycharmProjects\datasync-spatial` (backend) e `datasync-gis`.
 
-- OrganizationViewSet próprio e BaseReadOnlyModelViewSet, com OrganizationSerializer
-  (nome solicitado), django-filter, paginação, options/schema. Action do contrato removida.
-- Estado ATUAL do código: mesmo router de plans/contracts, /api/v1/admin/organizations/;
-  usuário comum via accessible_organizations/RBAC; superadmin com queryset global.
-  Somente leitura/organizações ativas; filtro contract na lista; /me/organizations mantido.
-- Arquivos: contracts/{views,serializers,filters,urls,tests/test_admin_api}.py,
-  contracts/tests/test_organizations_api.py e core/views.py. Config/api/v1 voltou ao original.
-  Docs alteradas: AGENTS/README/standards, API admin-contracts/organizations, overview,
-  plano, índice/ADR 0032 e knowledge architecture/log. Consultar git status/diff completo.
-- Último validador passou: 507 testes, lint/formato, migrations sem alterações,
-  checks desenvolvimento/produção. 68 testes dirigidos também passaram após router único.
-  List/options: cinco SELECTs com perfil em 1/30 itens, sem writes/locks/N+1;
-  limites de 100 e campos mínimos. Sem JWT real/carga nova; não garante capacidade.
+## Pendente fora do Bloco 6
 
-## Prioridade definida pelo usuário — AINDA NÃO implementada
-
-- Focar PRIMEIRO na área administrativa do admin/superadmin, seguindo Spatial e GIS:
-  login, criação de contrato e criação do administrador do contrato.
-- Fluxo de primeiro acesso com troca de senha NÃO se aplica ao superadmin.
-  Desenvolver o fluxo do administrador do contrato conforme as referências, sem
-  presumir detalhes de senha/provisionamento ainda não verificados no Spatial/GIS.
-- Não avançar organizações agora. Usuário disse que o superadmin, por enquanto,
-  terá apenas acesso à criação de contratos. Possível aba de organizações no contrato
-  ainda não decidida e não é o mesmo recurso de organizações da área do usuário.
-- Usuário cogitou apps/administration para regras da área do superadmin. Renomear
-  contracts inteiro ou separar a camada administrativa NÃO foi decidido/implementado.
-- A revisão pendente ainda expõe /admin/organizations ao usuário comum e acesso
-  global ao superadmin: NÃO representa o escopo final. Não commitar como concluída.
-  Docs/ADR 0032 também são rascunho antigo. Preservar trabalho para revisão posterior.
-- Orientação anterior: organizações do usuário ficam fora de /admin/. Pergunta sobre
-  never_cache pendente: controla headers de cache, não autorização; remoção não pedida.
+- Organizações: `OrganizationViewSet` em `/api/v1/admin/organizations/` commitado como
+  **rascunho** (ADR 0032 = Proposto): expõe a rota ao usuário comum e acesso global ao
+  superadmin. Revisar depois do Bloco 6; não tratar como concluído.
+- 5.3 (admin de usuários/superadmins), 5.4 (área comum) e 5.5 (OpenAPI) pendentes.
 
 ## Avisos
 
-- Reavaliar sequência do plano para a prioridade administrativa; não iniciar CRUD
-  de organizações (5.4) nem implementar agora. Push só quando solicitado.
-- Performance GLOBAL; managers exigem tenant; global só unscoped/system_context explícitos.
-- AuditEvent imutável; AccessLog só autenticação (ADR 0019), sem afirmar suficiência jurídica.
-- Banco local até audit.0005; não versionar .env/regenerar initials. Validador via Git Bash.
+- Superadmin local: `datasync_admin` (criado via `createsuperuser`; senha só com o usuário).
+- Banco local até `audit.0005`; não regenerar migrations iniciais; `.env` nunca versionado.
+- Managers exigem contexto de tenant; global só `unscoped()`/`system_context()`/`@system_scope`.
+- `AuditEvent` imutável; `AccessLog` só eventos de autenticação (ADR 0019) — adequação ao
+  Marco Civil não confirmada juridicamente.
+- Antes de produção: cache compartilhado do limite de login, borda, MFA, `flushexpiredtokens`
+  agendado, expurgo do `AccessLog` + `LegalHold` (ADR 0007), headers do proxy, criptografia
+  de banco/backups, NTP.
+- Push só quando o usuário pedir. Validador do backend via Git Bash
+  (`PATH=/usr/bin:/bin:$PATH bash .ai/skills/validar-etapa/validar.sh`).
