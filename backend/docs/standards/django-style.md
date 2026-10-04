@@ -28,7 +28,7 @@ Convenção definida pelo usuário:
 | `managers.py` | querysets e managers |
 | `middleware.py` | só classes de middleware |
 | `utils.py` | funções auxiliares do app, sem regra de negócio e sem escrita no banco |
-| `services.py` / `selectors.py` | escrita com regra de negócio / leituras |
+| `services.py` / `selectors.py` | operações próprias de domínio / leituras; CRUD auditado nos serializers |
 | `exceptions.py` | só classes de exceção |
 | `queries/<nome>.py` | uma query SQL escrita à mão por arquivo, como constante ([regras](#queries-sql-escritas-à-mão)) |
 | `constants.py` | constantes do app: só valores literais (texto, número, regex, mensagem traduzível), sem importar código do próprio app |
@@ -150,7 +150,7 @@ Mesmo formato: os parâmetros da função alimentam o CTE/tabela `parametros`. O
 
 A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para agentes de IA.
 
-## Views administrativas com services
+## Views administrativas e serializers auditados
 
 `BaseModelViewSet` e `BaseAdminModelViewSet`, em `apps/core/views.py`, compõem os
 comportamentos compartilhados. Mixins ficam em `core/mixins.py`; paginação em
@@ -162,8 +162,9 @@ limite de 120 caracteres continuam ativos.
 
 | Componente | Responsabilidade |
 |---|---|
-| `ServiceDeleteMixin` | exclusão pelo BaseModelService herdado da view base |
-| `ServiceModelSerializer` | create/update por service_class.save_instance |
+| `SerializerDeleteMixin` | exclusão com autoria/auditoria via serializer.delete() |
+| `BaseModelSerializer` | super().create/update do DRF, autoria, auditoria e hooks |
+| `BaseAdminModelSerializer` | escrita global autorizada explicitamente ao superadmin |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
 | `TableSchemaMixin` | schema de campos declarados, metadados do model e OrderingFilter |
@@ -174,7 +175,7 @@ limite de 120 caracteres continuam ativos.
 `BaseAdminModelViewSet` declara `SuperadminPermission`, compartilhada em
 `core/permissions.py`, sem organização. A base comum preserva as permissões globais
 de negação por padrão. Selectors de recursos comuns devem preservar o escopo;
-services continuam responsáveis pelas regras e escritas.
+CRUD auditado usa serializers; services ficam para operações próprias de domínio.
 
 O recurso declara queryset e configurações explicitamente:
 
@@ -185,21 +186,32 @@ class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
 
 
-class ContractSerializer(ServiceModelSerializer):
-    service_class = services.ContractService
+class ContractSerializer(BaseAdminModelSerializer):
+    audit_fields = CONTRACT_AUDIT_FIELDS
+    audit_events = {
+        'create': Event.CONTRACT_CREATED,
+        'update': Event.CONTRACT_UPDATED,
+        'delete': Event.CONTRACT_DELETED,
+    }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # Regras entre campos usando attrs e self.instance bloqueada.
+        return attrs
 ```
 
 Manter sempre a ordem: `queryset`, `serializer_class`, `filterset_class` e depois
 as demais configurações. Consultas administrativas simples são declaradas diretamente
 no queryset, lazy e sem SQL. get_queryset padrão do DRF clona por requisição.
-A view chama `serializer.save()` pelo fluxo padrão
-do DRF; `ServiceModelSerializer.create/update` chama `service_class.save_instance`
-repassando `values`, `actor` e, na
-atualização, `instance` ao service. O ator vem do request no contexto do serializer,
-passado explicitamente ao service, sem dependência da requisição no model.
-Cada serializer declara somente a classe do service, sem staticmethod ou métodos
-create/update próprios. A classe padrão é BaseModelService, cuja gravação falha
-sem regras de domínio implementadas (ADR 0025).
+A view chama serializer.save() pelo fluxo padrão do DRF. BaseModelSerializer
+chama super().create/update, define o ator explicitamente e registra auditoria
+atomicamente. Declare audit_fields e audit_events; evento ausente desfaz a escrita.
+Campos são validados pelo DRF e regras entre campos pelo validate() do recurso.
+Não usar full_clean genérico ou model_validation_fields/exclude na base.
+Hooks create_extra(validated_data) e update_extra(instance, validated_data) ajustam
+dados antes do super, sem salvar a instância. M2M padrão fica com o DRF (ADR 0030).
+Preservar audit_events multiline quando ajustado pelo usuário; fmt: off/on local
+pode preservar o formato sem desativar lint ou o limite de 120 caracteres.
 Querysets administrativos usam `objects.unscoped()` explicitamente, preservam
 inativos e excluem soft deleted; ContractViewSet mantém select_related('plan').
 Não criar selector que só repita essa declaração; reservar selectors para lógica
@@ -208,29 +220,22 @@ Essa declaração é própria dos recursos globais com SuperadminPermission. Sel
 dependentes de tenant devem ser chamados em get_queryset durante a requisição,
 ou usar TenantScopedViewMixin: construir queryset contextual na importação falha
 ou capturaria o contexto errado. Não avaliar queryset na declaração da view.
-O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
-a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
-no service, inclusive quando serializer.save() é chamado sem uma view.
-
-`BaseModelService`, em `core/services.py`, implementa `delete_instance` como método
-de classe e define o contrato `save_instance`. O service de domínio implementa a
-gravação e herda exclusão: autorização, lock por PK, estado anterior, soft delete e
-auditoria na mesma transação. Definir `model`, `authorize`, `state`, `audit_delete`
-e, se necessário, `write_scope` (por padrão preserva o contexto atual).
-Em contracts, `BaseContractService` compartilha autorização administrativa/auditoria;
-`PlanService` e `ContractService` definem model/evento e suas regras de gravação.
-
-Registrar classes uma vez no `AppConfig.ready`, sem consultas ao banco:
+ATOMIC_REQUESTS envolve validação e gravação na API. A view bloqueia o registro
+antes de validar update/delete, com select_for_update(of=('self',)); o serializer
+reutiliza essa instância. Uso direto exige atomic externo envolvendo ambos:
 
 ```python
-BaseModelService.register(PlanService)
-BaseModelService.register(ContractService)
+with transaction.atomic():
+    serializer = ContractSerializer(instance=contract, data=payload, partial=True, context={'request': request})
+    serializer.is_valid(raise_exception=True)
+    updated = serializer.save()
 ```
 
-A view base já usa `BaseModelService.delete_instance`; o registro por tipo seleciona
-o service. Não repetir `delete_service` nas views nem descobrir funções por nome.
-Model não registrado ou instância incompatível falha antes da escrita. Falha da
-autorização/auditoria desfaz toda a transação (ADR 0024).
+Sem view, a validação recarrega a instância com lock para usar seu estado atual.
+O contexto instance_locked é reservado ao fluxo interno da view; não configurá-lo
+em chamadas diretas. SerializerDeleteMixin chama serializer.delete(), com soft
+delete/autoria/auditoria na mesma transação. Services de users/RBAC permanecem;
+o registry genérico e os services repetitivos de Plan/Contract foram removidos.
 
 FilterSets do domínio ficam em `filters.py`, herdam `core.filters.BaseFilterSet`
 e declaram os filtros/campos de busca/OrderingFilter. Não usar geração automática
@@ -269,8 +274,8 @@ Não expandir automaticamente para todos os campos textuais. O custo de icontain
 (ADR 0029).
 
 O recurso declara `schema_columns`/`schema_filters` como nomes de campos e mantém
-ações específicas (ex.: organizações do contrato). Regras de negócio, transações,
-locks e auditoria continuam nos services. Essa base administrativa exige superadmin
+ações específicas (ex.: organizações do contrato). Regras ficam no validate() do
+serializer; transações, locks e auditoria seguem o ADR 0030. A base exige superadmin
 e não usa contexto organizacional; não deve ser usada em rotas comuns de tenant.
 
 ```python

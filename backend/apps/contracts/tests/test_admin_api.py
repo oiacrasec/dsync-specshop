@@ -6,16 +6,18 @@ from uuid import uuid4
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import close_old_connections, connection
 from django.test.utils import CaptureQueriesContext
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import ValidationError as SerializerValidationError
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.audit import services as audit_services
 from apps.audit.models import AccessLog, AuditEvent, AuditEventType
-from apps.contracts import services
 from apps.contracts.models import Contract, Organization, Plan
-from apps.contracts.serializers import ContractSerializer
+from apps.contracts.serializers import ContractSerializer, PlanSerializer
 from apps.core.exceptions import LicenseLimitReached
 
 pytestmark = pytest.mark.django_db
@@ -260,7 +262,7 @@ def test_audit_failure_rolls_back_mutation(world, monkeypatch):
     def fail(*args, **kwargs):
         raise RuntimeError('audit unavailable')
 
-    monkeypatch.setattr(services, 'record', fail)
+    monkeypatch.setattr(audit_services, 'record', fail)
     response = world['api'].post('/api/v1/admin/plans/', {'name': 'Rollback'}, format='json')
     assert response.status_code == 500
     assert not Plan.objects.filter(name='Rollback').exists()
@@ -276,7 +278,7 @@ def test_read_only_fields_cannot_change_public_id_or_author(world):
     assert response.json()['public_id'] == str(contract.public_id)
 
 
-def test_serializer_save_without_view_still_uses_service_rules_and_audit(world):
+def test_serializer_without_view_preserves_validation_autorship_and_audit(world):
     context = {'request': SimpleNamespace(user=world['admin'])}
     serializer = ContractSerializer(data=contract_payload(world), context=context)
     serializer.is_valid(raise_exception=True)
@@ -287,20 +289,86 @@ def test_serializer_save_without_view_still_uses_service_rules_and_audit(world):
     contract = world['contract']
     get_user_model().objects.create_user(username='inativo-direto', contract=contract, is_active=False)
     serializer = ContractSerializer(instance=contract, data={'licenses': 1}, partial=True, context=context)
-    serializer.is_valid(raise_exception=True)
-    with pytest.raises(ValidationError):
-        serializer.save()
+    with pytest.raises(SerializerValidationError):
+        serializer.is_valid(raise_exception=True)
     contract.refresh_from_db()
     assert contract.licenses == 5
 
 
-def test_serializer_save_without_view_preserves_service_authorization(world):
+def test_serializer_without_view_preserves_authorization(world):
     serializer = ContractSerializer(
         data=contract_payload(world), context={'request': SimpleNamespace(user=world['user'])}
     )
-    serializer.is_valid(raise_exception=True)
     with pytest.raises(PermissionDenied):
+        serializer.is_valid(raise_exception=True)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_serializer_requires_validation_inside_transaction(world):
+    serializer = PlanSerializer(data={'name': 'Plano'}, context={'request': SimpleNamespace(user=world['admin'])})
+    with pytest.raises(ImproperlyConfigured, match='same transaction'):
+        serializer.is_valid(raise_exception=True)
+
+
+def test_partial_update_validates_dates_against_fresh_instance(world):
+    contract = world['contract']
+    Contract.objects.filter(pk=contract.pk).update(start_date=date(2025, 1, 1))
+    serializer = ContractSerializer(
+        instance=contract,
+        data={'end_date': '2024-12-31'},
+        partial=True,
+        context={'request': SimpleNamespace(user=world['admin'])},
+    )
+    assert not serializer.is_valid()
+    assert 'end_date' in serializer.errors
+
+
+@pytest.mark.parametrize('action', ['create', 'update'])
+def test_serializer_extra_hooks_run_before_save_and_are_audited(world, action):
+    class CustomPlanSerializer(PlanSerializer):
+        def create_extra(self, validated_data):
+            assert connection.in_atomic_block
+            validated_data['is_active'] = False
+
+        def update_extra(self, instance, validated_data):
+            assert connection.in_atomic_block
+            assert Plan.objects.get(pk=instance.pk).is_active
+            validated_data['is_active'] = False
+
+    serializer = CustomPlanSerializer(
+        instance=world['plan'] if action == 'update' else None,
+        data={'name': 'Plano ajustado'},
+        partial=action == 'update',
+        context={'request': SimpleNamespace(user=world['admin'])},
+    )
+    serializer.is_valid(raise_exception=True)
+    saved = serializer.save()
+    saved.refresh_from_db()
+    assert not saved.is_active
+    event = AuditEvent.objects.get(event=serializer.audit_events[action], target_public_id=saved.public_id)
+    assert event.changes['after']['is_active'] is False
+    assert event.changes['before'] is None if action == 'create' else event.changes['before']['is_active'] is True
+
+
+def test_update_rolls_back_fields_and_author_when_audit_fails(world, monkeypatch):
+    def fail(*args, **kwargs):
+        raise RuntimeError('audit unavailable')
+
+    monkeypatch.setattr(audit_services, 'record', fail)
+    plan = world['plan']
+    before = AuditEvent.objects.count()
+    serializer = PlanSerializer(
+        instance=plan,
+        data={'is_active': False},
+        partial=True,
+        context={'request': SimpleNamespace(user=world['admin'])},
+    )
+    serializer.is_valid(raise_exception=True)
+    with pytest.raises(RuntimeError, match='audit unavailable'):
         serializer.save()
+    plan.refresh_from_db()
+    assert plan.is_active and plan.updated_by_id is None
+    assert AuditEvent.objects.count() == before
 
 
 @pytest.mark.django_db(transaction=True)
@@ -315,7 +383,11 @@ def test_license_reduction_and_user_creation_share_contract_lock(world):
         try:
             barrier.wait(timeout=10)
             if operation == 'reduce':
-                services.ContractService.save_instance(instance=contract, values={'licenses': 1}, actor=world['admin'])
+                api = APIClient()
+                api.force_authenticate(world['admin'])
+                response = api.patch(f'/api/v1/admin/contracts/{contract.public_id}/', {'licenses': 1}, format='json')
+                assert response.status_code in (200, 422), response.content
+                return 'success' if response.status_code == 200 else 'blocked'
             else:
                 get_user_model().objects.create_user(username='concorrente', contract_id=contract.pk)
             return 'success'
@@ -330,22 +402,22 @@ def test_license_reduction_and_user_creation_share_contract_lock(world):
     assert get_user_model().objects.filter(contract_id=contract.pk).count() <= contract.licenses
 
 
-@pytest.mark.parametrize('key,service', [('plan', services.PlanService), ('contract', services.ContractService)])
-def test_service_deletion_requires_superadmin_without_view(world, key, service):
+@pytest.mark.parametrize('key,serializer_class', [('plan', PlanSerializer), ('contract', ContractSerializer)])
+def test_serializer_deletion_requires_superadmin_without_view(world, key, serializer_class):
     with pytest.raises(PermissionDenied):
-        service.delete_instance(world[key], actor=world['user'])
+        serializer_class(instance=world[key], context={'request': SimpleNamespace(user=world['user'])}).delete()
     assert type(world[key]).objects.filter(pk=world[key].pk).exists()
 
 
-@pytest.mark.parametrize('key,service', [('plan', services.PlanService), ('contract', services.ContractService)])
-def test_service_deletion_rolls_back_when_audit_fails(world, monkeypatch, key, service):
+@pytest.mark.parametrize('key,serializer_class', [('plan', PlanSerializer), ('contract', ContractSerializer)])
+def test_serializer_deletion_rolls_back_when_audit_fails(world, monkeypatch, key, serializer_class):
     def fail(*args, **kwargs):
         raise RuntimeError('audit unavailable')
 
-    monkeypatch.setattr(services, 'record', fail)
+    monkeypatch.setattr(audit_services, 'record', fail)
     before = AuditEvent.objects.count()
     with pytest.raises(RuntimeError, match='audit unavailable'):
-        service.delete_instance(world[key], actor=world['admin'])
+        serializer_class(instance=world[key], context={'request': SimpleNamespace(user=world['admin'])}).delete()
     current = type(world[key]).objects.get(pk=world[key].pk)
     assert current.deleted_at is None and current.deleted_by_id is None
     assert AuditEvent.objects.count() == before

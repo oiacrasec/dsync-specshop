@@ -78,11 +78,14 @@ lookups específicos só por general_search_lookups explícito (ADR 0029).
 ## Auditoria e performance
 
 Views de planos/contratos herdam `BaseAdminModelViewSet` e usam serializer.save()
-do DRF. ServiceModelSerializer.create/update chamam service_class.save_instance;
-exclusão continua em ServiceDeleteMixin, usando BaseModelService da view base.
-PlanService/ContractService herdam exclusão comum e definem gravação/autorização/
-auditoria; registro explícito no AppConfig.ready, sem queries na inicialização.
-Cada recurso declara queryset/schema; serializer declara service_class (ADR 0025).
+do DRF. BaseAdminModelSerializer usa super().create/update com autoria e auditoria;
+exclusão passa por SerializerDeleteMixin e serializer.delete(). Os serializers
+declaram audit_fields/audit_events e regras próprias em validate(), sem full_clean
+genérico nem lista adicional de campos para validar. Serviços genéricos e registro
+no AppConfig.ready foram removidos (ADR 0030 substitui 0023–0025).
+ATOMIC_REQUESTS mantém validação e gravação na mesma transação; a view adquire o
+lock antes da validação de update/delete. Uso direto exige transaction.atomic
+envolvendo is_valid/save; a base recarrega a instância com lock nesse caminho.
 Consultas simples são declaradas no queryset da view, com unscoped
 explícito e select_related('plan') para contratos. DRF clona o queryset
 lazy por requisição; select_related do plano preservado, sem SQL na construção
@@ -98,7 +101,7 @@ em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/fil
 com base/backend DRF em `core/filters.py`; selectors fornecem o queryset do domínio.
 O backend segue a [integração oficial com DRF](https://django-filter.readthedocs.io/en/stable/guide/rest_framework.html).
 
-Escritas usam services com validação, autoria e AuditEvent na mesma transação.
+Escritas usam serializers com validação, autoria e AuditEvent na mesma transação.
 Eventos `plan.created/updated/deleted` e `contract.created/updated/deleted` guardam
 configuração antes/depois, UUID, ator e data, sem nomes de clientes. Alterar apenas
 nome continua gerando evento do alvo, sem copiar seu texto para o JSON.

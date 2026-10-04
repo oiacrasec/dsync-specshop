@@ -19,14 +19,16 @@ A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contrac
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
 As views herdam `BaseAdminModelViewSet` e declaram queryset diretamente; exclusão vem da base. Serializers
-herdam `ServiceModelSerializer`, declaram `service_class` e herdam create/update
-que chamam `service_class.save_instance` (ADR 0025); regras,
-locks e auditoria continuam nos services. `BaseModelService`, no core, padroniza
-services de domínio: PlanService/ContractService herdam exclusão, com registro
-explícito no AppConfig.ready e autorização/auditoria próprias (ADR 0024).
+herdam `BaseAdminModelSerializer`, com campos/eventos de auditoria explícitos.
+A base usa create/update do DRF, autoria e auditoria atômica; ajustes opcionais em
+create_extra/update_extra. Regras próprias ficam no validate() do recurso, sem
+full_clean genérico. ATOMIC_REQUESTS cobre validação/gravação, e a view bloqueia
+o registro antes de validar update/delete. Fora da API, usar transaction.atomic
+envolvendo is_valid/save. Exclusão via serializer.delete() (ADR 0030).
+Services de users/RBAC e operações próprias continuam separados.
 O `core` compõe as views base com mixins e `StandardResultsSetPagination`;
 listagens usam django-filter 26.2, BaseFilterSet no core e FilterSets nos apps.
-apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/django-style.md#views-administrativas-com-services).
+apps de domínio declaram os recursos. Ver o [guia de views](docs/standards/django-style.md#views-administrativas-e-serializers-auditados).
 Schemas recebem nomes de campos: labels/tipos vêm do model, URLs de relações do
 SchemaRouter e ordenação do OrderingFilter. Overrides por campo permitem trocar
 labels/URLs sem repetir metadados; geração sem consultas ao banco (ADR 0026).

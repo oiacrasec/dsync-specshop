@@ -16,11 +16,11 @@ from .serializers import OptionsQuerySerializer
 from .utils import context_values
 
 
-class ServiceDeleteMixin:
-    """Exclusão pelo service herdado da base; create/update ficam no serializer."""
+class SerializerDeleteMixin:
+    """Exclusão com autoria e auditoria pelo serializer base."""
 
     def perform_destroy(self, instance):
-        self.delete_service(instance, actor=self.request.user)
+        self.get_serializer(instance).delete()
 
 
 class ListFilterMixin:

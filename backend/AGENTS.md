@@ -20,9 +20,9 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 | Arquivo | Responsabilidade |
 |---|---|
 | `models.py` | persistência e comportamento da entidade |
-| `serializers.py` | validação, entrada e saída da API |
+| `serializers.py` | validação, entrada/saída da API e CRUD auditado pelo DRF |
 | `selectors.py` | **leituras** |
-| `services.py` | **escritas** e regras de negócio |
+| `services.py` | operações próprias de domínio, além do CRUD dos serializers |
 | `views.py` | camada HTTP, sempre fina |
 | `urls.py` | rotas do app |
 | `permissions.py` | autorização |
@@ -30,11 +30,16 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 | `tests/` | testes do app (`test_*.py`) |
 
 Leitura: `View → Queryset → Model` para consultas simples; lógica de leitura própria
-fica em selectors. Escrita: `View → Serializer → Service → Model`.
-ModelSerializers de escrita com regras herdam `ServiceModelSerializer`: declarar
-`service_class` (classe que herda BaseModelService); create/update chamam save_instance
-com dados validados/ator/instância. Views usam serializer.save() do DRF; exclusão via
-ServiceDeleteMixin (ADRs 0023 e 0025). Sem classe específica, a base nega a gravação.
+fica em selectors. CRUD auditado: `View → Serializer → Model` (ADR 0030).
+Herdar `BaseModelSerializer`, ou `BaseAdminModelSerializer` na administração global;
+declarar `audit_fields` e `audit_events`. A base usa super().create/update do DRF,
+autoria explícita, auditoria e hooks create_extra/update_extra antes da persistência.
+Campos são validados pelo DRF; regras entre campos ficam no validate() do recurso.
+Não adicionar full_clean genérico nem model_validation_fields/exclude à base.
+Validar e salvar na MESMA transaction.atomic; na API, ATOMIC_REQUESTS cobre ambos.
+BaseModelViewSet bloqueia update/delete antes da validação; fora da view, a base
+recarrega a instância com lock. Exclusão por SerializerDeleteMixin e serializer.delete().
+Services continuam nas operações próprias de users/RBAC e fluxos além do CRUD.
 Nas listagens, o selector fornece o queryset com escopo; FilterSet aplica filtros
 antes da paginação. Filtros continuam lazy, sem queries/escritas próprias por item.
 Busca única: declarar general_search_fields no FilterSet (padrão vazio), combinados
@@ -111,7 +116,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   SQL à mão (só se o ORM não resolver) em `queries/<nome>.py`: 1ª linha `-- NOME` em PT-BR, parâmetros
   `contract`/`organization` (id interno) no CTE ou tabela temporária `parametros`, um único `execute`,
   executado só pelo selector com `@tenant_params` + `fetch_all`, com teste de isolamento próprio ([formato](docs/standards/django-style.md));
-  regra de negócio em services/selectors ([estilo](docs/standards/django-style.md)).
+  regras de CRUD no validate do serializer; operações próprias em services/selectors
+  ([estilo](docs/standards/django-style.md), ADR 0030).
 - `AccessLog` registra login com sucesso/falha e refresh com sucesso (ADR 0019),
   marcado nas views e persistido após sua execução, fora de ATOMIC_REQUESTS.
   Leituras/navegação comuns não gravam AccessLog. Registro de autenticação não
@@ -129,7 +135,7 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Administração de planos/contratos em `apps/contracts`, sob `/api/v1/admin/`,
   com `SuperadminPermission`, sem organização (ADR 0020). Listas limitadas e
   campos de filtro/ordenação declarados; opções usam a mesma permissão administrativa.
-  Escritas pelos services, atomic/lock do registro e AuditEvent; redução de licenças
+  Escritas pelos serializers, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
   `BaseAdminModelViewSet` compõe hooks padrão e mixins; views declaram
@@ -138,10 +144,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Selectors ficam para consultas com lógica própria; administração usa unscoped explícito, queryset lazy
   construído sem SQL e get_queryset padrão do DRF clona por requisição (ADR 0028).
   Managers com tenant continuam exigindo contexto; não chamar esses selectors na
-  declaração da view. Exclusão é herdada
-  da base via `BaseModelService.delete_instance`; não declarar delete_service por
-  recurso. Services de domínio herdam BaseModelService, definem model/regras e são
-  registrados explicitamente no AppConfig.ready (ADR 0024). Não inferir nomes.
+  declaração da view. Exclusão é herdada via SerializerDeleteMixin e
+  BaseModelSerializer.delete(); sem registro de services ou delete_service por recurso.
+  BaseAdminModelSerializer revalida o ator no banco antes de escrever (ADR 0030).
   Bases compartilhadas em `core/views.py`, mixins em `core/mixins.py`, paginação
   em `core/pagination.py` e permissão administrativa em `core/permissions.py`.
   Bases usam django-filter: BaseFilterSet/backend em `core/filters.py`, FilterSets

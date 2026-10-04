@@ -1,5 +1,27 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: CRUD auditado nos serializers do DRF
+
+- BaseModelSerializer/BaseAdminModelSerializer substituem ServiceModelSerializer:
+  super().create/update, autoria explícita, hooks extras e auditoria atômica.
+  SerializerDeleteMixin delega a delete() da base. Removidos BaseModelService,
+  PlanService/ContractService e registry no AppConfig.ready (ADR 0030).
+- Campos usam validação DRF; Contract.validate trata vigência, plano disponível e
+  redução de licenças. Usuário dispensou full_clean genérico e model_validation_fields.
+  Preservado audit_events multiline ajustado pelo usuário, com fmt off/on local.
+- get_audit_contract_id fica na base: raiz Contract usa sua PK; demais registros
+  usam contract_id quando existente. ContractSerializer não precisa sobrescrever.
+- ATOMIC_REQUESTS e lock antes de validar update/delete na view; uso direto exige
+  atomic envolvendo is_valid/save e recarrega estado atual com lock. FK histórica,
+  contagem de inativos, isolamento e services próprios de users/RBAC preservados.
+- Validador completo: 478 testes, lint/formato, migrations e checks dev/produção OK.
+  Após três novos casos de hooks/rollback, rodada dirigida de 51 passou (481 no total).
+  Sem migrations ou dependências novas. OWASP A01–A10 revisadas, sem achados novos.
+  Leituras sem writes/locks e sem N+1; removidas consultas de full_clean, lock só no
+  registro/plano recebido e contagem só na redução de licenças. Sem ensaio de carga novo.
+- Documentação: backend/AGENTS/README/standards, overview, API administrativa,
+  ADR/índice, plano, memória de arquitetura e handoff sincronizados.
+
 ## 2026-10-04 — Login: remoção do estilo de formulário da senha
 
 - Removido `style={'input_type': 'password'}` de `LoginSerializer` em

@@ -39,13 +39,14 @@ um ADR novo que **substitui** o anterior.
 | [0020](0020-administracao-de-planos-e-contratos.md) | Administração de planos/contratos e redução segura de licenças | Aceito |
 | [0021](0021-views-base-compostas-no-core.md) | Views base compostas, mixins e paginação no core | Aceito |
 | [0022](0022-django-filter-nas-listagens.md) | django-filter com FilterSets declarados nas listagens | Aceito |
-| [0023](0023-services-nos-serializers-de-escrita.md) | Services nos métodos create/update dos serializers | Aceito |
-| [0024](0024-classe-base-de-services.md) | Classe base de services e exclusão herdada nas views | Aceito |
-| [0025](0025-classe-de-service-nos-serializers.md) | Classe de service declarada nos serializers | Aceito |
+| [0023](0023-services-nos-serializers-de-escrita.md) | Services nos métodos create/update dos serializers | Substituído por 0030 |
+| [0024](0024-classe-base-de-services.md) | Classe base de services e exclusão herdada nas views | Substituído por 0030 |
+| [0025](0025-classe-de-service-nos-serializers.md) | Classe de service declarada nos serializers | Substituído por 0030 |
 | [0026](0026-schema-automatico-por-campos.md) | Schema por campos, metadados automáticos e overrides | Aceito |
 | [0027](0027-classes-base-de-selectors.md) | Classes base de selectors e configuração das views | Aceito |
 | [0028](0028-querysets-simples-nas-views.md) | Querysets administrativos simples diretamente nas views; substitui 0027 | Aceito |
 | [0029](0029-busca-geral-e-filtros-individuais.md) | Busca geral e filtros individuais no Core | Aceito |
+| [0030](0030-crud-auditado-nos-serializers.md) | CRUD auditado com serializers padrão do DRF | Aceito |
 
 ## Modelo
 

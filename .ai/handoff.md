@@ -3,86 +3,59 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(auth): remove password form style` (consultar git log -1)
+- **Última alteração:** `refactor(api): use DRF serializers for audited CRUD` (consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 concluída; revisão para CRUD auditado via serializers em andamento |
-| Próximo passo exato | Concluir validação e documentação da refatoração autorizada dos serializers antes da 5.3 |
-| Aguardando o usuário? | não para esta revisão; 5.3 ainda exige confirmação |
+| Etapa atual | 5.2 e revisão dos serializers concluídas |
+| Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato |
+| Aguardando o usuário? | sim — confirmar início da 5.3 |
 
 ## Concluído
 
-Removido o estilo HTML da senha de LoginSerializer; write_only e espaços preservados.
-Validação deste ajuste: 41 testes de autenticação e lint passaram.
-Os itens abaixo descrevem a base commitada antes da refatoração ainda pendente.
+0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1–3.6 · 2.3–2.5 · 4.1 · 5.1–5.2 e revisões.
 
-0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1–3.6 · 2.3–2.5 · 4.1 e revisão · 5.1–5.2.
+- CRUD /api/v1/admin/plans e contracts: superadmin ativo, sem organização.
+  UUIDs externos, erros RFC 9457; lists/options/schema, organizações por contrato.
+- Views: queryset, serializer_class, filterset_class e demais configurações nessa ordem.
+  Consultas simples diretamente na view; selectors só para lógica própria (ADR 0028).
+  django-filter, general_search_fields OR e filtros individuais AND; schema separado,
+  metadados do model e overrides por campo, options_url via SchemaRouter (0026/0029).
+- ADR 0030 substitui 0023–0025: BaseModelSerializer/BaseAdminModelSerializer usam
+  super().create/update, autoria/auditoria atômica e create_extra/update_extra.
+  Campos validados pelo DRF; regras próprias no validate(). Usuário dispensou
+  full_clean genérico e model_validation_fields/exclude. Plan/Contract services,
+  BaseModelService e registry removidos; services próprios de users/RBAC preservados.
+- ATOMIC_REQUESTS engloba validação/gravação. View adquire lock antes de validar
+  update/delete; serializer reutiliza. Uso direto exige atomic envolvendo is_valid/save,
+  recarrega estado atual com lock. instance_locked é contexto interno da view.
+  SerializerDeleteMixin chama serializer.delete(): soft delete, sem cascata.
+- Licenças contam inativos e ativos não excluídos; redução não pode ficar abaixo
+  desse total. Mesmo lock de contrato do cadastro de usuários; concorrência testada.
+  Plano excluído não selecionável, mas FK histórica permanece e contrato é editável.
+- audit_fields/audit_events explícitos; auditoria sem nomes de clientes/senhas/tokens.
+  Falha da auditoria desfaz create/update/delete. Ajustes extras também auditados.
+- Validador: 478 testes + lint/formato/migrations/checks dev/produção passaram.
+  Depois, três casos novos de hooks/rollback; rodada dirigida 51 passou (481 total).
+  OWASP A01–A10 revisadas, sem achados novos; sem migrations/dependências novas.
+- Leituras sem writes/locks, plano em JOIN sem N+1. Lock de escrita só no registro
+  e plano recebido; COUNT de usuários só na redução. Sem ensaio de carga novo.
+- Models: verbose_name explícito e limite 120. Preservar cabeçalho compacto da
+  view base e audit_events multiline ajustado pelo usuário (fmt off/on local).
+- LoginSerializer sem style HTML; write_only e espaços preservados. OpenAPI na 5.5.
 
-- CRUD /api/v1/admin/plans e contracts: somente superadmin ativo, sem organização.
-  Listas limitadas/search/ordering/filtros, options/schema; organizations por contrato
-  (organizações ativas, não excluídas), previsto na 3.5. UUIDs na API; erros RFC 9457.
-- Camadas em apps/contracts: selectors/services/serializers/permissions/views/urls.
-  django-filter 26.2: BaseFilterSet/backend em core/filters, FilterSets nos apps,
-  filterset_class nas views. Filtros explícitos para não acessar managers na importação.
-  Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
-  views declaram queryset diretamente, seguido de serializer_class/filterset_class;
-  unscoped explícito e DRF padrão; selectors apenas para lógica própria de leitura
-  (ADR 0028). Tenant contextual só na requisição. Exclusão via BaseModelService,
-  PlanService/ContractService registrados por model no AppConfig.ready, sem SQL.
-  Serializers declaram service_class; ServiceModelSerializer implementa create/update
-  via service_class.save_instance, sem staticmethod nos recursos (ADR 0025);
-  view usa serializer.save() padrão (ADR 0023). Regras/locks/auditoria preservados.
-  Schemas: nomes de campos, labels/tipos do model e overrides por campo; options_url
-  via SchemaRouter/reverse; ordenação via OrderingFilter. Sem queries (ADR 0026).
-  general_search_fields/OR e filtros individuais/AND; schema general_search separado,
-  lookups textuais explícitos, tenant preservado e sem casts/regex/M2M (ADR 0029).
-  LookupOptionsMixin aceita options_permission_class; só administração usa
-  SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.
-- Licenças: usuário aprovou impedir redução abaixo dos não excluídos, contando
-  inativos (ADR 0020). Lock no contrato como save_user; teste concorrente passou.
-- Soft delete sem cascata; quotas sem enforcement; sem cobrança/aceite/assinatura.
-  Plano excluído não selecionável, FK histórica continua e contrato pode ser editado.
-- Escritas com autoria/AuditEvent atomicamente; antes/depois só configuração, sem
-  nome do cliente. Falha da auditoria desfaz alteração. audit.0005 aplicada localmente.
-- Leituras 1/30 itens: duas consultas de dados, sem writes, plano em JOIN sem N+1.
-  Medição local JWT, 10 chamadas sequenciais: 30 contratos list/options 6,91/4,09 ms;
-  10 mil 28,80/16,14 ms medianas. EXPLAIN ANALYZE avaliado; sem ensaio de concorrência
-  de leitura/capacidade. Rever índices/busca/COUNT/OFFSET conforme volume real.
-- Validação: suíte 477 + rodada dirigida 14 após novo teste M2M; cobertura total 478.
-  Lint/formato/migrations e checks desenvolvimento/produção OK, sem migrations.
-  OWASP A01–A10 revisada sem achados novos; base legal/CDC preservada, sem PII/
-  dependências/telas/retentivos novos. ADR 0020, plano/docs/memória sincronizados.
-  ADR 0021: bases compostas no core; preservar cabeçalho compacto/alinhado (fmt off/on).
-  ADR 0022: django-filter substitui filter_listing; pip check/licença BSD-3 verificados.
+## Pendências / avisos
 
-## Falta / dúvidas
-
-- Revisão autorizada, NÃO commitada: BaseModelSerializer/BaseAdminModelSerializer
-  usam super().create/update, autoria/auditoria e hooks create_extra/update_extra.
-  Plan/Contract migrados; services comuns removidos; view trava antes de validar.
-  Alterações em contracts/{apps,serializers,services,tests/test_admin_api}.py e
-  core/{mixins,serializers,services,views,tests/test_services}.py.
-- Última rodada dirigida: 43/46 testes passaram; três falharam por classe de exceção
-  esperada. Import corrigido, ainda precisa repetir a rodada e verificar lint.
-  Faltam validação completa, revisão, ADR/docs/memória e commit dessa refatoração.
-- 5.3 não iniciada; aprovação da próxima etapa necessária.
-- Models já usam verbose_name explícito nos rótulos; sem migrations pendentes.
-- ADR 0019: AccessLog só login sucesso/falha e refresh sucesso; leituras não gravam.
-  Cobertura jurídica escolhida precisa de validação antes de produção; não afirmar
-  que apenas login satisfaz a lei. AuditEvent e entrada de superadmin preservados.
-
-## Avisos
-
-- Premissa GLOBAL forte de performance: queries/escritas/locks/CPU/memória/rede/
-  concorrência; medir conforme risco. Queries constantes não bastam.
-- Managers falham sem tenant; global só system_context()/@system_scope/unscoped().
-  Views comuns TenantScopedViewMixin; model novo exige fábrica de isolamento.
-- Escritas users/RBAC pelos services; AuditEvent imutável; leitura de auditoria
-  deve filtrar contrato. A API administrativa usa acesso global autorizado explícito.
+- 5.3 não iniciada. Quotas do Plan só schema, sem enforcement/cobrança/assinatura.
+- Performance é premissa GLOBAL: banco/locks/CPU/memória/rede/concorrência;
+  consultas constantes não garantem capacidade. Medir conforme risco e volume real.
+- Managers exigem tenant; global só unscoped()/system_context()/@system_scope.
+  Models novos exigem fábrica de isolamento; AuditEvent imutável.
+- AccessLog só login sucesso/falha e refresh sucesso (ADR 0019), sem leituras comuns;
+  cobertura jurídica exige validação antes de produção, não afirmar suficiência legal.
 - Banco local aplicado até audit.0005; não regenerar initials nem versionar .env.
-- Antes de produção: expurgo/LegalHold (ADR 0007), proxy configurado, sigilo/backups,
-  NTP, cache compartilhado/atômico, borda, MFA/recuperação e limpeza de tokens.
-- Push só quando solicitado; validador Windows via Git Bash com PATH=/usr/bin:/bin:$PATH.
+- Antes de produção: expurgo/LegalHold, proxy, sigilo/backups, NTP, cache compartilhado,
+  proteção de borda, MFA/recuperação e limpeza de tokens. Push só quando solicitado.
+- Validador Windows via Git Bash: PATH=/usr/bin:/bin:$PATH.

@@ -50,6 +50,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (revisão 5.2: classes base de selectors, selector_class nas views e ordem padronizada de configuração; ADR 0027) | concluído |
 | `backend/` (revisão 5.2: querysets simples diretamente nas views administrativas, selectors para lógica própria, DRF padrão; ADR 0028 substitui 0027) | concluído |
 | `backend/` (revisão 5.2: general_search_fields, busca OR/controles individuais AND, schema general_search separado, validação de tipos/lookups; ADR 0029) | concluído |
+| `backend/` (revisão 5.2: CRUD padrão do DRF, autoria/auditoria nos serializers, validate próprio e hooks; ADR 0030 substitui 0023–0025) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |
@@ -594,9 +595,9 @@ A divisão de responsabilidades é:
 | Arquivo | Responsabilidade |
 |---|---|
 | `models.py` | Persistência e comportamento da entidade |
-| `serializers.py` | Validação, entrada e saída da API |
+| `serializers.py` | Validação, entrada/saída da API e CRUD auditado pelo DRF (ADR 0030) |
 | `selectors.py` | Consultas e operações de leitura |
-| `services.py` | Regras de negócio e alterações de estado |
+| `services.py` | Operações próprias de domínio, além do CRUD dos serializers |
 | `views.py` | Camada HTTP/API |
 | `urls.py` | Rotas do app |
 | `permissions.py` | Regras de autorização |
@@ -1347,7 +1348,7 @@ Ao criar uma nova funcionalidade:
 7. erros no formato RFC 9457 (skill `erros-api-rfc9457`);
 8. seguir os exemplos em `backend/docs/examples/`;
 9. leituras devem preferencialmente utilizar selectors;
-10. escritas e regras de negócio devem utilizar services;
+10. CRUD auditado usa BaseModelSerializer, validação DRF e validate próprio; services ficam para operações de domínio (ADR 0030);
 11. views devem permanecer finas;
 12. adicionar testes, incluindo **isolamento entre contratos**;
 13. revisar segurança (skill `owasp-top-10`) e performance (skill `revisao-performance`);
