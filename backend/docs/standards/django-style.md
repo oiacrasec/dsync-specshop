@@ -16,6 +16,19 @@ referência: [models](../examples/model.md). Implementações atuais:
 - Manter linhas em branco entre métodos e classes; a organização compacta não
   altera a separação das responsabilidades.
 
+## Organização dos módulos
+
+Convenção definida pelo usuário:
+
+| Arquivo | Contém |
+|---|---|
+| `middleware.py` | só classes de middleware |
+| `utils.py` | funções auxiliares do app, sem regra de negócio e sem escrita no banco |
+| `services.py` / `selectors.py` | escrita com regra de negócio / leituras |
+
+Não misturar auxiliares no módulo do middleware (ex.: `apps/audit/utils.py` marca a
+entrada do superadmin; `apps/audit/middleware.py` só grava).
+
 ## Formatação e lint
 
 `pyproject.toml` preserva a formatação manual de `models.py`:

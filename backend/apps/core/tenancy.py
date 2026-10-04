@@ -1,8 +1,9 @@
 """Contexto de tenant por requisição (ADR 0006 §1.3, camada C; etapa 2.4).
 
-Um `contextvar` guarda contrato, organização e se o usuário é superadmin. O middleware
-começa cada requisição sem contexto; as classes de permissão do DRF preenchem o
-contrato do usuário e o header preenche a organização. Fora de requisição (services
+Um `contextvar` guarda contrato, organização e se o usuário é superadmin. O
+`TenantContextMiddleware` (`apps/core/middleware.py`) começa cada requisição sem
+contexto; as classes de permissão do DRF preenchem o contrato do usuário e o header
+preenche a organização. Fora de requisição (services
 do superadmin, comandos, tarefas), o código define o contexto explicitamente com
 `use_context(...)` ou `system_context()`.
 
@@ -75,17 +76,3 @@ def system_scope(function):
             return function(*args, **kwargs)
 
     return wrapper
-
-
-class TenantContextMiddleware:
-    """Cada requisição começa sem contexto e o contexto anterior volta ao final."""
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        token = _current.set(None)
-        try:
-            return self.get_response(request)
-        finally:
-            _current.reset(token)

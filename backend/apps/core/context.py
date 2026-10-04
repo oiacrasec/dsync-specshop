@@ -59,7 +59,7 @@ def resolve_organization(request):
     request.organization = organization
     update_context(contract_id=organization.contract_id, organization_id=organization.pk)
     if user.is_superuser:
-        from apps.audit.middleware import mark_superadmin_entry
+        from apps.audit.utils import mark_superadmin_entry
 
         mark_superadmin_entry(request, organization)
     return organization

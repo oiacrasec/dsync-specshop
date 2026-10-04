@@ -1,10 +1,11 @@
-"""Correlação e erros que ocorrem fora de uma view do DRF."""
+"""Middlewares do core: correlação, erros fora de uma view do DRF e contexto de tenant."""
 
 import logging
 from uuid import uuid7
 
 from .exceptions import PROBLEM_CONTENT_TYPE, exception_handler, problem_http_response
 from .log_filters import request_id_context
+from .tenancy import reset_context, set_context
 
 logger = logging.getLogger(__name__)
 
@@ -45,3 +46,20 @@ class RequestIdMiddleware:
         if request.path_info.startswith('/api/'):
             return exception_handler(exception, {'request': request})
         return None
+
+
+class TenantContextMiddleware:
+    """Camada C (ADR 0006 §1.3): cada requisição começa sem contexto de tenant.
+
+    Ao final, o contexto anterior volta. Ver `apps/core/tenancy.py`.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        token = set_context(None)
+        try:
+            return self.get_response(request)
+        finally:
+            reset_context(token)
