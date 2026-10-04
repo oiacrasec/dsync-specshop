@@ -35,4 +35,4 @@ def record_superadmin_entry(*, superadmin, organization, access_jti=''):
         created_by=superadmin,
         updated_by=superadmin,
     )
-    AuditEvent.objects.bulk_create([entry], ignore_conflicts=True)
+    AuditEvent.objects.unscoped().bulk_create([entry], ignore_conflicts=True)

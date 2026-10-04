@@ -51,6 +51,8 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'apps.core.middleware.RequestIdMiddleware',
+    # Camada C: cada requisição começa sem contexto de tenant (ADR 0006 §1.3).
+    'apps.core.tenancy.TenantContextMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

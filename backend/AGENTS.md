@@ -79,8 +79,13 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Ao personalizar `Meta`, herdar a do tipo escolhido e preservar índices herdados.
 - Os tipos de escopo herdam `apps.core.models.BaseModel`: UUID v7 externo,
   datas, autoria e soft delete (ADR 0007). Tabelas `dsc_` são geradas automaticamente.
-- `objects` oculta excluídos, mas mantém inativos; `all_objects` é acesso explícito
-  para auditoria. No `User`, `is_active` mantém a semântica de autenticação do Django.
+- `objects` oculta excluídos, mas mantém inativos; `all_objects` inclui excluídos. **Os dois
+  filtram pelo contexto de tenant** (`apps/core/tenancy.py`) e levantam `TenantContextMissing`
+  sem contexto. Acesso global só por `Model.objects.unscoped()` ou `system_context()`/`@system_scope`
+  (services de integridade, comandos, autenticação). `_base_objects` é só do Django (FKs).
+  Nunca declarar `queryset = Model.objects...` no nível da classe: use `TenantScopedViewMixin`
+  com `model` e `ScopedModelSerializer` (FKs por `public_id`, sem `id`/`contract`/`organization`).
+  No `User`, `is_active` mantém a semântica de autenticação do Django.
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema
   sem usuário deixam autoria nula. Em `update`/operações bulk, preencher auditoria
   explicitamente. Soft delete não faz cascata; relações são tratadas no service.

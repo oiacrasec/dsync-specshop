@@ -11,3 +11,6 @@ PASSWORD_HASHERS = [
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+# App só de testes com um model de cada tipo de escopo (etapas 2.4 e 2.5); sem migrations.
+INSTALLED_APPS = [*INSTALLED_APPS, 'apps.core.tests.scoping']  # noqa: F405

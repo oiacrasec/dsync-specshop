@@ -60,13 +60,30 @@ O check usa apenas metadados, sem queries. No deploy, executar `manage.py check`
 explicitamente: o Django não executa os checks na inicialização WSGI.
 Referência: [system checks do Django](https://docs.djangoproject.com/en/5.2/topics/checks/).
 
-## Limites desta etapa
+## Contexto e managers (etapa 2.4)
 
-Os tipos declaram persistência; ainda não filtram queries por tenant nem
-concedem permissões. Nenhum model de negócio ou endpoint foi publicado.
-Managers com contexto, validação contrato/organização, restrições de escrita,
-unicidade híbrida e testes de isolamento entram nas próximas etapas do plano.
-Não tratar `objects` ou `all_objects` como autorização de acesso.
+Camadas B a E do ADR 0006 §1.3:
+
+| Camada | Peça | Regra |
+|---|---|---|
+| C. Contexto | `apps/core/tenancy.py` | `contextvar` com contrato, organização e superadmin. `TenantContextMiddleware` começa cada requisição sem contexto; `AllowAuthenticated`/`RequiredPermission` gravam o contrato do usuário e o header grava a organização. Fora de requisição: `use_context(...)`, `system_context()` ou `@system_scope` |
+| B. Manager | `objects` e `all_objects` | filtram pelo contexto; sem contexto → `TenantContextMissing` (500, nunca dados). Global só por `.unscoped()`. `_base_objects` (sem filtro) é o manager base do Django, para seguir FKs |
+| D. View | `apps/core/views.TenantScopedViewMixin` | `model` em vez de `queryset`; create/update gravam `contract`/`organization` do contexto e autoria, ignorando o payload; fora do contexto → 404; registro do sistema (Hybrid) → 403 para cliente |
+| E. Serializer | `apps/core/serializers.ScopedModelSerializer` | FKs por `public_id` com o manager com escopo (outro contrato → "não existe", 422); sem `id`, `contract` e `organization` |
+
+| Contexto | Shared | Hybrid | Contract | Organization | `Contract` / `User` |
+|---|---|---|---|---|---|
+| nenhum | todos | erro | erro | erro | erro |
+| contrato (usuário comum) | todos | sistema + próprio | próprio | erro | só o próprio / só do contrato |
+| contrato + organização | todos | sistema + próprio | próprio | própria organização | idem |
+| superadmin sem organização | todos | erro (`unscoped()`) | erro | erro | erro |
+| `system_context()` | todos | todos | todos | todos | todos |
+
+Superadmin com header age como o cliente daquela organização. Services de integridade
+(`save_user`, `delete_user`, RBAC, login/refresh/logout) rodam em `@system_scope`: a
+autorização fica em quem chama. Testes usam `system_context()` automático no `conftest`;
+o app só de testes `apps/core/tests/scoping` tem um model de cada tipo. Testes de
+isolamento genéricos (camada F) ficam na etapa 2.5.
 
 Os tipos abstratos não criam tabelas ou migrations. Desde a etapa 2.1, `Plan` usa
 `SharedModel`, `Organization` usa `ContractScopedModel` e `Contract` permanece

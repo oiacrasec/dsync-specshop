@@ -42,8 +42,8 @@ ADR 0006 (`SharedModel`, `HybridScopedModel`, `ContractScopedModel`,
 | `created_by` / `updated_by` | usuário que criou / alterou por último |
 | `is_active` | situação de negócio: **inativo continua visível** (ex.: produto fora de linha) |
 | `deleted_at` / `deleted_by` | soft delete: **excluído some** das consultas padrão (§4) |
-| `objects` | gerenciador padrão, sem os excluídos |
-| `all_objects` | todos, inclusive excluídos (uso explícito: auditoria, expurgo) |
+| `objects` | gerenciador padrão, sem os excluídos, filtrado pelo contexto de tenant (ADR 0006 §1.3, etapa 2.4) |
+| `all_objects` | inclusive excluídos, também filtrado pelo contexto (uso explícito: auditoria, expurgo); acesso global só por `.unscoped()` (decisão do usuário na etapa 2.4) |
 
 "Inativo" e "excluído" são estados diferentes e têm campos diferentes.
 

@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.db import close_old_connections, connection
 
 from apps.core.exceptions import LastContractAdmin
+from apps.core.tenancy import system_scope
 from apps.rbac import services
 from apps.rbac.models import Assignment, Profile
 from apps.rbac.selectors import active_admin_count
@@ -118,6 +119,7 @@ def test_concurrent_removal_of_the_two_last_admins_keeps_one(admin, user_contrac
     bia, _ = make_admin(admin, user_contract, 'bia', essential_profile)
     barrier = Barrier(2)
 
+    @system_scope  # Threads não herdam o contexto do teste.
     def remove_assignment():
         close_old_connections()
         barrier.wait()
@@ -129,6 +131,7 @@ def test_concurrent_removal_of_the_two_last_admins_keeps_one(admin, user_contrac
         finally:
             close_old_connections()
 
+    @system_scope  # Threads não herdam o contexto do teste.
     def remove_user():
         close_old_connections()
         barrier.wait()

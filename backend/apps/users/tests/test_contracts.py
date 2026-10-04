@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from apps.contracts.models import Contract
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
+from apps.core.tenancy import system_scope
 from apps.users.services import save_user
 
 
@@ -139,6 +140,7 @@ def test_concurrent_creation_cannot_exceed_contract_capacity(user_contract):
     barrier = Barrier(2)
     contract_id = user_contract.pk
 
+    @system_scope  # Threads não herdam o contexto do teste.
     def create(number):
         close_old_connections()
         try:

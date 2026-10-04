@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
-from apps.users.managers import UserManager, UserQuerySet
+from apps.users.managers import AllUsersManager, UserManager
 
 
 class User(AbstractUser, BaseModel):
@@ -16,7 +16,7 @@ class User(AbstractUser, BaseModel):
     """
 
     objects = UserManager()
-    all_objects = models.Manager.from_queryset(UserQuerySet)()
+    all_objects = AllUsersManager()
 
     contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
                                  null=True, blank=True, related_name='+',)

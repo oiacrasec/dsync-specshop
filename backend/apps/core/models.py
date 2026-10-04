@@ -43,9 +43,35 @@ class SoftDeleteQuerySet(models.QuerySet):
     delete.queryset_only = True
 
 
-class SoftDeleteManager(models.Manager.from_queryset(SoftDeleteQuerySet)):
+class ScopedManagerMixin:
+    """Fail closed (ADR 0006 §1.3, camada B): filtra pelo contexto ou levanta erro.
+
+    `unscoped()` é o único acesso global, sempre explícito (superadmin, comandos).
+    """
+
+    include_deleted = False
+
+    def _base_queryset(self):
+        queryset = super().get_queryset()
+        return queryset if self.include_deleted else queryset.filter(deleted_at__isnull=True)
+
     def get_queryset(self):
-        return super().get_queryset().filter(deleted_at__isnull=True)
+        condition = scope_filter(self.model)
+        queryset = self._base_queryset()
+        return queryset if condition is None else queryset.filter(condition)
+
+    def unscoped(self):
+        return self._base_queryset()
+
+
+class SoftDeleteManager(ScopedManagerMixin, models.Manager.from_queryset(SoftDeleteQuerySet)):
+    """`objects`: com escopo, sem excluídos."""
+
+
+class AllObjectsManager(ScopedManagerMixin, models.Manager.from_queryset(SoftDeleteQuerySet)):
+    """`all_objects`: com escopo, inclui excluídos (auditoria, expurgo)."""
+
+    include_deleted = True
 
 
 class BaseModel(models.Model, metaclass=DscModelBase):
@@ -65,12 +91,14 @@ class BaseModel(models.Model, metaclass=DscModelBase):
                                    on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name='+',)
 
     objects = SoftDeleteManager()
-    all_objects = models.Manager.from_queryset(SoftDeleteQuerySet)()
+    all_objects = AllObjectsManager()
+    # Sem filtro: só o Django usa (seguir FKs, refresh_from_db). Não usar em código de domínio.
+    _base_objects = models.Manager.from_queryset(SoftDeleteQuerySet)()
 
     class Meta:
         abstract = True
         default_manager_name = 'objects'
-        base_manager_name = 'all_objects'
+        base_manager_name = '_base_objects'
 
     def save(self, *args, actor=None, **kwargs):
         if actor is not None:
@@ -87,7 +115,8 @@ class BaseModel(models.Model, metaclass=DscModelBase):
         if self.pk is None:
             raise ValueError('Cannot delete an unsaved instance.')
         database = using or router.db_for_write(type(self), instance=self)
-        result = type(self).all_objects.using(database).filter(pk=self.pk).delete(actor=actor)
+        # A instância já foi obtida e autorizada; o lote usa o manager base, sem escopo.
+        result = SoftDeleteQuerySet.delete(type(self)._base_manager.using(database).filter(pk=self.pk), actor=actor)
         self.refresh_from_db(using=database)
         return result
 
@@ -151,3 +180,36 @@ class OrganizationScopedModel(BaseModel):
     class Meta(BaseModel.Meta):
         abstract = True
         indexes = [models.Index(fields=['contract', 'organization'])]
+
+
+def scope_filter(model):
+    """Condição do contexto atual para o model; None = sem filtro (ADR 0006 §1.1, ADR 0012).
+
+    Sem contexto, ou sem o contrato/organização que o tipo exige, levanta
+    TenantContextMissing. Superadmin sem organização precisa de `unscoped()`.
+    """
+    from apps.core.tenancy import TenantContextMissing, get_context
+
+    if issubclass(model, SharedModel):
+        return None
+    context = get_context()
+    if context is None:
+        raise TenantContextMissing(f'{model._meta.label} consultado sem contexto de tenant.')
+    if context.system:
+        return None
+    if context.contract_id is None:
+        raise TenantContextMissing(f'{model._meta.label} exige contrato no contexto (use unscoped()).')
+    label = model._meta.label
+    if label == 'contracts.Contract':
+        return models.Q(pk=context.contract_id)
+    if label == 'users.User':
+        return models.Q(contract_id=context.contract_id)
+    if issubclass(model, OrganizationScopedModel):
+        if context.organization_id is None:
+            raise TenantContextMissing(f'{label} exige organização no contexto.')
+        return models.Q(contract_id=context.contract_id, organization_id=context.organization_id)
+    if issubclass(model, ContractScopedModel):
+        return models.Q(contract_id=context.contract_id)
+    if issubclass(model, HybridScopedModel):
+        return models.Q(contract_id=context.contract_id) | models.Q(contract__isnull=True)
+    raise TenantContextMissing(f'{label} sem tipo de escopo conhecido.')

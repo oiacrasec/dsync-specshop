@@ -3,6 +3,19 @@ from datetime import date
 import pytest
 
 from apps.contracts.models import Contract, Plan
+from apps.core.tenancy import system_context
+
+
+@pytest.fixture(autouse=True)
+def tenant_system_context():
+    """Arrange e asserts dos testes com acesso global explícito (decisão 3 da 2.4).
+
+    Requisições pelo APIClient passam pelo TenantContextMiddleware, que começa sem
+    contexto: o caminho real das views continua testado. Testes de isolamento usam
+    use_context(...) para trocar o contexto.
+    """
+    with system_context():
+        yield
 
 
 @pytest.fixture

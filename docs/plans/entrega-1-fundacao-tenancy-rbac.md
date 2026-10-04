@@ -28,6 +28,7 @@ e só começa após aprovação do usuário.
 | 16 | Ordem ajustada (aprovado): 2.3 antes da 3.6, porque auditar a entrada do superadmin exige o contexto. Nova ordem: 2.3 → 3.6 → 2.4 → 2.5 → 4.1 → bloco 5 |
 | 17 | 2.3 (aprovado): login com senha certa e contrato indisponível → 403 `contract-inactive`; access/refresh negados enquanto indisponível, sem revogar todos os refresh; superadmin entra em organização de contrato vencido/inativo (excluído → 403); superadmin sem header em endpoint de negócio → 400. Usuário confirmou o 403 para contrato excluído |
 | 18 | 3.6 (aprovado): `apps/audit` + `AuditEvent` (ADR 0017); entrada do superadmin 1x por superadmin + organização + access token; "alterações de superadmin" = contas de superadmin; eventos imutáveis, com before/after só dos campos de permissão |
+| 19 | 2.4 (aprovado): `all_objects` também filtra pelo contexto (manager base do Django vira `_base_objects`, sem filtro); `User` e `Contract` entram no escopo (ADR 0012), autenticação usa `.unscoped()`; código fora de requisição usa `system_context()`/`@system_scope` e os testes um contexto de sistema automático; query sem contexto levanta `TenantContextMissing` |
 
 ## Bloco 0 — Fundação
 
@@ -51,7 +52,7 @@ e só começa após aprovação do usuário.
 | 2.1 | `Plan`, `Contract` (vigência, licenças, retenção pós-contrato) e `Organization` | 0006, 0007, 0013, 0014 | ✅ |
 | 2.2 | Campo `contract` no `User` + regras (licenças, superadmin sem contrato) | 0006 §2, 0015 | ✅ |
 | 2.3 | Resolução do contexto (`X-Organization-Id`): 400/403, contrato ativo, superadmin opcional | 0006 §3 | ✅ |
-| 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ⬜ |
+| 2.4 | Proteção em camadas B a E: manager fail closed, `contextvar`, mixin de view, FKs do serializer | 0006 §1.3 | ✅ |
 | 2.5 | Testes de isolamento genéricos (camada F) | 0006 §1.3 | ⬜ |
 
 ## Bloco 3 — RBAC

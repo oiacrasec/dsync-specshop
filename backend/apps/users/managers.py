@@ -2,7 +2,7 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import transaction
 
-from apps.core.models import SoftDeleteQuerySet
+from apps.core.models import ScopedManagerMixin, SoftDeleteQuerySet
 
 
 class UserQuerySet(SoftDeleteQuerySet):
@@ -25,11 +25,12 @@ class UserQuerySet(SoftDeleteQuerySet):
     delete.queryset_only = True
 
 
-class UserManager(DjangoUserManager.from_queryset(UserQuerySet)):
-    """Mantém create_user/create_superuser e oculta usuários excluídos."""
+class UserManager(ScopedManagerMixin, DjangoUserManager.from_queryset(UserQuerySet)):
+    """Mantém create_user/create_superuser, oculta excluídos e aplica o escopo (ADR 0012)."""
 
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted_at__isnull=True)
+    def get_by_natural_key(self, username):
+        """Login acontece antes de existir contexto: busca global explícita."""
+        return self.unscoped().get(**{self.model.USERNAME_FIELD: username})
 
     def _create_user(self, username, email, password, **extra_fields):
         from .services import save_user
@@ -40,3 +41,7 @@ class UserManager(DjangoUserManager.from_queryset(UserQuerySet)):
 
     async def _acreate_user(self, username, email, password, **extra_fields):
         return await sync_to_async(self._create_user)(username, email, password, **extra_fields)
+
+
+class AllUsersManager(ScopedManagerMixin, DjangoUserManager.from_queryset(UserQuerySet)):
+    include_deleted = True

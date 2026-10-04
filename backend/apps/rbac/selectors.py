@@ -113,7 +113,7 @@ def accessible_organizations(user):
 
     grants = user_grants(user)
     if not grants:
-        return Organization.objects.none()
+        return Organization.objects.unscoped().none()  # Superadmin não tem contrato no contexto.
     organizations = Organization.objects.filter(contract_id=user.contract_id, is_active=True).order_by('name', 'pk')
     direct = {grant.scope_organization for grant in grants if grant.scope is PermissionScope.ORGANIZATION}
     contract_wide = [grant for grant in grants if grant.scope is PermissionScope.CONTRACT]

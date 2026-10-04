@@ -8,9 +8,22 @@ contrato não excluído, inclusive vencido ou inativo, para suporte (auditado na
 from uuid import UUID
 
 from .exceptions import ContextForbidden, ContextInvalidRequest
+from .tenancy import TenantContext, get_context, set_context, update_context
 
 HEADER = 'X-Organization-Id'
 _UNRESOLVED = object()
+
+
+def bind_user(request):
+    """Camada C: contrato do usuário autenticado (ou superadmin sem contrato) no contexto.
+
+    Chamado pelas classes de permissão, que rodam em toda view protegida.
+    """
+    user = request.user
+    expected = TenantContext(superuser=True) if user.is_superuser else TenantContext(contract_id=user.contract_id)
+    current = get_context()
+    if current is None or (current.superuser, current.contract_id) != (expected.superuser, expected.contract_id):
+        set_context(expected)
 
 
 def resolve_organization(request):
@@ -30,16 +43,21 @@ def resolve_organization(request):
     except ValueError:
         raise ContextInvalidRequest() from None
     user = request.user
-    organizations = Organization.objects.filter(public_id=public_id, is_active=True)
+    bind_user(request)
     organization = None
     if user.is_superuser:
-        organization = organizations.filter(contract__deleted_at__isnull=True).first()
+        organizations = Organization.objects.unscoped()  # Entra em qualquer contrato (auditado).
+        organization = organizations.filter(
+            public_id=public_id, is_active=True, contract__deleted_at__isnull=True
+        ).first()
     elif user.contract_id is not None:
+        organizations = Organization.objects.filter(public_id=public_id, is_active=True)  # Já no escopo do contrato.
         organization = organizations.filter(contract_id=user.contract_id).first()
     if organization is None:
         raise ContextForbidden()
     request._dsc_organization = organization
     request.organization = organization
+    update_context(contract_id=organization.contract_id, organization_id=organization.pk)
     if user.is_superuser:
         from apps.audit.middleware import mark_superadmin_entry
 

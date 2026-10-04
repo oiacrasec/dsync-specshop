@@ -27,7 +27,12 @@ class AllowAuthenticated(BasePermission):
     """Marca explícita de endpoint aberto a qualquer usuário autenticado."""
 
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated)
+        if not (request.user and request.user.is_authenticated):
+            return False
+        from apps.core.context import bind_user
+
+        bind_user(request)
+        return True
 
 
 def required_permission(request, view):
@@ -68,8 +73,10 @@ class RequiredPermission(BasePermission):
             logger.warning('Permissão fora do registry declarada em %s', type(view).__name__)
             return False
         # Import tardio: o DRF carrega esta classe durante a inicialização de rest_framework.views.
-        from apps.core.context import resolve_organization
+        from apps.core.context import bind_user, resolve_organization
         from apps.core.exceptions import ContextForbidden
+
+        bind_user(request)
 
         # Endpoint de negócio sempre exige organização, inclusive para o superadmin (400 sem header).
         organization = resolve_organization(request)

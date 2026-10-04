@@ -8,6 +8,7 @@ from apps.audit.services import record
 from apps.contracts.models import Contract, Organization
 from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
+from apps.core.tenancy import system_scope
 
 from .models import Assignment, AssignmentExclusion, Profile, ProfilePermission
 from .selectors import (
@@ -28,6 +29,7 @@ def _begin_write(actor):
         cursor.execute('SELECT pg_advisory_xact_lock(%s)', [0x44534352424143])
 
 
+@system_scope
 def ensure_contract_keeps_admin(contract_id, *, exclude_assignment_id=None, exclude_user_id=None, adding=0):
     """ADR 0009 §5: o contrato nunca fica sem administrador, nem por ação do superadmin.
 
@@ -120,6 +122,7 @@ def _permission(code, scope=None):
     return definition
 
 
+@system_scope
 @transaction.atomic
 def save_profile(*, profile, actor):
     _begin_write(actor)
@@ -143,6 +146,7 @@ def save_profile(*, profile, actor):
     return profile, duplicate_client_contracts(profile) if profile.contract_id is None else None
 
 
+@system_scope
 @transaction.atomic
 def delete_profile(*, profile, actor):
     _begin_write(actor)
@@ -166,6 +170,7 @@ def delete_profile(*, profile, actor):
     return current
 
 
+@system_scope
 @transaction.atomic
 def save_profile_permission(*, permission, actor):
     _begin_write(actor)
@@ -190,6 +195,7 @@ def save_profile_permission(*, permission, actor):
     return permission
 
 
+@system_scope
 @transaction.atomic
 def delete_profile_permission(*, permission, actor):
     _begin_write(actor)
@@ -219,6 +225,7 @@ def _assignment_profile(assignment):
     return profile
 
 
+@system_scope
 @transaction.atomic
 def save_assignment(*, assignment, actor):
     _begin_write(actor)
@@ -262,6 +269,7 @@ def save_assignment(*, assignment, actor):
     return assignment
 
 
+@system_scope
 @transaction.atomic
 def delete_assignment(*, assignment, actor):
     _begin_write(actor)
@@ -284,6 +292,7 @@ def delete_assignment(*, assignment, actor):
     return current
 
 
+@system_scope
 @transaction.atomic
 def save_exclusion(*, exclusion, actor):
     _begin_write(actor)
@@ -309,6 +318,7 @@ def save_exclusion(*, exclusion, actor):
     return exclusion
 
 
+@system_scope
 @transaction.atomic
 def delete_exclusion(*, exclusion, actor):
     _begin_write(actor)

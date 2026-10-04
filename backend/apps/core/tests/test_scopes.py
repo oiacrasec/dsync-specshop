@@ -29,7 +29,7 @@ def test_scope_is_inherited_without_repeating_context(scope):
     assert issubclass(concrete, BaseModel)
     assert concrete._meta.db_table == 'dsc_record'
     assert concrete._meta.default_manager_name == 'objects'
-    assert concrete._meta.base_manager_name == 'all_objects'
+    assert concrete._meta.base_manager_name == '_base_objects'  # all_objects tem escopo (2.4).
     assert concrete._meta.get_field('public_id').unique
     if scope is OrganizationScopedModel:
         assert any(index.fields == ['contract', 'organization'] for index in concrete._meta.indexes)

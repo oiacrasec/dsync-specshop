@@ -19,7 +19,12 @@ class JWTAuthentication(SimpleJWTAuthentication):
         except ValueError, TypeError, AttributeError:
             raise InvalidToken() from None
         try:
-            user = self.user_model.objects.select_related('contract').get(**{api_settings.USER_ID_FIELD: public_id})
+            # Autenticação vem antes do contexto: busca global explícita.
+            user = (
+                self.user_model.objects.unscoped()
+                .select_related('contract')
+                .get(**{api_settings.USER_ID_FIELD: public_id})
+            )
         except self.user_model.DoesNotExist:
             raise AuthenticationFailed(_('User not found'), code='user_not_found') from None
         if api_settings.CHECK_USER_IS_ACTIVE and not user.is_active:

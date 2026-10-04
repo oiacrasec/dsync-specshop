@@ -3,20 +3,20 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Último commit:** etapa 3.6 (`feat(audit): add append-only audit trail for access changes`)
+- **Último commit:** etapa 2.4 (`feat(tenancy): add fail-closed scoped managers and tenant context`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 3.6 Auditoria (ADR 0017, `apps/audit`) — ✅ concluída |
-| Próximo passo exato | aplicar `audit.0001` no banco local (autorização do usuário) e iniciar a 2.4: proteção em camadas B a E |
-| Aguardando o usuário? | sim — autorizar a migration `audit.0001` no banco local e aprovar a 2.4 |
+| Etapa atual | 2.4 Proteção em camadas B a E — ✅ concluída |
+| Próximo passo exato | aplicar as migrations só de estado no banco local (autorização) e iniciar a 2.5: testes de isolamento genéricos (camada F) |
+| Aguardando o usuário? | sim — autorizar contracts.0002, rbac.0003, users.0003, audit.0002 (sem SQL) e aprovar a 2.5 |
 
 ## Concluído na entrega 1
 
-0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1 · 3.2 · 3.3 · 3.4 · 3.5 · 2.3 · 3.6. Ordem atual:
-2.4 → 2.5 → 4.1 → bloco 5.
+0.1 · 0.2 · 1.1 · 0.3 · 1.2 · 2.1 · 2.2 · 3.1 · 3.2 · 3.3 · 3.4 · 3.5 · 2.3 · 3.6 · 2.4. Ordem atual:
+2.5 → 4.1 → bloco 5.
 
 ## Dúvidas abertas
 
@@ -24,13 +24,15 @@
 
 ## Avisos
 
-- **Ainda não há isolamento entre contratos:** os tipos de escopo não filtram queries
-  (etapas 2.4–2.5). Não publicar endpoints de negócio antes delas. Único publicado:
+- **Isolamento entre contratos:** managers filtram pelo contexto e falham sem ele (2.4);
+  testes genéricos de isolamento na 2.5. Não publicar endpoints de negócio antes delas. Único publicado:
   `GET /api/v1/me/organizations/` (filtro explícito pelo usuário; superadmin → lista vazia).
+- Queries fora de requisição: `system_context()`/`@system_scope` ou `.unscoped()` explícito; nunca `queryset` de classe em view.
+- `AuditEvent` é Hybrid: ao ler pela API (bloco 5), filtrar sempre pelo contrato (eventos do sistema = contas de superadmin).
 - Toda view nega por padrão: declarar `required_permission` ou `AllowAuthenticated`.
 - Contrato indisponível → 403 `contract-inactive` no login, refresh e toda rota autenticada (2.3).
 - Superadmin entra em organização pelo header (qualquer contrato não excluído); a entrada é auditada (3.6).
-- Banco local migrado até rbac.0002, **sem audit.0001** (aguarda autorização), sem usuários. Não regenerar migrations iniciais já aplicadas.
+- Banco local com audit.0001; **sem** as migrations só de estado da 2.4 (aguardam autorização). Sem usuários. Não regenerar migrations iniciais já aplicadas.
 - Autoria pode ser nula em operações de sistema; `bulk`/`update` exigem auditoria
   explícita. `all_objects` não dispensa autorização.
 - Eventos de auditoria são imutáveis; services de RBAC e contas de superadmin auditam (ADR 0017).

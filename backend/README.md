@@ -90,7 +90,8 @@ Tabelas recebem automaticamente `dsc_` + nome da classe em snake_case; as relaç
 N:N automáticas seguem a tabela de origem.
 
 `objects` exclui registros com `deleted_at`, mas mantém os inativos. `all_objects`
-inclui excluídos para acesso explícito de auditoria. No `User`, o `is_active` original
+inclui excluídos. Desde a etapa 2.4 os dois filtram pelo contexto de tenant e falham sem
+ele; ver [tipos de escopo](docs/architecture/model-scopes.md#contexto-e-managers-etapa-24). No `User`, o `is_active` original
 do Django continua bloqueando autenticação; usuários excluídos também não autenticam.
 
 Autoria é passada explicitamente por `save(actor=user)` e `delete(actor=user)`.

@@ -8,7 +8,7 @@ def superadmin_contracts(search=None):
 
     Inclui inativos e vencidos para suporte; se a entrada é permitida decide a etapa 2.3.
     """
-    contracts = Contract.objects.order_by('name', 'pk')
+    contracts = Contract.objects.unscoped().order_by('name', 'pk')  # Busca global do superadmin.
     if search:
         contracts = contracts.filter(name__icontains=search)
     return contracts
@@ -16,4 +16,4 @@ def superadmin_contracts(search=None):
 
 def superadmin_contract_organizations(contract):
     """2º passo: organizações ativas e não excluídas do contrato escolhido."""
-    return Organization.objects.filter(contract=contract, is_active=True).order_by('name', 'pk')
+    return Organization.objects.unscoped().filter(contract=contract, is_active=True).order_by('name', 'pk')

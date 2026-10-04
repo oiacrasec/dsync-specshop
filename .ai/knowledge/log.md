@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 2.4: proteção em camadas B a E
+
+- `apps/core/tenancy.py` (contextvar, middleware, `system_context`, `@system_scope`);
+  `ScopedManagerMixin` em `objects`/`all_objects` de todos os models (incl. User, Contract,
+  AuditEvent); `scope_filter` por tipo; manager base `_base_objects`.
+- Contexto preenchido por `bind_user` (classes de permissão) e `resolve_organization`.
+- Services de integridade e de autenticação em `@system_scope` (o SimpleJWT usa `User.objects`).
+- `TenantScopedViewMixin` (D) e `ScopedModelSerializer`/`PublicIdRelatedField` (E).
+- App só de testes `apps/core/tests/scoping` (com migration, senão quebra as FKs no test DB).
+- Migrations só de estado (troca do manager base): contracts.0002, rbac.0003, users.0003, audit.0002.
+- ADR 0007 anotado (managers com escopo). 324 testes.
+
 ## 2026-10-04 — Etapa 3.6: trilha de auditoria
 
 - ADR 0017; `apps/audit` (startapp) com `AuditEvent` Hybrid, append-only (save/delete/lote

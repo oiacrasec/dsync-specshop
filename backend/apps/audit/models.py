@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.core.models import HybridScopedModel, SoftDeleteManager, SoftDeleteQuerySet
+from apps.core.models import HybridScopedModel, ScopedManagerMixin, SoftDeleteQuerySet
 
 
 class AuditEventType(models.TextChoices):
@@ -40,6 +40,14 @@ class AppendOnlyQuerySet(SoftDeleteQuerySet):
     update.queryset_only = True
 
 
+class AuditManager(ScopedManagerMixin, models.Manager.from_queryset(AppendOnlyQuerySet)):
+    pass
+
+
+class AllAuditManager(AuditManager):
+    include_deleted = True
+
+
 class AuditEvent(HybridScopedModel):
     """Evento de auditoria append-only: quem (created_by), quando (created_at) e o quê.
 
@@ -57,8 +65,9 @@ class AuditEvent(HybridScopedModel):
     access_jti = models.CharField(_('jti do token de acesso'), max_length=255, blank=True, default='')
     changes = models.JSONField(_('alterações'), default=dict, blank=True)
 
-    objects = SoftDeleteManager.from_queryset(AppendOnlyQuerySet)()
-    all_objects = models.Manager.from_queryset(AppendOnlyQuerySet)()
+    objects = AuditManager()
+    all_objects = AllAuditManager()
+    _base_objects = models.Manager.from_queryset(AppendOnlyQuerySet)()  # Base também imutável.
 
     class Meta(HybridScopedModel.Meta):
         abstract = False

@@ -13,11 +13,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.contracts.models import Contract
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
 from apps.core.models import SoftDeleteQuerySet
+from apps.core.tenancy import system_scope
 
 # Campos que mexem em papel, contrato, licença ou último admin.
 RULE_FIELDS = frozenset({'is_active', 'is_superuser', 'contract', 'contract_id', 'deleted_at'})
 
 
+@system_scope
 def save_user(*, user, actor=None, using=None, **save_options):
     """Escrita interna: papel, contrato e licenças; autorização fica nos futuros endpoints.
 
@@ -121,6 +123,7 @@ def _leaves_contract_admin(current, user):
     return user_is_active_admin(current)
 
 
+@system_scope
 def delete_user(*, user, actor=None, using=None):
     """Exclusão lógica de usuário; nunca deixa o contrato sem administrador (ADR 0009 §5).
 
@@ -169,6 +172,7 @@ def ensure_contract_available(user):
         raise ContractInactive()
 
 
+@system_scope  # Autenticação: antes do contexto; o SimpleJWT consulta User.objects.
 @transaction.atomic
 def login(*, request, username, password):
     user = authenticate(request=request, username=username, password=password)
@@ -195,13 +199,15 @@ def _locked_refresh(raw_token):
     return token, public_id
 
 
+@system_scope  # Autenticação: antes do contexto; o SimpleJWT consulta User.objects.
 @transaction.atomic
 def refresh_tokens(*, refresh):
     try:
         token, user_public_id = _locked_refresh(refresh)
         user = (
             get_user_model()
-            .objects.select_related('contract')
+            .objects.unscoped()
+            .select_related('contract')
             .select_for_update(of=('self',))  # Trava só o usuário; o contrato vem na mesma query.
             .get(public_id=user_public_id, is_active=True)
         )
@@ -218,6 +224,7 @@ def refresh_tokens(*, refresh):
         raise InvalidToken() from None
 
 
+@system_scope  # Autenticação: antes do contexto; o SimpleJWT consulta User.objects.
 @transaction.atomic
 def logout(*, refresh):
     try:

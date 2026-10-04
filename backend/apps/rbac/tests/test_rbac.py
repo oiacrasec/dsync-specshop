@@ -11,6 +11,7 @@ from apps.contracts.models import Contract, Organization
 from apps.core.checks import check_model_scopes
 from apps.core.exceptions import LastContractAdmin, ProfileInUse
 from apps.core.permission_registry import PermissionDefinition, PermissionRegistry, PermissionScope
+from apps.core.tenancy import system_scope
 from apps.rbac import services
 from apps.rbac.models import Assignment, AssignmentExclusion, Profile, ProfilePermission
 from apps.users.services import save_user
@@ -323,6 +324,7 @@ def test_concurrent_profile_creation_does_not_duplicate_name(user_contract, admi
     barrier = Barrier(2)
     actor_id, contract_id = admin.pk, user_contract.pk
 
+    @system_scope  # Threads não herdam o contexto do teste.
     def create(number):
         close_old_connections()
         try:
