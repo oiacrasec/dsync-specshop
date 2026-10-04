@@ -46,6 +46,9 @@ e só começa após aprovação do usuário.
 | 34 | Usuário aprovou CRUD padrão do DRF com autoria/auditoria no BaseModelSerializer, regras no validate() e hooks extras antes do super; dispensou full_clean genérico e model_validation_fields/exclude. Validação/gravação na mesma transação com lock anterior; ADR 0030 substitui 0023–0025 |
 | 35 | Usuário determinou helpers core/responses.py para actions customizadas com try/except como Spatial; adaptar ao handler RFC 9457 existente, preservando rollback, headers e logging seguro (ADR 0031) |
 | 36 | Usuário determinou OrganizationViewSet independente, sem action aninhada no contrato, respeitando organizações acessíveis; serializer chamado OrganizationSerializer. Escopo de leitura preservado, CRUD continua 5.4 (ADR 0032) |
+| 37 | Prioridade (usuário): área administrativa e frontend antes do restante do bloco 5. `contracts` continua o app do **domínio** (Plan, Contract, Organization, usado por todos); novo app `administration` só para a API do superadmin (views, serializers, services, URLs `/admin/`), sem models próprios |
+| 38 | Primeiro acesso (usuário, referência Spatial/GIS): provisionamento cria a **1ª organização + admin do contrato**; só se o contrato ainda não tem usuários; bloqueio até trocar a senha **no backend, em toda a API** (exceto trocar senha, refresh e logout); senha temporária devolvida **uma vez** na resposta (no-store, nunca em log/auditoria); escopo inclui listar admins e resetar senha; login devolve resumo do usuário. Superadmin fora do fluxo. Futuro: envio assíncrono por tabela de eventos + Celery/Dramatiq |
+| 39 | Frontend (usuário): **copiar o datasync-gis inteiro** (template Poseidon/PrimeTek, licença confirmada pelo usuário) para `frontend/` e desabilitar telas fora do escopo **comentando** rotas e menu, com a marca `// DESABILITADO: fora do escopo atual` |
 
 ## Bloco 0 — Fundação
 
@@ -98,3 +101,32 @@ e só começa após aprovação do usuário.
 | 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
 | 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ⬜ |
 | 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ⬜ |
+
+## Bloco 6 — Área administrativa e frontend (prioridade, decisões 37 a 39)
+
+Ordem proposta: 6.1 → 6.2 → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 → 6.8. Cada etapa fecha com
+`validar-etapa`; as de frontend usam lint/build/testes do próprio `frontend/`.
+
+| # | Etapa | Lado | ADR | Status |
+|---|---|---|---|---|
+| 6.1 | Copiar o datasync-gis para `frontend/` (sem `.git`, `node_modules`, `dist`, `.angular`; `environment*.ts` revisados), com `AGENTS.md`, README e `Dockerfile` próprios; conferir versão LTS do Angular/PrimeNG; build e lint passando | frontend | 0001, 0003 | ⬜ |
+| 6.2 | Desabilitar telas fora do escopo comentando rotas e menu (`// DESABILITADO: fora do escopo atual`): ficam login, primeiro acesso, seleção de organização e administração de contratos | frontend | — | ⬜ |
+| 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API | backend | novo (contracts × administration) | ⬜ |
+| 6.4 | Primeiro acesso: `User.must_change_password`; login devolve resumo do usuário; bloqueio global no backend até trocar; `POST` de troca de senha (atual + nova + confirmação, validadores do Django, diferente da atual) | backend | 0010 | ⬜ |
+| 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização | frontend | 0003, 0004 | ⬜ |
+| 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ⬜ |
+| 6.7 | Admins do contrato: listar e resetar senha (nova temporária + `must_change_password`), auditado | backend | 0010 | ⬜ |
+| 6.8 | Frontend: administração de contratos (lista, formulário, provisionamento, admins e reset), adaptada à API do core | frontend | 0008 | ⬜ |
+
+Pendências a decidir antes das etapas indicadas:
+
+| Antes de | Dúvida |
+|---|---|
+| 6.2 / 6.8 | Contrato exige plano: o GIS não tem tela de planos. Só seleção de plano no formulário de contrato (options) ou também uma tela de planos? |
+| 6.5 | Seleção de organização fica ativa já (o admin provisionado tem a 1ª organização)? |
+| 6.7 | O reset de senha deve revogar as sessões (refresh tokens) do admin? |
+
+A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes; o que a
+6.6/6.7 cobrir sai do escopo delas. O rascunho de organizações (ADR 0032, Proposto) é
+revisado depois do bloco 6.
+
