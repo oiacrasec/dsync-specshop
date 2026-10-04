@@ -70,6 +70,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `apps.core.problems`), nunca corpo de erro manual na view.
 - Usar `serializer.is_valid(raise_exception=True)`; validação retorna 422. Mensagens
   de validação não devem incluir dados pessoais ou detalhes internos.
+- Actions customizadas usam try/except e helpers de core/responses.py:
+  build_result_response(result, status_code=...) e
+  build_exception_response(exception=exc, request=request). O segundo delega ao
+  handler RFC 9457, com rollback, headers e logging seguro (ADR 0031).
 - `RequestIdMiddleware` vem antes dos demais middlewares; `X-Request-Id` é gerado
   pelo servidor e correlaciona logs e erros (contrato em `docs/api/errors.md`).
 - Não usar Django Admin, sessões ou messages (ADR 0008). Não registrar `admin.py`,

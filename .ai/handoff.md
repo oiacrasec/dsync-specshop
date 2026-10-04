@@ -3,15 +3,15 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): use DRF serializers for audited CRUD` (consultar git log -1)
+- **Última alteração:** `refactor(api): standardize custom action responses` (consultar git log -1)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.2 e revisão dos serializers concluídas |
-| Próximo passo exato | 5.3: API administrativa de usuários/superadmins/admins de contrato |
-| Aguardando o usuário? | sim — confirmar início da 5.3 |
+| Etapa atual | 5.2/responses concluídas; OrganizationViewSet em revisão |
+| Próximo passo exato | Documentar e commitar OrganizationViewSet já implementado e validado |
+| Aguardando o usuário? | não para esta revisão; 5.3 ainda exige confirmação |
 
 ## Concluído
 
@@ -45,9 +45,17 @@
 - Models: verbose_name explícito e limite 120. Preservar cabeçalho compacto da
   view base e audit_events multiline ajustado pelo usuário (fmt off/on local).
 - LoginSerializer sem style HTML; write_only e espaços preservados. OpenAPI na 5.5.
+- ADR 0031: core/responses.py, sucesso com payload/status, erro via handler RFC 9457
+  com request explícito; options/schema usam try/except. Rollback/logging preservados.
 
 ## Pendências / avisos
 
+- OrganizationViewSet ainda NÃO commitado: somente leitura em /api/v1/organizations/,
+  RBAC para usuário comum e acesso global do superadmin; filtro contract na lista.
+  Substitui action aninhada no contrato; usa OrganizationSerializer solicitado.
+  Código em contracts/{views,serializers,filters,urls}, core/views, config/api/v1 e testes.
+  Suíte completa 507 passou; lint/formato/migrations/checks OK (formato corrigido após
+  a rodada). Falta ADR/docs/memória/commit. /me/organizations continua disponível.
 - 5.3 não iniciada. Quotas do Plan só schema, sem enforcement/cobrança/assinatura.
 - Performance é premissa GLOBAL: banco/locks/CPU/memória/rede/concorrência;
   consultas constantes não garantem capacidade. Medir conforme risco e volume real.

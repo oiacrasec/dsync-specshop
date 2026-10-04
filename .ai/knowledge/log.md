@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Responses compartilhadas para actions customizadas
+
+- Criado core/responses.py com build_result_response e build_exception_response.
+  Actions options/schema seguem try/except como solicitado pelo usuário (ADR 0031).
+- Sucesso mantém payload/status; erro exige request e delega ao handler RFC 9457:
+  rollback, headers, request_id e logging sanitizado, sem mensagem privada da exceção.
+- Testes: 44 dirigidos de responses/options/schema passaram; 507 na suíte completa
+  incluindo a revisão de organizações ainda pendente de commit. Lint, formato,
+  migrations e checks dev/produção passaram após corrigir formatação de um teste.
+- OWASP A01–A10 revisadas, sem achados novos; helper sem consultas/escritas próprias,
+  sem mudanças de coleta/retentivos/dependências. Docs/ADR/memória sincronizados.
+
 ## 2026-10-04 — Revisão 5.2: CRUD auditado nos serializers do DRF
 
 - BaseModelSerializer/BaseAdminModelSerializer substituem ServiceModelSerializer:

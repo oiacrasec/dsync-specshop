@@ -47,6 +47,7 @@ um ADR novo que **substitui** o anterior.
 | [0028](0028-querysets-simples-nas-views.md) | Querysets administrativos simples diretamente nas views; substitui 0027 | Aceito |
 | [0029](0029-busca-geral-e-filtros-individuais.md) | Busca geral e filtros individuais no Core | Aceito |
 | [0030](0030-crud-auditado-nos-serializers.md) | CRUD auditado com serializers padrão do DRF | Aceito |
+| [0031](0031-respostas-de-actions-customizadas.md) | Helpers de resposta para actions customizadas | Aceito |
 
 ## Modelo
 

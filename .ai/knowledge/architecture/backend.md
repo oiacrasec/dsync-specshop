@@ -14,6 +14,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Módulos | `models`, `managers`, `middleware`, `utils`, `constants` (só literais), `exceptions` (só classes), módulos temáticos (`core/problems.py`) |
 | SQL à mão | `queries/<nome>.py`; `-- NOME` em PT-BR na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
 | Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
+| Responses customizadas | core/responses.py: build_result_response preserva payload/status; build_exception_response exige request e delega ao handler RFC 9457 com rollback/headers/logging seguro; actions próprias usam try/except (ADR 0031) |
 | Registro de acesso | `AccessLog` (ADR 0019) para login sucesso/falha e refresh sucesso; marker na view, middleware fora da transação; sem escrita em navegação comum; só inserção; expurgo antes de produção |
 | Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
 | Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view nos recursos comuns ou SuperadminPermission na administração; rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados |

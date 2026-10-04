@@ -11,6 +11,8 @@ Erros da API seguem [RFC 9457](../docs/api/errors.md), com
 `Content-Type: application/problem+json`. Toda resposta inclui `X-Request-Id`;
 o mesmo identificador acompanha o corpo dos erros e os logs. Rotas desconhecidas da
 API retornam 404, inclusive em desenvolvimento.
+Actions customizadas usam os helpers de `core/responses.py`: sucesso preserva o
+payload, e erros delegam ao handler global com request explícito (ADR 0031).
 
 A etapa 5.1 disponibiliza `LookupOptionsMixin` para seleções com UUID/rótulo,
 paginação limitada, busca declarada e resolução de inativos por UUID. Exige a

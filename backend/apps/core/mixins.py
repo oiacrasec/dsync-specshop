@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.response import Response
 
 from apps.rbac.permissions import LookupOptionsPermission, RequiredPermission
 
 from .models import HybridScopedModel
+from .responses import build_exception_response, build_result_response
 from .schema import column_schema, filter_schema, model_field
 from .selectors import lookup_options
 from .serializers import OptionsQuerySerializer
@@ -63,14 +63,16 @@ class TableSchemaMixin:
 
     @action(detail=False, methods=['get'])
     def schema(self, request):
-        return Response(
-            {
+        try:
+            result = {
                 'columns': self.get_schema_columns(),
                 'filters': self.get_schema_filters(),
                 'general_search': self.filterset_class.get_general_search_schema(),
                 'ordering_fields': tuple(self.filterset_class.base_filters['ordering'].param_map),
             }
-        )
+            return build_result_response(result)
+        except Exception as exc:
+            return build_exception_response(exception=exc, request=request)
 
 
 class TenantScopedViewMixin:
@@ -127,14 +129,17 @@ class LookupOptionsMixin:
 
     @action(detail=False, methods=['get'])
     def options(self, request):
-        if not self.options_label_field or not self.options_search_fields:
-            raise ImproperlyConfigured('Options requires explicit label and search fields.')
-        serializer = OptionsQuerySerializer(data=request.query_params)
-        serializer.is_valid(raise_exception=True)
-        result = lookup_options(
-            queryset=self.get_queryset(),
-            label_field=self.options_label_field,
-            search_fields=self.options_search_fields,
-            **serializer.validated_data,
-        )
-        return Response(result)
+        try:
+            if not self.options_label_field or not self.options_search_fields:
+                raise ImproperlyConfigured('Options requires explicit label and search fields.')
+            serializer = OptionsQuerySerializer(data=request.query_params)
+            serializer.is_valid(raise_exception=True)
+            result = lookup_options(
+                queryset=self.get_queryset(),
+                label_field=self.options_label_field,
+                search_fields=self.options_search_fields,
+                **serializer.validated_data,
+            )
+            return build_result_response(result)
+        except Exception as exc:
+            return build_exception_response(exception=exc, request=request)

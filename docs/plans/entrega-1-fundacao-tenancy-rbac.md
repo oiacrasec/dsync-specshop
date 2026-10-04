@@ -44,6 +44,7 @@ e só começa após aprovação do usuário.
 | 32 | Usuário aprovou adaptar general_search_fields do Spatial ao Core: busca única OR, controles individuais AND e schema separado, com lookups textuais explícitos e sem conversões de tipos (ADR 0029) |
 | 33 | Usuário determinou verbose_name explícito nos rótulos dos campos, mesmo quando Django aceita o argumento posicional; padrão de models atualizado, sem alteração de labels/migrations |
 | 34 | Usuário aprovou CRUD padrão do DRF com autoria/auditoria no BaseModelSerializer, regras no validate() e hooks extras antes do super; dispensou full_clean genérico e model_validation_fields/exclude. Validação/gravação na mesma transação com lock anterior; ADR 0030 substitui 0023–0025 |
+| 35 | Usuário determinou helpers core/responses.py para actions customizadas com try/except como Spatial; adaptar ao handler RFC 9457 existente, preservando rollback, headers e logging seguro (ADR 0031) |
 
 ## Bloco 0 — Fundação
 

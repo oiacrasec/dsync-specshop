@@ -65,6 +65,12 @@ Tipos de domínio estão declarados e testados; a validação das regras de cont
 vigência, licenças e perfis será implementada nas respectivas etapas da entrega.
 O registro técnico de correlação não substitui o `AccessLog` da etapa 4.1.
 
+Actions customizadas que capturam exceções usam
+`build_exception_response(exception=exc, request=request)` de core/responses.py.
+O helper delega ao mesmo handler global: status, formato RFC 9457, headers,
+request_id, mensagens seguras e rollback permanecem iguais (ADR 0031).
+Sucessos usam build_result_response(result, status_code=...), sem envelope novo.
+
 Fontes técnicas consultadas: [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457),
 [exceções do DRF](https://www.django-rest-framework.org/api-guide/exceptions/) e
 [middleware do Django](https://docs.djangoproject.com/en/5.2/topics/http/middleware/).

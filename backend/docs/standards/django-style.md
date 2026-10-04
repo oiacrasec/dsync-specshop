@@ -152,6 +152,24 @@ A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para 
 
 ## Views administrativas e serializers auditados
 
+Actions customizadas seguem o padrão do Spatial, adaptado ao contrato do Core
+(ADR 0031). Helpers em core/responses.py; sempre passar request no erro:
+
+```python
+@action(detail=True, methods=['patch'], url_path='custom-action')
+def custom_action(self, request, *args, **kwargs):
+    try:
+        instance = self.get_object()
+        result = execute_action(instance=instance, actor=request.user)
+        return build_result_response(result, status_code=status.HTTP_200_OK)
+    except Exception as exc:
+        return build_exception_response(exception=exc, request=request)
+```
+
+execute_action é ilustrativo: declarar a operação do domínio. Não copiar a mensagem
+da exceção para respostas/logs; o helper preserva RFC 9457 e rollback pelo handler.
+Este padrão vale para actions próprias; list/create/update/delete continuam no DRF.
+
 `BaseModelViewSet` e `BaseAdminModelViewSet`, em `apps/core/views.py`, compõem os
 comportamentos compartilhados. Mixins ficam em `core/mixins.py`; paginação em
 `core/pagination.py`, como a organização do Spatial, com o contrato próprio do Core.
