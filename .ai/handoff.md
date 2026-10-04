@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Revisão da 5.2: OrganizationViewSet — em andamento, NÃO commitada |
-| Próximo passo exato | Retomar a última orientação de rota/acesso e explicar never_cache antes de fechar a revisão |
-| Aguardando o usuário? | Sessão encerrada para handoff; confirmar retomada, sem iniciar 5.3 |
+| Etapa atual | Prioridade redefinida: área administrativa; revisão de organizações NÃO commitada |
+| Próximo passo exato | Retomar pelos fluxos administrativos do Spatial/GIS e planejar login, contrato e admin do contrato |
+| Aguardando o usuário? | Só handoff solicitado agora; confirmar retomada antes de implementar |
 
 ## Concluído e commitado
 
@@ -48,20 +48,28 @@
   List/options: cinco SELECTs com perfil em 1/30 itens, sem writes/locks/N+1;
   limites de 100 e campos mínimos. Sem JWT real/carga nova; não garante capacidade.
 
-## Última orientação — AINDA NÃO aplicada
+## Prioridade definida pelo usuário — AINDA NÃO implementada
 
-- Usuário: "o admin nao ira ver as organizacoes, pode colocar ele fora da url do admin".
-  Mover organizations para fora de /admin/. Esclarecer a abrangência de "admin"
-  (superadmin global ou área administrativa) antes de decidir a regra de acesso.
-- Pergunta pendente: por que @method_decorator(never_cache, name='dispatch')?
-  Ele acrescenta headers contra cache de respostas dependentes do usuário/permissões;
-  não filtra dados nem concede acesso. Explicar ao retomar; usuário não pediu sua remoção.
-- Docs/ADR 0032 atuais ainda descrevem /admin/organizations e acesso global: são
-  rascunho da revisão, NÃO decisão final. Corrigir com código/testes, validar e commitar.
+- Focar PRIMEIRO na área administrativa do admin/superadmin, seguindo Spatial e GIS:
+  login, criação de contrato e criação do administrador do contrato.
+- Fluxo de primeiro acesso com troca de senha NÃO se aplica ao superadmin.
+  Desenvolver o fluxo do administrador do contrato conforme as referências, sem
+  presumir detalhes de senha/provisionamento ainda não verificados no Spatial/GIS.
+- Não avançar organizações agora. Usuário disse que o superadmin, por enquanto,
+  terá apenas acesso à criação de contratos. Possível aba de organizações no contrato
+  ainda não decidida e não é o mesmo recurso de organizações da área do usuário.
+- Usuário cogitou apps/administration para regras da área do superadmin. Renomear
+  contracts inteiro ou separar a camada administrativa NÃO foi decidido/implementado.
+- A revisão pendente ainda expõe /admin/organizations ao usuário comum e acesso
+  global ao superadmin: NÃO representa o escopo final. Não commitar como concluída.
+  Docs/ADR 0032 também são rascunho antigo. Preservar trabalho para revisão posterior.
+- Orientação anterior: organizações do usuário ficam fora de /admin/. Pergunta sobre
+  never_cache pendente: controla headers de cache, não autorização; remoção não pedida.
 
 ## Avisos
 
-- Não iniciar 5.3/CRUD de organizações (5.4) sem confirmação. Push só quando solicitado.
+- Reavaliar sequência do plano para a prioridade administrativa; não iniciar CRUD
+  de organizações (5.4) nem implementar agora. Push só quando solicitado.
 - Performance GLOBAL; managers exigem tenant; global só unscoped/system_context explícitos.
 - AuditEvent imutável; AccessLog só autenticação (ADR 0019), sem afirmar suficiência jurídica.
 - Banco local até audit.0005; não versionar .env/regenerar initials. Validador via Git Bash.
