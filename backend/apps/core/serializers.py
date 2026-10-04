@@ -24,6 +24,16 @@ class ScopedModelSerializer(serializers.ModelSerializer):
         return fields
 
 
+class ServiceModelSerializer(ScopedModelSerializer):
+    """Gravação pelo service declarado; a view usa serializer.save() do DRF."""
+
+    def create(self, validated_data):
+        return self.save_service(values=validated_data, actor=self.context['request'].user)
+
+    def update(self, instance, validated_data):
+        return self.save_service(instance=instance, values=validated_data, actor=self.context['request'].user)
+
+
 class PageQuerySerializer(serializers.Serializer):
     first = serializers.IntegerField(default=0, min_value=0)
     rows = serializers.IntegerField(default=OPTIONS_DEFAULT_ROWS, min_value=1, max_value=OPTIONS_MAX_ROWS)

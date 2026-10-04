@@ -1,9 +1,12 @@
-from apps.core.serializers import ScopedModelSerializer
+from apps.core.serializers import ScopedModelSerializer, ServiceModelSerializer
 
+from . import services
 from .models import Contract, Organization, Plan
 
 
-class PlanSerializer(ScopedModelSerializer):
+class PlanSerializer(ServiceModelSerializer):
+    save_service = staticmethod(services.save_plan)
+
     class Meta:
         model = Plan
         fields = (
@@ -20,7 +23,9 @@ class PlanSerializer(ScopedModelSerializer):
         read_only_fields = ('public_id', 'created_at', 'updated_at')
 
 
-class ContractSerializer(ScopedModelSerializer):
+class ContractSerializer(ServiceModelSerializer):
+    save_service = staticmethod(services.save_contract)
+
     def get_fields(self):
         fields = super().get_fields()
         fields['plan'].queryset = Plan.objects.unscoped()

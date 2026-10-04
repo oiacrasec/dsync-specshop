@@ -60,8 +60,9 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 
 ## Auditoria e performance
 
-Views de planos/contratos herdam `BaseAdminModelViewSet`, que centraliza os hooks
-de CRUD. Cada recurso declara selector/services e configuração do schema;
+Views de planos/contratos herdam `BaseAdminModelViewSet` e usam serializer.save()
+do DRF. ServiceModelSerializer.create/update chamam o save_service declarado;
+exclusão continua em ServiceDeleteMixin. Cada recurso declara selector/services/schema;
 essa refatoração não altera rotas, payloads, permissões ou regras de negócio.
 As bases ficam em `core/views.py`, comportamentos em `core/mixins.py` e paginação
 em `core/pagination.py`. Filtros são FilterSets django-filter de `contracts/filters.py`,

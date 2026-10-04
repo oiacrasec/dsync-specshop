@@ -19,16 +19,8 @@ class SelectorQuerysetMixin:
         return self.queryset_selector()
 
 
-class ServiceWriteMixin:
-    """Encaminha escritas aos services declarados como staticmethod pelo recurso."""
-
-    def perform_create(self, serializer):
-        serializer.instance = self.save_service(values=serializer.validated_data, actor=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.instance = self.save_service(
-            instance=serializer.instance, values=serializer.validated_data, actor=self.request.user
-        )
+class ServiceDeleteMixin:
+    """Exclusão pelo service declarado; create/update ficam no serializer."""
 
     def perform_destroy(self, instance):
         self.delete_service(instance=instance, actor=self.request.user)

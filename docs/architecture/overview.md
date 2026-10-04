@@ -43,6 +43,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 5.2: API administrativa de planos/contratos, opções/schema, organizações para entrada; services e auditoria, redução de licenças protegida) | concluído |
 | `backend/` (revisão 5.2: bases compostas em core/views, mixins/pagination/permissions próprios, configuração nos apps; ADR 0021) | concluído |
 | `backend/` (revisão 5.2: django-filter 26.2, BaseFilterSet/backend no core e FilterSets nos apps, ADR 0022) | concluído |
+| `backend/` (revisão 5.2: serializers chamam services em create/update, hooks padrão DRF na view; exclusão por mixin, ADR 0023) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | **pendente** |

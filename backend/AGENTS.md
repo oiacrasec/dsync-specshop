@@ -29,7 +29,10 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 | `filters.py` | FilterSets django-filter com filtros/busca/ordenação declarados |
 | `tests/` | testes do app (`test_*.py`) |
 
-Leitura: `View → Selector → Model`. Escrita: `Serializer → View → Service → Model`.
+Leitura: `View → Selector → Model`. Escrita: `View → Serializer → Service → Model`.
+ModelSerializers de escrita com regras herdam `ServiceModelSerializer`: declarar
+`save_service` como staticmethod; create/update delegam dados validados/ator/instância
+ao service. Views usam serializer.save() do DRF; exclusão via ServiceDeleteMixin (ADR 0023).
 Nas listagens, o selector fornece o queryset com escopo; FilterSet aplica filtros
 antes da paginação. Filtros continuam lazy, sem queries/escritas próprias por item.
 Crie cada arquivo só quando ele for necessário.
@@ -118,8 +121,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Escritas pelos services, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
-  `BaseAdminModelViewSet` centraliza os quatro hooks de CRUD; subclasses declaram
-  `queryset_selector`, `save_service` e `delete_service` com `staticmethod`, além
+  `BaseAdminModelViewSet` compõe hooks padrão e mixins; views declaram
+  `queryset_selector` e `delete_service` com `staticmethod`, além
   de schema/filtros. Não repetir delegação nem inferir nomes de funções.
   Bases compartilhadas em `core/views.py`, mixins em `core/mixins.py`, paginação
   em `core/pagination.py` e permissão administrativa em `core/permissions.py`.

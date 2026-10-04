@@ -1,5 +1,21 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: services em create/update dos serializers
+
+- Usuário determinou gravar pelos serializers. ServiceModelSerializer em core
+  delega create/update ao save_service declarado; views usam serializer.save()
+  padrão do DRF, sem associação manual de serializer.instance ou service de gravação.
+- Plan/ContractSerializer declaram save_service; views mantêm selector/delete_service.
+  ServiceWriteMixin virou ServiceDeleteMixin; autoria vem do contexto do serializer,
+  explicitamente passada ao service. Transações/locks/regras/auditoria preservados.
+- Spatial verificado: view chama serializer.save(), BaseModelSerializer.create/update
+  chama super (gravação padrão), sem service genérico nesses métodos. Core adapta
+  o ciclo do DRF à arquitetura de services, sem copiar gravação direta.
+- ADR 0023 e docs/AGENTS/plano atualizados. 448 testes, lint/formato/migrations/checks
+  dev/produção aprovados; testes diretos do serializer provam regras/auditoria/autor.
+  OWASP A01–A10 sem achados novos, queries 1/30 e zero writes em leitura preservados;
+  sem dependências/migrations/dados pessoais novos ou alteração legal.
+
 ## 2026-10-04 — Revisão 5.2: django-filter como Spatial
 
 - Usuário pediu django-filter. 26.2 verificado no PyPI oficial (Django 5.2/Python

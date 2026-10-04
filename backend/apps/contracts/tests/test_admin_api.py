@@ -1,11 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from threading import Barrier
+from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import close_old_connections, connection
 from django.test.utils import CaptureQueriesContext
 from rest_framework.test import APIClient
@@ -14,6 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.audit.models import AccessLog, AuditEvent, AuditEventType
 from apps.contracts import services
 from apps.contracts.models import Contract, Organization, Plan
+from apps.contracts.serializers import ContractSerializer
 from apps.core.exceptions import LicenseLimitReached
 
 pytestmark = pytest.mark.django_db
@@ -261,6 +263,33 @@ def test_read_only_fields_cannot_change_public_id_or_author(world):
     )
     assert response.status_code == 200
     assert response.json()['public_id'] == str(contract.public_id)
+
+
+def test_serializer_save_without_view_still_uses_service_rules_and_audit(world):
+    context = {'request': SimpleNamespace(user=world['admin'])}
+    serializer = ContractSerializer(data=contract_payload(world), context=context)
+    serializer.is_valid(raise_exception=True)
+    created = serializer.save()
+    assert created.created_by == world['admin']
+    assert AuditEvent.objects.filter(event=AuditEventType.CONTRACT_CREATED, target_public_id=created.public_id).exists()
+
+    contract = world['contract']
+    get_user_model().objects.create_user(username='inativo-direto', contract=contract, is_active=False)
+    serializer = ContractSerializer(instance=contract, data={'licenses': 1}, partial=True, context=context)
+    serializer.is_valid(raise_exception=True)
+    with pytest.raises(ValidationError):
+        serializer.save()
+    contract.refresh_from_db()
+    assert contract.licenses == 5
+
+
+def test_serializer_save_without_view_preserves_service_authorization(world):
+    serializer = ContractSerializer(
+        data=contract_payload(world), context={'request': SimpleNamespace(user=world['user'])}
+    )
+    serializer.is_valid(raise_exception=True)
+    with pytest.raises(PermissionDenied):
+        serializer.save()
 
 
 @pytest.mark.django_db(transaction=True)

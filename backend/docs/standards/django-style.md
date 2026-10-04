@@ -161,7 +161,8 @@ limite de 120 caracteres continuam ativos.
 | Componente | Responsabilidade |
 |---|---|
 | `SelectorQuerysetMixin` | leitura pelo selector declarado |
-| `ServiceWriteMixin` | create/update/delete pelo service declarado |
+| `ServiceDeleteMixin` | exclusão pelo service declarado na view |
+| `ServiceModelSerializer` | create/update pelo service declarado no serializer |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
 | `TableSchemaMixin` | schema declarado pelo recurso |
@@ -181,14 +182,21 @@ class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
-    save_service = staticmethod(services.save_contract)
     delete_service = staticmethod(services.delete_contract)
+
+
+class ContractSerializer(ServiceModelSerializer):
+    save_service = staticmethod(services.save_contract)
 ```
 
 `staticmethod` impede que Python passe a view como argumento às funções do módulo.
-O selector retorna queryset lazy; o service de gravação recebe `values`, `actor` e,
-na atualização, `instance`. O service de exclusão recebe `instance` e `actor`.
-Gravação retorna a instância persistida, que a base associa ao serializer.
+O selector retorna queryset lazy. A view chama `serializer.save()` pelo fluxo padrão
+do DRF; `ServiceModelSerializer.create/update` repassa `values`, `actor` e, na
+atualização, `instance` ao service. O ator vem do request no contexto do serializer,
+passado explicitamente ao service, sem dependência da requisição no model.
+O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
+a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
+no service, inclusive quando serializer.save() é chamado sem uma view.
 
 FilterSets do domínio ficam em `filters.py`, herdam `core.filters.BaseFilterSet`
 e declaram os filtros/campos de busca/OrderingFilter. Não usar geração automática

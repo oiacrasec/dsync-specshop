@@ -16,7 +16,6 @@ class PlanViewSet(BaseAdminModelViewSet):
     filterset_class = PlanFilterSet
     serializer_class = PlanSerializer
     queryset_selector = staticmethod(selectors.admin_plans)
-    save_service = staticmethod(services.save_plan)
     delete_service = staticmethod(services.delete_plan)
     schema_columns = (('name', _('Nome')), ('is_active', _('Ativo')))
 
@@ -25,7 +24,6 @@ class ContractViewSet(BaseAdminModelViewSet):
     filterset_class = ContractFilterSet
     serializer_class = ContractSerializer
     queryset_selector = staticmethod(selectors.admin_contracts)
-    save_service = staticmethod(services.save_contract)
     delete_service = staticmethod(services.delete_contract)
     ordering_fields = (*BaseAdminModelViewSet.ordering_fields, 'start_date', 'end_date', 'licenses')
     schema_columns = (('name', _('Nome')), ('start_date', _('Início')), ('licenses', _('Licenças')))

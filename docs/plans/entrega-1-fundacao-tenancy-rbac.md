@@ -35,6 +35,7 @@ e só começa após aprovação do usuário.
 | 23 | 5.2: usuário aprovou impedir redução de licenças abaixo dos usuários não excluídos, contando inativos; usar lock do contrato compartilhado com cadastro de usuários (ADR 0020) |
 | 24 | Revisão 5.2: usuário pediu composição como Spatial, com bases em core/views, mixins/pagination/permissions compartilhados e recursos declarados nos apps (ADR 0021); preservar cabeçalho compacto/alinhado ajustado manualmente |
 | 25 | Usuário determinou usar django-filter como Spatial: BaseFilterSet/backend DRF no core e filterset_class/FilterSets explícitos nos apps, preservando contrato/escopo (ADR 0022) |
+| 26 | Usuário determinou delegar gravação por create/update dos serializers ao service, usando serializer.save() padrão nas views; exclusão permanece no mixin (ADR 0023) |
 
 ## Bloco 0 — Fundação
 

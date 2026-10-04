@@ -8,7 +8,7 @@ from .mixins import (
     ListFilterMixin,
     LookupOptionsMixin,
     SelectorQuerysetMixin,
-    ServiceWriteMixin,
+    ServiceDeleteMixin,
     TableSchemaMixin,
 )
 from .pagination import StandardResultsSetPagination
@@ -22,7 +22,7 @@ def api_not_found(request):
 
 
 # fmt: off
-class BaseModelViewSet(SelectorQuerysetMixin, ServiceWriteMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
+class BaseModelViewSet(SelectorQuerysetMixin, ServiceDeleteMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
                        viewsets.ModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'
