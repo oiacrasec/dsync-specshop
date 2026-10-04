@@ -100,3 +100,25 @@ def user_is_active_admin(user):
     return user.contract_id is not None and active_admin_count(user.contract_id) != active_admin_count(
         user.contract_id, exclude_user_id=user.pk
     )
+
+
+def accessible_organizations(user):
+    """Organizações em que o usuário pode entrar (ADR 0009 §6): a atribuição é o acesso.
+
+    Mesma regra do header X-Organization-Id: organização ativa e não excluída do contrato
+    do usuário, alcançada por alguma concessão ativa (CONTRACT menos exceções, ou
+    ORGANIZATION). Filtra no banco: 3 queries de concessões + 1 de organizações.
+    """
+    from apps.contracts.models import Organization
+
+    grants = user_grants(user)
+    if not grants:
+        return Organization.objects.none()
+    organizations = Organization.objects.filter(contract_id=user.contract_id, is_active=True).order_by('name', 'pk')
+    direct = {grant.scope_organization for grant in grants if grant.scope is PermissionScope.ORGANIZATION}
+    contract_wide = [grant for grant in grants if grant.scope is PermissionScope.CONTRACT]
+    if not contract_wide:
+        return organizations.filter(pk__in=direct)
+    # Fica de fora só o que todas as concessões de contrato excluem e nenhuma direta devolve.
+    excluded = frozenset.intersection(*(grant.excluded_organizations for grant in contract_wide)) - direct
+    return organizations.exclude(pk__in=excluded)

@@ -1,0 +1,19 @@
+"""Leituras de contratos e organizações."""
+
+from .models import Contract, Organization
+
+
+def superadmin_contracts(search=None):
+    """Busca do superadmin, 1º passo (ADR 0009 §6): contratos não excluídos, por nome.
+
+    Inclui inativos e vencidos para suporte; se a entrada é permitida decide a etapa 2.3.
+    """
+    contracts = Contract.objects.order_by('name', 'pk')
+    if search:
+        contracts = contracts.filter(name__icontains=search)
+    return contracts
+
+
+def superadmin_contract_organizations(contract):
+    """2º passo: organizações ativas e não excluídas do contrato escolhido."""
+    return Organization.objects.filter(contract=contract, is_active=True).order_by('name', 'pk')

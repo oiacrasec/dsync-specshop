@@ -8,6 +8,7 @@ inclusive em desenvolvimento. O fallback fica depois das versões em `config/url
 Campos JSON usam snake_case; identificadores externos são `public_id` UUID v7.
 Autenticação JWT e `IsAuthenticated` são globais. Login, refresh e logout ficam
 sob `/api/v1/auth/`, com contrato em [autenticação](authentication.md).
+Organizações acessíveis do usuário: `GET /api/v1/me/organizations/` ([contrato](organizations.md)).
 Nenhum endpoint de negócio está publicado.
 
 Todas as respostas do backend recebem `X-Request-Id`, gerado pelo servidor,

@@ -24,6 +24,7 @@ e só começa após aprovação do usuário.
 | 12 | Usuário aprovou apps/rbac para perfis, permissões e atribuições; registry compartilhado permanece em core (ADR 0016) |
 | 13 | Pedaço da 2.3 antecipado na 3.3 (aprovado): ler e validar `X-Organization-Id` (400) e resolver a organização do contrato do usuário (403), preenchendo `request.organization`. Contrato ativo a cada requisição e superadmin com organização opcional continuam na 2.3. O acesso total dinâmico do perfil essencial já vale no cálculo; a 3.4 fica com a fixture e a proteção do último admin |
 | 14 | 3.4 (aprovado): perfil essencial criado por migration de dados idempotente (não fixture manual); proteção do último admin cobre atribuição e também desativação/exclusão do usuário; vale inclusive para o superadmin; `User.delete()` e o lote de usuários delegam a `delete_user`; `User.save()` delega a `save_user` (aprovados) |
+| 15 | 3.5 (aprovado): publica só `GET /api/v1/me/organizations/` (filtrado pelo usuário); busca do superadmin fica em selectors, endpoint na área admin (5.2). Lista só organizações ativas e não excluídas, ordem por nome |
 
 ## Bloco 0 — Fundação
 
@@ -58,7 +59,7 @@ e só começa após aprovação do usuário.
 | 3.2 | `Profile`, permissões do perfil e atribuições (com exceções de organização) | 0009 §2, §3, 0016 | ✅ |
 | 3.3 | Cálculo da permissão efetiva + permissão do DRF que **nega por padrão** | 0009 §4 | ✅ |
 | 3.4 | Perfil essencial "Administrador do contrato" (fixture, acesso total dinâmico) | 0009 §5 | ✅ |
-| 3.5 | Lista de organizações acessíveis + busca contrato → organização do superadmin | 0009 §6 | ⬜ |
+| 3.5 | Lista de organizações acessíveis + busca contrato → organização do superadmin | 0009 §6 | ✅ |
 | 3.6 | Auditoria das mudanças de permissão e das entradas do superadmin em organização | 0009 §7 | ⬜ |
 
 ## Bloco 4 — Registro de acesso

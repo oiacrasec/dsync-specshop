@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-03 — Etapa 3.5: organizações acessíveis
+
+- `accessible_organizations` filtra no banco (CONTRACT menos interseção das exceções, + diretas);
+  `GET /api/v1/me/organizations/` (AllowAuthenticated, never_cache, superadmin → []).
+- Busca do superadmin em `apps/contracts/selectors.py`; endpoint na área admin (5.2).
+- 11 testes novos; 283 passaram. Docs: api/organizations.md, api/overview, domain/rbac,
+  overview, plano, README, handoff.
+
 ## 2026-10-03 — Etapa 3.4: perfil essencial e último administrador
 
 - Migration de dados rbac.0002 (idempotente) cria/restaura o perfil `contract_admin`;
