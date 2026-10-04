@@ -1,7 +1,7 @@
 # Handoff
 
 - **Atualizado em:** 2026-10-04
-- **Agente:** Claude
+- **Agente:** Claude → GPT (troca a pedido do usuário)
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
 - **Último commit:** etapa 4.1 (`feat(audit): record API access logs for Marco Civil compliance`)
 
@@ -10,8 +10,8 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 4.1 Registro de acesso (ADR 0018) — ✅ concluída |
-| Próximo passo exato | aplicar `audit.0003` no banco local (autorização) e iniciar o bloco 5 (endpoints), pela 5.1 |
-| Aguardando o usuário? | sim — autorizar `audit.0003` no banco local e aprovar o bloco 5 |
+| Próximo passo exato | discutir com o usuário a preocupação abaixo (INSERT do `AccessLog` por requisição) **antes** do bloco 5 |
+| Aguardando o usuário? | sim — decidir a estratégia de gravação do `AccessLog`; depois aprovar o bloco 5 |
 
 ## Concluído na entrega 1
 
@@ -26,7 +26,19 @@ e `backend/docs/standards/django-style.md`; checado pelo `validar-etapa`.
 
 ## Dúvidas abertas
 
-- Nenhuma (403 para contrato excluído confirmado pelo usuário).
+- **Preocupação do usuário (não discutida ainda):** o `AccessLog` faz 1 INSERT síncrono em
+  **toda** requisição à API (backend REST, muitas requisições). Decisão 5 da 4.1 foi "middleware
+  após a resposta; fila só se o volume exigir", mas o usuário quer rever. Levantar opções com
+  prós/contras, sem decidir sozinho (skill `questionador`), por exemplo:
+  - manter síncrono, medindo custo real (INSERT simples, sem índice único; ~ms);
+  - buffer em memória/lote (`bulk_create` a cada N ou T s) — risco de perder registros em queda,
+    o que conflita com a obrigação do Marco Civil art. 15;
+  - fila (Celery/RQ/Redis Streams) ou `transaction.on_commit` + worker — infra nova;
+  - particionamento mensal da tabela no PostgreSQL (facilita o expurgo de 6 meses e mantém
+    INSERT barato) — complementa qualquer opção;
+  - enviar para um pipeline de logs externo (stdout/JSON → coletor) — muda onde fica a guarda
+    sob sigilo e a busca por ordem judicial.
+  Restrições: não perder registros (obrigação legal), sigilo, recorte por usuário/IP + período.
 
 ## Avisos
 
@@ -39,7 +51,7 @@ e `backend/docs/standards/django-style.md`; checado pelo `validar-etapa`.
 - Toda view nega por padrão: declarar `required_permission` ou `AllowAuthenticated`.
 - Contrato indisponível → 403 `contract-inactive` no login, refresh e toda rota autenticada (2.3).
 - Superadmin entra em organização pelo header (qualquer contrato não excluído); a entrada é auditada (3.6).
-- Banco local sem `audit.0003` (registro de acesso; aguarda autorização). Sem usuários. Não regenerar migrations iniciais já aplicadas.
+- Banco local com todas as migrations aplicadas (inclui `audit.0003`, autorizada). Sem usuários. Não regenerar migrations iniciais já aplicadas.
 - Autoria pode ser nula em operações de sistema; `bulk`/`update` exigem auditoria
   explícita. `all_objects` não dispensa autorização.
 - Eventos de auditoria são imutáveis; services de RBAC e contas de superadmin auditam (ADR 0017).
