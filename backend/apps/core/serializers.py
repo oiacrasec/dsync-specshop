@@ -3,6 +3,7 @@
 from rest_framework import serializers
 
 from .constants import OPTIONS_DEFAULT_ROWS, OPTIONS_MAX_ROWS, SERIALIZER_HIDDEN_FIELDS
+from .services import BaseModelService
 
 
 class PublicIdRelatedField(serializers.SlugRelatedField):
@@ -25,13 +26,17 @@ class ScopedModelSerializer(serializers.ModelSerializer):
 
 
 class ServiceModelSerializer(ScopedModelSerializer):
-    """Gravação pelo service declarado; a view usa serializer.save() do DRF."""
+    """Declare service_class; a base encaminha criação/atualização ao service."""
+
+    service_class = BaseModelService
 
     def create(self, validated_data):
-        return self.save_service(values=validated_data, actor=self.context['request'].user)
+        return self.service_class.save_instance(values=validated_data, actor=self.context['request'].user)
 
     def update(self, instance, validated_data):
-        return self.save_service(instance=instance, values=validated_data, actor=self.context['request'].user)
+        return self.service_class.save_instance(
+            instance=instance, values=validated_data, actor=self.context['request'].user
+        )
 
 
 class PageQuerySerializer(serializers.Serializer):

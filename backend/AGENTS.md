@@ -31,8 +31,9 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 
 Leitura: `View → Selector → Model`. Escrita: `View → Serializer → Service → Model`.
 ModelSerializers de escrita com regras herdam `ServiceModelSerializer`: declarar
-`save_service` como staticmethod; create/update delegam dados validados/ator/instância
-ao service. Views usam serializer.save() do DRF; exclusão via ServiceDeleteMixin (ADR 0023).
+`service_class` (classe que herda BaseModelService); create/update chamam save_instance
+com dados validados/ator/instância. Views usam serializer.save() do DRF; exclusão via
+ServiceDeleteMixin (ADRs 0023 e 0025). Sem classe específica, a base nega a gravação.
 Nas listagens, o selector fornece o queryset com escopo; FilterSet aplica filtros
 antes da paginação. Filtros continuam lazy, sem queries/escritas próprias por item.
 Crie cada arquivo só quando ele for necessário.

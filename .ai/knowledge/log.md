@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: service_class nos serializers
+
+- Usuário aprovou declarar a classe do service em cada serializer, sem staticmethod.
+  ServiceModelSerializer.create/update chamam service_class.save_instance com
+  dados validados, ator explícito e instância na atualização. BaseModelService como
+  padrão falha sem implementação; nenhum fallback para gravação direta no ORM.
+- PlanSerializer/ContractSerializer declaram PlanService/ContractService. Regras,
+  autorização, locks, auditoria e consultas não mudaram. OWASP A01–A10 revisada sem
+  achados novos; performance sem consultas/escritas/custos de leitura adicionais.
+- Validação: 454 testes e checks/lint/formato/migrations OK; cobertura existente de
+  CRUD e serializer sem view preserva autoria, auditoria e negação de acesso.
+- Arquivos: core/serializers, contracts/serializers, backend/AGENTS/README/style,
+  API/plano/overview, ADR 0025, memória e handoff.
+
 ## 2026-10-04 — Revisão 5.2: classe base de services e exclusão herdada
 
 - BaseModelService em core/services implementa delete_instance e define save_instance;

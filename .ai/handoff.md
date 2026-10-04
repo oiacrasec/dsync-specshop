@@ -3,7 +3,7 @@
 - **Atualizado em:** 2026-10-04
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Última alteração:** `refactor(api): centralize deletion in base model services` (consultar git log -1)
+- **Última alteração:** `refactor(api): declare service classes in serializers` (consultar git log -1)
 
 ## Situação
 
@@ -26,7 +26,8 @@
   Bases em core/views, mixins em core/mixins, paginação e permissões no core (ADR 0021);
   views declaram selector/schema; exclusão herdada via BaseModelService (ADR 0024),
   PlanService/ContractService registrados por model no AppConfig.ready, sem SQL.
-  ServiceModelSerializer chama save_instance em create/update via save_service;
+  Serializers declaram service_class; ServiceModelSerializer implementa create/update
+  via service_class.save_instance, sem staticmethod nos recursos (ADR 0025);
   view usa serializer.save() padrão (ADR 0023). Regras/locks/auditoria preservados.
   LookupOptionsMixin aceita options_permission_class; só administração usa
   SuperadminPermission, recursos comuns continuam :view/contexto. Docs/api atualizados.

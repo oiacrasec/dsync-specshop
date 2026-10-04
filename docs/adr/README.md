@@ -41,6 +41,7 @@ um ADR novo que **substitui** o anterior.
 | [0022](0022-django-filter-nas-listagens.md) | django-filter com FilterSets declarados nas listagens | Aceito |
 | [0023](0023-services-nos-serializers-de-escrita.md) | Services nos métodos create/update dos serializers | Aceito |
 | [0024](0024-classe-base-de-services.md) | Classe base de services e exclusão herdada nas views | Aceito |
+| [0025](0025-classe-de-service-nos-serializers.md) | Classe de service declarada nos serializers | Aceito |
 
 ## Modelo
 

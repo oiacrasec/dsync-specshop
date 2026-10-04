@@ -19,7 +19,8 @@ A etapa 5.2 publica [planos/contratos administrativos](../docs/api/admin-contrac
 em `/api/v1/admin/`: somente superadmin, sem organização. Escritas auditadas e
 redução de licenças protegida por lock; quotas continuam sem enforcement.
 As views herdam `BaseAdminModelViewSet` e declaram selector; exclusão vem da base. Serializers
-herdam `ServiceModelSerializer` e chamam o service por create/update; regras,
+herdam `ServiceModelSerializer`, declaram `service_class` e herdam create/update
+que chamam `service_class.save_instance` (ADR 0025); regras,
 locks e auditoria continuam nos services. `BaseModelService`, no core, padroniza
 services de domínio: PlanService/ContractService herdam exclusão, com registro
 explícito no AppConfig.ready e autorização/auditoria próprias (ADR 0024).

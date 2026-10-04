@@ -162,7 +162,7 @@ limite de 120 caracteres continuam ativos.
 |---|---|
 | `SelectorQuerysetMixin` | leitura pelo selector declarado |
 | `ServiceDeleteMixin` | exclusão pelo BaseModelService herdado da view base |
-| `ServiceModelSerializer` | create/update pelo service declarado no serializer |
+| `ServiceModelSerializer` | create/update por service_class.save_instance |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
 | `LookupOptionsMixin` | seleção UUID/rótulo |
 | `TableSchemaMixin` | schema declarado pelo recurso |
@@ -185,14 +185,18 @@ class ContractViewSet(BaseAdminModelViewSet):
 
 
 class ContractSerializer(ServiceModelSerializer):
-    save_service = staticmethod(services.ContractService.save_instance)
+    service_class = services.ContractService
 ```
 
-`staticmethod` impede que Python passe a view como argumento às funções do módulo.
+`staticmethod` no selector impede que Python passe a view às funções do módulo.
 O selector retorna queryset lazy. A view chama `serializer.save()` pelo fluxo padrão
-do DRF; `ServiceModelSerializer.create/update` repassa `values`, `actor` e, na
+do DRF; `ServiceModelSerializer.create/update` chama `service_class.save_instance`
+repassando `values`, `actor` e, na
 atualização, `instance` ao service. O ator vem do request no contexto do serializer,
 passado explicitamente ao service, sem dependência da requisição no model.
+Cada serializer declara somente a classe do service, sem staticmethod ou métodos
+create/update próprios. A classe padrão é BaseModelService, cuja gravação falha
+sem regras de domínio implementadas (ADR 0025).
 O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
 a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
 no service, inclusive quando serializer.save() é chamado sem uma view.

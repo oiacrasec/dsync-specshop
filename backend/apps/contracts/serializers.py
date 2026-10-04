@@ -5,7 +5,7 @@ from .models import Contract, Organization, Plan
 
 
 class PlanSerializer(ServiceModelSerializer):
-    save_service = staticmethod(services.PlanService.save_instance)
+    service_class = services.PlanService
 
     class Meta:
         model = Plan
@@ -24,7 +24,7 @@ class PlanSerializer(ServiceModelSerializer):
 
 
 class ContractSerializer(ServiceModelSerializer):
-    save_service = staticmethod(services.ContractService.save_instance)
+    service_class = services.ContractService
 
     def get_fields(self):
         fields = super().get_fields()
