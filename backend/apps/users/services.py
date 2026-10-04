@@ -178,7 +178,7 @@ def login(*, request, username, password):
     if user is None or not api_settings.USER_AUTHENTICATION_RULE(user):
         raise AuthenticationFailed()
     ensure_contract_available(user)  # Só depois da senha válida: não revela nada a quem errou.
-    request.user = user  # O registro de acesso (Marco Civil art. 15) identifica quem entrou.
+    request.user = user  # Usuário validado para o registro de autenticação (ADR 0019).
     refresh = RefreshToken.for_user(user)
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
 
@@ -201,7 +201,7 @@ def _locked_refresh(raw_token):
 
 @system_scope  # Autenticação: antes do contexto; o SimpleJWT consulta User.objects.
 @transaction.atomic
-def refresh_tokens(*, refresh):
+def refresh_tokens(*, refresh, request=None):
     try:
         token, user_public_id = _locked_refresh(refresh)
         user = (
@@ -219,6 +219,8 @@ def refresh_tokens(*, refresh):
         token.set_exp()
         token.set_iat()
         token.outstand()
+        if request is not None:
+            request.user = user
         return {'access': str(token.access_token), 'refresh': str(token)}
     except TokenError, get_user_model().DoesNotExist:
         raise InvalidToken() from None

@@ -180,8 +180,8 @@ def test_generic_problems_preserve_http_semantics(rf, error):
         assert response['Retry-After'] == '12'
 
 
-def test_authentication_required_only_writes_the_access_log(client, test_routes, django_assert_num_queries):
-    with django_assert_num_queries(1):  # Só o INSERT do registro de acesso; a autenticação não consulta.
+def test_authentication_required_does_not_query_database(client, test_routes, django_assert_num_queries):
+    with django_assert_num_queries(0):
         response = client.get('/api/v1/protected/')
 
     assert response.status_code == 401

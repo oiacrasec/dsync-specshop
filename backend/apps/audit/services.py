@@ -7,7 +7,7 @@ mudança: se ela for desfeita, o evento também é. A entrada do superadmin em o
 
 from apps.core.tenancy import get_context
 
-from .models import AccessLog, AuditEvent, AuditEventType
+from .models import AccessLog, AccessLogAction, AuditEvent, AuditEventType
 from .utils import client_address
 
 
@@ -41,20 +41,21 @@ def record_superadmin_entry(*, superadmin, organization, access_jti=''):
     AuditEvent.objects.unscoped().bulk_create([entry], ignore_conflicts=True)
 
 
-def record_access(request):
-    """Grava o registro de acesso da requisição (Marco Civil art. 15), após a resposta.
+def record_access(request, *, action, user, occurred_at):
+    """Grava autenticação após a view, fora da sua transação (ADR 0019).
 
-    Usuário: o autenticado pelo DRF (ou o do login). Contrato e organização: os do
-    contexto de tenant validado; superadmin sem organização e anônimo ficam sem eles.
+    Falhas não associam a tentativa à conta digitada. Sucessos recebem o usuário
+    validado pelo serviço, sem consultar novamente ou armazenar credenciais.
     """
     ip, port = client_address(request)
-    user = getattr(request, 'user', None)
     context = get_context()
     tenant = context if context is not None and not context.system else None
     known_user = user if user is not None and user.is_authenticated else None
     # Sem contexto (ex.: login), o contrato é o do próprio usuário identificado.
     contract_id = tenant.contract_id if tenant else getattr(known_user, 'contract_id', None)
     access = AccessLog(
+        action=AccessLogAction(action),
+        occurred_at=occurred_at,
         ip=ip,
         port=port,
         user=known_user,

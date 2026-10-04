@@ -3,8 +3,9 @@
 from ipaddress import ip_address
 
 from django.conf import settings
+from django.utils import timezone
 
-from .constants import ENTRY_ATTRIBUTE
+from .constants import AUTH_ACCESS_ATTRIBUTE, ENTRY_ATTRIBUTE
 
 
 def mark_superadmin_entry(request, organization):
@@ -13,6 +14,12 @@ def mark_superadmin_entry(request, organization):
     auth = getattr(request, 'auth', None)
     jti = str(auth.get('jti', '')) if auth is not None and hasattr(auth, 'get') else ''
     setattr(django_request, ENTRY_ATTRIBUTE, (request.user, organization, jti))
+
+
+def mark_auth_access(request, *, action, user=None):
+    """Transporta o evento até o middleware, sem escrita nem credenciais (ADR 0019)."""
+    django_request = getattr(request, '_request', request)
+    setattr(django_request, AUTH_ACCESS_ATTRIBUTE, (action, user, timezone.now()))
 
 
 def snapshot(instance, fields):

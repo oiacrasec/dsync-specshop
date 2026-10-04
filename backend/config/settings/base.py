@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Fora da transação da view: a entrada do superadmin fica registrada mesmo com erro.
     'apps.audit.middleware.SuperadminEntryAuditMiddleware',
-    # Marco Civil art. 15: depois do TenantContextMiddleware, ainda com o contexto da requisição.
+    # ADR 0019: só eventos de autenticação, fora da transação da view.
     'apps.audit.middleware.AccessLogMiddleware',
 ]
 

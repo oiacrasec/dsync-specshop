@@ -82,11 +82,17 @@ class AuditEvent(HybridScopedModel):
     delete.alters_data = True
 
 
+class AccessLogAction(models.TextChoices):
+    LOGIN_SUCCESS = 'LOGIN_SUCCESS', _('login com sucesso')
+    LOGIN_FAILURE = 'LOGIN_FAILURE', _('login com falha')
+    REFRESH_SUCCESS = 'REFRESH_SUCCESS', _('renovação de token com sucesso')
+
+
 class AccessLog(models.Model, metaclass=DscModelBase):
     """Registro de acesso a aplicação (Marco Civil art. 15; ADR 0006 §6, ADR 0018).
 
-    Uma linha por requisição à API: data e hora (UTC), IP e porta de origem, usuário,
-    contrato e organização do contexto e o request_id. Sem BaseModel: volume alto, só
+    Exemplo: Maria faz login ou renova o token → um registro com action e origem.
+    Consultas comuns não geram linha (ADR 0019). Sem BaseModel: só
     inserção, sem soft delete nem autoria. Guarda mínima de 6 meses; o expurgo e o
     LegalHold vêm na entrega do ADR 0007. Sob sigilo: leitura só global explícita.
     """
@@ -95,6 +101,8 @@ class AccessLog(models.Model, metaclass=DscModelBase):
 
     id = models.BigAutoField(primary_key=True)
     occurred_at = models.DateTimeField(_('data e hora (UTC)'), default=timezone.now)
+    # Registros anteriores ao ADR 0019 ficam sem classificação; não inferir seu evento.
+    action = models.CharField(_('ação'), max_length=32, choices=AccessLogAction.choices, blank=True, default='')
     ip = models.GenericIPAddressField(_('IP de origem'))
     port = models.PositiveIntegerField(_('porta de origem'), null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('usuário'), on_delete=models.PROTECT,

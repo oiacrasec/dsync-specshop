@@ -108,6 +108,16 @@ Veja a [documentação de cache](https://docs.djangoproject.com/en/5.2/topics/ca
 
 ## Operação e retenção
 
+AccessLog registra LOGIN_SUCCESS, LOGIN_FAILURE e REFRESH_SUCCESS (ADR 0019).
+Login com credenciais rejeitadas ou contrato indisponível gera falha; sem username
+digitado ou associação presumida a uma conta. Sucessos registram o usuário validado.
+Payload inválido, throttle antes da tentativa, refresh recusado e logout não geram
+esse registro. Erros continuam no logging técnico; a revogação no logout permanece.
+O middleware grava fora da transação da view, antes de devolver a resposta; o
+registro de falha sobrevive ao rollback. Dados guardados: ação, data UTC, origem,
+vínculos conhecidos e request_id, sem senhas/tokens. Guarda declarada de seis meses,
+expurgo/LegalHold na entrega própria. Ver [auditoria](../domain/audit.md).
+
 Instalar os requirements, configurar a chave JWT independente e executar
 `python manage.py migrate`. As migrations da blacklist mantêm nomes próprios
 da biblioteca, conforme ADR 0007. Elas foram aplicadas ao banco local com

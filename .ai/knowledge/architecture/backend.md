@@ -14,7 +14,8 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Módulos | `models`, `managers`, `middleware`, `utils`, `constants` (só literais), `exceptions` (só classes), módulos temáticos (`core/problems.py`) |
 | SQL à mão | `queries/<nome>.py`; `-- NOME` em PT-BR na 1ª linha; CTE/temporária `parametros` (`contract`/`organization`, id interno); um `execute`; selector com `@tenant_params` + `fetch_all` |
 | Auditoria | `apps/audit` append-only (ADR 0017); services de RBAC e contas de superadmin auditam |
-| Registro de acesso | `AccessLog` (ADR 0018) para toda requisição à `/api/`; só inserção; expurgo antes de produção |
+| Registro de acesso | `AccessLog` (ADR 0019) para login sucesso/falha e refresh sucesso; marker na view, middleware fora da transação; sem escrita em navegação comum; só inserção; expurgo antes de produção |
+| Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
 | Idioma | código em inglês; rótulos/mensagens em português |
 
 Os itens abaixo são o histórico por etapa (podem citar estados já superados; vale a tabela acima).

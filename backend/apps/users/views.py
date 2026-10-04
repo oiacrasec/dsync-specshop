@@ -9,6 +9,9 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.audit.models import AccessLogAction
+from apps.audit.utils import mark_auth_access
+from apps.core.exceptions import ContractInactive
 from apps.users import services
 from apps.users.serializers import LoginSerializer, RefreshSerializer
 from apps.users.throttles import LoginThrottle
@@ -36,9 +39,14 @@ class LoginView(AuthView):
         try:
             tokens = services.login(request=request, **serializer.validated_data)
         except AuthenticationFailed:
+            mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
             for throttle in self.login_throttles:
                 throttle.record_failure()
             raise
+        except ContractInactive:
+            mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
+            raise
+        mark_auth_access(request, action=AccessLogAction.LOGIN_SUCCESS, user=request.user)
         return Response(tokens)
 
 
@@ -46,7 +54,8 @@ class RefreshView(AuthView):
     def post(self, request):
         serializer = RefreshSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        tokens = services.refresh_tokens(**serializer.validated_data)
+        tokens = services.refresh_tokens(request=request, **serializer.validated_data)
+        mark_auth_access(request, action=AccessLogAction.REFRESH_SUCCESS, user=request.user)
         return Response(tokens)
 
 

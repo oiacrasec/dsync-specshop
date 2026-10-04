@@ -32,6 +32,7 @@ Preferências do usuário que valem **sempre**, para qualquer agente. Esta skill
 |---|---|
 | Versões | sempre a **última versão LTS** (verificada na fonte oficial, nunca de memória) |
 | Etapas pequenas | seguir o plano ativo em `docs/plans/`; cada etapa fecha com a skill `validar-etapa` |
+| Performance | premissa forte do projeto inteiro, não só logs: analisar consultas, escritas, locks, CPU, memória, tráfego e concorrência antes de entregar; medir conforme o risco e não aceitar gargalos graves conhecidos. Autenticação admite seu custo necessário, sem replicar esse custo na navegação/uso cotidiano |
 | Aprovação | não iniciar a próxima etapa sem a confirmação do usuário |
 | Commits | skill `git-commit`; push só quando o usuário pedir |
 | Ações difíceis de desfazer | confirmar antes (apagar, alterar banco, sobrescrever, publicar) |

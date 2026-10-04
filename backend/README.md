@@ -151,9 +151,17 @@ a busca contrato → organização do superadmin fica em `apps/contracts/selecto
 Etapa 2.3: contrato conferido no login, refresh e a cada requisição (403
 `contract-inactive`); superadmin entra em organização pelo header. Etapa 3.6: `apps/audit` guarda a trilha append-only de mudanças de permissão, contas de
 superadmin e entradas do superadmin em organização ([auditoria](../docs/domain/audit.md)).
-Etapa 4.1: registro de acesso (Marco Civil art. 15) em `AccessLog` para toda requisição à API;
+Etapa 4.1 revisada: `AccessLog` registra login com sucesso/falha e refresh com sucesso;
+leituras e navegação comuns não geram INSERT de acesso. A auditoria de negócio permanece
+separada. Cobertura definida pelo usuário no [ADR 0019](../docs/adr/0019-registros-de-autenticacao.md),
+sem afirmar que apenas login é suficiente para a lei. O middleware persiste eventos
+marcados pelas views, fora de suas transações. Registros históricos preservados.
 atrás do proxy, configurar `DJANGO_ACCESS_LOG_IP_HEADER` e `DJANGO_ACCESS_LOG_PORT_HEADER`
 ([ADR 0018](../docs/adr/0018-registro-de-acesso.md)). Ainda não há endpoints de gestão.
+
+Performance é premissa global: revisar queries, escritas, locks, CPU, memória,
+tráfego e concorrência de cada mudança. Consultas constantes não provam, sozinhas,
+eficiência; medir os caminhos afetados conforme o risco antes de entregar.
 
 ## Configuração do PyCharm
 

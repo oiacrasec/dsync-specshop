@@ -1,4 +1,4 @@
-from .constants import ACCESS_LOG_PATH_PREFIX, ENTRY_ATTRIBUTE
+from .constants import AUTH_ACCESS_ATTRIBUTE, ENTRY_ATTRIBUTE
 from .services import record_access, record_superadmin_entry
 
 
@@ -23,7 +23,7 @@ class SuperadminEntryAuditMiddleware:
 
 
 class AccessLogMiddleware:
-    """Registro de acesso de toda requisição à API, inclusive anônima e com erro (ADR 0018).
+    """Persiste somente eventos de autenticação marcados pelas views (ADR 0019).
 
     Grava após a resposta, fora do ATOMIC_REQUESTS da view, ainda com o contexto de
     tenant da requisição (fica depois do TenantContextMiddleware na lista).
@@ -34,6 +34,8 @@ class AccessLogMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        if request.path_info.startswith(ACCESS_LOG_PATH_PREFIX):
-            record_access(request)
+        entry = getattr(request, AUTH_ACCESS_ATTRIBUTE, None)
+        if entry is not None:
+            action, user, occurred_at = entry
+            record_access(request, action=action, user=user, occurred_at=occurred_at)
         return response

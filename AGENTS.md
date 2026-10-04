@@ -28,6 +28,12 @@ Princípio central: **código isolado, conhecimento conectado.**
 - Cada projeto tem suas próprias dependências, ambiente, `Dockerfile` e documentação.
 - A raiz cuida do repositório e do contexto global, não do runtime das aplicações.
 - Não criar estruturas profundas antecipadamente; a arquitetura cresce com o domínio.
+- Performance é premissa global: revisar impacto de toda mudança em consultas,
+  escritas, locks, CPU, memória, tráfego e concorrência, no backend e frontend.
+  Fluxos cotidianos devem evitar trabalho repetido, efeitos colaterais de leitura
+  e custo crescente por item. Medir os caminhos afetados conforme o risco; número
+  constante de queries sozinho não prova eficiência. Não entregar gargalos graves
+  conhecidos ou adicionar infraestrutura custosa sem justificar sua necessidade.
 - Responder ao usuário em **PT-BR**.
 
 ## Onde está cada coisa
@@ -67,7 +73,7 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
 | `verificar-ambiente` | máquina nova, pedido de checar ambiente/plugins, ou ferramenta (LSP, codegraph, rtk) falhando |
 | `erros-api-rfc9457` | **sempre** ao criar ou alterar endpoints, exceções e respostas de erro da API |
 | `validar-etapa` | **sempre** ao terminar cada etapa do plano de entrega, antes do commit |
-| `revisao-performance` | **sempre** em code review e ao escrever código que consulta o banco (N+1, agregação, índices) |
+| `revisao-performance` | **sempre** ao projetar, implementar e revisar mudanças: banco, processamento, memória, rede e concorrência; medir conforme o risco |
 | `owasp-top-10` | **sempre** em code review e antes de entregar mudanças em auth, permissões, endpoints, queries, dependências ou configuração |
 
 **Nunca inferir, nunca supor; conflitos não se resolvem em silêncio:** sem fonte

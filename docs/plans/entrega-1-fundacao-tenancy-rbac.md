@@ -30,6 +30,8 @@ e só começa após aprovação do usuário.
 | 18 | 3.6 (aprovado): `apps/audit` + `AuditEvent` (ADR 0017); entrada do superadmin 1x por superadmin + organização + access token; "alterações de superadmin" = contas de superadmin; eventos imutáveis, com before/after só dos campos de permissão |
 | 19 | 2.4 (aprovado): `all_objects` também filtra pelo contexto (manager base do Django vira `_base_objects`, sem filtro); `User` e `Contract` entram no escopo (ADR 0012), autenticação usa `.unscoped()`; código fora de requisição usa `system_context()`/`@system_scope` e os testes um contexto de sistema automático; query sem contexto levanta `TenantContextMissing` |
 | 20 | 4.1 (aprovado): IP/porta reais por headers do proxy configuráveis (`check --deploy` avisa); toda requisição à `/api/` com só os campos da lei + `request_id`; `AccessLog` como exceção ao escopo (ADR 0018); retenção de 6 meses declarada, expurgo + `LegalHold` na entrega do ADR 0007 antes de produção; gravação por middleware após a resposta |
+| 21 | Revisão da 4.1 aprovada: seguir cobertura implementada no Spatial (login sucesso/falha e refresh sucesso), sem AccessLog por requisição comum; preservar AuditEvent e registros históricos. ADR 0019 substitui a cobertura de 0018, sem afirmar suficiência jurídica de apenas login |
+| 22 | Premissa permanente do usuário: performance forte em todo o projeto, não só AccessLog; avaliar frequência, queries, escritas, locks, CPU, memória, tráfego e concorrência, com medição conforme o risco antes de entregar |
 
 ## Bloco 0 — Fundação
 
@@ -71,7 +73,7 @@ e só começa após aprovação do usuário.
 
 | # | Etapa | ADR | Status |
 |---|---|---|---|
-| 4.1 | `AccessLog` + middleware (IP, porta, data UTC, usuário, contrato, organização) + retenção mínima de 6 meses | 0006 §6, skill `marco-civil` | ✅ |
+| 4.1 | `AccessLog` seletivo de autenticação + middleware (IP, porta, data UTC, usuário, contrato, organização) + retenção declarada de 6 meses | 0006 §6, 0018, 0019, skill `marco-civil` | ✅ |
 
 ## Bloco 5 — Endpoints
 

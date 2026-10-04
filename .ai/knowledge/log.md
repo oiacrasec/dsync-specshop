@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 4.1: autenticação seletiva e premissa global de performance
+
+- Usuário aprovou seguir o Spatial: AccessLog só para login sucesso/falha e refresh
+  sucesso. ADR 0019 substitui cobertura por requisição de 0018, sem afirmar que a lei
+  exige apenas login ou que esta cobertura comprova conformidade. Validação jurídica pendente.
+- Markers nas views, persistência síncrona no middleware fora da transação da view;
+  falha sobrevive ao rollback. Refresh fornece o usuário validado, sem consulta extra.
+  Sem username/token/senha; não gravar em consultas comuns, logout ou refresh recusado.
+- audit.0004 aplicada localmente; action vazio no histórico, sem apagar/reclassificar.
+  AuditEvent e entrada de superadmin preservados. Docs/plano/overview/memória sincronizados.
+- Premissa forte GLOBAL de performance registrada em AGENTS e skills de trabalho/revisão:
+  banco, locks, CPU, memória, tráfego e concorrência, com medição proporcional ao risco;
+  contagem constante de queries não substitui avaliação de custo ou ensaio sob carga.
+- 381 testes passaram, lint/formato/migrations/checks desenvolvimento/produção OK.
+  Leitura comum com 1/30 chamadas sem INSERT; login 8, refresh 20, logout 13 queries,
+  constantes com 1/30 usuários adicionais. Sem benchmark de capacidade/latência.
+
 ## 2026-10-04 — Etapa 4.1: registro de acesso
 
 - ADR 0018; `AccessLog` em `apps/audit`, fora do BaseModel e dos tipos de escopo

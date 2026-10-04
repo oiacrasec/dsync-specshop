@@ -11,6 +11,16 @@ description: Checklist de revisão de performance de banco e API (Django ORM, DR
 
 ## Como revisar
 
+0. Aplicar a premissa global do usuário a toda mudança, inclusive frontend, middleware,
+   tarefas e integrações. Avaliar frequência de execução, crescimento com dados/usuários,
+   escritas desnecessárias em leituras, duração e abrangência de locks, CPU, memória,
+   tráfego e contenção. Autenticação admite trabalho necessário à segurança; isso não
+   autoriza repetir esse custo no uso cotidiano. Contagem constante de queries não
+   demonstra, sozinha, baixo custo ou boa escalabilidade. Para caminhos de alto volume
+   ou custos novos relevantes, medir latência/capacidade e recursos sob carga adequada,
+   além das queries; registrar limites da evidência e corrigir gargalos graves antes
+   da entrega. Não inventar metas de desempenho ou declarar aprovação sob carga sem medição.
+
 1. Ler o diff procurando acesso ao banco: querysets, serializers, propriedades de model, loops.
 2. Passar pelo checklist abaixo.
 3. Reportar cada achado assim:

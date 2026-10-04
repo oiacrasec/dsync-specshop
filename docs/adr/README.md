@@ -35,6 +35,7 @@ um ADR novo que **substitui** o anterior.
 | [0016](0016-dominio-rbac.md) | Domínio próprio para gestão de acesso | Aceito |
 | [0017](0017-trilha-de-auditoria.md) | Trilha de auditoria append-only | Aceito |
 | [0018](0018-registro-de-acesso.md) | Registro de acesso fora dos tipos de escopo | Aceito |
+| [0019](0019-registros-de-autenticacao.md) | Registros de acesso concentrados na autenticação | Aceito (substitui parcialmente 0018) |
 
 ## Modelo
 

@@ -38,19 +38,33 @@ Trilha append-only do [ADR 0017](../adr/0017-trilha-de-auditoria.md), em `apps/a
 
 ## Registro de acesso (etapa 4.1)
 
-`AccessLog` (`dsc_access_log`), [ADR 0018](../adr/0018-registro-de-acesso.md), Marco Civil art. 15.
+`AccessLog` (`dsc_access_log`), [ADR 0018](../adr/0018-registro-de-acesso.md), com a
+cobertura atual definida no [ADR 0019](../adr/0019-registros-de-autenticacao.md).
+Registro selecionado de autenticação; não representa toda atividade na sessão.
 
 | Campo | Conteúdo |
 |---|---|
 | `occurred_at` | data e hora em UTC |
+| `action` | LOGIN_SUCCESS, LOGIN_FAILURE ou REFRESH_SUCCESS; vazio nos registros anteriores sem classificação |
 | `ip` / `port` | origem do cliente; atrás do proxy, pelos headers `DJANGO_ACCESS_LOG_IP_HEADER`/`DJANGO_ACCESS_LOG_PORT_HEADER` |
 | `user` | autenticado (no login, quem entrou); vazio se anônimo |
 | `contract` / `organization` | do contexto de tenant; sem contexto, o contrato do usuário |
 | `request_id` | correlação com `X-Request-Id` e os logs |
 
-- Toda requisição a `/api/`, inclusive anônima e com erro; gravada após a resposta, fora da
-  transação da view (`AccessLogMiddleware`).
+- Login com sucesso/falha e refresh com sucesso. Views marcam o evento; middleware
+  grava após a execução da view, antes de devolver a resposta, fora de sua transação.
+  A falha de login sobrevive ao rollback. Hora capturada no evento, não após a gravação.
+- Falha de credenciais ou contrato indisponível no login gera LOGIN_FAILURE sem
+  associar a conta digitada. Não armazenar username, senha, token ou payload.
+- Consultas comuns, logout, refresh recusado, erros de validação e bloqueios pelo
+  throttle não criam AccessLog. Logging técnico de erros e AuditEvent permanecem.
+- Sucessos recebem usuário/contrato já validados, sem lookup extra. Testes verificam
+  zero INSERT na navegação comum com 1/30 chamadas. Autenticação tem queries constantes
+  com 1/30 usuários adicionais; sem ensaio de carga, não afirmar capacidade/latência.
 - Só inserção; leitura só em `system_context()`/`unscoped()` (ordem judicial, recorte por
   usuário ou IP + período, índices `(user, occurred_at)` e `(ip, occurred_at)`).
 - Guarda mínima de 6 meses (`AccessLog.minimum_retention_months`). Expurgo e `LegalHold`:
   entrega do ADR 0007, obrigatórios antes de produção.
+- A cobertura segue a decisão do usuário, tomando o Spatial como referência; não
+  afirmar que o Marco Civil exige só login. Sua adequação jurídica ao serviço
+  continua pendente. Registros históricos preservados, com action vazio.
