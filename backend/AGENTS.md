@@ -89,6 +89,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   No `User`, `is_active` mantém a semântica de autenticação do Django.
 - Módulos: `middleware.py` só com classes de middleware; auxiliares em `utils.py` do app;
   constantes literais em `constants.py` do app; querysets/managers em `managers.py`;
+  SQL à mão (só se o ORM não resolver) em `queries/<nome>.py`, executado só pelo selector,
+  com `contract_id`/`organization_id` do contexto como parâmetro e teste de isolamento próprio;
   regra de negócio em services/selectors ([estilo](docs/standards/django-style.md)).
 - Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
   commit; sem ela a suíte falha (camada F).

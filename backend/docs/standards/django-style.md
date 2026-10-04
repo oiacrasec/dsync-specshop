@@ -28,6 +28,7 @@ Convenção definida pelo usuário:
 | `utils.py` | funções auxiliares do app, sem regra de negócio e sem escrita no banco |
 | `services.py` / `selectors.py` | escrita com regra de negócio / leituras |
 | `exceptions.py` | só classes de exceção |
+| `queries/<nome>.py` | uma query SQL escrita à mão por arquivo, como constante ([regras](#queries-sql-escritas-à-mão)) |
 | `constants.py` | constantes do app: só valores literais (texto, número, regex, mensagem traduzível), sem importar código do próprio app |
 | módulo temático (ex.: `problems.py`) | bloco grande de um único tema, para o `utils.py` não virar gaveta |
 
@@ -40,6 +41,50 @@ validar a constante contra ela mesma.
 
 Não misturar auxiliares no módulo do middleware (ex.: `apps/audit/utils.py` marca a
 entrada do superadmin; `apps/audit/middleware.py` só grava).
+
+## Queries SQL escritas à mão
+
+Primeiro tente o ORM (`annotate`, `Subquery`, `Window`, `Case`, `RawSQL` dentro de um
+queryset): ele mantém o escopo de tenant automático. SQL cru só quando o ORM não resolver.
+
+```text
+apps/<app>/
+├── queries/
+│   ├── __init__.py
+│   └── admin_report.py      ← ADMIN_REPORT = """SELECT ..."""
+└── selectors.py             ← importa a constante, passa o contexto e executa
+```
+
+| Regra | Motivo |
+|---|---|
+| Um arquivo por query, com uma constante `UPPER_SNAKE` de nome igual ao do arquivo | achar e revisar cada query isoladamente |
+| Só o SQL literal no arquivo, sem lógica nem import do app | mesma regra do `constants.py` |
+| Só o selector executa a query; a view chama o selector | a view nunca conhece SQL |
+| `contract_id` (e `organization_id`, quando houver) entram como **parâmetros obrigatórios**, lidos de `get_context()` pelo selector | SQL cru não passa pelo manager com escopo (ADR 0006 §1.3) |
+| Sempre parâmetros nomeados (`%(contract_id)s`); nunca f-string, `format` ou concatenação | SQL injection (skill `owasp-top-10`, A03) |
+| Teste de isolamento próprio para cada query (outro contrato e outra organização) | a camada F (2.5) testa managers, não SQL cru |
+| Revisar `EXPLAIN` e índices | skill `revisao-performance` |
+
+Exemplo de selector:
+
+```python
+from django.db import connection
+
+from apps.core.tenancy import TenantContextMissing, get_context
+
+from .queries.admin_report import ADMIN_REPORT
+
+
+def admin_report():
+    context = get_context()
+    if context is None or context.contract_id is None:
+        raise TenantContextMissing('admin_report exige contrato no contexto.')
+    with connection.cursor() as cursor:
+        cursor.execute(ADMIN_REPORT, {'contract_id': context.contract_id})
+        return cursor.fetchall()
+```
+
+A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para agentes de IA.
 
 ## Formatação e lint
 

@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Padrão de queries SQL escritas à mão
+
+- `apps/<app>/queries/<nome>.py` com uma constante por arquivo; só o selector executa,
+  com contrato/organização do contexto como parâmetros nomeados e teste de isolamento próprio.
+  Documentado no guia de estilo e no `backend/AGENTS.md`. Nenhuma query criada ainda.
+
 ## 2026-10-04 — Organização dos módulos dos apps
 
 - `audit/managers.py`; `rbac/utils.py` (`required_permission`, `access_evaluation`);
