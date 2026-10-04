@@ -146,3 +146,31 @@ def test_concurrent_removal_of_the_two_last_admins_keeps_one(admin, user_contrac
         )
     assert results == ['blocked', 'ok']
     assert active_admin_count(user_contract.pk) == 1
+
+
+def test_model_delete_also_protects_the_last_admin(admin, user_contract, essential_profile):
+    ana, _ = make_admin(admin, user_contract, 'ana', essential_profile)
+    with pytest.raises(LastContractAdmin):
+        ana.delete(actor=admin)
+    ana.refresh_from_db()
+    assert ana.deleted_at is None
+
+
+@pytest.mark.parametrize('manager', ['objects', 'all_objects'])
+def test_bulk_delete_cannot_remove_all_admins_and_rolls_back(manager, admin, user_contract, essential_profile):
+    make_admin(admin, user_contract, 'ana', essential_profile)
+    make_admin(admin, user_contract, 'bia', essential_profile)
+    with pytest.raises(LastContractAdmin):
+        getattr(get_user_model(), manager).filter(contract=user_contract).delete(actor=admin)
+    assert active_admin_count(user_contract.pk) == 2  # Nenhum excluído: tudo ou nada.
+
+
+def test_bulk_delete_of_common_users_keeps_authorship(admin, user_contract, essential_profile):
+    make_admin(admin, user_contract, 'ana', essential_profile)
+    for name in ('c1', 'c2'):
+        get_user_model().objects.create_user(username=name, contract=user_contract)
+    count, _ = get_user_model().objects.filter(username__in=['c1', 'c2']).delete(actor=admin)
+    assert count == 2
+    assert set(get_user_model().all_objects.filter(username__in=['c1', 'c2']).values_list('deleted_by', flat=True)) == {
+        admin.pk
+    }

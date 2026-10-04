@@ -104,7 +104,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Atualmente somente superadmin ativo pode escrever. Perfil essencial (`contract_admin`) é
   criado pela migration rbac.0002 e não é editável. O contrato nunca fica sem administrador
   ativo (`LastContractAdmin`, 409), nem por ação do superadmin: excluir usuário só via
-  `apps.users.services.delete_user`, nunca `user.delete()`. Ver
+  `apps.users.services.delete_user`; `user.delete()` e `User.objects...delete()` delegam a ele
+  (o lote de usuários exclui um a um, com N queries, de propósito). Ver
   [domínio RBAC](../docs/domain/rbac.md). Transferir User de contrato exige remover
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view

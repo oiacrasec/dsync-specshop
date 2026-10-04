@@ -4,6 +4,7 @@ from django.db import IntegrityError, models, transaction
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
+from apps.contracts.models import Plan
 from apps.core.models import BaseModel
 
 
@@ -85,15 +86,15 @@ def test_soft_delete_preserves_data_and_authorship_and_is_idempotent():
 @pytest.mark.django_db
 @pytest.mark.parametrize('quantity', [1, 30])
 def test_bulk_delete_uses_one_query_and_keeps_rows(quantity, django_assert_num_queries):
-    user_model = get_user_model()
-    actor = user_model.objects.create_superuser(username='actor')
-    user_model.objects.bulk_create([user_model(is_superuser=True, username=f'user-{i}') for i in range(quantity)])
+    # User exclui um a um (proteção do último admin); o comportamento genérico usa Plan.
+    actor = get_user_model().objects.create_superuser(username='actor')
+    Plan.objects.bulk_create([Plan(name=f'plan-{i}') for i in range(quantity)])
     with django_assert_num_queries(1):
-        count, _ = user_model.objects.exclude(pk=actor.pk).delete(actor=actor)
+        count, _ = Plan.objects.all().delete(actor=actor)
     assert count == quantity
-    assert user_model.objects.count() == 1
-    assert user_model.all_objects.filter(deleted_by=actor).count() == quantity
-    assert user_model.all_objects.filter(deleted_by=actor).delete()[0] == 0
+    assert Plan.objects.count() == 0
+    assert Plan.all_objects.filter(deleted_by=actor).count() == quantity
+    assert Plan.all_objects.filter(deleted_by=actor).delete()[0] == 0
 
 
 @pytest.mark.django_db

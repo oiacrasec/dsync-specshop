@@ -116,7 +116,7 @@ a regra vale também para o superadmin → 409 `last-contract-admin`.
 |---|---|
 | Remover, desativar ou trocar o perfil da atribuição essencial | `save_assignment` / `delete_assignment` |
 | Desativar o usuário | `save_user` |
-| Excluir o usuário (soft delete) | `delete_user` (nunca `user.delete()`) |
+| Excluir o usuário (soft delete) | `delete_user`; `user.delete()` e `QuerySet.delete()` de usuários delegam a ele (o lote exclui um a um, tudo ou nada) |
 
 Concorrência: a checagem bloqueia a linha do contrato (`select_for_update`), na ordem
 usuário → contrato; teste com duas threads prova que sobra um administrador.

@@ -13,6 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.contracts.models import Contract
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
+from apps.core.models import SoftDeleteQuerySet
 
 
 def save_user(*, user, actor=None, using=None):
@@ -81,8 +82,12 @@ def _leaves_contract_admin(current, user):
 def delete_user(*, user, actor=None, using=None):
     """Exclusão lógica de usuário; nunca deixa o contrato sem administrador (ADR 0009 §5).
 
-    Use este service em vez de user.delete(): o model não conhece a regra do RBAC.
+    User.delete() e QuerySet.delete() delegam para cá; a exclusão em si usa o
+    SoftDeleteQuerySet base para não voltar ao override.
+    Retorna a quantidade excluída (0 se já estava excluído).
     """
+    if user.pk is None:
+        raise ValueError('Cannot delete an unsaved instance.')
     database = using or router.db_for_write(type(user), instance=user)
     with transaction.atomic(using=database):
         current = type(user).all_objects.using(database).select_for_update().get(pk=user.pk)
@@ -93,9 +98,10 @@ def delete_user(*, user, actor=None, using=None):
                 from apps.rbac.services import ensure_contract_keeps_admin
 
                 ensure_contract_keeps_admin(current.contract_id, exclude_user_id=current.pk)
-        current.delete(using=database, actor=actor)
+        base = type(user).all_objects.using(database).filter(pk=current.pk)
+        count, _ = SoftDeleteQuerySet.delete(base, actor=actor)
     user.refresh_from_db(using=database)
-    return user
+    return count
 
 
 @transaction.atomic

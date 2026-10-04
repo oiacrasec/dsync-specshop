@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
-from apps.users.managers import UserManager
+from apps.users.managers import UserManager, UserQuerySet
 
 
 class User(AbstractUser, BaseModel):
@@ -16,6 +16,7 @@ class User(AbstractUser, BaseModel):
     """
 
     objects = UserManager()
+    all_objects = models.Manager.from_queryset(UserQuerySet)()
 
     contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
                                  null=True, blank=True, related_name='+',)
@@ -29,3 +30,12 @@ class User(AbstractUser, BaseModel):
                                    models.Q(is_superuser=False, contract__isnull=False),
                                    name='dsc_user_contract_by_role'),
         ]
+
+    def delete(self, using=None, keep_parents=False, *, actor=None):
+        """Delega a delete_user: nunca deixa o contrato sem administrador (ADR 0009 §5)."""
+        from apps.users.services import delete_user
+
+        count = delete_user(user=self, actor=actor, using=using)
+        return count, {self._meta.label: count}
+
+    delete.alters_data = True

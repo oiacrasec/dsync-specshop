@@ -6,6 +6,8 @@
   aplicada ao banco local.
 - `ensure_contract_keeps_admin` (lock do contrato) protege atribuições, desativação
   em `save_user` e o novo `delete_user`; vale para o superadmin (`LastContractAdmin` 409).
+- `User.delete()` e `UserQuerySet.delete()` (objects e all_objects) delegam a `delete_user`,
+  um a um e atômico; teste genérico de lote em 1 query passou a usar `Plan`.
 - Teste de concorrência com threads; 263 testes e validador completo passaram.
 - Arquivos: apps/rbac (migration, selectors, services, testes), apps/users/services,
   conftest, backend/AGENTS.md, README, docs/domain/rbac.md, overview, plano, handoff.

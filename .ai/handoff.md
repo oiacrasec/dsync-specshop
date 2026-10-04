@@ -31,7 +31,7 @@ commits). Ordem atual: 3.5 → 3.6 → 2.3 → 2.4 → 2.5 → 4.1 → bloco 5.
 - Banco local migrado (inclui rbac.0002 com o perfil essencial), sem usuários. Não regenerar migrations iniciais já aplicadas.
 - Autoria pode ser nula em operações de sistema; `bulk`/`update` exigem auditoria
   explícita. `all_objects` não dispensa autorização.
-- Escritas de usuário passam por `save_user`/`delete_user` (nunca `user.delete()`); de RBAC, pelos services de `apps/rbac`.
+- Escritas de usuário passam por `save_user`/`delete_user` (`user.delete()` e lote delegam ao `delete_user`; `user.save()` direto ainda pula as regras); de RBAC, pelos services de `apps/rbac`.
 - Antes de produção: cache compartilhado e atômico para o limite de login, proteção
   de borda, MFA/recuperação e `manage.py flushexpiredtokens` agendado diariamente.
 - Expurgo e eliminação ficam em entrega própria (ADR 0007).
