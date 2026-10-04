@@ -5,6 +5,9 @@
 - `apps/<app>/queries/<nome>.py` com uma constante por arquivo; só o selector executa,
   com contrato/organização do contexto como parâmetros nomeados e teste de isolamento próprio.
   Documentado no guia de estilo e no `backend/AGENTS.md`. Nenhuma query criada ainda.
+- Formato: `-- NOME` na 1ª linha; CTE (ou temporária `ON COMMIT DROP`) `parametros` com
+  `contract`/`organization` (id interno, cast); tudo num `execute` (binding no cliente, testado);
+  selector avança com `nextset()`. Funções do PostgreSQL: futuro command idempotente no deploy.
 
 ## 2026-10-04 — Organização dos módulos dos apps
 

@@ -51,38 +51,85 @@ queryset): ele mantém o escopo de tenant automático. SQL cru só quando o ORM 
 apps/<app>/
 ├── queries/
 │   ├── __init__.py
-│   └── admin_report.py      ← ADMIN_REPORT = """SELECT ..."""
+│   └── relatorio_xpto.py    ← RELATORIO_XPTO = """-- RELATORIO XPTO ..."""
 └── selectors.py             ← importa a constante, passa o contexto e executa
 ```
+
+### Formato do SQL (definido pelo usuário)
+
+Objetivo: copiar o SQL para o DataGrip/DBeaver e depurar trocando só os valores de `parametros`.
+
+1. **1ª linha:** comentário com o nome da funcionalidade (`-- RELATORIO XPTO`, `-- DASHBOARD ABC`).
+2. **Parâmetros primeiro**, num CTE `parametros`; o restante resolve com JOIN nele:
+
+```sql
+-- RELATORIO XPTO
+WITH parametros AS (
+    SELECT
+        %(contract)s::bigint AS contract,
+        %(organization)s::bigint AS organization
+)
+SELECT x.public_id, x.name
+FROM dsc_xpto x
+JOIN parametros p ON p.contract = x.contract_id AND p.organization = x.organization_id
+```
+
+3. **Tabela temporária**, quando precisar separar etapas: tudo no mesmo SQL, num único `execute`:
+
+```sql
+-- RELATORIO XYZ
+CREATE TEMPORARY TABLE parametros ON COMMIT DROP AS
+SELECT
+    %(contract)s::bigint AS contract,
+    %(organization)s::bigint AS organization;
+CREATE INDEX ON parametros (contract, organization);  -- só se o EXPLAIN justificar
+ANALYZE parametros;
+-- demais etapas (outras temporárias, índices) com JOIN em parametros
+SELECT ...;
+```
+
+### Regras
 
 | Regra | Motivo |
 |---|---|
 | Um arquivo por query, com uma constante `UPPER_SNAKE` de nome igual ao do arquivo | achar e revisar cada query isoladamente |
 | Só o SQL literal no arquivo, sem lógica nem import do app | mesma regra do `constants.py` |
-| Só o selector executa a query; a view chama o selector | a view nunca conhece SQL |
-| `contract_id` (e `organization_id`, quando houver) entram como **parâmetros obrigatórios**, lidos de `get_context()` pelo selector | SQL cru não passa pelo manager com escopo (ADR 0006 §1.3) |
-| Sempre parâmetros nomeados (`%(contract_id)s`); nunca f-string, `format` ou concatenação | SQL injection (skill `owasp-top-10`, A03) |
+| `contract` e `organization` são o **id interno** (bigint), com cast explícito | JOIN direto; o banco infere o tipo do parâmetro |
+| Parâmetros nomeados (`%(contract)s`), nunca f-string, `format` ou concatenação; nomes únicos no SQL | SQL injection (skill `owasp-top-10`, A03) |
+| Só o selector executa; lê `contract`/`organization` de `get_context()` e falha sem contrato (`TenantContextMissing`) | SQL cru não passa pelo manager com escopo (ADR 0006 §1.3) |
+| Com vários comandos, o selector avança até o último resultado (`while cursor.nextset(): pass`) | o cursor começa no resultado do 1º comando |
+| Um SQL com tabela `parametros` por transação | `ON COMMIT DROP` só apaga no fim da transação |
+| Não ativar `server_side_binding` no banco | vários comandos com parâmetros num `execute` dependem do binding no cliente (padrão do Django), testado em 2026-10-04 |
 | Teste de isolamento próprio para cada query (outro contrato e outra organização) | a camada F (2.5) testa managers, não SQL cru |
 | Revisar `EXPLAIN` e índices | skill `revisao-performance` |
 
-Exemplo de selector:
+### Selector
 
 ```python
 from django.db import connection
 
 from apps.core.tenancy import TenantContextMissing, get_context
 
-from .queries.admin_report import ADMIN_REPORT
+from .queries.relatorio_xpto import RELATORIO_XPTO
 
 
-def admin_report():
+def relatorio_xpto():
     context = get_context()
     if context is None or context.contract_id is None:
-        raise TenantContextMissing('admin_report exige contrato no contexto.')
+        raise TenantContextMissing('relatorio_xpto exige contrato no contexto.')
+    params = {'contract': context.contract_id, 'organization': context.organization_id}
     with connection.cursor() as cursor:
-        cursor.execute(ADMIN_REPORT, {'contract_id': context.contract_id})
+        cursor.execute(RELATORIO_XPTO, params)
+        while cursor.nextset():  # SQL com vários comandos: resultado do último.
+            pass
         return cursor.fetchall()
 ```
+
+### Funções do PostgreSQL
+
+Mesmo formato: os parâmetros da função alimentam o CTE/tabela `parametros`. O SQL fica em
+`queries/<nome>.py`; um management command futuro aplicará as funções de forma idempotente
+(`CREATE OR REPLACE FUNCTION`) no deploy. Até ele existir, não criar funções no banco.
 
 A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para agentes de IA.
 
