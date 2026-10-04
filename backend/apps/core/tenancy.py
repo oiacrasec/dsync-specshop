@@ -10,10 +10,12 @@ do superadmin, comandos, tarefas), o código define o contexto explicitamente co
 Sem contexto, os managers com escopo levantam `TenantContextMissing` (fail closed).
 """
 
+from collections.abc import Callable
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, replace
 from functools import wraps
+from typing import Any
 
 
 class TenantContextMissing(RuntimeError):
@@ -76,3 +78,33 @@ def system_scope(function):
             return function(*args, **kwargs)
 
     return wrapper
+
+
+def tenant_params(*, organization=False):
+    """Decorator de selector com SQL escrito à mão: valida o contexto e injeta `tenant`.
+
+    A função recebe `tenant={'contract': ..., 'organization': ...}` (ids internos, nomes
+    iguais aos do CTE `parametros`). Sem contrato no contexto, ou sem organização quando
+    `organization=True`, levanta TenantContextMissing. Contrato e organização nunca vêm
+    de quem chama (anti-IDOR).
+
+        @tenant_params(organization=True)
+        def feedlot_batch_details(feedlot_id, *, tenant):
+            ...
+    """
+
+    # Callable[..., Any]: quem chama não passa `tenant`; o decorator injeta (IDEs não acusam falta).
+    def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            context = _current.get()
+            if context is None or context.contract_id is None:
+                raise TenantContextMissing(f'{function.__qualname__} exige contrato no contexto.')
+            if organization and context.organization_id is None:
+                raise TenantContextMissing(f'{function.__qualname__} exige organização no contexto.')
+            tenant = {'contract': context.contract_id, 'organization': context.organization_id}
+            return function(*args, tenant=tenant, **kwargs)
+
+        return wrapper
+
+    return decorator

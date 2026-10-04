@@ -55,3 +55,16 @@ def context_values(model):
     if issubclass(model, ContractScopedModel | HybridScopedModel):
         return {'contract_id': context.contract_id}
     return {}
+
+
+def fetch_all(cursor):
+    """Linhas do último resultado como dicionários (SQL com vários comandos num `execute`).
+
+    O cursor começa no resultado do 1º comando; avança até o último antes de ler.
+    """
+    while cursor.nextset():
+        pass
+    if cursor.description is None:
+        return []
+    columns = [column.name for column in cursor.description]
+    return [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]

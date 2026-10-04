@@ -51,7 +51,7 @@ queryset): ele mantém o escopo de tenant automático. SQL cru só quando o ORM 
 apps/<app>/
 ├── queries/
 │   ├── __init__.py
-│   └── relatorio_xpto.py    ← RELATORIO_XPTO = """-- RELATORIO XPTO ..."""
+│   └── movements_report.py  ← MOVEMENTS_REPORT = """-- MOVEMENTS REPORT ..."""
 └── selectors.py             ← importa a constante, passa o contexto e executa
 ```
 
@@ -96,8 +96,8 @@ SELECT ...;
 | Só o SQL literal no arquivo, sem lógica nem import do app | mesma regra do `constants.py` |
 | `contract` e `organization` são o **id interno** (bigint), com cast explícito | JOIN direto; o banco infere o tipo do parâmetro |
 | Parâmetros nomeados (`%(contract)s`), nunca f-string, `format` ou concatenação; nomes únicos no SQL | SQL injection (skill `owasp-top-10`, A03) |
-| Só o selector executa; lê `contract`/`organization` de `get_context()` e falha sem contrato (`TenantContextMissing`) | SQL cru não passa pelo manager com escopo (ADR 0006 §1.3) |
-| Com vários comandos, o selector avança até o último resultado (`while cursor.nextset(): pass`) | o cursor começa no resultado do 1º comando |
+| Só o selector executa, com `@tenant_params`; falha sem contrato/organização (`TenantContextMissing`) | SQL cru não passa pelo manager com escopo (ADR 0006 §1.3) |
+| Ler o resultado com `fetch_all(cursor)` | o cursor começa no resultado do 1º comando; `fetch_all` avança até o último |
 | Um SQL com tabela `parametros` por transação | `ON COMMIT DROP` só apaga no fim da transação |
 | Não ativar `server_side_binding` no banco | vários comandos com parâmetros num `execute` dependem do binding no cliente (padrão do Django), testado em 2026-10-04 |
 | Teste de isolamento próprio para cada query (outro contrato e outra organização) | a camada F (2.5) testa managers, não SQL cru |
@@ -105,25 +105,39 @@ SELECT ...;
 
 ### Selector
 
+`@tenant_params` (`apps/core/tenancy.py`) valida o contexto e injeta `tenant`;
+`fetch_all` (`apps/core/utils.py`) avança até o último resultado e devolve dicionários.
+
 ```python
 from django.db import connection
 
-from apps.core.tenancy import TenantContextMissing, get_context
+from apps.core.tenancy import tenant_params
+from apps.core.utils import fetch_all
 
-from .queries.relatorio_xpto import RELATORIO_XPTO
+from .queries.feedlot_batch_details import FEEDLOT_BATCH_DETAILS
 
 
-def relatorio_xpto():
-    context = get_context()
-    if context is None or context.contract_id is None:
-        raise TenantContextMissing('relatorio_xpto exige contrato no contexto.')
-    params = {'contract': context.contract_id, 'organization': context.organization_id}
+@tenant_params(organization=True)  # organization=False: só exige contrato
+def feedlot_batch_details(feedlot_id, diet_id, day, include_costs=False, *, tenant):
     with connection.cursor() as cursor:
-        cursor.execute(RELATORIO_XPTO, params)
-        while cursor.nextset():  # SQL com vários comandos: resultado do último.
-            pass
-        return cursor.fetchall()
+        cursor.execute(
+            FEEDLOT_BATCH_DETAILS,
+            {
+                **tenant,  # {'contract': ..., 'organization': ...} do contexto
+                'feedlot_id': feedlot_id,
+                'diet_id': diet_id,
+                'day': day,
+                'include_costs': include_costs,
+            },
+        )
+        return fetch_all(cursor)
 ```
+
+Contrato e organização **nunca** são argumentos do selector (anti-IDOR, OWASP A01): vêm do
+contexto validado. Parâmetros de negócio entram como argumentos; o JOIN com `parametros`
+garante que um id de outro contrato não retorne nada. Nomes de funções, parâmetros e
+queries em inglês, como o restante do código. Exemplo testado em
+`apps/core/tests/test_raw_queries.py`.
 
 ### Funções do PostgreSQL
 

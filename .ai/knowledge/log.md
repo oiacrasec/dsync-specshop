@@ -8,6 +8,8 @@
 - Formato: `-- NOME` na 1ª linha; CTE (ou temporária `ON COMMIT DROP`) `parametros` com
   `contract`/`organization` (id interno, cast); tudo num `execute` (binding no cliente, testado);
   selector avança com `nextset()`. Funções do PostgreSQL: futuro command idempotente no deploy.
+- `@tenant_params(organization=...)` injeta `tenant` do contexto (falha fechada) e `fetch_all`
+  devolve dicts do último resultado; testados em `core/tests/test_raw_queries.py`. Nomes em inglês.
 
 ## 2026-10-04 — Organização dos módulos dos apps
 
