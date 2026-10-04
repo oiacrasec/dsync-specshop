@@ -40,6 +40,7 @@ e só começa após aprovação do usuário.
 | 28 | Usuário aprovou service_class nos serializers; ServiceModelSerializer centraliza create/update chamando save_instance, sem staticmethod nos recursos (ADR 0025) |
 | 29 | Usuário determinou schema de colunas/filtros por campos do model, label/tipo/URL automáticos com sobrescrita por campo; ordenação usa OrderingFilter sem duplicação na view (ADR 0026) |
 | 30 | Usuário aprovou classes de selectors/base no core e selector_class nas views; determinou ordem selector_class, serializer_class, filterset_class e demais configurações (ADR 0027) |
+| 31 | Usuário revisou a preferência: queryset diretamente nas views para consultas simples, sem função de selector só para isso; selectors para lógica própria; ordem queryset/serializer_class/filterset_class/demais; ADR 0028 substitui 0027 |
 
 ## Bloco 0 — Fundação
 

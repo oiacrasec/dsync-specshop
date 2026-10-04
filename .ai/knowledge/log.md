@@ -1,5 +1,20 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Revisão 5.2: querysets simples diretamente nas views
+
+- Usuário determinou queries simples diretamente no queryset da view, sem selector wrapper.
+  Removidas classes de selectors e SelectorQuerysetMixin; get_queryset padrão do DRF.
+  Ordem nas views: queryset, serializer_class, filterset_class, demais configurações.
+- Administração conserva unscoped explícito, inativos, soft delete e JOIN do plano;
+  queryset construído sem SQL, clonado por requisição. Recursos de tenant continuam
+  construindo querysets durante requisição, sem relaxar managers/contexto.
+- Validação: 464 testes e checks/lint/formato/migrations OK. Cobertura existente
+  verifica CRUD, inativos/excluídos, queries constantes/JOIN e isolamento/autorização.
+  OWASP A01–A10 sem achados
+  novos, nenhuma query/escrita/lock adicional; mesma conformidade anterior.
+- Arquivos: contracts/selectors/views/tests, core/selectors/mixins/views/tests,
+  backend/AGENTS/README/style, API/plano/overview, ADR 0028, memória/handoff.
+
 ## 2026-10-04 — Revisão 5.2: classes de selectors
 
 - BaseModelSelector preserva o contexto do manager e aplica select_related declarado;

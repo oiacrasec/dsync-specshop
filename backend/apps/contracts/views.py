@@ -9,18 +9,19 @@ from apps.core.views import BaseAdminModelViewSet
 
 from . import selectors
 from .filters import ContractFilterSet, OrganizationFilterSet, PlanFilterSet
+from .models import Contract, Plan
 from .serializers import ContractSerializer, OrganizationSummarySerializer, PlanSerializer
 
 
 class PlanViewSet(BaseAdminModelViewSet):
-    selector_class = selectors.PlanSelector
+    queryset = Plan.objects.unscoped()
     serializer_class = PlanSerializer
     filterset_class = PlanFilterSet
     schema_columns = ('name', 'is_active')
 
 
 class ContractViewSet(BaseAdminModelViewSet):
-    selector_class = selectors.ContractSelector
+    queryset = Contract.objects.unscoped().select_related('plan')
     serializer_class = ContractSerializer
     filterset_class = ContractFilterSet
     schema_columns = ('name', 'start_date', 'licenses')

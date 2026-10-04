@@ -3,38 +3,9 @@
 from functools import reduce
 from operator import or_
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 
 from .constants import OPTIONS_DEFAULT_ROWS
-
-
-class BaseModelSelector:
-    """Leitura com o contexto atual; declare model e relações para JOIN."""
-
-    model = None
-    select_related = ()
-
-    @classmethod
-    def get_queryset(cls):
-        if cls.model is None:
-            raise ImproperlyConfigured('Declare the selector model before exposing its API.')
-        queryset = cls.get_base_queryset()
-        if cls.select_related:
-            queryset = queryset.select_related(*cls.select_related)
-        return queryset
-
-    @classmethod
-    def get_base_queryset(cls):
-        return cls.model.objects.all()
-
-
-class BaseAdminModelSelector(BaseModelSelector):
-    """Leitura global explícita; use somente após autorização administrativa."""
-
-    @classmethod
-    def get_base_queryset(cls):
-        return cls.model.objects.unscoped()
 
 
 def lookup_options(*, queryset, label_field, search_fields, q='', first=0, rows=OPTIONS_DEFAULT_ROWS, public_id=None):

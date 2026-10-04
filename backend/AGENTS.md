@@ -29,7 +29,8 @@ na última LTS, com `~=` nos requirements (patches automáticos).
 | `filters.py` | FilterSets django-filter com filtros/busca/ordenação declarados |
 | `tests/` | testes do app (`test_*.py`) |
 
-Leitura: `View → Selector → Model`. Escrita: `View → Serializer → Service → Model`.
+Leitura: `View → Queryset → Model` para consultas simples; lógica de leitura própria
+fica em selectors. Escrita: `View → Serializer → Service → Model`.
 ModelSerializers de escrita com regras herdam `ServiceModelSerializer`: declarar
 `service_class` (classe que herda BaseModelService); create/update chamam save_instance
 com dados validados/ator/instância. Views usam serializer.save() do DRF; exclusão via
@@ -91,7 +92,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   filtram pelo contexto de tenant** (`apps/core/tenancy.py`) e levantam `TenantContextMissing`
   sem contexto. Acesso global só por `Model.objects.unscoped()` ou `system_context()`/`@system_scope`
   (services de integridade, comandos, autenticação). `_base_objects` é só do Django (FKs).
-  Nunca declarar `queryset = Model.objects...` no nível da classe: use `TenantScopedViewMixin`
+  Em recursos de tenant, não declarar queryset com manager dependente de contexto
+  no nível da classe: use `TenantScopedViewMixin`
   com `model` e `ScopedModelSerializer` (FKs por `public_id`, sem `id`/`contract`/`organization`).
   No `User`, `is_active` mantém a semântica de autenticação do Django.
 - Código em inglês (models, campos, funções, parâmetros, queries e constantes); rótulos,
@@ -123,11 +125,12 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
   `BaseAdminModelViewSet` compõe hooks padrão e mixins; views declaram
-  `selector_class`, além de schema/filtros. Manter a ordem de configuração nas views:
-  selector_class, serializer_class, filterset_class e depois as demais propriedades.
-  SelectorQuerysetMixin chama selector_class.get_queryset. BaseModelSelector preserva
-  contexto/inativos e permite select_related explícito; BaseAdminModelSelector usa
-  unscoped somente em recursos administrativos autorizados (ADR 0027). Exclusão é herdada
+  `queryset = Contract.objects.unscoped().select_related('plan')`, além de schema/filtros. Manter a ordem:
+  queryset, serializer_class, filterset_class e depois as demais propriedades.
+  Selectors ficam para consultas com lógica própria; administração usa unscoped explícito, queryset lazy
+  construído sem SQL e get_queryset padrão do DRF clona por requisição (ADR 0028).
+  Managers com tenant continuam exigindo contexto; não chamar esses selectors na
+  declaração da view. Exclusão é herdada
   da base via `BaseModelService.delete_instance`; não declarar delete_service por
   recurso. Services de domínio herdam BaseModelService, definem model/regras e são
   registrados explicitamente no AppConfig.ready (ADR 0024). Não inferir nomes.

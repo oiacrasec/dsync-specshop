@@ -160,7 +160,6 @@ limite de 120 caracteres continuam ativos.
 
 | Componente | Responsabilidade |
 |---|---|
-| `SelectorQuerysetMixin` | leitura pelo selector declarado |
 | `ServiceDeleteMixin` | exclusão pelo BaseModelService herdado da view base |
 | `ServiceModelSerializer` | create/update por service_class.save_instance |
 | `ListFilterMixin` | aplica o backend django-filter nas listagens, preservando detalhes |
@@ -175,11 +174,11 @@ limite de 120 caracteres continuam ativos.
 de negação por padrão. Selectors de recursos comuns devem preservar o escopo;
 services continuam responsáveis pelas regras e escritas.
 
-O recurso declara suas classes explicitamente, sem descoberta automática por nome:
+O recurso declara queryset e configurações explicitamente:
 
 ```python
 class ContractViewSet(BaseAdminModelViewSet):
-    selector_class = selectors.ContractSelector
+    queryset = Contract.objects.unscoped().select_related('plan')
     serializer_class = ContractSerializer
     filterset_class = ContractFilterSet
 
@@ -188,9 +187,10 @@ class ContractSerializer(ServiceModelSerializer):
     service_class = services.ContractService
 ```
 
-Manter sempre a ordem: `selector_class`, `serializer_class`, `filterset_class` e
-depois as demais configurações. A base chama `selector_class.get_queryset()`;
-o selector retorna queryset lazy. A view chama `serializer.save()` pelo fluxo padrão
+Manter sempre a ordem: `queryset`, `serializer_class`, `filterset_class` e depois
+as demais configurações. Consultas administrativas simples são declaradas diretamente
+no queryset, lazy e sem SQL. get_queryset padrão do DRF clona por requisição.
+A view chama `serializer.save()` pelo fluxo padrão
 do DRF; `ServiceModelSerializer.create/update` chama `service_class.save_instance`
 repassando `values`, `actor` e, na
 atualização, `instance` ao service. O ator vem do request no contexto do serializer,
@@ -198,14 +198,14 @@ passado explicitamente ao service, sem dependência da requisição no model.
 Cada serializer declara somente a classe do service, sem staticmethod ou métodos
 create/update próprios. A classe padrão é BaseModelService, cuja gravação falha
 sem regras de domínio implementadas (ADR 0025).
-Selectors de model herdam `BaseModelSelector`, declaram `model` e, opcionalmente,
-`select_related = ('plan',)`. A base aplica JOINs somente quando declarados, sem
-`select_related()` vazio, que incluiria relações adicionais. O manager preserva
-contexto, exclui soft deleted e mantém inativos; sem contexto falha.
-`BaseAdminModelSelector` troca somente o queryset inicial por `objects.unscoped()`;
-usar exclusivamente na administração já autorizada. PlanSelector/ContractSelector
-herdam essa base; ContractSelector mantém JOIN do plano. Não inferir classe pelo
-nome nem executar consultas ao declarar/importar selectors (ADR 0027).
+Querysets administrativos usam `objects.unscoped()` explicitamente, preservam
+inativos e excluem soft deleted; ContractViewSet mantém select_related('plan').
+Não criar selector que só repita essa declaração; reservar selectors para lógica
+própria de leitura. Sem classe de selector, staticmethod ou mixin (ADR 0028 substitui 0027).
+Essa declaração é própria dos recursos globais com SuperadminPermission. Selectors
+dependentes de tenant devem ser chamados em get_queryset durante a requisição,
+ou usar TenantScopedViewMixin: construir queryset contextual na importação falha
+ou capturaria o contexto errado. Não avaliar queryset na declaração da view.
 O service de exclusão recebe `instance` e `actor` pelo mixin da view. Gravação retorna
 a instância persistida, que o DRF associa ao serializer. Regras/locks/auditoria ficam
 no service, inclusive quando serializer.save() é chamado sem uma view.

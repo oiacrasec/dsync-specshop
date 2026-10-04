@@ -1,4 +1,4 @@
-"""Views base compostas; recursos declaram selectors e herdam exclusão comum."""
+"""Views base compostas; recursos declaram querysets e herdam exclusão comum."""
 
 from django.db import transaction
 from rest_framework import viewsets
@@ -7,7 +7,6 @@ from .filters import ValidatedDjangoFilterBackend
 from .mixins import (
     ListFilterMixin,
     LookupOptionsMixin,
-    SelectorQuerysetMixin,
     ServiceDeleteMixin,
     TableSchemaMixin,
 )
@@ -23,7 +22,7 @@ def api_not_found(request):
 
 
 # fmt: off
-class BaseModelViewSet(SelectorQuerysetMixin, ServiceDeleteMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
+class BaseModelViewSet(ServiceDeleteMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
                        viewsets.ModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'
