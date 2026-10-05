@@ -31,6 +31,8 @@ Ordem seguinte: 6.6 → 6.7 → 6.8 (decisões 37–41 do plano).
   Senhas não persistidas; troca usa resumo atualizado, mínimo UI 12 + confirmação.
 - ETag global legado URL-only e resumo de permissões GIS desabilitados. Não existe
   endpoint de resumo RBAC no Core. Dev proxy /api → 127.0.0.1:8000; sem novo CORS.
+- Usuário confirmou login manual de datasync_admin funcionando. Antes houve
+  credenciais rejeitadas/429 pelo limite 5 falhas/min; nenhuma senha foi redefinida.
 - Validação 6.5: 44 testes ChromeHeadless, lint/formato/build; 555 testes backend,
   Ruff/migrations/checks dev/prod OK. 30 pedidos comuns sem storage/refresh.
   Bundle ~1,25 MB/~257 KB estimados. Sem E2E completo duas abas/backend, ensaio de
