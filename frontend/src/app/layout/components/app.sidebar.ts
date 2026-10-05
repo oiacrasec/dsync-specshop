@@ -301,7 +301,7 @@ export class AppSidebar implements OnInit, OnDestroy {
     }
 
     getOrganizationName(): string | null {
-        return this.userContextService.getActiveContext()?.organizacao_nome?.trim() ?? null;
+        return this.userContextService.getActiveContext()?.organization_name?.trim() ?? null;
     }
 
     getOrganizationLabel(): string | null {

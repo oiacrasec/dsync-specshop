@@ -4,8 +4,6 @@ import { ToastModule } from 'primeng/toast';
 import { PrimeNG } from 'primeng/config';
 
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
-import { PermissionContextService } from '@/app/core/services/permission-context.service';
-import { UserContextService } from '@/app/core/services/user-context.service';
 
 @Component({
     selector: 'app-root',
@@ -17,33 +15,12 @@ import { UserContextService } from '@/app/core/services/user-context.service';
     `
 })
 export class AppComponent {
-    private authSession = inject(AuthSessionService);
-    private permissionContextService = inject(PermissionContextService);
-    private userContextService = inject(UserContextService);
     private primengConfig = inject(PrimeNG);
 
     constructor() {
-        this.authSession.initExpiryWarning();
-        this.preloadPermissions();
+        // Inicializa a sessão e a sincronização entre abas; sem polling de auth/permissões.
+        inject(AuthSessionService);
         this.configureLocale();
-    }
-
-    private preloadPermissions() {
-        const user = this.authSession.getUser();
-
-        if (!user) {
-            return;
-        }
-
-        if (!user.is_superuser && !this.userContextService.hasActiveContext()) {
-            return;
-        }
-
-        this.permissionContextService.loadForCurrentContext().subscribe({
-            error: () => {
-                // Guard/component-level checks handle permission errors.
-            }
-        });
     }
 
     private configureLocale() {

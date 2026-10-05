@@ -13,6 +13,14 @@
 
 ## Sessao, contexto e permissao
 
+**Core, etapa 6.5 (ADR 0035):** JWT e organização UUID em localStorage. Organização
+compartilhada e recarregamento entre abas; refresh/logout coordenados por Web Locks.
+Interceptors registrados: `contextErrorInterceptor` envolvendo `authInterceptor`.
+`etagInterceptor` global desabilitado: cache só por URL não separa conta/contexto.
+`PermissionContextService` legado desabilitado (nega por padrão, sem chamada HTTP):
+o Core ainda não tem endpoint de resumo. O fluxo abaixo é referência GIS, não
+contrato ativo. Detalhes: [autenticação Core](../architecture/authentication.md).
+
 Servicos centrais:
 
 - `AuthSessionService`: tokens, expiracao, usuario.

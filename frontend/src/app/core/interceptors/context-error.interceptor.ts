@@ -1,62 +1,59 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { catchError, throwError } from 'rxjs';
-
 import { API_BASE_URL } from '../tokens/api-base-url';
 import { AuthSessionService } from '../services/auth-session.service';
-import { PermissionContextService } from '../services/permission-context.service';
 import { UserContextService } from '../services/user-context.service';
-
-const CONTEXT_SELECTION_PATH = '/contexto/selecao';
+import { apiPath } from '../utils/api-url';
+import { apiProblem } from '../utils/api-problem';
 
 export const contextErrorInterceptor: HttpInterceptorFn = (req, next) => {
     const baseUrl = inject(API_BASE_URL);
     const router = inject(Router);
-    const messageService = inject(MessageService);
-    const authSessionService = inject(AuthSessionService);
-    const userContextService = inject(UserContextService);
-    const permissionContextService = inject(PermissionContextService);
+    const messages = inject(MessageService);
+    const session = inject(AuthSessionService);
+    const contexts = inject(UserContextService);
+    const revision = session.getRevision();
+    const organization = contexts.getActiveContext()?.organization_public_id;
+    const hadSession = !!session.getUser();
+    const path = apiPath(req.url, baseUrl);
 
     return next(req).pipe(
         catchError((error) => {
-            if (!(error instanceof HttpErrorResponse)) {
+            const problem = apiProblem(error);
+
+            if (!path || !problem || !hadSession || ['/auth/login/', '/auth/logout/'].includes(path)) {
                 return throwError(() => error);
             }
 
-            if (!req.url.startsWith(baseUrl) || !authSessionService.isAuthenticated()) {
+            // Uma resposta da sessão/contexto anterior não pode alterar a sessão nova.
+            if (revision !== session.getRevision() || organization !== contexts.getActiveContext()?.organization_public_id) {
                 return throwError(() => error);
             }
 
-            const user = authSessionService.getUser();
+            if (problem.type === 'urn:datasync:problem:authentication-required' || problem.type === 'urn:datasync:problem:contract-inactive') {
+                session.clearSession();
 
-            if (user?.is_superuser) {
-                return throwError(() => error);
+                if (!router.url.startsWith('/landing/login')) {
+                    void router.navigateByUrl('/landing/login');
+                }
+            } else if (problem.type === 'urn:datasync:problem:password-change-required' && !session.getUser()?.is_superuser) {
+                session.updateUser({ must_change_password: true });
+                contexts.clearActiveContext();
+
+                if (!router.url.startsWith('/primeiro-acesso/trocar-senha')) {
+                    void router.navigateByUrl('/primeiro-acesso/trocar-senha');
+                }
+            } else if (['urn:datasync:problem:context-invalid-request', 'urn:datasync:problem:context-forbidden'].includes(problem.type) && !session.getUser()?.is_superuser) {
+                contexts.clearActiveContext();
+
+                if (!router.url.startsWith('/contexto/selecao')) {
+                    void router.navigate(['/contexto/selecao'], { queryParams: { returnUrl: router.url } });
+                    messages.add({ severity: 'warn', summary: 'Contexto de trabalho', detail: 'Selecione novamente a organização para continuar.' });
+                }
             }
-
-            const errorCode = error.error?.code;
-            const isInvalidRequest = error.status === 400 && errorCode === 'context_invalid_request';
-            const isForbidden = error.status === 403 && errorCode === 'context_forbidden';
-
-            if (!isInvalidRequest && !isForbidden) {
-                return throwError(() => error);
-            }
-
-            userContextService.clearActiveContext();
-            permissionContextService.clearCache();
-
-            if (!router.url.startsWith(CONTEXT_SELECTION_PATH)) {
-                void router.navigate([CONTEXT_SELECTION_PATH], {
-                    queryParams: { returnUrl: router.url }
-                });
-            }
-
-            messageService.add({
-                severity: isForbidden ? 'warn' : 'info',
-                summary: 'Contexto de trabalho',
-                detail: 'Selecione novamente a organização para continuar.'
-            });
 
             return throwError(() => error);
         })

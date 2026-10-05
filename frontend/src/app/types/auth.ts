@@ -3,26 +3,12 @@ export interface LoginRequest {
     password: string;
 }
 
-export type UserType = 'INTERNAL' | 'CITIZEN';
-export type UserAccessStatus = 'ATIVO' | 'BLOQUEADO' | 'INATIVO';
-
 export interface LoginUser {
-    uuid: string;
+    public_id: string;
     username: string;
     name: string;
-    email: string;
     is_superuser: boolean;
-    user_type: UserType;
-    status_acesso: UserAccessStatus;
     must_change_password: boolean;
-}
-
-export interface LoginResponse {
-    access: string;
-    refresh: string;
-    access_expires_in: number;
-    refresh_expires_in: number;
-    user: LoginUser;
 }
 
 export interface TokenRefreshRequest {
@@ -31,11 +17,11 @@ export interface TokenRefreshRequest {
 
 export interface TokenRefreshResponse {
     access: string;
-    refresh?: string;
+    refresh: string;
 }
 
-export interface TokenVerifyRequest {
-    token: string;
+export interface LoginResponse extends TokenRefreshResponse {
+    user: LoginUser;
 }
 
 export interface FirstAccessPasswordChangeRequest {
@@ -45,5 +31,9 @@ export interface FirstAccessPasswordChangeRequest {
 }
 
 export interface FirstAccessPasswordChangeResponse {
-    detail: string;
+    user: LoginUser;
 }
+
+// DESABILITADO: contratos herdados de telas ainda não adaptadas à API do core.
+export type UserType = 'INTERNAL' | 'CITIZEN';
+export type UserAccessStatus = 'ATIVO' | 'BLOQUEADO' | 'INATIVO';

@@ -14,10 +14,11 @@ da Entrega 1. Comunica-se com o backend **só pela API HTTP** (`/api/v1/`).
 
 ```bash
 npm ci
-npm start          # http://localhost:4200, API em http://localhost:8000/api/v1
+npm start          # http://localhost:4200; /api/v1 via proxy para 127.0.0.1:8000
 npm run lint          # ESLint (código ativo; telas desabilitadas ficam fora até reativar)
 npm run format:check  # Prettier
 npm run build
+npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
 ## Ambientes
@@ -27,6 +28,24 @@ npm run build
 | `src/environments/environment.ts` | desenvolvimento (API local) |
 | `src/environments/environment.homol.ts` | homologação (URL a definir) |
 | `src/environments/environment.prod.ts` | produção (URL a definir) |
+
+## Autenticação e contexto (etapa 6.5)
+
+Login, refresh, logout, troca de senha e organizações usam o contrato do Core.
+Access/refresh e resumo do usuário ficam no **localStorage**, por decisão explícita
+do usuário; a API recebe Bearer JWT. A organização UUID também é compartilhada:
+trocar em uma aba recarrega o conteúdo de todas as abas da mesma origem/perfil.
+Formulários abertos podem ser descartados. Logout limpa sessão/contexto e tenta
+revogar o refresh no servidor; uma falha de revogação é informada.
+
+Refresh sob demanda, coordenado entre abas por Web Locks (HTTPS/localhost e navegador
+compatível). Sem polling. Primeiro acesso obrigatório redireciona à troca de senha;
+superadmin vai direto à home sem organização. Campos de senha não são persistidos.
+Erros seguem RFC 9457. Detalhes e limites: [autenticação](docs/architecture/authentication.md).
+
+As telas de contratos ainda usam o contrato GIS: adaptação na etapa 6.8. O resumo
+de permissões legado e o cache ETag global ficam desabilitados; não existe endpoint
+de resumo RBAC no Core nesta etapa. Telas fora do escopo permanecem desabilitadas.
 
 ## Docker
 

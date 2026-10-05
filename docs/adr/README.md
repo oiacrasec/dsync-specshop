@@ -51,6 +51,7 @@ um ADR novo que **substitui** o anterior.
 | [0032](0032-organizacoes-em-viewset-proprio.md) | Organizações acessíveis em ViewSet próprio | Proposto |
 | [0033](0033-api-administrativa-separada-do-dominio.md) | API do superadmin em administration, domínio em contracts e plano opcional | Aceito |
 | [0034](0034-primeiro-acesso-e-troca-de-senha.md) | Primeiro acesso e troca de senha com bloqueio global por JWT | Aceito |
+| [0035](0035-jwt-localstorage-e-contexto-entre-abas.md) | JWT em localStorage e organização sincronizada com recarregamento entre abas | Aceito |
 
 ## Modelo
 

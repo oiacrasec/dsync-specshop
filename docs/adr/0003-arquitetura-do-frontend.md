@@ -33,7 +33,7 @@ src/app/
 - Versão (última LTS do Angular no momento da implementação) e biblioteca de componentes.
 - Gerenciamento de estado.
 - Fluxo de seleção e troca de organização (header `X-Organization-Id`) e entrada direta do superadmin na área administrativa.
-- Armazenamento do token JWT (a referência usa `localStorage`, exposto a XSS; skill `owasp-top-10`, A07).
+- Armazenamento JWT e sincronização de organização resolvidos pelo [ADR 0035](0035-jwt-localstorage-e-contexto-entre-abas.md): localStorage e recarregamento entre abas, decisão explícita do usuário.
 - Estrutura da área administrativa (ADR 0008).
 - Componentes de seleção (referência `datasync-gis`): `ui-autocomplete` com padrão de 20 linhas e `public_id`; novo **autocomplete múltiplo**; contrato no ADR 0011.
 - Revisão após análise do projeto de referência.

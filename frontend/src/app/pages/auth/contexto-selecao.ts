@@ -1,225 +1,125 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
-import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { UserContextService } from '@/app/core/services/user-context.service';
-import { UserContextsResponse } from '@/app/types/context';
+import { AvailableOrganization } from '@/app/types/context';
+import { problemMessage } from '@/app/core/utils/api-problem';
+import { UiButton } from '@/app/shared/ui/button/button';
 
 @Component({
     selector: 'app-contexto-selecao',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule],
+    imports: [ReactiveFormsModule, UiButton],
     template: `
-        <section class="card max-w-3xl mx-auto">
-            <div class="flex flex-col gap-2">
-                <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Selecionar organização</h1>
-                <p class="text-surface-600 dark:text-surface-300">Escolha a organização para definir o contexto de trabalho desta sessão.</p>
+        <section class="card max-w-2xl mx-auto flex flex-col gap-6" [attr.aria-busy]="loading()">
+            <div>
+                <h1 class="text-2xl font-semibold">Organização de trabalho</h1>
+                <p>Selecione a organização para continuar. A escolha será aplicada a todas as abas.</p>
             </div>
-
-            @if (loading()) {
-                <div class="mt-8 flex flex-col gap-4">
-                    <div class="text-surface-600 dark:text-surface-300">Carregando contextos disponíveis...</div>
-                    <div class="flex items-center justify-start w-full gap-3">
-                        <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" (click)="logout()"></button>
-                    </div>
-                </div>
-            } @else if (!contexts()) {
-                <div class="mt-8 flex flex-col gap-4">
-                    <p class="text-surface-600 dark:text-surface-300">Não foi possível carregar os contextos.</p>
-                    <div class="flex items-center justify-between w-full gap-3">
-                        <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" (click)="logout()"></button>
-                        <button pButton type="button" label="Tentar novamente" class="!w-auto" (click)="loadContexts()"></button>
-                    </div>
-                </div>
-            } @else if (!(contexts()?.organizacoes?.length ?? 0)) {
-                <div class="mt-8 flex flex-col gap-4">
-                    <p class="text-surface-600 dark:text-surface-300">Seu usuário não possui organizações ativas vinculadas neste contrato.</p>
-                    <div class="flex items-center justify-between w-full gap-3">
-                        <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" (click)="logout()"></button>
-                        <button pButton type="button" label="Tentar novamente" class="!w-auto" (click)="loadContexts()"></button>
-                    </div>
-                </div>
-            } @else {
-                <div class="mt-8 flex flex-col gap-5">
-                    <div class="flex flex-col gap-2">
-                        <label for="organizacao" class="font-medium text-surface-700 dark:text-surface-200">Organização</label>
-                        <select
-                            id="organizacao"
-                            class="w-full p-3 border border-surface-300 dark:border-surface-700 rounded-lg bg-surface-0 dark:bg-surface-900"
-                            [ngModel]="selectedOrganizationId()"
-                            (ngModelChange)="selectedOrganizationId.set($event)"
-                        >
-                            <option [ngValue]="null">Selecione uma organização</option>
-                            @for (organization of organizations(); track organization.id) {
-                                <option [ngValue]="organization.id">{{ organization.nome }}</option>
-                            }
-                        </select>
-                    </div>
-
-                    @if (selectedOrganizationName()) {
-                        <div class="p-3 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-800/50">
-                            <span class="text-sm text-surface-700 dark:text-surface-200">
-                                Contrato: <strong>{{ contexts()?.contrato?.nome }}</strong>
-                            </span>
-                            <br />
-                            <span class="text-sm text-surface-700 dark:text-surface-200">
-                                Organização selecionada: <strong>{{ selectedOrganizationName() }}</strong>
-                            </span>
-                        </div>
-                    }
-
-                    <div class="flex items-center justify-between w-full gap-3">
-                        <button pButton type="button" label="Sair" severity="secondary" class="!w-auto" [disabled]="saving()" (click)="logout()"></button>
-                        <button pButton type="button" label="Confirmar contexto" class="!w-auto" [loading]="saving()" [disabled]="selectedOrganizationId() === null" (click)="confirmContext()"></button>
-                    </div>
-                </div>
+            <p role="status" aria-live="polite">{{ loading() ? 'Carregando organizações…' : '' }}</p>
+            <p role="alert" class="text-red-500">{{ errorMessage() }}</p>
+            @if (!loading() && organizations().length === 0 && !errorMessage()) {
+                <p>Nenhuma organização disponível. Entre em contato com o administrador do contrato.</p>
             }
+            <form [formGroup]="form" (ngSubmit)="confirm()" class="flex flex-col gap-4">
+                <label for="organization">Organização</label>
+                <select id="organization" formControlName="organization" class="p-3 border rounded-lg bg-surface-0 dark:bg-surface-900" [attr.aria-invalid]="form.controls.organization.touched && form.controls.organization.invalid">
+                    <option value="">Selecione uma organização</option>
+                    @for (organization of organizations(); track organization.public_id) {
+                        <option [value]="organization.public_id">{{ organization.name }}</option>
+                    }
+                </select>
+                <div class="flex flex-wrap justify-end gap-3">
+                    <ui-button label="Sair" severity="secondary" [loading]="leaving()" [disabled]="leaving()" (onClick)="logout()" />
+                    @if (errorMessage()) {
+                        <ui-button label="Tentar novamente" severity="secondary" [disabled]="loading() || leaving()" (onClick)="loadOrganizations()" />
+                    }
+                    <ui-button label="Continuar" type="submit" [disabled]="loading() || leaving() || organizations().length === 0" />
+                </div>
+            </form>
         </section>
     `
 })
 export class ContextoSelecaoPage implements OnInit {
-    private userContextService = inject(UserContextService);
-    private permissionContextService = inject(PermissionContextService);
-    private authSessionService = inject(AuthSessionService);
+    private contexts = inject(UserContextService);
+    private session = inject(AuthSessionService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private messageService = inject(MessageService);
-
-    contexts = signal<UserContextsResponse | null>(null);
-    selectedOrganizationId = signal<number | null>(null);
+    private messages = inject(MessageService);
+    organizations = signal<AvailableOrganization[]>([]);
     loading = signal(false);
-    saving = signal(false);
-
-    private returnUrl = '/kpi';
+    errorMessage = signal('');
+    leaving = signal(false);
+    form = inject(FormBuilder).nonNullable.group({ organization: ['', Validators.required] });
 
     ngOnInit() {
-        const user = this.authSessionService.getUser();
+        this.loadOrganizations();
+    }
 
-        if (user?.is_superuser) {
-            this.router.navigateByUrl('/');
-
+    loadOrganizations() {
+        if (this.loading()) {
             return;
         }
 
-        this.returnUrl = this.normalizeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'));
-        this.loadContexts();
-    }
-
-    loadContexts() {
         this.loading.set(true);
-        this.contexts.set(null);
-        this.selectedOrganizationId.set(null);
-        this.permissionContextService.clearCache();
+        this.errorMessage.set('');
+        const revision = this.session.getRevision();
 
-        this.userContextService
+        this.contexts
             .loadAvailableContexts()
             .pipe(finalize(() => this.loading.set(false)))
             .subscribe({
-                next: (contexts) => {
-                    this.userContextService.syncActiveContextLabelsFromAvailableContexts(contexts);
-                    this.contexts.set(contexts);
+                next: (organizations) => {
+                    if (revision !== this.session.getRevision()) {
+                        return;
+                    }
+
+                    this.organizations.set(organizations);
+                    this.contexts.syncActiveContextLabelsFromAvailableContexts(organizations);
+                    this.form.controls.organization.setValue(this.contexts.getActiveContext()?.organization_public_id ?? '');
                 },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Falha ao carregar contextos',
-                        detail: 'Não foi possível carregar as organizações disponíveis.'
-                    });
-                }
+                error: (error) => this.errorMessage.set(problemMessage(error, 'Não foi possível carregar as organizações.'))
             });
     }
 
-    selectedOrganizationName() {
-        const contexts = this.contexts();
-        const selectedOrganizationId = this.selectedOrganizationId();
-
-        if (!contexts || selectedOrganizationId === null) {
-            return null;
+    confirm() {
+        if (this.loading() || this.leaving()) {
+            return;
         }
 
-        const selected = contexts.organizacoes.find((organization) => organization.id === selectedOrganizationId);
+        const organization = this.organizations().find((item) => item.public_id === this.form.controls.organization.value);
 
-        return selected?.nome ?? null;
-    }
-
-    organizations() {
-        return this.contexts()?.organizacoes ?? [];
-    }
-
-    confirmContext() {
-        const contexts = this.contexts();
-        const selectedOrganizationId = this.selectedOrganizationId();
-
-        if (!contexts || !contexts.contrato || selectedOrganizationId === null) {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Seleção obrigatória',
-                detail: 'Selecione uma organização para continuar.'
-            });
+        if (!organization) {
+            this.form.markAllAsTouched();
+            this.errorMessage.set('Selecione uma organização disponível.');
 
             return;
         }
 
-        const selected = contexts.organizacoes.find((organization) => organization.id === selectedOrganizationId);
-
-        if (!selected) {
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Organização inválida',
-                detail: 'A organização selecionada não está disponível para este usuário.'
-            });
-
-            return;
-        }
-
-        this.saving.set(true);
-        this.userContextService.setActiveContext({
-            contrato_id: contexts.contrato.id,
-            contrato_nome: contexts.contrato.nome,
-            organizacao_id: selected.id,
-            organizacao_nome: selected.nome
-        });
-        this.permissionContextService.refreshForCurrentContext().subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Contexto definido',
-                    detail: 'Organização selecionada com sucesso.'
-                });
-                this.router.navigateByUrl(this.returnUrl).finally(() => {
-                    this.saving.set(false);
-                });
-            },
-            error: () => {
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Contexto salvo',
-                    detail: 'Não foi possível atualizar permissões agora. Tente novamente em instantes.'
-                });
-                this.router.navigateByUrl(this.returnUrl).finally(() => {
-                    this.saving.set(false);
-                });
-            }
-        });
+        this.contexts.setActiveContext({ organization_public_id: organization.public_id, organization_name: organization.name });
+        // Recria também esta aba: componentes e chamadas anteriores são descartados.
+        this.contexts.openContext(this.route.snapshot.queryParamMap.get('returnUrl'));
     }
 
     logout() {
-        this.permissionContextService.clearCache();
-        this.authSessionService.clearSession();
-        this.router.navigateByUrl('/landing/login');
-    }
-
-    private normalizeReturnUrl(value: string | null) {
-        if (!value || !value.startsWith('/') || value.startsWith('/contexto/selecao')) {
-            return '/kpi';
+        if (this.leaving()) {
+            return;
         }
 
-        return value;
+        this.leaving.set(true);
+        this.session
+            .logout()
+            .pipe(
+                finalize(() => {
+                    this.leaving.set(false);
+                    void this.router.navigateByUrl('/landing/login');
+                })
+            )
+            .subscribe({
+                error: () => this.messages.add({ severity: 'warn', summary: 'Sessão encerrada neste navegador', detail: 'Não foi possível confirmar a revogação no servidor.' })
+            });
     }
 }

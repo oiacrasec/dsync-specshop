@@ -8,7 +8,6 @@ import { MessageService } from 'primeng/api';
 import { appRoutes } from './app.routes';
 import { definePreset } from '@primeuix/themes';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
-import { etagInterceptor } from './app/core/interceptors/etag.interceptor';
 import { contextErrorInterceptor } from './app/core/interceptors/context-error.interceptor';
 import { environment } from './environments/environment';
 
@@ -82,7 +81,8 @@ export const appConfig: ApplicationConfig = {
             }),
             withEnabledBlockingInitialNavigation()
         ),
-        provideHttpClient(withFetch(), withInterceptors([authInterceptor, etagInterceptor, contextErrorInterceptor])),
+        // Erros envolvem a renovação/repetição; ETag global legado fica desabilitado (cache só por URL).
+        provideHttpClient(withFetch(), withInterceptors([contextErrorInterceptor, authInterceptor])),
         provideZonelessChangeDetection(),
         providePrimeNG({ theme: { preset: MyPreset, options: { darkModeSelector: '.app-dark' } } }),
         MessageService,

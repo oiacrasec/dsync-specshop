@@ -15,6 +15,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { FormsModule } from '@angular/forms';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
+import { MessageService } from 'primeng/api';
+import { finalize } from 'rxjs';
 
 interface NotificationsBars {
     id: string;
@@ -176,6 +178,8 @@ export class AppTopbar {
     private authSession = inject(AuthSessionService);
     private permissionContext = inject(PermissionContextService);
     private router = inject(Router);
+    private messages = inject(MessageService);
+    private leaving = false;
 
     isDarkTheme = computed(() => this.layoutService.isDarkTheme());
 
@@ -302,9 +306,24 @@ export class AppTopbar {
 
     logout(event: Event) {
         event.preventDefault();
+
+        if (this.leaving) {
+            return;
+        }
+
+        this.leaving = true;
         this.permissionContext.clearCache();
-        this.authSession.clearSession();
-        this.router.navigateByUrl('/landing/login');
+        this.authSession
+            .logout()
+            .pipe(
+                finalize(() => {
+                    this.leaving = false;
+                    void this.router.navigateByUrl('/landing/login');
+                })
+            )
+            .subscribe({
+                error: () => this.messages.add({ severity: 'warn', summary: 'Sessão encerrada neste navegador', detail: 'Não foi possível confirmar a revogação no servidor.' })
+            });
     }
 
     switchContext(event: Event) {

@@ -152,6 +152,16 @@ o inventário/política do controlador conforme sua relação com os titulares.
 O resumo só retorna dados da própria conta. Não há novo envio a terceiros ou tracking.
 Fonte: [LGPD, texto oficial](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm).
 
+## Cliente Angular (etapa 6.5)
+
+Decisão explícita do usuário: access/refresh no localStorage, enviados como Bearer
+(ADR 0035), mantendo o contrato JSON acima. O resumo mínimo de usuário também é
+persistido para UX; a API continua validando conta/contrato/permissões a cada pedido.
+Organização UUID é compartilhada entre abas; trocar recarrega conteúdo e limpa caches.
+Refresh/logout são coordenados por Web Locks para não consumir o mesmo refresh duas
+vezes. Não há cookie de autenticação nem mudança de CSRF/backend nesta etapa.
+Tokens continuam acessíveis a JavaScript; controles contra XSS são necessários.
+
 ## Limite de falhas de login
 
 Por confirmação do usuário, contar **somente falhas de autenticação por conta**,

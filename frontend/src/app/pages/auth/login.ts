@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
 import { Router, RouterModule } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,6 +11,7 @@ import { MessageService } from 'primeng/api';
 
 import { AuthService } from '@/app/core/services/auth.service';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
+import { problemMessage } from '@/app/core/utils/api-problem';
 
 @Component({
     selector: 'app-login',
@@ -35,24 +36,19 @@ import { AuthSessionService } from '@/app/core/services/auth-session.service';
                             <div class="flex items-center justify-center">
                                 <app-auth-logo-widget />
                             </div>
-                            <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync GIS</h1>
+                            <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync</h1>
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="username" class="font-medium text-surface-500 dark:text-white/64">Usuario</label>
-                            <input name="username" pInputText id="username" formControlName="username" class="w-full" />
+                            <label for="username" class="font-medium text-surface-500 dark:text-white/64">Usuário</label>
+                            <input name="username" pInputText id="username" formControlName="username" autocomplete="username" class="w-full" />
                         </div>
                         <div class="flex flex-col gap-2">
                             <label for="password" class="font-medium text-surface-500 dark:text-white/64">Senha</label>
-                            <input name="password" pInputText id="password" formControlName="password" type="password" class="w-full" />
+                            <input name="password" pInputText id="password" formControlName="password" type="password" autocomplete="current-password" class="w-full" />
                         </div>
-                        <div class="flex items-center justify-between">
-                            <a routerLink="" class="font-semibold text-primary">Esqueceu a senha?</a>
-                        </div>
-                        <p-button class="w-full" rounded type="submit" [loading]="loading" label="Login"></p-button>
-                        <div class="flex items-center justify-center gap-2 mt-8">
-                            <span class="text-surface-500 dark:text-white/64">Não registrado?</span>
-                            <a routerLink="/landing/login" class="text-primary">Crie uma Conta</a>
-                        </div>
+                        <p class="text-red-500" role="alert">{{ errorMessage() }}</p>
+                        <p-button class="w-full" rounded type="submit" [loading]="loading()" [disabled]="loading()" label="Entrar"></p-button>
+                        <!-- DESABILITADO: recuperação e cadastro público fora do escopo atual. -->
                     </form>
                 </div>
             </div>
@@ -66,7 +62,8 @@ export class Login {
     private router = inject(Router);
     private messageService = inject(MessageService);
 
-    loading = false;
+    loading = signal(false);
+    errorMessage = signal('');
     form = this.fb.nonNullable.group({
         username: ['', Validators.required],
         password: ['', Validators.required]
@@ -79,6 +76,10 @@ export class Login {
     }
 
     submit() {
+        if (this.loading()) {
+            return;
+        }
+
         if (this.form.invalid) {
             this.form.markAllAsTouched();
             this.messageService.add({
@@ -90,22 +91,30 @@ export class Login {
             return;
         }
 
-        this.loading = true;
+        this.loading.set(true);
+        this.errorMessage.set('');
         const payload = this.form.getRawValue();
 
         this.authService
             .login(payload)
-            .pipe(finalize(() => (this.loading = false)))
+            .pipe(finalize(() => this.loading.set(false)))
             .subscribe({
                 next: (response) => {
-                    this.authSession.setSession(response);
-                    this.navigateAfterLogin();
+                    try {
+                        this.authSession.setSession(response);
+                        this.form.controls.password.reset();
+                        this.navigateAfterLogin();
+                    } catch {
+                        this.authSession.clearSession();
+                        this.errorMessage.set('Não foi possível guardar a sessão neste navegador.');
+                    }
                 },
-                error: () => {
+                error: (error) => {
+                    this.errorMessage.set(problemMessage(error, 'Não foi possível entrar. Tente novamente.'));
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Login invalido',
-                        detail: 'Verifique suas credenciais e tente novamente.'
+                        detail: this.errorMessage()
                     });
                 }
             });

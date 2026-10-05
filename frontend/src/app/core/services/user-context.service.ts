@@ -1,138 +1,130 @@
-import { Injectable, inject } from '@angular/core';
-
-import { AuthService } from '@/app/core/services/auth.service';
-import { TableQueryCacheService } from '@/app/core/services/table-query-cache.service';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { AuthService } from './auth.service';
+import { TableQueryCacheService } from './table-query-cache.service';
 import { ActiveUserContext, UserContextsResponse } from '@/app/types/context';
+import { CONTEXT_KEY, UUID_PATTERN } from '../utils/session-data';
 
-const ACTIVE_CONTEXT_KEY = 'dss_active_context';
+interface StoredContext extends ActiveUserContext {
+    user_public_id: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class UserContextService {
     private authService = inject(AuthService);
     private tableQueryCache = inject(TableQueryCacheService);
+    private activeContext = signal<StoredContext | null>(this.restoreContext());
+    private userPublicId: string | null = null;
+
+    constructor() {
+        const synchronize = (event: StorageEvent) => {
+            if (event.storageArea !== localStorage || (event.key !== CONTEXT_KEY && event.key !== null)) {
+                return;
+            }
+
+            const current = this.activeContext();
+            const latest = this.restoreContext();
+
+            if (current?.organization_public_id === latest?.organization_public_id && current?.user_public_id === latest?.user_public_id) {
+                this.activeContext.set(latest);
+
+                return;
+            }
+
+            this.activeContext.set(latest?.user_public_id === this.userPublicId ? latest : null);
+            this.tableQueryCache.clearAll();
+            this.reloadPage();
+        };
+
+        window.addEventListener('storage', synchronize);
+        inject(DestroyRef).onDestroy(() => window.removeEventListener('storage', synchronize));
+    }
+
+    bindUser(publicId: string) {
+        if (this.activeContext() && this.activeContext()?.user_public_id !== publicId) {
+            this.clearActiveContext();
+        }
+
+        this.userPublicId = publicId;
+    }
 
     loadAvailableContexts() {
         return this.authService.contexts();
     }
 
     setActiveContext(context: ActiveUserContext) {
-        this.persistActiveContext(context, true);
+        if (!this.userPublicId || !UUID_PATTERN.test(context.organization_public_id)) {
+            throw new Error('Organização inválida.');
+        }
+
+        const value = { ...context, user_public_id: this.userPublicId };
+
+        localStorage.setItem(CONTEXT_KEY, JSON.stringify(value));
+        this.tableQueryCache.clearAll();
+        this.activeContext.set(value);
     }
 
     syncActiveContextLabelsFromAvailableContexts(contexts: UserContextsResponse) {
-        const activeContext = this.getActiveContext();
+        const active = this.activeContext();
 
-        if (!activeContext || !contexts.contrato) {
+        if (!active) {
             return;
         }
 
-        if (activeContext.contrato_id !== contexts.contrato.id) {
-            return;
+        const matched = contexts.find((organization) => organization.public_id === active.organization_public_id);
+
+        if (!matched) {
+            this.clearActiveContext();
+        } else if (matched.name !== active.organization_name) {
+            this.setActiveContext({ organization_public_id: matched.public_id, organization_name: matched.name });
         }
-
-        const matchedOrganization = contexts.organizacoes.find((organization) => organization.id === activeContext.organizacao_id);
-
-        if (!matchedOrganization) {
-            return;
-        }
-
-        const nextContext: ActiveUserContext = {
-            ...activeContext,
-            contrato_nome: contexts.contrato.nome,
-            organizacao_nome: matchedOrganization.nome
-        };
-
-        const shouldUpdate = nextContext.contrato_nome !== activeContext.contrato_nome || nextContext.organizacao_nome !== activeContext.organizacao_nome;
-
-        if (!shouldUpdate) {
-            return;
-        }
-
-        this.persistActiveContext(nextContext, false);
-    }
-
-    updateActiveOrganizationName(organizationId: number, organizationName: string) {
-        const activeContext = this.getActiveContext();
-
-        if (!activeContext || activeContext.organizacao_id !== organizationId) {
-            return;
-        }
-
-        const normalizedName = (organizationName ?? '').trim();
-
-        if (!normalizedName || normalizedName === activeContext.organizacao_nome) {
-            return;
-        }
-
-        this.persistActiveContext(
-            {
-                ...activeContext,
-                organizacao_nome: normalizedName
-            },
-            false
-        );
-    }
-
-    updateActiveContractName(contractId: number, contractName: string) {
-        const activeContext = this.getActiveContext();
-
-        if (!activeContext || activeContext.contrato_id !== contractId) {
-            return;
-        }
-
-        const normalizedName = (contractName ?? '').trim();
-
-        if (!normalizedName || normalizedName === activeContext.contrato_nome) {
-            return;
-        }
-
-        this.persistActiveContext(
-            {
-                ...activeContext,
-                contrato_nome: normalizedName
-            },
-            false
-        );
     }
 
     getActiveContext(): ActiveUserContext | null {
-        const raw = localStorage.getItem(ACTIVE_CONTEXT_KEY);
-
-        if (!raw) {
-            return null;
-        }
-
-        try {
-            const parsed = JSON.parse(raw) as ActiveUserContext;
-
-            if (Number.isFinite(parsed.contrato_id) && Number.isFinite(parsed.organizacao_id) && typeof parsed.contrato_nome === 'string' && typeof parsed.organizacao_nome === 'string') {
-                return parsed;
-            }
-
-            return null;
-        } catch {
-            return null;
-        }
+        return this.activeContext();
     }
 
     hasActiveContext() {
-        return !!this.getActiveContext();
+        return this.activeContext() !== null;
     }
 
     clearActiveContext() {
-        localStorage.removeItem(ACTIVE_CONTEXT_KEY);
+        this.activeContext.set(null);
+        localStorage.removeItem(CONTEXT_KEY);
         this.tableQueryCache.clearAll();
     }
 
-    isOrganizationAvailable(contexts: UserContextsResponse, organizationId: number) {
-        return contexts.organizacoes.some((organization) => organization.id === organizationId);
+    reloadPage() {
+        window.location.reload();
     }
 
-    private persistActiveContext(context: ActiveUserContext, clearTableQueryCache: boolean) {
-        localStorage.setItem(ACTIVE_CONTEXT_KEY, JSON.stringify(context));
+    invalidateCachedQueries() {
+        this.tableQueryCache.clearAll();
+    }
 
-        if (clearTableQueryCache) {
-            this.tableQueryCache.clearAll();
+    openContext(returnUrl: string | null) {
+        const path = returnUrl && /^\/(?!\/)/.test(returnUrl) && !returnUrl.includes('\\') && !/^\/(contexto|primeiro-acesso|landing)(\/|\?|$)/.test(returnUrl) ? returnUrl : '/kpi';
+
+        window.location.assign(path);
+    }
+
+    private restoreContext(): StoredContext | null {
+        try {
+            const value = JSON.parse(localStorage.getItem(CONTEXT_KEY) ?? 'null');
+
+            if (
+                value &&
+                typeof value.organization_public_id === 'string' &&
+                UUID_PATTERN.test(value.organization_public_id) &&
+                typeof value.user_public_id === 'string' &&
+                UUID_PATTERN.test(value.user_public_id) &&
+                typeof value.organization_name === 'string'
+            ) {
+                return value;
+            }
+        } catch {
+            // Estado local inválido nunca fornece contexto à API.
         }
+
+        return null;
     }
 }

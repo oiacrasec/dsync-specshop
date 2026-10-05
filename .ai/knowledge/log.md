@@ -1,5 +1,25 @@
 # Histórico do conhecimento
 
+## 2026-10-04 — Etapa 6.5: frontend auth e organização compartilhada
+
+- Usuário decidiu manter JWT localStorage após avaliar HttpOnly; determinou que
+  mudar organização sincronize/recarregue todas as abas. ADR 0035 e decisão 41.
+- AuthService/types/telas/interceptors adaptados a /api/v1, user mínimo, UUID de
+  organização e RFC 9457. Senhas não persistidas; resumo atualizado após troca.
+- Sessão/contexto signals + localStorage; Web Locks coordena refresh/logout,
+  compartilhamento na mesma aba, descarte de respostas antigas e isolamento de URL.
+- Storage sincroniza login/logout/organização. Troca limpa caches e recarrega;
+  atualização apenas de label/rotação de JWT não recarrega. Dono impede contexto
+  herdado por outra conta. Removidos headers/contrato de contexto Spatial.
+- ETag global URL-only e resumo de permissões GIS desabilitados; nenhuma nova API.
+  Proxy dev Angular /api → 127.0.0.1:8000; homol/prod URL e contratos 6.8 pendentes.
+- 44 testes ChromeHeadless e probe de 30 pedidos sem storage/refresh; bundle ~1,25 MB.
+  Arquivos: frontend core/types/auth/layout/appconfig, README/AGENTS/padrões/docs,
+  docs ADR/API/overview/plano e memória frontend/handoff. Backend não alterado.
+- Evidência não inclui E2E completo duas abas/backend, capacidade sob carga ou
+  auditoria WCAG completa. JWT continua legível por JS; risco registrado, sem
+  promessa de HttpOnly. Demais pendências anteriores de segurança/legal preservadas.
+
 ## 2026-10-04 — Etapa 6.4: primeiro acesso e troca de senha
 
 - User.must_change_password default false; users.0004 aplicada localmente, sem

@@ -79,7 +79,8 @@
                             "buildTarget": "datasync-core-frontend:build:production"
                         },
                         "development": {
-                            "buildTarget": "datasync-core-frontend:build:development"
+                            "buildTarget": "datasync-core-frontend:build:development",
+                            "proxyConfig": "proxy.conf.json"
                         },
                         "homologation": {
                             "buildTarget": "datasync-core-frontend:build:homologation"

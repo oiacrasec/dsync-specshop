@@ -6,7 +6,6 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { TabsModule } from 'primeng/tabs';
 
-import { UserContextService } from '@/app/core/services/user-context.service';
 import { ContratoService } from '../contrato.service';
 import { getBackendErrorMessage } from '@/app/pages/administracao/usuario/error-message';
 import { UiInputNumber } from '@/app/shared/ui/input-number/input-number';
@@ -29,7 +28,6 @@ export class ContratoFormPage implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private messageService = inject(MessageService);
-    private userContextService = inject(UserContextService);
 
     saving = false;
     provisionandoPrimeiroAcesso = false;
@@ -111,7 +109,7 @@ export class ContratoFormPage implements OnInit {
         request.subscribe({
             next: (contrato: Contrato) => {
                 this.saving = false;
-                this.userContextService.updateActiveContractName(contrato.id, contrato.nome);
+                // DESABILITADO: contexto do core usa apenas organização UUID; adaptar contrato na 6.8.
                 this.messageService.add({
                     severity: 'success',
                     summary: this.isEditing ? 'Contrato atualizado' : 'Contrato criado',

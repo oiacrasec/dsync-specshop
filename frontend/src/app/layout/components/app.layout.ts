@@ -82,7 +82,7 @@ export class AppLayout {
             return true;
         }
 
-        return this.userContextService.hasActiveContext();
+        return !!user && !user.must_change_password && this.userContextService.hasActiveContext();
     }
 
     shouldShowBreadcrumb() {
