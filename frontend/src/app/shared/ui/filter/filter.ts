@@ -9,8 +9,9 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 
-import { UiAutocomplete, UiLookupOptionsProvider, UiLookupOptionsResponse, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
+import { UiAutocomplete, UiLookupOptionsProvider, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
 import { UiButton } from '@/app/shared/ui/button/button';
+import { toLookupResponse } from '@/app/core/utils/table-schema';
 import { OptionsResponse } from '@/app/types/options';
 
 export interface UiFilterChoice {
@@ -194,7 +195,7 @@ export class UiFilter implements OnChanges, OnDestroy {
                 params = params.set('q', String(query.q));
             }
 
-            return this.http.get<OptionsResponse>(endpoint, { params }).pipe(map((page): UiLookupOptionsResponse => ({ data: page.data, totalRecords: page.total_records, first, rows, hasNext: page.has_next })));
+            return this.http.get<OptionsResponse>(endpoint, { params }).pipe(map((page) => toLookupResponse(page, first, rows)));
         };
 
         this.relationProviders.set(cacheKey, provider);

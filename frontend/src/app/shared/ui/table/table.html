@@ -45,7 +45,7 @@
         <tr>
             @for (col of tableColumns; track col.field) {
             <td>
-                @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { {{ getCellValue(row, col) | date: (col.format || 'dd/MM/yyyy') }} } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean-tag') {
+                @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { {{ getCellValue(row, col) | date: (col.format || 'shortDate') }} } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean-tag') {
                 <p-tag [value]="getCellValue(row, col) ? col.booleanTag?.trueLabel : col.booleanTag?.falseLabel" [severity]="getCellValue(row, col) ? col.booleanTag?.trueSeverity : col.booleanTag?.falseSeverity" />
                 } @case ('choice') { {{ resolveNullableValue(resolveChoiceLabel(col, getCellValue(row, col)), col) }} } @default { {{ resolveNullableValue(getCellValue(row, col), col) }} } }
             </td>

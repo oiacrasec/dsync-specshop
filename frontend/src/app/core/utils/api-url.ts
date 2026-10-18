@@ -25,3 +25,22 @@ export function apiEndpoint(baseUrl: string, path: string): string {
 
     return `${baseUrl.replace(/\/+$/, '')}${path}`;
 }
+
+/**
+ * Caminho absoluto devolvido pelo backend (ex.: `options_url` do schema) na origem da API.
+ * Não depende do prefixo de versão: vale para `API_BASE_URL` relativo (proxy de dev) ou absoluto.
+ * Só aceita caminho do próprio servidor (`/...`); URL completa ou `//host` é recusada.
+ */
+export function serverUrl(path: string, baseUrl: string): string {
+    if (!baseUrl.trim()) {
+        throw new Error('API_BASE_URL não configurada.');
+    }
+
+    if (!path.startsWith('/') || path.startsWith('//')) {
+        throw new Error('Caminho do servidor inválido.');
+    }
+
+    const base = new URL(baseUrl, window.location.origin);
+
+    return base.origin === window.location.origin ? path : `${base.origin}${path}`;
+}

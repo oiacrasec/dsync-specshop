@@ -43,6 +43,13 @@ compatível). Sem polling. Primeiro acesso obrigatório redireciona à troca de 
 superadmin vai direto à home sem organização. Campos de senha não são persistidos.
 Erros seguem RFC 9457. Detalhes e limites: [autenticação](docs/architecture/authentication.md).
 
+## Locale
+
+`LOCALE_ID` é `pt-BR` (`registerLocaleData` no `app.config.ts`) e o `index.html` declara
+`lang="pt-BR"`. Pipes de data, número e moeda seguem o padrão brasileiro. O `ui-table` formata
+colunas `date` com `shortDate` (`01/10/2026`); a coluna só define `format` em exceções. O backend
+informa apenas o tipo semântico da coluna, nunca a máscara.
+
 ## Administração de contratos (etapa 6.8)
 
 Tela do superadmin na API do Core (`/api/v1/admin/contracts/`, `public_id`):
@@ -50,7 +57,8 @@ lista paginada com schema do backend (colunas, busca geral `search`, filtros e p
 `options`), formulário com plano opcional e retenção pós-contrato (0–365, padrão 90),
 provisionamento do primeiro acesso (organização + admin com `username` e nome), lista de
 admins e redefinição de senha com confirmação. Senhas temporárias aparecem uma única vez
-e não são persistidas. `ContratoService` adapta `total_records`/schema ao `ui-table` e
+e não são persistidas. Listagens usam `BaseCrudService.listTable`/`lookupOptions`, com o adaptador
+único `core/utils/table-schema.ts` (schema por recurso, `total_records`, tipos de coluna); o
 `ui-filter` resolve opções por `public_id` (ADR 0004/0011). O resumo de permissões legado e o
 cache ETag global continuam desabilitados; telas fora do escopo seguem desabilitadas.
 

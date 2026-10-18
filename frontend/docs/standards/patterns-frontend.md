@@ -101,6 +101,14 @@ Guards:
 
 ## Componentes compartilhados
 
+- Datas/números: `LOCALE_ID` pt-BR; `ui-table` usa `shortDate` como padrão de colunas `date`.
+  Tipos de coluna vêm do schema do backend; não fixar máscara de data no backend.
+- URL vinda do backend (ex.: `options_url`) é caminho do servidor: resolver com
+  `serverUrl(path, API_BASE_URL)`, sem conhecer o prefixo de versão.
+- Listagem/options do Core: no service da tela, `this.listTable<T>('recurso', query)` e
+  `this.lookupOptions('recurso', query)` (BaseCrudService). O mapeamento Core → ui-table/
+  ui-filter/ui-autocomplete fica só em `core/utils/table-schema.ts`.
+
 - `UiTable`:
   coluna de acoes com label padrao `Ações`; menu de linha com `pi pi-ellipsis-h` e `severity="secondary"`.
 - `UiTable`:

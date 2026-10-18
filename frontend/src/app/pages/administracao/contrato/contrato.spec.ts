@@ -1,4 +1,6 @@
+import { formatDate, registerLocaleData } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
+import localePt from '@angular/common/locales/pt';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -8,7 +10,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import { UiLookupOptionsResponse } from '@/app/shared/ui/autocomplete/autocomplete';
 import { UiTableListResponse } from '@/app/shared/ui/table/table';
-import { Contract, ContractAdmin, TableSchema } from '@/app/types/contrato';
+import { Contract, ContractAdmin } from '@/app/types/contrato';
+import { TableSchema } from '@/app/types/table-schema';
 import { ContratoService } from './contrato.service';
 import { ContratoFormPage } from './formulario/formulario';
 
@@ -18,9 +21,9 @@ const ADMIN_ID = '019a0000-0000-7000-8000-0000000000a1';
 
 const SCHEMA: TableSchema = {
     columns: [
-        { field: 'name', label: 'Nome' },
-        { field: 'start_date', label: 'Início' },
-        { field: 'licenses', label: 'Licenças' }
+        { field: 'name', label: 'Nome', type: 'text' },
+        { field: 'start_date', label: 'Início', type: 'date' },
+        { field: 'licenses', label: 'Licenças', type: 'number' }
     ],
     filters: [
         { field: 'is_active', label: 'Ativo', type: 'boolean' },
@@ -94,7 +97,7 @@ describe('ContratoService (API do Core)', () => {
         expect(results[0].totalRecords).toBe(57);
         expect(results[0].columns).toEqual([
             { field: 'name', header: 'Nome', sortable: true },
-            { field: 'start_date', header: 'Início', sortable: true },
+            { field: 'start_date', header: 'Início', sortable: true, type: 'date' },
             { field: 'licenses', header: 'Licenças', sortable: true }
         ]);
         expect(results[0].filters).toEqual([
@@ -107,6 +110,13 @@ describe('ContratoService (API do Core)', () => {
         controller.expectNone('/api/v1/admin/contracts/schema/');
         controller.expectOne((request) => request.url === '/api/v1/admin/contracts/').flush({ data: [], total_records: 57 });
         expect(results.length).toBe(2);
+    });
+
+    it('formata datas do schema no padrão pt-BR, sem deslocar o dia pelo fuso', () => {
+        registerLocaleData(localePt, 'pt-BR');
+
+        expect(formatDate('2026-10-01', 'shortDate', 'pt-BR')).toBe('01/10/2026');
+        expect(formatDate('2026-10-01T13:45:00', 'short', 'pt-BR')).toBe('01/10/2026 13:45');
     });
 
     it('busca planos por texto e resolve rótulos por public_id', () => {

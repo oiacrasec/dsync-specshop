@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Tipo nas colunas do schema e locale pt-BR
+
+- Pedido do usuário: máscara de data na grid de contratos. Escolha do usuário pensando em
+  i18n: backend envia só o tipo semântico; frontend formata pelo locale.
+- Backend: `core/schema.field_type` compartilhado; colunas do schema ganham `type` (mudança
+  compatível, ADR 0026). Testes de schema/admin/organizações atualizados (594).
+- Frontend: `LOCALE_ID` pt-BR + `registerLocaleData`, `index.html` `lang="pt-BR"` (skill
+  acessibilidade), `ui-table` padrão `shortDate`; ContratoService mapeia date/datetime.
+  55 testes ChromeHeadless; bundle ~1,25 MB. LOCALE_ID afeta números/moeda no app todo.
+- Adaptador do Core extraído do ContratoService: `core/utils/table-schema.ts` (COLUMN_FORMATS,
+  toTableResponse, toLookupResponse) e `BaseCrudService.listTable`/`lookupOptions`, com cache
+  de schema por recurso; tipos genéricos em `types/table-schema.ts`. Sem mudança de comportamento.
+- `API_PREFIX` fixo removido: `core/utils/api-url.serverUrl` resolve caminhos do servidor na origem
+  do API_BASE_URL (recusa URL completa/`//host`). 3 testes novos (58).
+- Lições registradas no `frontend/AGENTS.md` a pedido do usuário: reuso antes de tela, URLs só via
+  API_BASE_URL, i18n com tipo semântico + LOCALE_ID, validar/codificar ids em caminhos da API.
+
 ## 2026-10-18 — Etapa 6.8: frontend de contratos na API do Core
 
 - Decisão 44 (usuário): retenção pós-contrato no formulário. Tipos de contrato em inglês/

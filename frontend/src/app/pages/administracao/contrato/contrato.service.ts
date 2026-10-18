@@ -1,35 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { BaseCrudService } from '@/app/core/services/base-crud.service';
-import { UiLookupOptionsProvider, UiLookupOptionsResponse, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
-import { UiFilterField } from '@/app/shared/ui/filter/filter';
-import { UiTableColumn, UiTableListResponse } from '@/app/shared/ui/table/table';
-import { Contract, ContractAdminPasswordReset, ContractAdminsResponse, ContractListResponse, ContractProvision, ContractProvisionResult, ContractWrite, SchemaFilter, TableSchema } from '@/app/types/contrato';
-import { OptionsResponse } from '@/app/types/options';
+import { UiLookupOptionsProvider } from '@/app/shared/ui/autocomplete/autocomplete';
+import { UiTableListResponse } from '@/app/shared/ui/table/table';
+import { Contract, ContractAdmin, ContractAdminPasswordReset, ContractProvision, ContractProvisionResult, ContractWrite } from '@/app/types/contrato';
+import { PageResponse } from '@/app/types/table-schema';
 
 const CONTRACTS = 'admin/contracts';
 const PLANS = 'admin/plans';
 
-// Tabela do Core (ADR 0004/0026): listagem leve + schema buscado uma vez; o serviço adapta ao ui-table.
 @Injectable({ providedIn: 'root' })
 export class ContratoService extends BaseCrudService {
-    private schema$?: Observable<TableSchema>;
-
-    readonly planOptions: UiLookupOptionsProvider = (query) => this.options(PLANS, query);
+    readonly planOptions: UiLookupOptionsProvider = (query) => this.lookupOptions(PLANS, query);
 
     list(query: Record<string, unknown> = {}): Observable<UiTableListResponse<Contract>> {
-        const params = this.buildParams(query);
-
-        return forkJoin([this.schema(), this.http.get<ContractListResponse>(`${this.baseUrl}/${CONTRACTS}/`, { params })]).pipe(
-            map(([schema, page]) => ({
-                data: page.data,
-                totalRecords: page.total_records,
-                columns: toColumns(schema),
-                filters: toFilters(schema, this.baseUrl)
-            }))
-        );
+        return this.listTable<Contract>(CONTRACTS, query);
     }
 
     get(publicId: string) {
@@ -56,7 +43,7 @@ export class ContratoService extends BaseCrudService {
         // Um contrato tem poucos admins: uma página com o máximo da API (100).
         const params = this.buildParams({ first: 0, rows: 100 });
 
-        return this.http.get<ContractAdminsResponse>(`${this.contractUrl(publicId)}admins/`, { params });
+        return this.http.get<PageResponse<ContractAdmin>>(`${this.contractUrl(publicId)}admins/`, { params });
     }
 
     resetAdminPassword(publicId: string, userPublicId: string) {
@@ -67,69 +54,4 @@ export class ContratoService extends BaseCrudService {
     private contractUrl(publicId: string) {
         return `${this.baseUrl}/${CONTRACTS}/${encodeURIComponent(publicId)}/`;
     }
-
-    private schema() {
-        this.schema$ ??= this.http.get<TableSchema>(`${this.baseUrl}/${CONTRACTS}/schema/`).pipe(shareReplay({ bufferSize: 1, refCount: false }));
-
-        return this.schema$;
-    }
-
-    private options(resource: string, query: UiLookupQuery): Observable<UiLookupOptionsResponse> {
-        const first = query.first ?? 0;
-        const rows = query.rows ?? 20;
-        const params = this.buildParams(query.pk ? { public_id: query.pk, first, rows } : { q: query.q, first, rows });
-
-        return this.http.get<OptionsResponse>(`${this.baseUrl}/${resource}/options/`, { params }).pipe(map((page) => toLookupResponse(page, first, rows)));
-    }
-}
-
-function toLookupResponse(page: OptionsResponse, first: number, rows: number): UiLookupOptionsResponse {
-    return { data: page.data, totalRecords: page.total_records, first, rows, hasNext: page.has_next };
-}
-
-function toColumns(schema: TableSchema): UiTableColumn[] {
-    return schema.columns.map((column) => ({
-        field: column.field,
-        header: column.label,
-        sortable: schema.ordering_fields.includes(column.field)
-    }));
-}
-
-function toFilters(schema: TableSchema, baseUrl: string): UiFilterField[] {
-    // ui-filter envia a busca geral como `search`, o parâmetro do Core.
-    const general: UiFilterField[] = (schema.general_search?.fields ?? []).map((field) => ({
-        field: field.field,
-        header: field.label,
-        type: 'text',
-        placement: 'general'
-    }));
-    const advanced = schema.filters.map((filter) => toFilter(filter, baseUrl));
-
-    return [...general, ...advanced];
-}
-
-function toFilter(filter: SchemaFilter, baseUrl: string): UiFilterField {
-    const field: UiFilterField = {
-        field: filter.field,
-        header: filter.label,
-        type: filter.type === 'datetime' ? 'date' : filter.type,
-        placement: 'advanced'
-    };
-
-    if (filter.type === 'choice') {
-        field.choices = filter.choices?.map((choice) => ({ label: choice.label, value: choice.value })) ?? [];
-    }
-
-    if (filter.type === 'relation' && filter.options_url) {
-        // options_url vem do reverse do backend (ex.: /api/v1/admin/plans/options/); a base configurada já inclui /api/v1.
-        field.lookup = { endpoint: resolveOptionsUrl(filter.options_url, baseUrl) };
-    }
-
-    return field;
-}
-
-function resolveOptionsUrl(optionsUrl: string, baseUrl: string) {
-    const apiPrefix = '/api/v1/';
-
-    return optionsUrl.startsWith(apiPrefix) ? `${baseUrl}/${optionsUrl.slice(apiPrefix.length)}` : optionsUrl;
 }

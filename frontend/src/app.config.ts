@@ -1,6 +1,8 @@
+import { registerLocaleData } from '@angular/common';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import localePt from '@angular/common/locales/pt';
 import { API_BASE_URL } from './app/core/tokens/api-base-url';
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
@@ -10,6 +12,9 @@ import { definePreset } from '@primeuix/themes';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { contextErrorInterceptor } from './app/core/interceptors/context-error.interceptor';
 import { environment } from './environments/environment';
+
+// Pipes de data, número e moeda no formato brasileiro; textos de UI continuam em português.
+registerLocaleData(localePt, 'pt-BR');
 
 const MyPreset = definePreset(Aura, {
     semantic: {
@@ -86,6 +91,7 @@ export const appConfig: ApplicationConfig = {
         provideZonelessChangeDetection(),
         providePrimeNG({ theme: { preset: MyPreset, options: { darkModeSelector: '.app-dark' } } }),
         MessageService,
+        { provide: LOCALE_ID, useValue: 'pt-BR' },
         { provide: API_BASE_URL, useValue: environment.apiBaseUrl }
     ]
 };

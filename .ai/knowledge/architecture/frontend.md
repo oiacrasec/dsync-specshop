@@ -33,8 +33,9 @@
   Sem E2E completo duas abas/backend, capacidade sob carga ou auditoria WCAG completa.
 - Risco conhecido: JWT legível por JS/XSS, escolha documentada. HTTPS/CSP/MFA/infra
   antes de produção. Senhas fora do storage/logs. AccessLog backend não alterado.
-- 6.8 (decisão 44): contratos do superadmin na API do Core. ContratoService busca o schema
-  uma vez (shareReplay) e adapta total_records/colunas/filtros ao ui-table; ui-filter
+- 6.8 (decisão 44): contratos do superadmin na API do Core. BaseCrudService.listTable busca o
+  schema uma vez por recurso (shareReplay) e core/utils/table-schema adapta total_records/
+  colunas (tipo → máscara pelo LOCALE_ID pt-BR)/filtros ao ui-table; lookupOptions e ui-filter
   resolve opções por public_id (rows 20) e mapeia snake_case. Formulário: plano opcional por
   options, retenção 0–365 (padrão 90), provisionamento (username + nome), admins e reset
   com confirmação; senha temporária só em memória. Erros por problemMessage (RFC 9457).

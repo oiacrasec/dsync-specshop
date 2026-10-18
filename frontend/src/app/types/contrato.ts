@@ -23,37 +23,6 @@ export interface ContractWrite {
     is_active: boolean;
 }
 
-export interface ContractListResponse {
-    data: Contract[];
-    total_records: number;
-}
-
-export interface SchemaColumn {
-    field: string;
-    label: string;
-}
-
-export interface SchemaFilter {
-    field: string;
-    label: string;
-    type: 'text' | 'number' | 'boolean' | 'choice' | 'date' | 'datetime' | 'relation';
-    options_url?: string | null;
-    choices?: Array<{ value: unknown; label: string }>;
-}
-
-export interface GeneralSearchSchema {
-    parameter: string;
-    label: string;
-    fields: Array<{ field: string; label: string; lookup: string }>;
-}
-
-export interface TableSchema {
-    columns: SchemaColumn[];
-    filters: SchemaFilter[];
-    general_search: GeneralSearchSchema | null;
-    ordering_fields: string[];
-}
-
 export interface ContractProvision {
     organization_name: string;
     username: string;
@@ -85,11 +54,6 @@ export interface ContractAdmin {
     name: string;
     is_active: boolean;
     must_change_password: boolean;
-}
-
-export interface ContractAdminsResponse {
-    data: ContractAdmin[];
-    total_records: number;
 }
 
 export interface ContractAdminPasswordReset {
