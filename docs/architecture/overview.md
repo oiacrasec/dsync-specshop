@@ -56,6 +56,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (revisão 5.2: OrganizationViewSet independente somente leitura, queryset RBAC, filtro de contrato e OrganizationSerializer; ADR 0032) | concluído |
 | `backend/` (etapa 6.3: API de planos/contratos em administration, models em contracts; plan opcional, contracts.0003; ADR 0033) | concluído |
 | `backend/` (etapa 6.4: must_change_password, resumo no login e troca autenticada, bloqueio global por JWT com superadmin isento; ADR 0034) | concluído |
+| `backend/` (etapa 6.6: provisionamento do contrato, 1ª organização + admin essencial com senha temporária única, 409 `contract-not-provisionable`) | concluído |
 | `frontend/` (etapa 6.5: auth Core, primeiro acesso, seleção UUID, RFC 9457; JWT/contexto localStorage e recarregamento entre abas, ADR 0035) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |

@@ -56,6 +56,13 @@ class ProfileInUse(ProblemException):
     default_detail = _('Remova as atribuições do perfil antes de excluí-lo.')
 
 
+class ContractNotProvisionable(ProblemException):
+    status_code = 409
+    problem_type = 'urn:datasync:problem:contract-not-provisionable'
+    title = _('Contrato não pode ser provisionado')
+    default_detail = _('O provisionamento exige contrato disponível, sem usuários e sem organizações.')
+
+
 class LastContractAdmin(ProblemException):
     status_code = 409
     problem_type = 'urn:datasync:problem:last-contract-admin'

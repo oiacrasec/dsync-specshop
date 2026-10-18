@@ -25,6 +25,48 @@ Organizações agora usam [OrganizationViewSet próprio](organizations.md), em
 `/api/v1/admin/organizations/?contract=<public_id>`. A action aninhada foi removida
 (ADR 0032). O novo endpoint também atende usuários comuns, com queryset RBAC.
 
+## Provisionamento do contrato (6.6)
+
+`POST /api/v1/admin/contracts/{public_id}/provision/` cria, numa única transação, a
+primeira organização e o administrador do contrato (perfil essencial no escopo do
+contrato), com senha temporária e `must_change_password=true` (decisões 38 e 42).
+
+```json
+{"organization_name": "Matriz", "username": "maria.silva", "name": "Maria"}
+```
+
+Resposta 201, com `Cache-Control: no-store`:
+
+```json
+{
+  "organization": {"public_id": "...", "name": "Matriz"},
+  "user": {"public_id": "...", "username": "maria.silva", "name": "Maria",
+           "is_superuser": false, "must_change_password": true},
+  "temporary_password": "<16 caracteres>"
+}
+```
+
+| Situação | Resposta |
+|---|---|
+| Contrato inativo, vencido ou com início futuro | 409 [`contract-not-provisionable`](errors/contract-not-provisionable.md) |
+| Contrato com usuário ou organização não excluídos (inclusive inativos) | 409 `contract-not-provisionable` |
+| `username` em uso (inclusive por usuário excluído) ou entrada inválida | 422 `validation-error` |
+| Contrato inexistente ou excluído | 404 |
+| Não superadmin | 401/403 |
+
+- Dados mínimos do admin: `username` (validador do Django, até 150) e `name`
+  (`first_name`, até 150). Sem email/sobrenome até haver uso para eles (LGPD, necessidade).
+- A senha temporária é gerada no servidor (CSPRNG, 16 caracteres) e passa pelos
+  validadores do Django. Aparece **só** nesta resposta: não é gravada em claro, em
+  log ou na auditoria. Login com ela exige a troca (ADR 0034).
+- Auditoria na mesma transação: `assignment.created` (perfil essencial) e
+  `contract.provisioned` com os UUIDs da organização e do admin. Falha em qualquer
+  passo desfaz tudo.
+- Locks: configuração RBAC (advisory) → contrato, a mesma ordem de `save_assignment`.
+  Dois provisionamentos simultâneos do mesmo contrato resultam em um 201 e um 409.
+- Custo: operação rara e fixa, 5 escritas e até 30 comandos de dados (reutiliza
+  `save_user` e `save_assignment`), sem trabalho por item.
+
 ## Entrada e saída
 
 Contract.plan é opcional: criação pode omitir o campo ou enviar null. Atualização

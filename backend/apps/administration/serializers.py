@@ -9,6 +9,17 @@ from apps.core.serializers import BaseAdminModelSerializer
 from .constants import CONTRACT_AUDIT_FIELDS, PLAN_AUDIT_FIELDS
 
 
+class ContractProvisionSerializer(serializers.Serializer):
+    """Entrada do provisionamento; dados mínimos do admin (username e nome)."""
+
+    organization_name = serializers.CharField(max_length=255)
+    username = serializers.CharField(max_length=150, validators=[get_user_model().username_validator])
+    name = serializers.CharField(max_length=150)
+
+    def validate_username(self, value):
+        return get_user_model().normalize_username(value)
+
+
 class PlanSerializer(BaseAdminModelSerializer):
     audit_fields = PLAN_AUDIT_FIELDS
     # fmt: off

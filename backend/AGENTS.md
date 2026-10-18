@@ -91,6 +91,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   revalida conta/senha sob lock próprio, validadores Django, Argon2 e auditoria atômica
   sem senha/hash. Login e troca retornam UserSummarySerializer (whitelist explícita).
   Não adicionar consulta/escrita/hash/lock na navegação para conferir a flag.
+- Provisionamento (6.6, decisão 42): `apps.administration.services.provision_contract`,
+  action `provision` do ContractViewSet. Locks: `rbac.services.begin_write` antes do
+  contrato. Só contrato disponível sem usuários/organizações; senha temporária de
+  `users.utils.generate_temporary_password`, devolvida uma vez, nunca em log/auditoria.
 - Chave JWT independente via `DJANGO_JWT_SIGNING_KEY`; nunca versionar seu valor,
   logar tokens ou retornar respostas de autenticação cacheáveis.
 - Limite de login conta apenas falhas por conta: `DJANGO_AUTH_LOGIN_RATE=5/min`,

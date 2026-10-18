@@ -57,13 +57,14 @@ desconhecidos. O namespace URN `datasync` é informal (ADR 0004).
 | [malformed-request](errors/malformed-request.md) | 400 |
 | [validation-error](errors/validation-error.md) | 422 |
 | [license-limit-reached](errors/license-limit-reached.md) | 409 |
+| [contract-not-provisionable](errors/contract-not-provisionable.md) | 409 |
 | [profile-in-use](errors/profile-in-use.md) | 409 |
 | [last-contract-admin](errors/last-contract-admin.md) | 409 |
 | [not-found](errors/not-found.md) | 404 |
 | [authentication-required](errors/authentication-required.md) | 401 |
 
 Tipos de domínio estão declarados, testados e disparados pelas regras de contexto (3.3),
-vigência (2.3), licenças (2.2), perfis (3.2) e último administrador (3.4).
+vigência (2.3), licenças (2.2), perfis (3.2), último administrador (3.4) e provisionamento (6.6).
 O registro técnico de correlação não substitui o `AccessLog` da etapa 4.1.
 
 Actions customizadas que capturam exceções usam

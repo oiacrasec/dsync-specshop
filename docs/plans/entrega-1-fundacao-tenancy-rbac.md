@@ -51,6 +51,7 @@ e só começa após aprovação do usuário.
 | 39 | Frontend (usuário): **copiar o datasync-gis inteiro** (template Poseidon/PrimeTek, licença confirmada pelo usuário) para `frontend/` e desabilitar telas fora do escopo **comentando** rotas e menu, com a marca `// DESABILITADO: fora do escopo atual` |
 | 40 | Respostas do bloco 6 (usuário): `Contract.plan` passa a ser **opcional** (nulo = sem plano/sem limites; PROTECT mantido; migration e doc de domínio na 6.3); formulário de contrato lista planos (options), campo opcional; tela de cadastro de planos fica para o futuro. Seleção de organização pronta na 6.5 para usuários comuns (superadmin não tem organização). Reset de senha do admin revoga seus refresh tokens (6.7) |
 | 41 | Após avaliar cookies HttpOnly, usuário decidiu manter JWT em **localStorage**; organização ativa também compartilhada. Trocar organização em uma aba sincroniza e recarrega o conteúdo de todas; refresh/logout coordenados entre abas por Web Locks, sem polling (ADR 0035) |
+| 42 | 6.6 (usuário): `POST /api/v1/admin/contracts/{public_id}/provision/`; admin com dados mínimos (`username` + `name`); só contrato **disponível** e sem usuários **e** sem organizações não excluídos (inclusive inativos), senão 409 `contract-not-provisionable` |
 
 ## Bloco 0 — Fundação
 
@@ -117,7 +118,7 @@ Ordem proposta: 6.1 → 6.2 → 6.2a → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 →
 | 6.3 | App `administration`: mover a API admin de planos e contratos de `contracts` (views, serializers, filters, URLs), sem mudar o contrato da API; `Contract.plan` opcional (decisão 40) | backend | 0033 | ✅ |
 | 6.4 | Primeiro acesso: `User.must_change_password`; login devolve resumo do usuário; bloqueio global no backend até trocar; `POST` de troca de senha (atual + nova + confirmação, validadores do Django, diferente da atual) | backend | 0010, 0034 | ✅ |
 | 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização; JWT/contexto localStorage, sincronização/recarregamento entre abas | frontend | 0003, 0004, 0035 | ✅ |
-| 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ⬜ |
+| 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ✅ |
 | 6.7 | Admins do contrato: listar e resetar senha (nova temporária + `must_change_password`), auditado | backend | 0010 | ⬜ |
 | 6.8 | Frontend: administração de contratos (lista, formulário, provisionamento, admins e reset), adaptada à API do core | frontend | 0008 | ⬜ |
 

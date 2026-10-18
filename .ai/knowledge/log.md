@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 6.6: provisionamento do contrato
+
+- Decisão 42 (usuário): rota POST /api/v1/admin/contracts/{public_id}/provision/; admin com
+  username + name; exige contrato disponível e sem usuários/organizações não excluídos.
+- `apps/administration/services.py` (provision_contract), action `provision`,
+  `ContractProvisionSerializer`, `users/utils.generate_temporary_password`, exceção
+  `ContractNotProvisionable` (409) e evento `contract.provisioned` (audit.0007, só choices).
+  `rbac.services._begin_write` virou `begin_write` (público) para a ordem de locks.
+- 21 testes novos (sucesso, login com troca obrigatória, 409/422/404/401/403, rollback,
+  custo fixo e concorrência); suíte com 576 + 1 de catálogo. Migration audit.0007 (só choices, sem
+  SQL) aplicada ao banco local com autorização do usuário.
+- Docs: admin-contracts, errors (+ contract-not-provisionable), audit, plano, overview,
+  backend AGENTS/README, skill erros-api-rfc9457, memória e handoff.
+
 ## 2026-10-18 — Documentação alinhada às etapas entregues
 
 - Status dos ADRs 0023–0025 (substituídos por 0030) e 0027 (substituído por 0028)

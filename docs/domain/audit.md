@@ -13,6 +13,7 @@ Trilha append-only do [ADR 0017](../adr/0017-trilha-de-auditoria.md), em `apps/a
 | Exceção | `exclusion.added`, `.updated`, `.removed` | `apps.rbac.services` |
 | Conta de superadmin | `superadmin.created`, `.promoted`, `.demoted`, `.deactivated`, `.reactivated`, `.deleted`, `.restored` | `save_user` / `delete_user` |
 | Entrada em organização | `superadmin.entered_organization` | `SuperadminEntryAuditMiddleware` |
+| Provisionamento do contrato | `contract.provisioned` (UUIDs da organização e do admin, `must_change_password`) | `apps.administration.services.provision_contract` |
 | Troca da própria senha | `user.password_changed` (só before/after de must_change_password) | `apps.users.services.change_password` |
 
 ## Campos

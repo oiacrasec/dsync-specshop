@@ -21,7 +21,8 @@ from .selectors import (
 )
 
 
-def _begin_write(actor):
+def begin_write(actor):
+    """Exige superadmin ativo e serializa a configuração RBAC; chamar antes de outros locks."""
     if actor is None or not get_user_model().objects.filter(pk=actor.pk, is_active=True, is_superuser=True).exists():
         raise PermissionDenied(_('A gestão de acesso exige autorização administrativa.'))
     # Catálogo pequeno de configuração; serializa escritas RBAC, inclusive nome híbrido.
@@ -100,7 +101,7 @@ def _permission(code, scope=None):
 @system_scope
 @transaction.atomic
 def save_profile(*, profile, actor):
-    _begin_write(actor)
+    begin_write(actor)
     if profile.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de perfil.')
     if not profile._state.adding:
@@ -124,7 +125,7 @@ def save_profile(*, profile, actor):
 @system_scope
 @transaction.atomic
 def delete_profile(*, profile, actor):
-    _begin_write(actor)
+    begin_write(actor)
     current = Profile.objects.select_for_update().get(pk=profile.pk)
     _mutable_profile(current)
     if profile_is_assigned(current):
@@ -148,7 +149,7 @@ def delete_profile(*, profile, actor):
 @system_scope
 @transaction.atomic
 def save_profile_permission(*, permission, actor):
-    _begin_write(actor)
+    begin_write(actor)
     if permission.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de permissão do perfil.')
     profile = _profile(permission.profile_id)
@@ -173,7 +174,7 @@ def save_profile_permission(*, permission, actor):
 @system_scope
 @transaction.atomic
 def delete_profile_permission(*, permission, actor):
-    _begin_write(actor)
+    begin_write(actor)
     current = ProfilePermission.objects.get(pk=permission.pk)
     _mutable_profile(_profile(current.profile_id))
     before = _snapshot(current)
@@ -203,7 +204,7 @@ def _assignment_profile(assignment):
 @system_scope
 @transaction.atomic
 def save_assignment(*, assignment, actor):
-    _begin_write(actor)
+    begin_write(actor)
     if assignment.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de atribuição.')
     try:
@@ -247,7 +248,7 @@ def save_assignment(*, assignment, actor):
 @system_scope
 @transaction.atomic
 def delete_assignment(*, assignment, actor):
-    _begin_write(actor)
+    begin_write(actor)
     current = Assignment.objects.get(pk=assignment.pk)
     if _is_active_admin_grant(current):
         ensure_contract_keeps_admin(current.contract_id, exclude_assignment_id=current.pk)
@@ -270,7 +271,7 @@ def delete_assignment(*, assignment, actor):
 @system_scope
 @transaction.atomic
 def save_exclusion(*, exclusion, actor):
-    _begin_write(actor)
+    begin_write(actor)
     if exclusion.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de exceção.')
     assignment = Assignment.objects.get(pk=exclusion.assignment_id)
@@ -296,7 +297,7 @@ def save_exclusion(*, exclusion, actor):
 @system_scope
 @transaction.atomic
 def delete_exclusion(*, exclusion, actor):
-    _begin_write(actor)
+    begin_write(actor)
     current = AssignmentExclusion.objects.get(pk=exclusion.pk)
     before = _snapshot(current)
     current.delete(actor=actor)

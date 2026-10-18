@@ -17,6 +17,7 @@ class AuditEventType(models.TextChoices):
     CONTRACT_CREATED = 'contract.created', _('contrato criado')
     CONTRACT_UPDATED = 'contract.updated', _('contrato alterado')
     CONTRACT_DELETED = 'contract.deleted', _('contrato excluído')
+    CONTRACT_PROVISIONED = 'contract.provisioned', _('contrato provisionado')
     PROFILE_CREATED = 'profile.created', _('perfil criado')
     PROFILE_UPDATED = 'profile.updated', _('perfil alterado')
     PROFILE_DELETED = 'profile.deleted', _('perfil excluído')
