@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -11,6 +11,7 @@ import { SelectModule } from 'primeng/select';
 
 import { UiAutocomplete, UiLookupOptionsProvider, UiLookupOptionsResponse, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
 import { UiButton } from '@/app/shared/ui/button/button';
+import { OptionsResponse } from '@/app/types/options';
 
 export interface UiFilterChoice {
     label: string;
@@ -181,21 +182,19 @@ export class UiFilter implements OnChanges, OnDestroy {
 
         const endpoint = filter.lookup.endpoint;
 
+        // Contrato de options do Core (ADR 0011): resolve por public_id e responde em snake_case.
         const provider: UiLookupOptionsProvider = (query: UiLookupQuery) => {
-            let params = new HttpParams();
+            const first = query.first ?? 0;
+            const rows = query.rows ?? 20;
+            let params = new HttpParams().set('first', String(first)).set('rows', String(rows));
 
-            if (query.q !== undefined && query.q !== null && query.q !== '') {
+            if (query.pk !== undefined && query.pk !== null && query.pk !== '') {
+                params = params.set('public_id', String(query.pk));
+            } else if (query.q !== undefined && query.q !== null && query.q !== '') {
                 params = params.set('q', String(query.q));
             }
 
-            if (query.pk !== undefined && query.pk !== null && query.pk !== '') {
-                params = params.set('pk', String(query.pk));
-            }
-
-            params = params.set('first', String(query.first ?? 0));
-            params = params.set('rows', String(query.rows ?? 50));
-
-            return this.http.get<UiLookupOptionsResponse>(endpoint, { params });
+            return this.http.get<OptionsResponse>(endpoint, { params }).pipe(map((page): UiLookupOptionsResponse => ({ data: page.data, totalRecords: page.total_records, first, rows, hasNext: page.has_next })));
         };
 
         this.relationProviders.set(cacheKey, provider);

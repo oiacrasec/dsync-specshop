@@ -27,10 +27,15 @@
 - Guards UX; backend autoriza. PermissionContextService legado sem endpoint no
   Core, negando por padrão; não inventar endpoint ao adaptar telas desabilitadas.
 - Dev /api/v1 usa proxy Angular 127.0.0.1:8000. Homol/prod URL pendente, fail closed
-  para não vazar tokens quando base vazia. Contratos ainda GIS, adaptação na 6.8.
+  para não vazar tokens quando base vazia. Contratos adaptados na 6.8.
 - 44 testes ChromeHeadless, lint/formato/build; bundle inicial ~1,25 MB/~257 KB
   estimados. Storage real de iframe, refresh em dois serviços, erros/guards/telas.
   Sem E2E completo duas abas/backend, capacidade sob carga ou auditoria WCAG completa.
 - Risco conhecido: JWT legível por JS/XSS, escolha documentada. HTTPS/CSP/MFA/infra
   antes de produção. Senhas fora do storage/logs. AccessLog backend não alterado.
-- Próxima etapa 6.6: provisionar organização+admin do contrato; esperar confirmação.
+- 6.8 (decisão 44): contratos do superadmin na API do Core. ContratoService busca o schema
+  uma vez (shareReplay) e adapta total_records/colunas/filtros ao ui-table; ui-filter
+  resolve opções por public_id (rows 20) e mapeia snake_case. Formulário: plano opcional por
+  options, retenção 0–365 (padrão 90), provisionamento (username + nome), admins e reset
+  com confirmação; senha temporária só em memória. Erros por problemMessage (RFC 9457).
+  52 testes ChromeHeadless; bundle inicial ~1,25 MB. Bloco 6 concluído.

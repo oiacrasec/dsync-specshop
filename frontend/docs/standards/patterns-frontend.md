@@ -1,6 +1,6 @@
 > **Herdado do datasync-gis (etapa 6.1).** Descreve a arquitetura do template ajustado.
 > Trechos sobre a API do Spatial, telas geoespaciais e `permissoes-contexto` deixam de valer
-> à medida que as telas forem adaptadas à API do core (etapas 6.5 e 6.8).
+> à medida que as telas forem adaptadas à API do core (etapas 6.5 e 6.8, concluídas; contratos usam `public_id`, `search` e options do Core).
 
 # Padrões Frontend (datasync-gis)
 

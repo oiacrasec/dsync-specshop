@@ -2,60 +2,71 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { TabsModule } from 'primeng/tabs';
+import { TagModule } from 'primeng/tag';
 
 import { ContratoService } from '../contrato.service';
-import { getBackendErrorMessage } from '@/app/pages/administracao/usuario/error-message';
-import { UiInputNumber } from '@/app/shared/ui/input-number/input-number';
-import { UiInputText } from '@/app/shared/ui/input-text/input-text';
-import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
+import { problemMessage } from '@/app/core/utils/api-problem';
+import { UiAutocomplete } from '@/app/shared/ui/autocomplete/autocomplete';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
-import { ContratoAdministrador, ContratoAdministradorResetSenhaResult, Contrato, ContratoAdministradoresResponse, ContratoCreate, ContratoProvisionamentoInicialCreate, ContratoProvisionamentoInicialResult } from '@/app/types/contrato';
+import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
+import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
+import { UiInputNumber } from '@/app/shared/ui/input-number/input-number';
+import { UiInputText } from '@/app/shared/ui/input-text/input-text';
+import { Contract, ContractAdmin, ContractAdminPasswordReset, ContractProvision, ContractProvisionResult, ContractWrite } from '@/app/types/contrato';
+
+type ContractTab = 'principal' | 'primeiro-acesso' | 'administradores';
+
+// Retenção pós-contrato (ADR 0007): padrão 90 dias, máximo 365.
+const DEFAULT_RETENTION_DAYS = 90;
+const MAX_RETENTION_DAYS = 365;
 
 @Component({
     selector: 'app-contrato-formulario',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiInputNumber, UiInputText, UiInputDate, UiButton, UiCheckbox, TabsModule, ToastModule],
+    imports: [CommonModule, ReactiveFormsModule, UiAutocomplete, UiInputNumber, UiInputText, UiInputDate, UiButton, UiCheckbox, UiConfirmDialog, TabsModule, TagModule],
     templateUrl: './formulario.html',
-    providers: []
+    providers: [ConfirmationService]
 })
 export class ContratoFormPage implements OnInit {
     private fb = inject(FormBuilder);
-    private contratoService = inject(ContratoService);
+    readonly contratoService = inject(ContratoService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    private confirmationService = inject(ConfirmationService);
+
+    readonly maxRetentionDays = MAX_RETENTION_DAYS;
 
     saving = false;
-    provisionandoPrimeiroAcesso = false;
+    provisioning = false;
     loading = false;
-    loadingAdministradores = false;
+    loadingAdmins = false;
     isEditing = false;
-    activeTab = 'principal';
-    contratoId?: number;
-    provisionamentoResult: ContratoProvisionamentoInicialResult | null = null;
-    resetSenhaResult: ContratoAdministradorResetSenhaResult | null = null;
-    administradores: ContratoAdministrador[] = [];
-    private resettingAdminIds = new Set<number>();
-    private requestedTab: 'primeiro-acesso' | 'administradores' | null = null;
+    activeTab: ContractTab = 'principal';
+    contractId?: string;
+    provisionResult: ContractProvisionResult | null = null;
+    resetResult: ContractAdminPasswordReset | null = null;
+    admins: ContractAdmin[] = [];
+    private resettingAdminIds = new Set<string>();
+    private requestedTab: ContractTab | null = null;
 
-    form = this.fb.nonNullable.group({
-        nome: ['', Validators.required],
-        data_inicio: ['', Validators.required],
-        data_fim: [''],
-        licencas: [1, [Validators.min(1)]],
-        ativo: [true]
+    form = this.fb.group({
+        name: this.fb.nonNullable.control('', Validators.required),
+        plan: this.fb.control<string | null>(null),
+        start_date: this.fb.nonNullable.control('', Validators.required),
+        end_date: this.fb.nonNullable.control(''),
+        licenses: this.fb.nonNullable.control(1, [Validators.required, Validators.min(1)]),
+        post_termination_retention_days: this.fb.nonNullable.control(DEFAULT_RETENTION_DAYS, [Validators.required, Validators.min(0), Validators.max(MAX_RETENTION_DAYS)]),
+        is_active: this.fb.nonNullable.control(true)
     });
 
-    primeiroAcessoForm = this.fb.nonNullable.group({
-        organizacao_nome: ['', Validators.required],
-        usuario_nome: ['', Validators.required],
-        usuario_sobrenome: ['', Validators.required],
-        usuario_username: ['', Validators.required],
-        usuario_email: ['', [Validators.required, Validators.email]]
+    provisionForm = this.fb.nonNullable.group({
+        organization_name: ['', Validators.required],
+        username: ['', Validators.required],
+        name: ['', Validators.required]
     });
 
     ngOnInit() {
@@ -70,18 +81,18 @@ export class ContratoFormPage implements OnInit {
 
         if (idParam) {
             this.isEditing = true;
-            this.contratoId = Number(idParam);
-            this.loadContrato();
-            this.loadAdministradores();
+            this.contractId = idParam;
+            this.loadContract();
+            this.loadAdmins();
         }
     }
 
-    get exibirPrimeiroAcessoTab() {
-        return this.isEditing && !this.loadingAdministradores && this.administradores.length === 0;
+    get showProvisionTab() {
+        return this.isEditing && !this.loadingAdmins && this.admins.length === 0;
     }
 
-    get exibirAdministradoresTab() {
-        return this.isEditing && !this.loadingAdministradores && this.administradores.length > 0;
+    get showAdminsTab() {
+        return this.isEditing && !this.loadingAdmins && this.admins.length > 0;
     }
 
     goBack() {
@@ -93,8 +104,8 @@ export class ContratoFormPage implements OnInit {
             this.form.markAllAsTouched();
             this.messageService.add({
                 severity: 'warn',
-                summary: 'Campos obrigatorios',
-                detail: 'Preencha os campos obrigatorios antes de salvar.'
+                summary: 'Campos obrigatórios',
+                detail: 'Preencha os campos obrigatórios antes de salvar.'
             });
 
             return;
@@ -104,12 +115,11 @@ export class ContratoFormPage implements OnInit {
 
         this.saving = true;
 
-        const request = this.isEditing && this.contratoId ? this.contratoService.update(this.contratoId, payload) : this.contratoService.create(payload);
+        const request = this.isEditing && this.contractId ? this.contratoService.update(this.contractId, payload) : this.contratoService.create(payload);
 
         request.subscribe({
-            next: (contrato: Contrato) => {
+            next: (contract: Contract) => {
                 this.saving = false;
-                // DESABILITADO: contexto do core usa apenas organização UUID; adaptar contrato na 6.8.
                 this.messageService.add({
                     severity: 'success',
                     summary: this.isEditing ? 'Contrato atualizado' : 'Contrato criado',
@@ -122,26 +132,26 @@ export class ContratoFormPage implements OnInit {
                     return;
                 }
 
-                this.router.navigate(['/pages/administracao/contrato', contrato.id], { queryParams: { tab: 'primeiro-acesso' } });
+                this.router.navigate(['/pages/administracao/contrato', contract.public_id], { queryParams: { tab: 'primeiro-acesso' } });
             },
             error: (error: unknown) => {
                 this.saving = false;
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Falha ao salvar',
-                    detail: getBackendErrorMessage(error, 'Verifique os dados e tente novamente.')
+                    detail: problemMessage(error, 'Verifique os dados e tente novamente.')
                 });
             }
         });
     }
 
-    provisionarPrimeiroAcesso() {
-        if (!this.contratoId) {
+    provision() {
+        if (!this.contractId) {
             return;
         }
 
-        if (this.primeiroAcessoForm.invalid) {
-            this.primeiroAcessoForm.markAllAsTouched();
+        if (this.provisionForm.invalid) {
+            this.provisionForm.markAllAsTouched();
             this.messageService.add({
                 severity: 'warn',
                 summary: 'Campos obrigatórios',
@@ -151,144 +161,129 @@ export class ContratoFormPage implements OnInit {
             return;
         }
 
-        this.provisionandoPrimeiroAcesso = true;
-        const payload = this.buildPrimeiroAcessoPayload();
+        this.provisioning = true;
 
-        this.contratoService.provisionarPrimeiroAcesso(this.contratoId, payload).subscribe({
-            next: (result: ContratoProvisionamentoInicialResult) => {
-                this.provisionandoPrimeiroAcesso = false;
-                this.provisionamentoResult = result;
-                this.resetSenhaResult = null;
+        this.contratoService.provision(this.contractId, this.buildProvisionPayload()).subscribe({
+            next: (result: ContractProvisionResult) => {
+                this.provisioning = false;
+                this.provisionResult = result;
+                this.resetResult = null;
+                this.provisionForm.reset();
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Primeiro acesso provisionado',
-                    detail: 'Organização e usuário admin do contrato criados com sucesso.'
+                    detail: 'Organização e administrador do contrato criados com sucesso.'
                 });
-                this.loadAdministradores();
+                this.loadAdmins();
             },
             error: (error: unknown) => {
-                this.provisionandoPrimeiroAcesso = false;
+                this.provisioning = false;
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Falha no provisionamento',
-                    detail: getBackendErrorMessage(error, 'Não foi possível provisionar o primeiro acesso.')
+                    detail: problemMessage(error, 'Não foi possível provisionar o primeiro acesso.')
                 });
             }
         });
     }
 
-    resetarSenhaAdministrador(administrador: ContratoAdministrador) {
-        if (!this.contratoId || this.isResetandoAdministrador(administrador.id)) {
+    confirmResetPassword(admin: ContractAdmin) {
+        if (!this.contractId || this.isResetting(admin.public_id)) {
             return;
         }
 
-        this.resettingAdminIds.add(administrador.id);
-        this.contratoService.resetarSenhaAdministrador(this.contratoId, administrador.id).subscribe({
-            next: (result: ContratoAdministradorResetSenhaResult) => {
-                this.resettingAdminIds.delete(administrador.id);
-                this.resetSenhaResult = result;
-                this.provisionamentoResult = null;
+        this.confirmationService.confirm({
+            header: 'Redefinir senha',
+            message: `Gerar uma nova senha temporária para "${admin.username}"? As sessões abertas desse usuário serão encerradas.`,
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => this.resetPassword(admin)
+        });
+    }
+
+    isResetting(adminPublicId: string) {
+        return this.resettingAdminIds.has(adminPublicId);
+    }
+
+    copyPassword(password: string | undefined) {
+        if (!password) {
+            return;
+        }
+
+        navigator.clipboard
+            .writeText(password)
+            .then(() => {
                 this.messageService.add({
                     severity: 'success',
-                    summary: 'Senha resetada',
-                    detail: `Senha temporária gerada para o usuário ${result.usuario.username}.`
+                    summary: 'Senha copiada',
+                    detail: 'Senha temporária copiada para a área de transferência.'
+                });
+            })
+            .catch(() => {
+                this.messageService.add({
+                    severity: 'warn',
+                    summary: 'Cópia indisponível',
+                    detail: 'Não foi possível copiar automaticamente. Copie manualmente.'
+                });
+            });
+    }
+
+    private resetPassword(admin: ContractAdmin) {
+        if (!this.contractId) {
+            return;
+        }
+
+        this.resettingAdminIds.add(admin.public_id);
+        this.contratoService.resetAdminPassword(this.contractId, admin.public_id).subscribe({
+            next: (result: ContractAdminPasswordReset) => {
+                this.resettingAdminIds.delete(admin.public_id);
+                this.resetResult = result;
+                this.provisionResult = null;
+                this.admins = this.admins.map((item) => (item.public_id === result.user.public_id ? result.user : item));
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Senha redefinida',
+                    detail: `Senha temporária gerada para o usuário ${result.user.username}.`
                 });
             },
             error: (error: unknown) => {
-                this.resettingAdminIds.delete(administrador.id);
+                this.resettingAdminIds.delete(admin.public_id);
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Falha ao resetar senha',
-                    detail: getBackendErrorMessage(error, 'Não foi possível resetar a senha do administrador.')
+                    summary: 'Falha ao redefinir senha',
+                    detail: problemMessage(error, 'Não foi possível redefinir a senha do administrador.')
                 });
             }
         });
     }
 
-    isResetandoAdministrador(administradorId: number) {
-        return this.resettingAdminIds.has(administradorId);
-    }
-
-    copyTemporaryPassword() {
-        const temporaryPassword = this.provisionamentoResult?.senha_temporaria;
-
-        if (!temporaryPassword) {
-            return;
-        }
-
-        navigator.clipboard
-            .writeText(temporaryPassword)
-            .then(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Senha copiada',
-                    detail: 'Senha temporária copiada para a área de transferência.'
-                });
-            })
-            .catch(() => {
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Cópia indisponível',
-                    detail: 'Não foi possível copiar automaticamente. Copie manualmente.'
-                });
-            });
-    }
-
-    copyResetTemporaryPassword() {
-        const temporaryPassword = this.resetSenhaResult?.senha_temporaria;
-
-        if (!temporaryPassword) {
-            return;
-        }
-
-        navigator.clipboard
-            .writeText(temporaryPassword)
-            .then(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Senha copiada',
-                    detail: 'Senha temporária copiada para a área de transferência.'
-                });
-            })
-            .catch(() => {
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Cópia indisponível',
-                    detail: 'Não foi possível copiar automaticamente. Copie manualmente.'
-                });
-            });
-    }
-
-    private loadContrato() {
-        if (!this.contratoId) {
+    private loadContract() {
+        if (!this.contractId) {
             return;
         }
 
         this.loading = true;
-        this.contratoService.get(this.contratoId).subscribe({
-            next: (contrato) => {
+        this.contratoService.get(this.contractId).subscribe({
+            next: (contract) => {
                 this.loading = false;
                 this.form.patchValue({
-                    nome: contrato.nome,
-                    data_inicio: contrato.data_inicio,
-                    data_fim: contrato.data_fim ?? '',
-                    licencas: contrato.licencas,
-                    ativo: contrato.ativo
+                    name: contract.name,
+                    plan: contract.plan,
+                    start_date: contract.start_date,
+                    end_date: contract.end_date ?? '',
+                    licenses: contract.licenses,
+                    post_termination_retention_days: contract.post_termination_retention_days,
+                    is_active: contract.is_active
                 });
 
-                const currentOrganizationName = this.primeiroAcessoForm.controls.organizacao_nome.value.trim();
-
-                if (!currentOrganizationName) {
-                    this.primeiroAcessoForm.patchValue({
-                        organizacao_nome: `${contrato.nome} - Organização Principal`
-                    });
+                if (!this.provisionForm.controls.organization_name.value.trim()) {
+                    this.provisionForm.patchValue({ organization_name: `${contract.name} - Organização Principal` });
                 }
             },
             error: () => {
                 this.loading = false;
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Contrato nao encontrado',
+                    summary: 'Contrato não encontrado',
                     detail: 'Retornando para a lista.'
                 });
                 this.goBack();
@@ -296,26 +291,26 @@ export class ContratoFormPage implements OnInit {
         });
     }
 
-    private loadAdministradores() {
-        if (!this.contratoId) {
+    private loadAdmins() {
+        if (!this.contractId) {
             return;
         }
 
-        this.loadingAdministradores = true;
-        this.contratoService.administradores(this.contratoId).subscribe({
-            next: (response: ContratoAdministradoresResponse) => {
-                this.loadingAdministradores = false;
-                this.administradores = response.data ?? [];
+        this.loadingAdmins = true;
+        this.contratoService.admins(this.contractId).subscribe({
+            next: (response) => {
+                this.loadingAdmins = false;
+                this.admins = response.data ?? [];
                 this.syncConditionalTab();
             },
             error: (error: unknown) => {
-                this.loadingAdministradores = false;
-                this.administradores = [];
+                this.loadingAdmins = false;
+                this.admins = [];
                 this.syncConditionalTab();
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Falha ao carregar administradores',
-                    detail: getBackendErrorMessage(error, 'Não foi possível carregar os administradores do contrato.')
+                    detail: problemMessage(error, 'Não foi possível carregar os administradores do contrato.')
                 });
             }
         });
@@ -331,51 +326,51 @@ export class ContratoFormPage implements OnInit {
 
             this.requestedTab = null;
 
-            if (requested === 'primeiro-acesso' && this.administradores.length === 0) {
+            if (requested === 'primeiro-acesso' && this.admins.length === 0) {
                 this.activeTab = 'primeiro-acesso';
 
                 return;
             }
 
-            if (requested === 'administradores' && this.administradores.length > 0) {
+            if (requested === 'administradores' && this.admins.length > 0) {
                 this.activeTab = 'administradores';
 
                 return;
             }
         }
 
-        if (this.administradores.length > 0 && this.activeTab === 'primeiro-acesso') {
+        if (this.admins.length > 0 && this.activeTab === 'primeiro-acesso') {
             this.activeTab = 'administradores';
 
             return;
         }
 
-        if (this.administradores.length === 0 && this.activeTab === 'administradores') {
+        if (this.admins.length === 0 && this.activeTab === 'administradores') {
             this.activeTab = 'primeiro-acesso';
         }
     }
 
-    private buildPayload(): ContratoCreate {
+    private buildPayload(): ContractWrite {
         const raw = this.form.getRawValue();
 
         return {
-            nome: raw.nome.trim(),
-            data_inicio: raw.data_inicio,
-            data_fim: raw.data_fim ? raw.data_fim : null,
-            licencas: raw.licencas,
-            ativo: raw.ativo
+            name: raw.name.trim(),
+            plan: raw.plan || null,
+            start_date: raw.start_date,
+            end_date: raw.end_date ? raw.end_date : null,
+            licenses: raw.licenses,
+            post_termination_retention_days: raw.post_termination_retention_days,
+            is_active: raw.is_active
         };
     }
 
-    private buildPrimeiroAcessoPayload(): ContratoProvisionamentoInicialCreate {
-        const raw = this.primeiroAcessoForm.getRawValue();
+    private buildProvisionPayload(): ContractProvision {
+        const raw = this.provisionForm.getRawValue();
 
         return {
-            organizacao_nome: raw.organizacao_nome.trim(),
-            usuario_nome: raw.usuario_nome.trim(),
-            usuario_sobrenome: raw.usuario_sobrenome.trim(),
-            usuario_username: raw.usuario_username.trim(),
-            usuario_email: raw.usuario_email.trim().toLowerCase()
+            organization_name: raw.organization_name.trim(),
+            username: raw.username.trim(),
+            name: raw.name.trim()
         };
     }
 }

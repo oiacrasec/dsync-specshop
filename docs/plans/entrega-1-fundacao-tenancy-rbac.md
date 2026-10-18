@@ -53,6 +53,7 @@ e só começa após aprovação do usuário.
 | 41 | Após avaliar cookies HttpOnly, usuário decidiu manter JWT em **localStorage**; organização ativa também compartilhada. Trocar organização em uma aba sincroniza e recarrega o conteúdo de todas; refresh/logout coordenados entre abas por Web Locks, sem polling (ADR 0035) |
 | 42 | 6.6 (usuário): `POST /api/v1/admin/contracts/{public_id}/provision/`; admin com dados mínimos (`username` + `name`); só contrato **disponível** e sem usuários **e** sem organizações não excluídos (inclusive inativos), senão 409 `contract-not-provisionable` |
 | 43 | 6.7 (usuário): admins do contrato = atribuição essencial ativa (perfil ativo), usuário ativo **ou inativo**, não excluído; rotas `GET …/contracts/{public_id}/admins/` (paginada) e `POST …/admins/{user_public_id}/reset-password/`. Refresh passa a travar usuário → token, a mesma ordem do reset |
+| 44 | 6.8 (usuário): formulário de contrato inclui a retenção pós-contrato (`post_termination_retention_days`, 0–365, padrão 90) além do plano opcional |
 
 ## Bloco 0 — Fundação
 
@@ -121,7 +122,7 @@ Ordem proposta: 6.1 → 6.2 → 6.2a → 6.3 → 6.4 → 6.5 → 6.6 → 6.7 →
 | 6.5 | Frontend: camada de API do core (login/refresh/logout JWT, `X-Organization-Id`, erros RFC 9457, `public_id`) + telas de login, primeiro acesso e seleção de organização; JWT/contexto localStorage, sincronização/recarregamento entre abas | frontend | 0003, 0004, 0035 | ✅ |
 | 6.6 | Provisionamento do contrato: cria 1ª organização + admin (perfil essencial) com senha temporária; só contrato sem usuários; licença conferida; auditado sem a senha | backend | 0009 §5, 0010 | ✅ |
 | 6.7 | Admins do contrato: listar e resetar senha (nova temporária + `must_change_password`), auditado | backend | 0010 | ✅ |
-| 6.8 | Frontend: administração de contratos (lista, formulário, provisionamento, admins e reset), adaptada à API do core | frontend | 0008 | ⬜ |
+| 6.8 | Frontend: administração de contratos (lista, formulário, provisionamento, admins e reset), adaptada à API do core | frontend | 0008 | ✅ |
 
 Pendências do bloco 6: respondidas (decisão 40).
 
@@ -130,7 +131,7 @@ entre serviços independentes; lint, formato e build. Validador backend preserva
 30 pedidos cotidianos sem storage/refresh; bundle ~1,25 MB (~257 KB estimados).
 Sem auditoria WCAG completa, E2E com duas abas/banco ou ensaio de capacidade sob carga.
 ETag global herdado desabilitado por cache apenas por URL; resumo de permissões GIS
-desabilitado, endpoint inexistente no Core. API de contratos continua para a 6.8.
+desabilitado, endpoint inexistente no Core. Contratos adaptados na 6.8.
 
 Achados da 6.1 (herdados do datasync-gis, a decidir com o usuário):
 

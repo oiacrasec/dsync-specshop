@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 6.8: frontend de contratos na API do Core
+
+- Decisão 44 (usuário): retenção pós-contrato no formulário. Tipos de contrato em inglês/
+  snake_case (`types/contrato.ts`) e `types/options.ts`.
+- ContratoService: /api/v1/admin/contracts, schema cacheado e adaptado ao ui-table,
+  planOptions (q / public_id), provision, admins (rows 100) e resetAdminPassword.
+- ui-filter: relação resolve por `public_id` (antes `pk`), rows 20, resposta snake_case.
+- Lista com dataKey public_id/rows 20; formulário com plano, retenção, provisionamento,
+  admins (situação/troca pendente) e reset com confirmação; erros via problemMessage.
+- Rotas mantêm accessGuard ADMIN; permissionGuard libera superadmin (códigos `contrato:*`
+  do GIS seguem sem uso no Core).
+- 8 testes novos (52 no total), lint/formato/build OK; bundle ~1,25 MB. Backend inalterado.
+- Docs: frontend README/autenticação/padrões, plano, overview, memória e handoff.
+
 ## 2026-10-18 — Etapa 6.7: admins do contrato e reset de senha
 
 - Decisão 43 (usuário): lista inclui admins inativos; rotas admins/ e reset-password/ (POST).

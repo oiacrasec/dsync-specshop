@@ -43,9 +43,16 @@ compatível). Sem polling. Primeiro acesso obrigatório redireciona à troca de 
 superadmin vai direto à home sem organização. Campos de senha não são persistidos.
 Erros seguem RFC 9457. Detalhes e limites: [autenticação](docs/architecture/authentication.md).
 
-As telas de contratos ainda usam o contrato GIS: adaptação na etapa 6.8. O resumo
-de permissões legado e o cache ETag global ficam desabilitados; não existe endpoint
-de resumo RBAC no Core nesta etapa. Telas fora do escopo permanecem desabilitadas.
+## Administração de contratos (etapa 6.8)
+
+Tela do superadmin na API do Core (`/api/v1/admin/contracts/`, `public_id`):
+lista paginada com schema do backend (colunas, busca geral `search`, filtros e plano via
+`options`), formulário com plano opcional e retenção pós-contrato (0–365, padrão 90),
+provisionamento do primeiro acesso (organização + admin com `username` e nome), lista de
+admins e redefinição de senha com confirmação. Senhas temporárias aparecem uma única vez
+e não são persistidas. `ContratoService` adapta `total_records`/schema ao `ui-table` e
+`ui-filter` resolve opções por `public_id` (ADR 0004/0011). O resumo de permissões legado e o
+cache ETag global continuam desabilitados; telas fora do escopo seguem desabilitadas.
 
 ## Docker
 

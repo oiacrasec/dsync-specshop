@@ -61,7 +61,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `frontend/` (etapa 6.5: auth Core, primeiro acesso, seleção UUID, RFC 9457; JWT/contexto localStorage e recarregamento entre abas, ADR 0035) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
-| `frontend/` | criado; auth/contexto adaptados, contratos na 6.8 |
+| `frontend/` | criado; auth/contexto (6.5) e administração de contratos (6.8) adaptados ao Core |
 | `AGENTS.md` (frontend) | criado |
 
 Diretórios ainda sem conteúdo contêm `.gitkeep` apenas para preservar a estrutura

@@ -1,60 +1,98 @@
-export interface Contrato {
-    id: number;
-    nome: string;
-    data_inicio: string;
-    data_fim: string | null;
-    licencas: number;
-    ativo: boolean;
+// Contrato da API administrativa do Core (docs/api/admin-contracts.md): snake_case e public_id.
+
+export interface Contract {
+    public_id: string;
+    name: string;
+    plan: string | null;
+    start_date: string;
+    end_date: string | null;
+    licenses: number;
+    post_termination_retention_days: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
-export interface ContratoCreate {
-    nome: string;
-    data_inicio?: string;
-    data_fim?: string | null;
-    licencas?: number;
-    ativo?: boolean;
+export interface ContractWrite {
+    name: string;
+    plan: string | null;
+    start_date: string;
+    end_date: string | null;
+    licenses: number;
+    post_termination_retention_days: number;
+    is_active: boolean;
 }
 
-export type ContratoUpdate = Partial<ContratoCreate>;
-
-export interface ContratoProvisionamentoInicialCreate {
-    organizacao_nome: string;
-    usuario_nome: string;
-    usuario_sobrenome: string;
-    usuario_username: string;
-    usuario_email: string;
+export interface ContractListResponse {
+    data: Contract[];
+    total_records: number;
 }
 
-export interface ContratoProvisionamentoInicialResult {
-    contrato_id: number;
-    organizacao: {
-        id: number;
-        nome: string;
-    };
-    usuario: {
-        id: number;
-        username: string;
-        email: string;
-        nome: string;
-        sobrenome: string;
-    };
-    senha_temporaria: string;
+export interface SchemaColumn {
+    field: string;
+    label: string;
 }
 
-export interface ContratoAdministrador {
-    id: number;
+export interface SchemaFilter {
+    field: string;
+    label: string;
+    type: 'text' | 'number' | 'boolean' | 'choice' | 'date' | 'datetime' | 'relation';
+    options_url?: string | null;
+    choices?: Array<{ value: unknown; label: string }>;
+}
+
+export interface GeneralSearchSchema {
+    parameter: string;
+    label: string;
+    fields: Array<{ field: string; label: string; lookup: string }>;
+}
+
+export interface TableSchema {
+    columns: SchemaColumn[];
+    filters: SchemaFilter[];
+    general_search: GeneralSearchSchema | null;
+    ordering_fields: string[];
+}
+
+export interface ContractProvision {
+    organization_name: string;
     username: string;
+    name: string;
 }
 
-export interface ContratoAdministradoresResponse {
-    total: number;
-    data: ContratoAdministrador[];
+export interface ProvisionedOrganization {
+    public_id: string;
+    name: string;
 }
 
-export interface ContratoAdministradorResetSenhaResult {
-    usuario: {
-        id: number;
-        username: string;
-    };
-    senha_temporaria: string;
+export interface ProvisionedUser {
+    public_id: string;
+    username: string;
+    name: string;
+    is_superuser: boolean;
+    must_change_password: boolean;
+}
+
+export interface ContractProvisionResult {
+    organization: ProvisionedOrganization;
+    user: ProvisionedUser;
+    temporary_password: string;
+}
+
+export interface ContractAdmin {
+    public_id: string;
+    username: string;
+    name: string;
+    is_active: boolean;
+    must_change_password: boolean;
+}
+
+export interface ContractAdminsResponse {
+    data: ContractAdmin[];
+    total_records: number;
+}
+
+export interface ContractAdminPasswordReset {
+    user: ContractAdmin;
+    temporary_password: string;
 }

@@ -73,4 +73,4 @@ Limitações conhecidas: JWT acessível a JS por decisão explícita; MFA, infra
 retenção/expurgo e adequação jurídica de AccessLog permanecem pendências anteriores.
 
 Dev: API relativa com proxy Angular; homol/prod aguardam URL. Cache ETag global por
-URL fica desabilitado até revisão de isolamento/no-store. Contratos: adaptar na 6.8.
+URL fica desabilitado até revisão de isolamento/no-store. Contratos adaptados na 6.8 (README).
