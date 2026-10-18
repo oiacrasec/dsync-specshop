@@ -1,6 +1,6 @@
 # 0025 — Classe de service declarada nos serializers
 
-- **Status:** Aceito
+- **Status:** Substituído por 0030
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0023 e 0024
 

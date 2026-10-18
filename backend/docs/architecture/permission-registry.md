@@ -48,10 +48,10 @@ As exceções ValueError/KeyError/TypeError são internas; services de apps/rbac
 traduzem violações para erros de validação/RFC 9457. Não enviar
 mensagens internas diretamente ao cliente.
 
-## O que ainda falta
+## Onde o registry é usado
 
 Perfis e atribuições estão em apps/rbac (3.2), conforme o
-[domínio RBAC](../../../docs/domain/rbac.md). Cálculo da permissão efetiva e integração DRF concluídos (3.3). Faltam fixture do
-perfil essencial (3.4), organizações acessíveis (3.5) e auditoria (3.6, `apps/audit`).
-Depois disso, retomar o contexto (2.3). O registry permanece Python puro, sem
-models ou migrations próprios; não há concessão automática ou mudança nos endpoints JWT.
+[domínio RBAC](../../../docs/domain/rbac.md). Cálculo da permissão efetiva e integração
+DRF (3.3), perfil essencial (3.4), organizações acessíveis (3.5) e auditoria (3.6,
+`apps/audit`) estão concluídos. O registry permanece Python puro, sem models ou
+migrations próprios.

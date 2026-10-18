@@ -128,5 +128,3 @@ usuários. Autorização, atribuições e auditoria completa entram nas etapas d
 e gestão de usuários. Não expor esse serviço por uma API sem essas proteções.
 Desde a etapa 3.2, transferir de contrato exige remover as atribuições RBAC não
 excluídas primeiro, inclusive as inativas, para manter coerência entre os vínculos.
-Bloqueio de login/refresh e requisições por contrato indisponível será conectado
-na etapa de validação de contexto; esta etapa valida o contrato nas escritas.

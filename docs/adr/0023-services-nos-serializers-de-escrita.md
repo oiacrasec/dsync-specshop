@@ -1,6 +1,6 @@
 # 0023 — Services nos serializers de escrita
 
-- **Status:** Aceito
+- **Status:** Substituído por 0030
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0002 e 0021
 

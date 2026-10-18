@@ -621,34 +621,15 @@ A divisão de responsabilidades é:
 ## 5.1 Fluxo de leitura
 
 ```text
-HTTP Request
-      │
-      ▼
-    View
-      │
-      ▼
-  Selector
-      │
-      ▼
-    Model
+consulta simples:     View → Queryset → Model            (ADR 0028)
+lógica de leitura:    View → Selector → Model
 ```
 
 ## 5.2 Fluxo de escrita
 
 ```text
-HTTP Request
-      │
-      ▼
- Serializer
-      │
-      ▼
-    View
-      │
-      ▼
-   Service
-      │
-      ▼
-    Model
+CRUD auditado:        View → Serializer → Model          (ADR 0030)
+operação de domínio:  View → Service → Model             (users, RBAC, fluxos além do CRUD)
 ```
 
 Views e serializers devem permanecer finos.
@@ -1360,7 +1341,7 @@ Ao criar uma nova funcionalidade:
 6. seleções usam o endpoint `options` (ADR 0011);
 7. erros no formato RFC 9457 (skill `erros-api-rfc9457`);
 8. seguir os exemplos em `backend/docs/examples/`;
-9. leituras devem preferencialmente utilizar selectors;
+9. consultas simples no queryset da view; selectors para leitura com lógica própria (ADR 0028);
 10. CRUD auditado usa BaseModelSerializer, validação DRF e validate próprio; services ficam para operações de domínio (ADR 0030);
 11. views devem permanecer finas;
 12. adicionar testes, incluindo **isolamento entre contratos**;

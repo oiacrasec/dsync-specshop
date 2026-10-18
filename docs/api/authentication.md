@@ -79,8 +79,7 @@ até expirar, por no máximo 15 minutos, conforme ADR 0004.
 Contrato do usuário vencido, futuro, inativo ou excluído → 403 `contract-inactive` no login
 (após senha correta), no refresh e em toda rota autenticada; logout continua permitido
 ([regras](../domain/contracts.md)). O
-armazenamento de tokens no navegador continua pendente no ADR 0003; esta etapa
-não define armazenamento no frontend.
+armazenamento de tokens no navegador foi definido no ADR 0035 (ver Cliente Angular abaixo).
 
 ## Erros
 
@@ -142,7 +141,7 @@ de autenticação/troca, nunca nas leituras comuns.
 A sessão atual continua com seus tokens; a troca não emite novos tokens nem revoga
 outros refresh. O access passa a ser aceito assim que a flag é limpa. Rotação/logout
 mantêm a política acima; reset com revogação de refresh será implementado na 6.7.
-A adaptação das telas/interceptors pertence à 6.5.
+A adaptação das telas/interceptors foi feita na 6.5.
 
 Finalidade da flag vinculada à conta: impedir uso com senha temporária e permitir
 acesso seguro ao serviço contratado. Mantida junto à conta, limpa na troca, sem

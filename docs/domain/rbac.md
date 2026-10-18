@@ -135,7 +135,7 @@ O acesso total dinâmico do perfil essencial vale no cálculo (3.3).
 | `contracts.selectors.superadmin_contract_organizations(contract)` | 2º passo: organizações ativas do contrato. Endpoints na área admin (bloco 5) |
 
 Toda mudança de permissão é auditada ([auditoria](audit.md), etapa 3.6). Autoria nos models não substitui essa trilha.
-O isolamento automático de queries continua nas etapas 2.4–2.5.
+O isolamento automático de queries foi entregue nas etapas 2.4–2.5.
 
 ## Dados e finalidade
 

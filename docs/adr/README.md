@@ -43,7 +43,7 @@ um ADR novo que **substitui** o anterior.
 | [0024](0024-classe-base-de-services.md) | Classe base de services e exclusão herdada nas views | Substituído por 0030 |
 | [0025](0025-classe-de-service-nos-serializers.md) | Classe de service declarada nos serializers | Substituído por 0030 |
 | [0026](0026-schema-automatico-por-campos.md) | Schema por campos, metadados automáticos e overrides | Aceito |
-| [0027](0027-classes-base-de-selectors.md) | Classes base de selectors e configuração das views | Aceito |
+| [0027](0027-classes-base-de-selectors.md) | Classes base de selectors e configuração das views | Substituído por 0028 |
 | [0028](0028-querysets-simples-nas-views.md) | Querysets administrativos simples diretamente nas views; substitui 0027 | Aceito |
 | [0029](0029-busca-geral-e-filtros-individuais.md) | Busca geral e filtros individuais no Core | Aceito |
 | [0030](0030-crud-auditado-nos-serializers.md) | CRUD auditado com serializers padrão do DRF | Aceito |

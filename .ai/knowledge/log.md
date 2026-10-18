@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Documentação alinhada às etapas entregues
+
+- Status dos ADRs 0023–0025 (substituídos por 0030) e 0027 (substituído por 0028)
+  corrigidos nos arquivos e no índice; conteúdo das decisões preservado.
+- Overview §5 e §29 seguem os fluxos dos ADRs 0028/0030. README da raiz, visão geral
+  da API, catálogo de erros, autenticação, domínio, registry, escopos e backend
+  AGENTS/README deixaram de descrever como pendente o que foi entregue (2.3–3.6, 6.5).
+- Só documentação; nenhum código ou contrato de API alterado.
+
 ## 2026-10-18 — ADR 0036: projetos derivados do core
 
 - Registrado, como proposta, o modelo em que cada projeto é um fork do core com remote
@@ -7,7 +16,7 @@
   editar arquivos do core. Inclui o procedimento de venda por espelhamento do histórico.
 - Criado `docs/adr/0036-projetos-derivados-do-core.md`; atualizados o índice dos ADRs,
   `docs/architecture/overview.md` (seção 2.3) e o `AGENTS.md` da raiz.
-- Só documentação. Nenhum código alterado. Não houve commit.
+- Só documentação. Nenhum código alterado. Commit `bb39658`.
 
 ## 2026-10-04 — Etapa 6.5: frontend auth e organização compartilhada
 

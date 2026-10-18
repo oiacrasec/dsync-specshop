@@ -4,9 +4,9 @@ Monorepo fullstack com backend e frontend autônomos.
 
 | Parte | Stack | Estado |
 |---|---|---|
-| `backend/` | Django 5.2 LTS + DRF + PostgreSQL | estrutura inicial |
-| `frontend/` | Angular | pendente |
-| Infra | Docker / Docker Compose | pendente |
+| `backend/` | Django 5.2 LTS + DRF + PostgreSQL | em desenvolvimento (Entrega 1) |
+| `frontend/` | Angular 21 + PrimeNG 21 | em desenvolvimento (Entrega 1) |
+| Infra | Docker / Docker Compose | pendente (só o `Dockerfile` do frontend existe) |
 
 ## Estrutura
 
@@ -24,15 +24,9 @@ datasync-core/
 
 ## Como rodar
 
-Cada projeto roda isoladamente:
-
-```bash
-cd backend && docker compose up
-cd frontend && docker compose up
-```
-
-> Os projetos ainda serão criados — veja o estado atual em
-> [`docs/architecture/overview.md`](docs/architecture/overview.md).
+Cada projeto roda isoladamente. O Docker Compose ainda não existe; por enquanto,
+siga [`backend/README.md`](backend/README.md) e [`frontend/README.md`](frontend/README.md).
+Estado de cada parte: [`docs/architecture/overview.md`](docs/architecture/overview.md).
 
 ## Contribuindo
 

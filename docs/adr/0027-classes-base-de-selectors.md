@@ -1,6 +1,6 @@
 # 0027 — Classes base de selectors e configuração das views
 
-- **Status:** Aceito
+- **Status:** Substituído por 0028
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0002 e 0021
 

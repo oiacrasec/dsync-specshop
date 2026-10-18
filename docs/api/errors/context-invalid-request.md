@@ -12,5 +12,4 @@ sem query string e `request_id` igual ao header `X-Request-Id`.
 
 O cliente deve limpar o contexto e voltar à seleção de organização.
 
-Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
-será implementada na etapa correspondente do plano da Entrega 1.
+Disparada por `apps/core/context.py` desde a etapa 3.3 (ver [RBAC](../../domain/rbac.md)).

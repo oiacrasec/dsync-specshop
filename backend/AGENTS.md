@@ -111,8 +111,6 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Ver [domínio de contratos](../docs/domain/contracts.md).
   FKs de contexto e plano usam `PROTECT` (ADR 0013). Contract.plan é opcional
   (null/blank), sem quotas de plano quando ausente; licenças continuam no contrato.
-  Os tipos abstratos ainda não
-  aplicam isolamento de queries; managers/contexto entram nas próximas etapas.
 - Ao personalizar `Meta`, herdar a do tipo escolhido e preservar índices herdados.
 - Os tipos de escopo herdam `apps.core.models.BaseModel`: UUID v7 externo,
   datas, autoria e soft delete (ADR 0007). Tabelas `dsc_` são geradas automaticamente.

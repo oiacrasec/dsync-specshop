@@ -1,6 +1,6 @@
 # 0024 — Classe base de services e exclusão herdada nas views
 
-- **Status:** Aceito
+- **Status:** Substituído por 0030
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0021 e 0023
 

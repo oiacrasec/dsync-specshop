@@ -21,7 +21,7 @@ O padrão para dados de negócio é `OrganizationScopedModel`. Entidades filhas
 também guardam o contexto; não o deduzem pelo pai. As FKs têm índice individual;
 esse tipo também fornece índice composto `(contract, organization)`.
 
-As relações apontam para o futuro app `apps/contracts`, usam `PROTECT` e não
+As relações apontam para o app `apps/contracts`, usam `PROTECT` e não
 criam acessores reversos (`related_name='+'`). `PROTECT` impede remoção física
 pelo ORM quando há dependentes; o soft delete continua sem cascata.
 

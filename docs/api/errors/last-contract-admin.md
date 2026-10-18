@@ -10,5 +10,5 @@
 Segue o [contrato global](../errors.md): `application/problem+json`, `instance`
 sem query string e `request_id` igual ao header `X-Request-Id`.
 
-Nesta etapa, a exceção está disponível e testada. A regra de negócio que a dispara
-será implementada na etapa correspondente do plano da Entrega 1.
+Disparada desde a etapa 3.4 por `save_assignment`, `delete_assignment`, `save_user` e
+`delete_user` (ver [RBAC](../../domain/rbac.md#último-administrador-etapa-34)).

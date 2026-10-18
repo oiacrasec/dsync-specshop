@@ -44,7 +44,7 @@ POST /api/v1/auth/change-password/ exige access, senha atual/nova/confirmação;
 sob lock próprio, usa validadores Django/Argon2 e auditoria atômica sem credenciais.
 Refresh/logout e troca continuam disponíveis; nenhum custo adicional de consulta ou
 escrita nas leituras. Ver [autenticação](../docs/api/authentication.md) e ADR 0034.
-Próxima etapa prioritária: integrar autenticação e primeiro acesso no frontend (6.5).
+Frontend integrado na 6.5; próxima etapa do plano: provisionamento do contrato (6.6).
 Selectors ficam para consultas com lógica própria. Views administrativas declaram
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.
@@ -128,7 +128,7 @@ Estilo obrigatório de models: [padrão Django](docs/standards/django-style.md) 
 Models próprios herdam um dos quatro [tipos de escopo](docs/architecture/model-scopes.md),
 que derivam de `apps.core.models.BaseModel` (ADR 0007). Exceções: `User` e `Contract`
 (ADR 0012). System checks rejeitam escopo ausente, múltiplo ou campos incompatíveis.
-Os tipos ainda não filtram queries por tenant; contexto e autorização seguem pendentes.
+Desde a etapa 2.4, os managers filtram pelo contexto de tenant (ver abaixo).
 `Plan`, `Contract` e `Organization` estão em `apps/contracts`,
 com `PROTECT` nas relações de contexto e plano (ADR 0013). O `id`
 BIGINT é interno; `public_id` UUID v7 é o identificador para a API e o JWT.
@@ -161,16 +161,16 @@ mensais; somente o schema está pronto, sem contadores ou bloqueios por quota.
 Modalidade é definida pela implantação, sem campo no plano (ADR 0014).
 O contrato guarda vigência, licenças e retenção pós-contrato (90 dias, máximo 365).
 Datas e limites contratuais são protegidos por constraints. A organização pertence
-obrigatoriamente a um contrato. Quotas do plano, contexto e isolamento
-de consultas continuam nas etapas correspondentes; nenhum endpoint novo foi criado.
+obrigatoriamente a um contrato. Contexto e isolamento de consultas vieram nas etapas
+2.3–2.5; quotas do plano continuam sem enforcement.
 
 Etapa 2.2: `User.contract` vincula usuário comum ao contrato; superadmin fica sem
 contrato, garantido por constraint. Licenças contam ativos e inativos não excluídos;
 soft delete libera vaga. Escritas usam `apps.users.services.save_user`, com
 transação/lock e disponibilidade no cadastro, transferência ou restauração.
 O manager delega a esse serviço, inclusive versões async; `createsuperuser`
-continua disponível. Sem novos endpoints; validação do contrato em login/contexto
-e autorização de gestão continuam nas próximas etapas.
+continua disponível. Validação do contrato em login/contexto entrou na etapa 2.3;
+endpoints de gestão de usuários continuam pendentes (5.3/5.4).
 
 ## RBAC
 
