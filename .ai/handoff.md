@@ -3,20 +3,20 @@
 - **Atualizado em:** 2026-10-18
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 6 = prioridade)
-- **Último commit:** 9ea7662 docs: align documentation with delivered stages
+- **Último commit:** 6.7 feat(administration): list contract admins and reset their passwords
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 6.6 provisionamento do contrato — ✅ concluída e commitada |
-| Próximo passo exato | 6.7: listar admins do contrato e resetar senha (nova temporária + flag + revogar refresh) |
-| Aguardando o usuário? | sim — confirmação para iniciar 6.7; commits só após revisão do usuário |
+| Etapa atual | 6.7 admins do contrato e reset de senha — ✅ concluída e commitada |
+| Próximo passo exato | 6.8: frontend de contratos (lista, formulário, provisionamento, admins e reset) na API do Core |
+| Aguardando o usuário? | sim — confirmação para iniciar 6.8; commits só após revisão do usuário |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1 · 6.2 · 6.2a · 6.3 · 6.4 · 6.5 · 6.6.
-Ordem seguinte: 6.7 → 6.8.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1 · 6.2 · 6.2a · 6.3 · 6.4 · 6.5 · 6.6 · 6.7.
+Ordem seguinte: 6.8.
 
 - 6.6/decisão 42: POST /api/v1/admin/contracts/{public_id}/provision/ cria 1ª organização +
   admin (perfil essencial, escopo contrato, must_change_password). Dados mínimos: username +
@@ -31,8 +31,9 @@ Ordem seguinte: 6.7 → 6.8.
 
 - validar.sh procura `.venv` na raiz; o venv local é `~/Virtual/datasync-core-3.14`.
   Usuário pediu para não mexer em config/docs de ambiente: rodar os passos à mão.
-- 6.7: reset gera nova senha (reutilizar generate_temporary_password), marca a flag e revoga
-  refresh do admin (decisão 40). Listar admins do contrato.
+- 6.7/decisão 43: GET admin/contracts/{id}/admins/ (inclui inativos) e POST
+  …/admins/{user}/reset-password/ (temporária + flag + revoga todos os refresh, user.password_reset).
+  Refresh agora trava usuário → token (mesma ordem do reset). audit.0008 aplicada ao banco local com autorização.
 - 6.8: frontend contratos ainda GIS/id/PT; adaptar Core/public_id, plan opcional/options e
   provisionamento. Não reativar telas DESABILITADO. KPI fictícia preservada por pedido.
 - OrganizationViewSet/ADR 0032 Proposto; revisar após Bloco 6. 5.3/5.4/5.5 pendentes.

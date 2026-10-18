@@ -66,7 +66,8 @@ Todas as respostas dessas rotas incluem `Cache-Control` com `no-store` e
 | Renovação | revoga refresh anterior e registra o novo |
 | Logout | revoga o refresh apresentado |
 
-O cliente deve substituir o refresh anterior pelo novo após renovar. Reutilizar
+Ordem de locks na renovação: usuário → token (a mesma do reset de senha da 6.7, que revoga
+todos os refresh da conta). O cliente deve substituir o refresh anterior pelo novo após renovar. Reutilizar
 um refresh revogado retorna 401. Renovação e logout são transacionais e usam lock
 de linha do token no PostgreSQL; duas renovações simultâneas do mesmo refresh
 não podem emitir dois novos pares válidos.
@@ -140,7 +141,8 @@ de autenticação/troca, nunca nas leituras comuns.
 
 A sessão atual continua com seus tokens; a troca não emite novos tokens nem revoga
 outros refresh. O access passa a ser aceito assim que a flag é limpa. Rotação/logout
-mantêm a política acima; reset com revogação de refresh será implementado na 6.7.
+mantêm a política acima. O reset pelo superadmin (6.7) revoga todos os refresh da conta
+([admins do contrato](admin-contracts.md#admins-do-contrato-e-reset-de-senha-67)).
 A adaptação das telas/interceptors foi feita na 6.5.
 
 Finalidade da flag vinculada à conta: impedir uso com senha temporária e permitir

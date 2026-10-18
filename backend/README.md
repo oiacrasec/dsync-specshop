@@ -46,7 +46,8 @@ Refresh/logout e troca continuam disponíveis; nenhum custo adicional de consult
 escrita nas leituras. Ver [autenticação](../docs/api/authentication.md) e ADR 0034.
 Provisionamento (6.6): `POST /api/v1/admin/contracts/{public_id}/provision/` cria a 1ª
 organização e o admin do contrato com senha temporária única; ver
-[administração](../docs/api/admin-contracts.md#provisionamento-do-contrato-66).
+[administração](../docs/api/admin-contracts.md#provisionamento-do-contrato-66). A 6.7 lista os admins
+(`…/admins/`) e reseta a senha deles, revogando os refresh da conta.
 Selectors ficam para consultas com lógica própria. Views administrativas declaram
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.

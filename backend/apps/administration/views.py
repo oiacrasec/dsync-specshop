@@ -7,11 +7,12 @@ from apps.contracts.models import Contract, Plan
 from apps.contracts.serializers import OrganizationSerializer
 from apps.core.responses import build_exception_response, build_result_response
 from apps.core.views import BaseAdminModelViewSet
+from apps.rbac.selectors import contract_admin_users
 from apps.users.serializers import UserSummarySerializer
 
 from .filters import ContractFilterSet, PlanFilterSet
-from .serializers import ContractProvisionSerializer, ContractSerializer, PlanSerializer
-from .services import provision_contract
+from .serializers import ContractAdminSerializer, ContractProvisionSerializer, ContractSerializer, PlanSerializer
+from .services import provision_contract, reset_admin_password
 
 
 class PlanViewSet(BaseAdminModelViewSet):
@@ -45,6 +46,34 @@ class ContractViewSet(BaseAdminModelViewSet):
                 'temporary_password': temporary_password,
             }
             response = build_result_response(result, status_code=status.HTTP_201_CREATED)
+        except Exception as exc:
+            response = build_exception_response(exception=exc, request=request)
+        add_never_cache_headers(response)
+        return response
+
+    @action(detail=True, methods=['get'])
+    def admins(self, request, *args, **kwargs):
+        """Admins do contrato (atribuição essencial ativa), ativos ou não, paginados."""
+        try:
+            contract = self.get_object()
+            queryset = contract_admin_users(contract.pk).order_by('username', 'public_id')
+            page = self.paginate_queryset(queryset)
+            response = self.get_paginated_response(ContractAdminSerializer(page, many=True).data)
+        except Exception as exc:
+            response = build_exception_response(exception=exc, request=request)
+        add_never_cache_headers(response)
+        return response
+
+    @action(detail=True, methods=['post'], url_path='admins/<uuid:user_public_id>/reset-password')
+    def admin_password_reset(self, request, user_public_id, *args, **kwargs):
+        """Nova senha temporária do admin; devolvida só nesta resposta."""
+        try:
+            contract = self.get_object()
+            user, temporary_password = reset_admin_password(
+                contract=contract, user_public_id=user_public_id, actor=request.user
+            )
+            result = {'user': ContractAdminSerializer(user).data, 'temporary_password': temporary_password}
+            response = build_result_response(result)
         except Exception as exc:
             response = build_exception_response(exception=exc, request=request)
         add_never_cache_headers(response)

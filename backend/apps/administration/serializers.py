@@ -20,6 +20,17 @@ class ContractProvisionSerializer(serializers.Serializer):
         return get_user_model().normalize_username(value)
 
 
+class ContractAdminSerializer(serializers.ModelSerializer):
+    """Admin do contrato na administração: só identificação e situação de acesso."""
+
+    name = serializers.CharField(source='first_name', read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('public_id', 'username', 'name', 'is_active', 'must_change_password')
+        read_only_fields = fields
+
+
 class PlanSerializer(BaseAdminModelSerializer):
     audit_fields = PLAN_AUDIT_FIELDS
     # fmt: off

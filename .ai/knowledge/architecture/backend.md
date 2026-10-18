@@ -1,6 +1,6 @@
 # Backend — conhecimento compilado
 
-## Estado atual (2026-10-18, após a etapa 6.6)
+## Estado atual (2026-10-18, após a etapa 6.7)
 
 Fonte de verdade das convenções: `backend/AGENTS.md` e
 `backend/docs/standards/django-style.md`. Resumo:
@@ -20,6 +20,7 @@ Fonte de verdade das convenções: `backend/AGENTS.md` e
 | Performance | premissa global forte: queries, escritas, locks, CPU, memória, rede e concorrência; medir conforme risco; queries constantes não bastam para declarar eficiência |
 | Primeiro acesso | User.must_change_password default false; JWTAuthentication.authenticate nega antes das permissões/contexto com 403 password-change-required, superadmin isento. Só PasswordChangeView libera flag; refresh/logout públicos. Login retorna user explícito; POST /auth/change-password/ usa conta do request, valida senha sob lock próprio/Django/Argon2, limpa flag e audita sem credenciais, tudo atômico. Troca também voluntária, throttle 5 pedidos/min por usuário, sem revogação nova; nenhum custo extra de consulta/escrita na navegação (ADR 0034). Frontend na 6.5, marcação da flag no provisionamento/reset 6.6/6.7 |
 | Provisionamento | 6.6: POST admin/contracts/{id}/provision/ (service em administration) cria organização + admin essencial com must_change_password; só contrato disponível sem usuários/organizações não excluídos, senão 409 contract-not-provisionable; senha temporária CSPRNG 16 validada pelo Django, só na resposta no-store; auditoria assignment.created + contract.provisioned; locks advisory RBAC → contrato |
+| Admins do contrato | 6.7: GET admin/contracts/{id}/admins/ (paginado, EXISTS, unscoped) lista usuários não excluídos com atribuição essencial ativa, ativos ou não; POST …/admins/{user}/reset-password/ gera temporária, marca flag, revoga todos os refresh e audita user.password_reset; fora da lista → 404. Refresh trava usuário → token (mesma ordem do reset) |
 | Seleções | LookupOptionsMixin + queryset com escopo; rótulo/campos SQL declarados, permissão :view nos recursos comuns ou SuperadminPermission na administração; rows 20/máximo 100, UUID repetível; inativos só na resolução; duas queries de dados |
 | Administração | API /admin/plans e /admin/contracts em apps/administration (6.3), sem models próprios; domínio em contracts, plan opcional; SuperadminPermission sem organização; serializers auditados, opções/schema e redução de licenças abaixo dos usuários não excluídos impedida, contando inativos (ADR 0033) |
 | Views base | BaseModelViewSet/BaseAdminModelViewSet em core/views, mixins/pagination/permissions no core; queryset/schema nas views; SerializerDeleteMixin chama serializer.delete(); BaseModelSerializer/BaseAdminModelSerializer usam super().create/update do DRF, autoria/auditoria e hooks extras; campos validados pelo DRF, regras no validate(), sem full_clean genérico/configuração adicional; ATOMIC_REQUESTS e lock antes da validação, uso direto exige atomic envolvendo is_valid/save; services de users/RBAC preservados (ADR 0030) |

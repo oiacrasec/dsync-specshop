@@ -4,11 +4,12 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import router, transaction
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.contracts.models import Contract
@@ -184,27 +185,32 @@ def login(*, request, username, password):
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
 
 
-def _locked_refresh(raw_token):
-    """Chamado dentro de atomic; serializa rotação e logout pelo jti."""
+def _decode_refresh(raw_token):
+    """Valida assinatura/validade, sem tocar no banco."""
     try:
         token = RefreshToken(raw_token)
         public_id = UUID(token.get(api_settings.USER_ID_CLAIM))
     except TokenError, KeyError, ValueError, TypeError, AttributeError:
         raise InvalidToken() from None
+    return token, public_id
+
+
+def _lock_outstanding(token):
+    """Chamado dentro de atomic; serializa rotação e logout pelo jti."""
     try:
         OutstandingToken.objects.select_for_update().get(jti=token[api_settings.JTI_CLAIM])
         # Outro processo pode ter revogado o token enquanto aguardávamos o lock.
         token.check_blacklist()
     except OutstandingToken.DoesNotExist, TokenError:
         raise InvalidToken() from None
-    return token, public_id
 
 
 @system_scope  # Autenticação: antes do contexto; o SimpleJWT consulta User.objects.
 @transaction.atomic
 def refresh_tokens(*, refresh, request=None):
     try:
-        token, user_public_id = _locked_refresh(refresh)
+        token, user_public_id = _decode_refresh(refresh)
+        # Ordem de locks usuário → token, a mesma do reset de senha (revoga todos os refresh).
         user = (
             get_user_model()
             .objects.unscoped()
@@ -212,6 +218,7 @@ def refresh_tokens(*, refresh, request=None):
             .select_for_update(of=('self',))  # Trava só o usuário; o contrato vem na mesma query.
             .get(public_id=user_public_id, is_active=True)
         )
+        _lock_outstanding(token)
         if not api_settings.USER_AUTHENTICATION_RULE(user):
             raise AuthenticationFailed()
         ensure_contract_available(user)
@@ -231,7 +238,8 @@ def refresh_tokens(*, refresh, request=None):
 @transaction.atomic
 def logout(*, refresh):
     try:
-        token, _ = _locked_refresh(refresh)
+        token, _ = _decode_refresh(refresh)
+        _lock_outstanding(token)
         token.blacklist()
     except TokenError:
         raise InvalidToken() from None
@@ -281,3 +289,48 @@ def change_password(*, user, current_password, new_password):
         after={'must_change_password': False},
     )
     return current
+
+
+def _revoke_refresh_tokens(user):
+    """Revoga todos os refresh pendentes da conta. Exige o lock do usuário (ordem usuário → token)."""
+    pending = OutstandingToken.objects.filter(
+        user_id=user.pk, blacklistedtoken__isnull=True, expires_at__gt=timezone.now()
+    ).values_list('pk', flat=True)
+    BlacklistedToken.objects.bulk_create([BlacklistedToken(token_id=pk) for pk in pending], ignore_conflicts=True)
+
+
+@system_scope
+@transaction.atomic
+def reset_password(*, user, actor):
+    """Senha temporária nova + troca obrigatória + revogação dos refresh (decisão 40).
+
+    Só usuário comum não excluído; a autorização fica com quem chama. A senha volta
+    uma única vez ao chamador; o evento guarda só a flag. Access já emitido expira
+    sozinho, mas a flag bloqueia a navegação desde já (ADR 0034).
+    """
+    current = (
+        get_user_model()
+        .objects.unscoped()
+        .select_for_update(of=('self',))
+        .get(pk=user.pk, deleted_at__isnull=True, is_superuser=False)
+    )
+    from apps.audit.models import AuditEventType
+    from apps.audit.services import record
+
+    from .utils import generate_temporary_password
+
+    before = {'must_change_password': current.must_change_password}
+    temporary_password = generate_temporary_password(current)
+    current.set_password(temporary_password)
+    current.must_change_password = True
+    current.save(actor=actor, update_fields=['password', 'must_change_password'])
+    _revoke_refresh_tokens(current)
+    record(
+        AuditEventType.USER_PASSWORD_RESET,
+        actor=actor,
+        contract_id=current.contract_id,
+        target=current,
+        before=before,
+        after={'must_change_password': True},
+    )
+    return current, temporary_password

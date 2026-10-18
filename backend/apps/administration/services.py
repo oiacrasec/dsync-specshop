@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import NotFound
 
 from apps.audit.models import AuditEventType as Event
 from apps.audit.services import record
@@ -11,8 +12,9 @@ from apps.core.permission_registry import PermissionScope
 from apps.core.tenancy import system_scope
 from apps.rbac.constants import ESSENTIAL_PROFILE_KEY
 from apps.rbac.models import Assignment, Profile
+from apps.rbac.selectors import contract_admin_users
 from apps.rbac.services import begin_write, save_assignment
-from apps.users.services import save_user
+from apps.users.services import reset_password, save_user
 from apps.users.utils import generate_temporary_password
 
 
@@ -65,3 +67,19 @@ def provision_contract(*, contract, organization_name, username, name, actor):
         },
     )
     return organization, user, temporary_password
+
+
+@system_scope
+@transaction.atomic
+def reset_admin_password(*, contract, user_public_id, actor):
+    """Reset da senha de um admin do contrato (6.7): nova temporária, troca obrigatória e refresh revogados.
+
+    Admin fora da lista do contrato → 404, sem revelar se o usuário existe.
+    """
+    if not get_user_model().objects.filter(pk=actor.pk, is_active=True, is_superuser=True).exists():
+        raise PermissionDenied(_('A operação exige autorização administrativa.'))
+    try:
+        user = contract_admin_users(contract.pk).get(public_id=user_public_id)
+    except get_user_model().DoesNotExist:
+        raise NotFound() from None
+    return reset_password(user=user, actor=actor)

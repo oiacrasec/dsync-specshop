@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 6.7: admins do contrato e reset de senha
+
+- Decisão 43 (usuário): lista inclui admins inativos; rotas admins/ e reset-password/ (POST).
+- `rbac.selectors.contract_admin_users`, `users.services.reset_password` +
+  `_revoke_refresh_tokens`, `administration.services.reset_admin_password`, actions `admins`
+  e `admin_password_reset`, `ContractAdminSerializer`, evento `user.password_reset` (audit.0008).
+- Refresh mudou a ordem de locks para usuário → OutstandingToken (antes token → usuário),
+  igual ao reset, evitando deadlock e refresh concorrente escapando da revogação.
+  Logout continua só no token. Testes de auth/concorrência preservados.
+- 17 casos de teste novos (lista/paginação/queries constantes, reset, revogação, 404, 401/403,
+  rollback, ator revalidado, refresh × reset concorrentes); suíte 594.
+- Docs: admin-contracts, authentication, audit, plano, overview, backend AGENTS/README,
+  memória e handoff.
+
 ## 2026-10-18 — Etapa 6.6: provisionamento do contrato
 
 - Decisão 42 (usuário): rota POST /api/v1/admin/contracts/{public_id}/provision/; admin com

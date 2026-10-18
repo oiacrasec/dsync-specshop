@@ -67,6 +67,36 @@ Resposta 201, com `Cache-Control: no-store`:
 - Custo: operação rara e fixa, 5 escritas e até 30 comandos de dados (reutiliza
   `save_user` e `save_assignment`), sem trabalho por item.
 
+## Admins do contrato e reset de senha (6.7)
+
+| Método | Rota | Resultado |
+|---|---|---|
+| GET | `/api/v1/admin/contracts/{public_id}/admins/` | admins do contrato, paginados (`first`/`rows`, máximo 100) |
+| POST | `/api/v1/admin/contracts/{public_id}/admins/{user_public_id}/reset-password/` | 200, nova senha temporária |
+
+Admin = usuário não excluído com atribuição do perfil essencial **ativa** (perfil ativo),
+**incluindo usuários inativos** (decisão 43). Cada item: `public_id`, `username`, `name`,
+`is_active`, `must_change_password`. Ordem por `username`; `{"data": [...], "total_records": n}`.
+
+Reset (decisões 40 e 43):
+
+```json
+{"user": {"public_id": "...", "username": "maria.silva", "name": "Maria",
+          "is_active": true, "must_change_password": true},
+ "temporary_password": "<16 caracteres>"}
+```
+
+- Gera senha temporária (mesmo gerador do provisionamento), marca `must_change_password`
+  e **revoga todos os refresh** pendentes da conta, na mesma transação. O access já emitido
+  expira sozinho, mas a flag barra a navegação imediatamente (403 `password-change-required`).
+- Senha só nesta resposta, `no-store`; evento `user.password_reset` guarda apenas a flag.
+- Usuário fora da lista do contrato (comum, atribuição inativa, outro contrato, excluído,
+  superadmin ou UUID desconhecido) → 404, sem revelar se existe. Admin inativo pode ser
+  resetado: só entra quando for reativado.
+- Locks: usuário → tokens, a mesma ordem do refresh (ver [autenticação](authentication.md)).
+- Custo: lista com queries constantes (1/30 admins, EXISTS sem JOIN multiplicador, sem
+  escritas); reset é operação rara, com 1 SELECT dos refresh pendentes e 1 INSERT em lote.
+
 ## Entrada e saída
 
 Contract.plan é opcional: criação pode omitir o campo ou enviar null. Atualização

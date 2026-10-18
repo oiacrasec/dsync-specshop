@@ -1,4 +1,5 @@
-from django.db.models import Prefetch, Q
+from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef, Prefetch, Q
 
 from apps.core.permission_registry import PermissionScope
 
@@ -92,6 +93,24 @@ def active_admin_count(contract_id, *, exclude_assignment_id=None, exclude_user_
     if exclude_user_id is not None:
         admins = admins.exclude(user_id=exclude_user_id)
     return admins.count()
+
+
+def contract_admin_users(contract_id):
+    """Admins exibidos na administração (6.7): atribuição essencial ativa com perfil ativo.
+
+    Inclui usuários inativos (decisão 43); exclui os excluídos. Um usuário por linha
+    (EXISTS, sem JOIN multiplicador); queryset lazy para paginar no banco. Acesso global
+    explícito (`unscoped`): uso exclusivo da administração do superadmin (ADR 0028).
+    """
+    grants = Assignment.objects.unscoped().filter(
+        user_id=OuterRef('pk'),
+        contract_id=contract_id,
+        is_active=True,
+        profile__system_key=ESSENTIAL_PROFILE_KEY,
+        profile__is_active=True,
+        profile__deleted_at__isnull=True,
+    )
+    return get_user_model().objects.unscoped().filter(contract_id=contract_id).filter(Exists(grants))
 
 
 def user_is_active_admin(user):
