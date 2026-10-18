@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — ADR 0036: projetos derivados do core
+
+- Registrado, como proposta, o modelo em que cada projeto é um fork do core com remote
+  `core`, o fluxo é só do core para os projetos e o projeto apenas acrescenta, sem
+  editar arquivos do core. Inclui o procedimento de venda por espelhamento do histórico.
+- Criado `docs/adr/0036-projetos-derivados-do-core.md`; atualizados o índice dos ADRs,
+  `docs/architecture/overview.md` (seção 2.3) e o `AGENTS.md` da raiz.
+- Só documentação. Nenhum código alterado. Não houve commit.
+
 ## 2026-10-04 — Etapa 6.5: frontend auth e organização compartilhada
 
 - Usuário decidiu manter JWT localStorage após avaliar HttpOnly; determinou que

@@ -52,6 +52,7 @@ um ADR novo que **substitui** o anterior.
 | [0033](0033-api-administrativa-separada-do-dominio.md) | API do superadmin em administration, domínio em contracts e plano opcional | Aceito |
 | [0034](0034-primeiro-acesso-e-troca-de-senha.md) | Primeiro acesso e troca de senha com bloqueio global por JWT | Aceito |
 | [0035](0035-jwt-localstorage-e-contexto-entre-abas.md) | JWT em localStorage e organização sincronizada com recarregamento entre abas | Aceito |
+| [0036](0036-projetos-derivados-do-core.md) | Projetos derivados do core: fork com histórico, fluxo só do core para os projetos | Proposto |
 
 ## Modelo
 

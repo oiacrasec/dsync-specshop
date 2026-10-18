@@ -27,6 +27,9 @@ Princípio central: **código isolado, conhecimento conectado.**
 - Backend e frontend **nunca** dependem de arquivos um do outro; comunicação só via API HTTP/REST.
 - Cada projeto tem suas próprias dependências, ambiente, `Dockerfile` e documentação.
 - A raiz cuida do repositório e do contexto global, não do runtime das aplicações.
+- O core é base de projetos derivados (forks com remote `core`). Nunca colocar no core
+  código ou dado de um projeto derivado, e nunca fazer merge de um projeto no core. Em
+  um projeto derivado, não editar arquivos que vêm do core; só acrescentar (ADR 0036).
 - Não criar estruturas profundas antecipadamente; a arquitetura cresce com o domínio.
 - Performance é premissa global: revisar impacto de toda mudança em consultas,
   escritas, locks, CPU, memória, tráfego e concorrência, no backend e frontend.

@@ -135,6 +135,13 @@ Contract (cliente)  →  Organization (unidade)  →  Sector (futuro)
   servidor do cliente).
 - Decisões completas: `docs/adr/` (índice em `docs/adr/README.md`).
 
+## 2.3 Projetos derivados
+
+O core é a base de vários projetos. Cada projeto é um fork com histórico preservado e
+um remote `core`, evolui no próprio ritmo e recebe as evoluções de arquitetura do core
+por merge manual. O fluxo é só do core para os projetos, e o projeto apenas acrescenta
+código novo, sem editar arquivos que vêm do core (ADR 0036).
+
 ---
 
 # 3. Estrutura oficial do repositório
