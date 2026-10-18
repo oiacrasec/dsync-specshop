@@ -179,7 +179,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   do domínio em `apps/<app>/filters.py` e `filterset_class` na view (ADR 0022).
   Declarar filtros explicitamente para não consultar managers na importação.
   Schemas: schema_columns/schema_filters contêm nomes de campos; labels vêm do
-  verbose_name e tipos do model. schema_column_overrides/schema_filter_overrides
+  verbose_name e tipos (colunas e filtros) do model, só semânticos: nunca máscara/formato de
+  exibição no schema (o frontend formata pelo locale). schema_column_overrides/schema_filter_overrides
   sobrescrevem apenas os campos desejados. Ordenação vem do OrderingFilter, sem
   ordering_fields na view. Usar SchemaRouter: options de relações são resolvidos
   por model/basename registrado e reverse, sem montar URLs por convenção (ADR 0026).

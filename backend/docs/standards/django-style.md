@@ -312,7 +312,8 @@ schema_filters = ('plan',)
 Labels usam `capfirst(model_field.verbose_name)`; o exemplo mantém "Início" como
 sobrescrita, enquanto o padrão seria "Início da vigência". Não gerar colunas/filtros
 para todos os campos: a lista explícita controla a exposição e a ordem.
-`is_active` continua filtro comum. Tipos dos filtros vêm dos campos do model;
+`is_active` continua filtro comum. Tipos de colunas e filtros vêm dos campos do model (semânticos, sem
+formato de exibição: o cliente formata pelo locale);
 o filtro precisa existir no FilterSet. `ordering_fields` da resposta usa o
 OrderingFilter do FilterSet, sem declaração duplicada na view.
 

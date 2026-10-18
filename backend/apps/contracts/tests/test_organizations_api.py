@@ -112,7 +112,7 @@ def test_organizations_are_read_only(world, method):
 
 def test_schema_is_readable_and_previous_nested_route_removed(world):
     api = client(world['user'])
-    assert api.get(URL + 'schema/').json()['columns'] == [{'field': 'name', 'label': 'Nome'}]
+    assert api.get(URL + 'schema/').json()['columns'] == [{'field': 'name', 'label': 'Nome', 'type': 'text'}]
     assert (
         client(world['admin']).get(f'/api/v1/admin/contracts/{world["contract"].public_id}/organizations/').status_code
         == 404

@@ -1,0 +1,69 @@
+import { UiLookupOptionsResponse } from '@/app/shared/ui/autocomplete/autocomplete';
+import { serverUrl } from '@/app/core/utils/api-url';
+import type { UiFilterField } from '@/app/shared/ui/filter/filter';
+import { UiTableColumn, UiTableListResponse } from '@/app/shared/ui/table/table';
+import { OptionsResponse } from '@/app/types/options';
+import { PageResponse, SchemaFieldType, SchemaFilter, TableSchema } from '@/app/types/table-schema';
+
+// Adaptador único entre o contrato do Core (snake_case, schema separado) e os componentes
+// herdados do GIS (ui-table, ui-filter, ui-autocomplete). Serviços de tela não repetem mapeamento.
+
+// O backend informa só o tipo; o formato vem do LOCALE_ID (pt-BR: shortDate 01/10/2026, short com hora).
+const COLUMN_FORMATS: Partial<Record<SchemaFieldType, Partial<UiTableColumn>>> = {
+    date: { type: 'date' },
+    datetime: { type: 'date', format: 'short' }
+};
+
+export function toTableResponse<T>(schema: TableSchema, page: PageResponse<T>, baseUrl: string): UiTableListResponse<T> {
+    return {
+        data: page.data,
+        totalRecords: page.total_records,
+        columns: toColumns(schema),
+        filters: toFilters(schema, baseUrl)
+    };
+}
+
+export function toLookupResponse(page: OptionsResponse, first: number, rows: number): UiLookupOptionsResponse {
+    return { data: page.data, totalRecords: page.total_records, first, rows, hasNext: page.has_next };
+}
+
+function toColumns(schema: TableSchema): UiTableColumn[] {
+    return schema.columns.map((column) => ({
+        field: column.field,
+        header: column.label,
+        sortable: schema.ordering_fields.includes(column.field),
+        ...COLUMN_FORMATS[column.type]
+    }));
+}
+
+function toFilters(schema: TableSchema, baseUrl: string): UiFilterField[] {
+    // ui-filter envia a busca geral como `search`, o parâmetro do Core.
+    const general: UiFilterField[] = (schema.general_search?.fields ?? []).map((field) => ({
+        field: field.field,
+        header: field.label,
+        type: 'text',
+        placement: 'general'
+    }));
+
+    return [...general, ...schema.filters.map((filter) => toFilter(filter, baseUrl))];
+}
+
+function toFilter(filter: SchemaFilter, baseUrl: string): UiFilterField {
+    const field: UiFilterField = {
+        field: filter.field,
+        header: filter.label,
+        type: filter.type === 'datetime' ? 'date' : filter.type,
+        placement: 'advanced'
+    };
+
+    if (filter.type === 'choice') {
+        field.choices = filter.choices?.map((choice) => ({ label: choice.label, value: choice.value })) ?? [];
+    }
+
+    if (filter.type === 'relation' && filter.options_url) {
+        // options_url é caminho do servidor (reverse do backend); resolvido na origem da API, sem prefixo fixo.
+        field.lookup = { endpoint: serverUrl(filter.options_url, baseUrl) };
+    }
+
+    return field;
+}

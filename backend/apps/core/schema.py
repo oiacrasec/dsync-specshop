@@ -15,13 +15,8 @@ def model_field(model, name):
     return field
 
 
-def column_schema(model, name, overrides):
-    field = model_field(model, name)
-    return {'field': name, 'label': capfirst(field.verbose_name), **overrides}
-
-
-def filter_schema(model, name, overrides, options_url=None):
-    field = model_field(model, name)
+def field_type(field, name):
+    """Tipo de exibição/filtro derivado do campo do model; sem suporte falha explicitamente."""
     if field.is_relation:
         kind = 'relation'
     elif field.choices:
@@ -37,7 +32,18 @@ def filter_schema(model, name, overrides, options_url=None):
     elif isinstance(field, (models.CharField, models.TextField, models.UUIDField)):
         kind = 'text'
     else:
-        raise ImproperlyConfigured(f'Unsupported schema filter type: {name}.')
+        raise ImproperlyConfigured(f'Unsupported schema field type: {name}.')
+    return kind
+
+
+def column_schema(model, name, overrides):
+    field = model_field(model, name)
+    return {'field': name, 'label': capfirst(field.verbose_name), 'type': field_type(field, name), **overrides}
+
+
+def filter_schema(model, name, overrides, options_url=None):
+    field = model_field(model, name)
+    kind = field_type(field, name)
     result = {'field': name, 'label': capfirst(field.verbose_name), 'type': kind}
     if kind == 'relation':
         result['options_url'] = options_url

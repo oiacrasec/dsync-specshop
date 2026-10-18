@@ -218,7 +218,7 @@ def test_filters_sorting_pagination_and_schema(world):
 def test_schema_ordering_matches_filterset_and_column_labels(world):
     data = world['api'].get('/api/v1/admin/contracts/schema/').json()
     assert data['ordering_fields'] == ['name', 'created_at', 'updated_at', 'start_date', 'end_date', 'licenses']
-    assert data['columns'][1] == {'field': 'start_date', 'label': 'Início'}
+    assert data['columns'][1] == {'field': 'start_date', 'label': 'Início', 'type': 'date'}
     assert data['general_search'] == {
         'parameter': 'search',
         'label': 'Busca geral',

@@ -20,9 +20,9 @@ def test_schema_metadata_and_route_resolution_do_not_query_database():
         filters = view.get_schema_filters()
     assert len(queries) == 0
     assert columns == [
-        {'field': 'name', 'label': 'Nome'},
-        {'field': 'start_date', 'label': 'Início'},
-        {'field': 'licenses', 'label': 'Licenças'},
+        {'field': 'name', 'label': 'Nome', 'type': 'text'},
+        {'field': 'start_date', 'label': 'Início', 'type': 'date'},
+        {'field': 'licenses', 'label': 'Licenças', 'type': 'number'},
     ]
     assert filters == [
         {'field': 'is_active', 'label': 'Ativo', 'type': 'boolean'},
@@ -33,9 +33,9 @@ def test_schema_metadata_and_route_resolution_do_not_query_database():
 def test_column_override_changes_only_selected_label():
     view = ContractViewSet(schema_column_overrides={'licenses': {'label': 'Vagas'}})
     assert view.get_schema_columns() == [
-        {'field': 'name', 'label': 'Nome'},
-        {'field': 'start_date', 'label': 'Início da vigência'},
-        {'field': 'licenses', 'label': 'Vagas'},
+        {'field': 'name', 'label': 'Nome', 'type': 'text'},
+        {'field': 'start_date', 'label': 'Início da vigência', 'type': 'date'},
+        {'field': 'licenses', 'label': 'Vagas', 'type': 'number'},
     ]
 
 

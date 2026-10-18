@@ -136,9 +136,12 @@ Filtros/ordenações desconhecidos não são interpolados em SQL. Campo de orden
 fora da lista e filtro `plan` em recurso incompatível retornam 422. Parâmetros
 desconhecidos são ignorados, sem criar filtros dinâmicos.
 
-`schema` retorna colunas com `field`/`label`, filtros com `field`/`label`/`type` e
+`schema` retorna colunas com `field`/`label`/`type`, filtros com `field`/`label`/`type` e
 `ordering_fields`. O filtro de relação `plan` tem `options_url` apontando para
 `/api/v1/admin/plans/options/`. Documentação OpenAPI entra na etapa 5.5.
+O `type` da coluna (`text`, `number`, `boolean`, `choice`, `date`, `datetime`, `relation`) vem do
+campo do model, como nos filtros: é semântico e neutro de idioma. O cliente escolhe o formato
+pelo locale (no Angular, `LOCALE_ID` pt-BR → `01/10/2026`).
 
 O schema também retorna `general_search`, separado dos filtros individuais:
 
