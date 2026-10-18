@@ -33,7 +33,7 @@ export class ContratoService extends BaseCrudService {
     }
 
     get(publicId: string) {
-        return this.http.get<Contract>(`${this.baseUrl}/${CONTRACTS}/${publicId}/`);
+        return this.http.get<Contract>(this.contractUrl(publicId));
     }
 
     create(payload: ContractWrite) {
@@ -41,26 +41,31 @@ export class ContratoService extends BaseCrudService {
     }
 
     update(publicId: string, payload: ContractWrite) {
-        return this.http.patch<Contract>(`${this.baseUrl}/${CONTRACTS}/${publicId}/`, payload).pipe(tap(() => this.invalidateTableCache()));
+        return this.http.patch<Contract>(this.contractUrl(publicId), payload).pipe(tap(() => this.invalidateTableCache()));
     }
 
     remove(publicId: string) {
-        return this.http.delete<void>(`${this.baseUrl}/${CONTRACTS}/${publicId}/`).pipe(tap(() => this.invalidateTableCache()));
+        return this.http.delete<void>(this.contractUrl(publicId)).pipe(tap(() => this.invalidateTableCache()));
     }
 
     provision(publicId: string, payload: ContractProvision) {
-        return this.http.post<ContractProvisionResult>(`${this.baseUrl}/${CONTRACTS}/${publicId}/provision/`, payload);
+        return this.http.post<ContractProvisionResult>(`${this.contractUrl(publicId)}provision/`, payload);
     }
 
     admins(publicId: string) {
         // Um contrato tem poucos admins: uma página com o máximo da API (100).
         const params = this.buildParams({ first: 0, rows: 100 });
 
-        return this.http.get<ContractAdminsResponse>(`${this.baseUrl}/${CONTRACTS}/${publicId}/admins/`, { params });
+        return this.http.get<ContractAdminsResponse>(`${this.contractUrl(publicId)}admins/`, { params });
     }
 
     resetAdminPassword(publicId: string, userPublicId: string) {
-        return this.http.post<ContractAdminPasswordReset>(`${this.baseUrl}/${CONTRACTS}/${publicId}/admins/${userPublicId}/reset-password/`, {});
+        return this.http.post<ContractAdminPasswordReset>(`${this.contractUrl(publicId)}admins/${encodeURIComponent(userPublicId)}/reset-password/`, {});
+    }
+
+    // Identificadores entram no caminho codificados: um valor forjado não muda o endpoint (CSPT).
+    private contractUrl(publicId: string) {
+        return `${this.baseUrl}/${CONTRACTS}/${encodeURIComponent(publicId)}/`;
     }
 
     private schema() {

@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 
 import { ContratoService } from '../contrato.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
+import { UUID_PATTERN } from '@/app/core/utils/session-data';
 import { UiAutocomplete } from '@/app/shared/ui/autocomplete/autocomplete';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
@@ -78,6 +79,13 @@ export class ContratoFormPage implements OnInit {
         }
 
         const idParam = this.route.snapshot.paramMap.get('id');
+
+        if (idParam !== null && !UUID_PATTERN.test(idParam)) {
+            // Só public_id UUID chega à API; link forjado volta para a lista (CSPT).
+            this.goBack();
+
+            return;
+        }
 
         if (idParam) {
             this.isEditing = true;

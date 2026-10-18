@@ -129,6 +129,13 @@ describe('ContratoService (API do Core)', () => {
         resolve.flush({ data: [], total_records: 0, has_next: false });
     });
 
+    it('codifica os identificadores no caminho da API', () => {
+        service.get('../plans').subscribe();
+        controller.expectOne('/api/v1/admin/contracts/..%2Fplans/').flush(CONTRACT);
+        service.resetAdminPassword(CONTRACT_ID, '../x').subscribe();
+        controller.expectOne(`/api/v1/admin/contracts/${CONTRACT_ID}/admins/..%2Fx/reset-password/`).flush({});
+    });
+
     it('usa as rotas do Core para provisionamento, admins e reset', () => {
         service.provision(CONTRACT_ID, { organization_name: 'Matriz', username: 'maria', name: 'Maria' }).subscribe();
         const provision = controller.expectOne(`/api/v1/admin/contracts/${CONTRACT_ID}/provision/`);
@@ -183,6 +190,18 @@ describe('ContratoFormPage', () => {
         });
         request.flush(CONTRACT);
         expect(navigate).toHaveBeenCalledWith(['/pages/administracao/contrato', CONTRACT_ID], { queryParams: { tab: 'primeiro-acesso' } });
+    });
+
+    it('volta para a lista sem chamar a API quando o id da rota não é UUID', () => {
+        configure('..%2F..%2Fplans');
+        controller = TestBed.inject(HttpTestingController);
+        const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
+        const page = TestBed.createComponent(ContratoFormPage).componentInstance;
+
+        page.ngOnInit();
+
+        expect(page.isEditing).toBeFalse();
+        expect(navigate).toHaveBeenCalledWith('/pages/administracao/contrato');
     });
 
     it('rejeita retenção acima de 365 dias sem chamar a API', () => {
