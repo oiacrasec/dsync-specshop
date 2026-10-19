@@ -14,7 +14,7 @@ importa Django/DRF e não espelha permissões em `auth_permission`.
 |---|---|---|---|
 | organização | `organization:view`, `organization:update`, `organization:delete` | CONTRACT, ORGANIZATION | não (ADR 0037) |
 | organização | `organization:create` | CONTRACT | não (ADR 0037) |
-| usuário | `user:create`, `user:update`, `user:manage` | CONTRACT | sim (ADR 0009 §3.1) |
+| usuário | `user:view`, `user:create`, `user:update`, `user:delete`, `user:manage` (redefinir senha) | CONTRACT | sim (ADR 0009 §3.1) |
 | perfil | `profile:create`, `profile:update`, `profile:delete` | CONTRACT | sim |
 | atribuição | `assignment:create`, `assignment:delete` | CONTRACT | sim |
 

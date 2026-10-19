@@ -84,8 +84,10 @@ PERMISSIONS = PermissionRegistry(
         *(
             PermissionDefinition(code, _CONTRACT_SCOPE, reserved=True)
             for code in (
+                'user:view',
                 'user:create',
                 'user:update',
+                'user:delete',
                 'user:manage',
                 'profile:create',
                 'profile:update',

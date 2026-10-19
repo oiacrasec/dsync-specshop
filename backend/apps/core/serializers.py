@@ -156,7 +156,7 @@ class PageQuerySerializer(serializers.Serializer):
 
 class ListQuerySerializer(PageQuerySerializer):
     search = serializers.CharField(default='', allow_blank=True, max_length=255)
-    ordering = serializers.CharField(default='name', max_length=100)
+    ordering = serializers.CharField(required=False, default=None, allow_null=True, max_length=100)
     is_active = serializers.BooleanField(required=False, default=None, allow_null=True)
 
 

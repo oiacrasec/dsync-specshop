@@ -162,6 +162,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   CRUD em `/api/v1/organizations/` (contracts, 7.3) com `ContractWidePermission`: código em qualquer
   escopo vale no contrato inteiro, mas o header e o acesso à organização ativa continuam obrigatórios.
   Escritas travam a linha do contrato (nome único 422, última ativa e em uso 409).
+- Usuários do contrato (8.1): `/api/v1/users/` (`UserViewSet`, `model = User`, `permission_resource =
+  'user'`, reset em `user:manage`), reservados ao admin do contrato. `ContractUserSerializer` cria via
+  `save_user` com senha temporária devolvida uma vez; `username` único validado em `all_objects.unscoped()`.
+  Rotas de auth seguem em `/api/v1/auth/` (mesmo `users/urls.py`). FilterSet declara `default_ordering`.
   Escritas pelos serializers, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).

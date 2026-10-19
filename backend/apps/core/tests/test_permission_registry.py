@@ -117,8 +117,10 @@ def test_organization_permissions_are_assignable_by_the_customer():
 def test_user_profile_and_assignment_management_stay_reserved():
     reserved = {item.code for item in PERMISSIONS if item.reserved}
     assert reserved == {
+        'user:view',
         'user:create',
         'user:update',
+        'user:delete',
         'user:manage',
         'profile:create',
         'profile:update',

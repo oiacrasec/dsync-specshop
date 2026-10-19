@@ -12,6 +12,9 @@ from .managers import AccessLogManager, AccessLogQuerySet, AllAuditManager, Appe
 class AuditEventType(models.TextChoices):
     USER_PASSWORD_CHANGED = 'user.password_changed', _('senha do usuário alterada')
     USER_PASSWORD_RESET = 'user.password_reset', _('senha do usuário redefinida')
+    USER_CREATED = 'user.created', _('usuário criado')
+    USER_UPDATED = 'user.updated', _('usuário alterado')
+    USER_DELETED = 'user.deleted', _('usuário excluído')
     PLAN_CREATED = 'plan.created', _('plano criado')
     PLAN_UPDATED = 'plan.updated', _('plano alterado')
     PLAN_DELETED = 'plan.deleted', _('plano excluído')

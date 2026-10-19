@@ -32,6 +32,7 @@ class BaseFilterSet(filters.FilterSet):
     ordering = filters.OrderingFilter(fields=('name', 'created_at', 'updated_at'))
     general_search_fields = ()
     general_search_lookups = {}
+    default_ordering = ('name',)
 
     @classmethod
     def get_general_search_fields(cls):
@@ -77,4 +78,4 @@ class BaseFilterSet(filters.FilterSet):
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
-        return queryset.order_by(*(queryset.query.order_by or ('name',)), 'public_id')
+        return queryset.order_by(*(queryset.query.order_by or self.default_ordering), 'public_id')
