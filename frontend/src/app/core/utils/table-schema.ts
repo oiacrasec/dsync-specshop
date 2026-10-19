@@ -10,6 +10,7 @@ import { PageResponse, SchemaFieldType, SchemaFilter, TableSchema } from '@/app/
 
 // O backend informa só o tipo; o formato vem do LOCALE_ID (pt-BR: shortDate 01/10/2026, short com hora).
 const COLUMN_FORMATS: Partial<Record<SchemaFieldType, Partial<UiTableColumn>>> = {
+    boolean: { type: 'boolean' },
     date: { type: 'date' },
     datetime: { type: 'date', format: 'short' }
 };

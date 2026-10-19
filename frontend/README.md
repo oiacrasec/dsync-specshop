@@ -63,6 +63,20 @@ e não são persistidas. Listagens usam `BaseCrudService.listTable`/`lookupOptio
 como padrão, e `ui-autocomplete` busca 20 opções: telas não repetem esses valores. O cache ETag
 global continua desabilitado; telas fora do escopo seguem desabilitadas.
 
+## Ícones
+
+| Biblioteca | Uso | Licença |
+|---|---|---|
+| PrimeIcons | componentes do PrimeNG e telas herdadas (`pi pi-*`) | MIT |
+| [Font Awesome Free](https://fontawesome.com) 7.3 (`@fortawesome/fontawesome-free`) | ícones próprios por classe (`fa-solid fa-*`, `fa-regular fa-*`) | ícones CC BY 4.0, fontes SIL OFL 1.1, código MIT |
+
+Font Awesome entra pelo CSS em `angular.json` (núcleo + solid + regular; brands fora). A
+atribuição exigida pela CC BY fica no cabeçalho do CSS distribuído e nesta seção:
+*Icons by Font Awesome Free (https://fontawesome.com), licensed under CC BY 4.0.*
+Custo: ~80 KB a mais no CSS inicial (~13 KB comprimido); as fontes só baixam quando usadas.
+O aviso de orçamento do bundle inicial é 2 MB (decisão do usuário; erro em 5 MB).
+Os prefixos não colidem com o PrimeIcons.
+
 ## Organizações (etapa 7.4)
 
 Menu "Organizações" da área do cliente (ADR 0037): lista, criação, edição e exclusão em

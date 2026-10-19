@@ -10,6 +10,11 @@
   renomear a ativa atualiza o contexto. `PERMISSION_KEYS.ORGANIZATION_*` = códigos do registry.
 - Pedido do usuário: padrões nos componentes (`ui-table` rows 20 e dataKey `public_id`;
   `ui-autocomplete` rows 20); telas não repetem. 8 testes novos (72). Bundle ~1,24 MB.
+- Pedido do usuário: coluna `boolean` do schema vira ícone no ui-table (`pi-check-square` verde,
+  `pi-times-circle` vermelho; PrimeIcons não tem x quadrado), com texto oculto Sim/Não. +1 teste (73).
+- Pedido do usuário: Font Awesome Free 7.3.1 por classe (npm verificado: CC-BY-4.0 AND OFL-1.1
+  AND MIT; atribuição no README). CSS núcleo+solid+regular em angular.json; célula booleana usa
+  `fa-square-check`/`fa-square-xmark`. Bundle inicial 1,24 → 1,32 MB (aviso do orçamento de 1,3 MB).
 
 ## 2026-10-18 — Etapa 7.3: CRUD de organizações na área do cliente
 

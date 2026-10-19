@@ -29,6 +29,9 @@
                             }
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css",
+                            "node_modules/@fortawesome/fontawesome-free/css/solid.min.css",
+                            "node_modules/@fortawesome/fontawesome-free/css/regular.min.css",
                             "src/assets/styles.scss",
                             "src/assets/tailwind.css"
                         ],
@@ -45,7 +48,7 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "1.3mb",
+                                    "maximumWarning": "2mb",
                                     "maximumError": "5mb"
                                 },
                                 {
@@ -101,6 +104,9 @@
                             "src/assets"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css",
+                            "node_modules/@fortawesome/fontawesome-free/css/solid.min.css",
+                            "node_modules/@fortawesome/fontawesome-free/css/regular.min.css",
                             "src/assets/styles.scss"
                         ],
                         "scripts": []

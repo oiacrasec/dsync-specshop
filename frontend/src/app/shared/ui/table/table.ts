@@ -17,7 +17,7 @@ export interface UiTableColumn {
     field: string;
     header: string;
     sortable?: boolean;
-    type?: 'text' | 'number' | 'date' | 'boolean-tag' | 'choice' | 'relation';
+    type?: 'text' | 'number' | 'date' | 'boolean' | 'boolean-tag' | 'choice' | 'relation';
     format?: string;
     nullablePlaceholder?: string;
     booleanTag?: {
