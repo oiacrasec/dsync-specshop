@@ -38,9 +38,10 @@ import { UserContextService } from '@/app/core/services/user-context.service';
                 <div app-rightmenu></div>
                 <div class="layout-mask"></div>
             } @else {
+                <!-- Sem menu (seleção de organização e troca de senha após o login): card centralizado na vertical. -->
                 <div class="layout-content-wrapper">
                     <div class="layout-content-wrapper-inside">
-                        <div class="layout-content">
+                        <div class="layout-content flex flex-col justify-center py-8">
                             <router-outlet></router-outlet>
                         </div>
                     </div>
