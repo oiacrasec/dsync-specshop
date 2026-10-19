@@ -2,6 +2,7 @@ import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { AuthService } from './auth.service';
 import { TableQueryCacheService } from './table-query-cache.service';
 import { ActiveUserContext, UserContextsResponse } from '@/app/types/context';
+import { safeReturnPath } from '../utils/return-url';
 import { CONTEXT_KEY, UUID_PATTERN } from '../utils/session-data';
 
 interface StoredContext extends ActiveUserContext {
@@ -102,9 +103,7 @@ export class UserContextService {
     }
 
     openContext(returnUrl: string | null) {
-        const path = returnUrl && /^\/(?!\/)/.test(returnUrl) && !returnUrl.includes('\\') && !/^\/(contexto|primeiro-acesso|landing)(\/|\?|$)/.test(returnUrl) ? returnUrl : '/kpi';
-
-        window.location.assign(path);
+        window.location.assign(safeReturnPath(returnUrl, window.location.origin));
     }
 
     private restoreContext(): StoredContext | null {
