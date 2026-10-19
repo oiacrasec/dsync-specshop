@@ -160,4 +160,4 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 | 7.1 | ADR 0037; remover `/admin/organizations/`; registry com `organization:view` e as quatro permissões não reservadas (`create` só CONTRACT) | backend | 0037 | ✅ |
 | 7.2 | `GET /api/v1/me/permissions/`: códigos efetivos na organização ativa, para a interface | backend | 0037, 0009 §4 | ✅ |
 | 7.3 | CRUD de organizações em `/api/v1/organizations/` (lista, detalhe, options, schema, criar, editar, excluir), RBAC, auditoria e isolamento | backend | 0037, 0006 | ✅ |
-| 7.4 | Frontend: tela de organizações no Core, `PermissionContextService` ligado ao 7.2, menu e botões por permissão | frontend | 0037, 0035 | ⬜ |
+| 7.4 | Frontend: tela de organizações no Core, `PermissionContextService` ligado ao 7.2, menu e botões por permissão | frontend | 0037, 0035 | ✅ |

@@ -20,7 +20,8 @@ logout → lock entre abas → limpar estado → revogar refresh mais recente
 `AuthService` apenas chama a API. `AuthSessionService` mantém o resumo/tokens em signal
 e localStorage; `UserContextService` mantém organização, proprietário e caches.
 Interceptors limitam credenciais à API correta e tratam tipos RFC 9457. Guards são
-UX; a autorização continua no backend. Não há chamada ao resumo de permissões do GIS.
+UX; a autorização continua no backend. Permissões para menu e botões vêm de
+`GET /api/v1/me/permissions/` (`PermissionContextService`, uma vez por sessão e organização).
 
 ## Persistência e concorrência
 

@@ -61,6 +61,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (etapa 7.1: organizações só na área do cliente, rota admin removida, permissões `organization:*` atribuíveis pelo cliente; ADR 0037) | concluído |
 | `backend/` (etapa 7.2: `GET /api/v1/me/permissions/`, códigos efetivos na organização ativa para a interface) | concluído |
 | `backend/` (etapa 7.3: CRUD de organizações na área do cliente, `ContractWidePermission`, nome único, última ativa e organização em uso protegidos) | concluído |
+| `frontend/` (etapa 7.4: organizações na área do cliente, `PermissionContextService` com `/me/permissions/`, menu e botões por permissão) | concluído |
 | `frontend/` (etapa 6.5: auth Core, primeiro acesso, seleção UUID, RFC 9457; JWT/contexto localStorage e recarregamento entre abas, ADR 0035) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |

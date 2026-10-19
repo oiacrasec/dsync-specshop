@@ -17,9 +17,9 @@
 compartilhada e recarregamento entre abas; refresh/logout coordenados por Web Locks.
 Interceptors registrados: `contextErrorInterceptor` envolvendo `authInterceptor`.
 `etagInterceptor` global desabilitado: cache só por URL não separa conta/contexto.
-`PermissionContextService` legado desabilitado (nega por padrão, sem chamada HTTP):
-o Core ainda não tem endpoint de resumo. O fluxo abaixo é referência GIS, não
-contrato ativo. Detalhes: [autenticação Core](../architecture/authentication.md).
+`PermissionContextService` lê `GET /api/v1/me/permissions/` (ADR 0037) por sessão e organização
+ativa e nega por padrão até carregar; códigos em `PERMISSION_KEYS` seguem o registry do Core
+(`organization:view`…). O fluxo abaixo é referência GIS. Detalhes: [autenticação Core](../architecture/authentication.md).
 
 Servicos centrais:
 

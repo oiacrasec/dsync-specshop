@@ -24,8 +24,10 @@
 - Login superadmin → dashboards; comum marcado → troca (12+ caracteres/confirmar na UI,
   validadores completos Django), depois seleção; comum → seleção de organizações
   acessíveis array {public_id,name}. Sem id interno/contrato/setores no contexto.
-- Guards UX; backend autoriza. PermissionContextService legado sem endpoint no
-  Core, negando por padrão; não inventar endpoint ao adaptar telas desabilitadas.
+- Guards UX; backend autoriza. PermissionContextService (7.4) lê /me/permissions/ por
+  sessão+organização (shareReplay, signal), nega até carregar; menu carrega no ngOnInit.
+  Organizações: lista/form no Core (public_id, name/is_active), PERMISSION_KEYS.ORGANIZATION_*.
+  ui-table rows 20/dataKey public_id e ui-autocomplete rows 20 por padrão.
 - Dev /api/v1 usa proxy Angular 127.0.0.1:8000. Homol/prod URL pendente, fail closed
   para não vazar tokens quando base vazia. Contratos adaptados na 6.8.
 - 44 testes ChromeHeadless, lint/formato/build; bundle inicial ~1,25 MB/~257 KB

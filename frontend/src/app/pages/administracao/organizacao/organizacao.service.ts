@@ -1,44 +1,36 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { BaseCrudService } from '@/app/core/services/base-crud.service';
-import { Organizacao, OrganizacaoCreate, OrganizacaoUpdate } from '@/app/types/organizacao';
-import { PaginatedResponse } from '@/app/types/pagination';
+import { UiTableListResponse } from '@/app/shared/ui/table/table';
+import { Organization, OrganizationWrite } from '@/app/types/organizacao';
 
-export interface OrganizacaoQuery {
-    page?: number;
-    rows?: number;
-    first?: number;
-    nome?: string;
-    cnpj?: string;
-    contrato?: number;
-    ativo?: boolean;
-    ordering?: string;
-    id?: number;
-    id__in?: string;
-}
+const ORGANIZATIONS = 'organizations';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizacaoService extends BaseCrudService {
-    list(query: OrganizacaoQuery = {}) {
-        const params = this.buildParams(query);
-
-        return this.http.get<PaginatedResponse<Organizacao>>(`${this.baseUrl}/administracao/organizacao/`, { params });
+    list(query: Record<string, unknown> = {}): Observable<UiTableListResponse<Organization>> {
+        return this.listTable<Organization>(ORGANIZATIONS, query);
     }
 
-    get(id: number) {
-        return this.http.get<Organizacao>(`${this.baseUrl}/administracao/organizacao/${id}/`);
+    get(publicId: string) {
+        return this.http.get<Organization>(this.organizationUrl(publicId));
     }
 
-    create(payload: OrganizacaoCreate) {
-        return this.http.post<Organizacao>(`${this.baseUrl}/administracao/organizacao/`, payload).pipe(tap(() => this.invalidateTableCache()));
+    create(payload: OrganizationWrite) {
+        return this.http.post<Organization>(`${this.baseUrl}/${ORGANIZATIONS}/`, payload).pipe(tap(() => this.invalidateTableCache()));
     }
 
-    update(id: number, payload: OrganizacaoUpdate) {
-        return this.http.patch<Organizacao>(`${this.baseUrl}/administracao/organizacao/${id}/`, payload).pipe(tap(() => this.invalidateTableCache()));
+    update(publicId: string, payload: OrganizationWrite) {
+        return this.http.patch<Organization>(this.organizationUrl(publicId), payload).pipe(tap(() => this.invalidateTableCache()));
     }
 
-    remove(id: number) {
-        return this.http.delete<void>(`${this.baseUrl}/administracao/organizacao/${id}/`).pipe(tap(() => this.invalidateTableCache()));
+    remove(publicId: string) {
+        return this.http.delete<void>(this.organizationUrl(publicId)).pipe(tap(() => this.invalidateTableCache()));
+    }
+
+    private organizationUrl(publicId: string) {
+        return `${this.baseUrl}/${ORGANIZATIONS}/${encodeURIComponent(publicId)}/`;
     }
 }

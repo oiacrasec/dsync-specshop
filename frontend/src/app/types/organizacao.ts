@@ -1,33 +1,13 @@
-export interface Organizacao {
-    id: number;
-    contrato: number;
-    contrato_id?: number;
-    contrato_label?: string;
-    nome: string;
-    cnpj: string | null;
-    inscricao_estadual: string | null;
-    logradouro: string | null;
-    numero: string | null;
-    bairro: string | null;
-    complemento: string | null;
-    cep: string | null;
-    cidade: number | null;
-    cidade_id?: number | null;
-    cidade_label?: string | null;
-    ativo: boolean;
+// Organização da área do cliente (docs/api/organizations.md): snake_case e public_id.
+export interface Organization {
+    public_id: string;
+    name: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
-export interface OrganizacaoCreate {
-    nome: string;
-    cnpj?: string | null;
-    inscricao_estadual?: string | null;
-    logradouro?: string | null;
-    numero?: string | null;
-    bairro?: string | null;
-    complemento?: string | null;
-    cep?: string | null;
-    cidade?: number | null;
-    ativo?: boolean;
+export interface OrganizationWrite {
+    name: string;
+    is_active: boolean;
 }
-
-export type OrganizacaoUpdate = Partial<OrganizacaoCreate>;

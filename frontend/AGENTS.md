@@ -31,5 +31,8 @@ Regras do frontend do datasync-core. As regras globais estão no `AGENTS.md` da 
   O frontend formata pelo `LOCALE_ID` (pt-BR); `format` explícito só em exceção justificada.
 - Identificador de rota ou payload que vai para um caminho da API: validar o formato (UUID,
   `UUID_PATTERN`) e montar o caminho com `encodeURIComponent` (client-side path traversal).
+- Menu, guards e botões por permissão só via `PermissionContextService` (`/me/permissions/`) e
+  `PERMISSION_KEYS` com os códigos do registry do Core; nunca liberar ação por padrão no front.
+- Padrões dos componentes (20 linhas, `public_id`) ficam nos componentes; telas não repetem.
 - Redirecionamento por parâmetro (`returnUrl`): só via `safeReturnPath` (`core/utils/return-url.ts`);
   nunca validar URL de destino por regex/texto (open redirect).

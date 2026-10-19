@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 7.4: organizações no frontend
+
+- `PermissionContextService` real: `/me/permissions/` uma vez por sessão+organização, signal, nega
+  por padrão; superadmin não consulta; menu carrega no ngOnInit. `types/permission.ts` = PermissionSummary.
+- Tela de organizações reativada (rotas COMMON com requireContext e permissionGuard; menu por
+  `organization:view`; fora dos ignores do ESLint): service no Core (`listTable`, `encodeURIComponent`),
+  lista com `resolveCrudPermissions`, formulário só com nome/situação, UUID validado, problemMessage,
+  renomear a ativa atualiza o contexto. `PERMISSION_KEYS.ORGANIZATION_*` = códigos do registry.
+- Pedido do usuário: padrões nos componentes (`ui-table` rows 20 e dataKey `public_id`;
+  `ui-autocomplete` rows 20); telas não repetem. 8 testes novos (72). Bundle ~1,24 MB.
+
 ## 2026-10-18 — Etapa 7.3: CRUD de organizações na área do cliente
 
 - Decisões 50–53 (usuário): editar/excluir com código em qualquer escopo valem no contrato todo;
@@ -19,6 +30,8 @@
   `options_permission_class`, `LookupOptionsPermission` e o `get_permissions` do mixin;
   `RequiredPermission.has_context` exige `:view` no options e `AllowAuthenticated` delega o
   options a RequiredPermission. Testes de options inalterados; +1 teste (contrato inteiro). 610.
+- Refactor: `core/mixins.ModelQuerysetMixin` (`model = X` → `X.objects.all()` na requisição) nas
+  bases; OrganizationViewSet sem `get_queryset` próprio. +1 teste; 611.
 
 ## 2026-10-18 — Etapa 7.2: resumo de permissões
 

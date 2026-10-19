@@ -9,14 +9,14 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 7.2 e 7.3 — ✅ concluídas e commitadas |
-| Próximo passo exato | 7.4: tela de organizações no frontend, menu/botões por `/me/permissions/` |
-| Aguardando o usuário? | não — 7.4 autorizada; commit só após revisão |
+| Etapa atual | 7.4 frontend de organizações — ✅ implementada, **não commitada**; refactor `model` do backend também pendente |
+| Próximo passo exato | usuário revisar e commitar (refactor(core) + feat(frontend)); Bloco 7 concluído → escolher 5.3/5.4 (usuários, perfis, atribuições) ou 5.5 |
+| Aguardando o usuário? | sim — revisão dos diffs |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3.
-Pendentes: 7.4; depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4 (sem commit).
+Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
   usuário → token), frontend de contratos no Core. audit.0007/0008 aplicadas ao banco local.

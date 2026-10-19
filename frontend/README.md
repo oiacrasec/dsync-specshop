@@ -59,8 +59,17 @@ provisionamento do primeiro acesso (organização + admin com `username` e nome)
 admins e redefinição de senha com confirmação. Senhas temporárias aparecem uma única vez
 e não são persistidas. Listagens usam `BaseCrudService.listTable`/`lookupOptions`, com o adaptador
 único `core/utils/table-schema.ts` (schema por recurso, `total_records`, tipos de coluna); o
-`ui-filter` resolve opções por `public_id` (ADR 0004/0011). O resumo de permissões legado e o
-cache ETag global continuam desabilitados; telas fora do escopo seguem desabilitadas.
+`ui-filter` resolve opções por `public_id` (ADR 0004/0011). `ui-table` usa 20 linhas e `public_id`
+como padrão, e `ui-autocomplete` busca 20 opções: telas não repetem esses valores. O cache ETag
+global continua desabilitado; telas fora do escopo seguem desabilitadas.
+
+## Organizações (etapa 7.4)
+
+Menu "Organizações" da área do cliente (ADR 0037): lista, criação, edição e exclusão em
+`/api/v1/organizations/`. `PermissionContextService` busca `GET /api/v1/me/permissions/` uma vez
+por sessão e organização ativa (nega por padrão enquanto não carregou) e alimenta o menu, os
+guards e os botões (`resolveCrudPermissions`). Só reflete: o backend autoriza cada chamada.
+O formulário tem só nome e situação; renomear a organização ativa atualiza o nome do contexto.
 
 ## Docker
 

@@ -37,8 +37,7 @@ export default [
             requireContext: false,
             requiredPermission: PERMISSION_KEYS.CONTRATO_UPDATE
         }
-    }
-    /* DESABILITADO: fora do escopo atual
+    },
     {
         path: 'organizacao',
         canActivate: [accessGuard, permissionGuard],
@@ -47,11 +46,9 @@ export default [
             breadcrumb: 'Organizações',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.ORGANIZACAO_VIEW
+            requiredPermission: PERMISSION_KEYS.ORGANIZATION_VIEW
         }
     },
-    */
-    /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao/novo',
         canActivate: [accessGuard, permissionGuard],
@@ -60,11 +57,9 @@ export default [
             breadcrumb: 'Nova organização',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.ORGANIZACAO_CREATE
+            requiredPermission: PERMISSION_KEYS.ORGANIZATION_CREATE
         }
     },
-    */
-    /* DESABILITADO: fora do escopo atual
     {
         path: 'organizacao/:id',
         canActivate: [accessGuard, permissionGuard],
@@ -73,10 +68,9 @@ export default [
             breadcrumb: 'Editar organização',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.ORGANIZACAO_UPDATE
+            requiredPermission: PERMISSION_KEYS.ORGANIZATION_UPDATE
         }
-    },
-    */
+    }
     /* DESABILITADO: fora do escopo atual
     {
         path: 'setor',

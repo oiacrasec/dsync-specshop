@@ -119,7 +119,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
     @Input() optionsProvider?: UiLookupOptionsProvider;
 
     @Input() minLength = 1;
-    @Input() rows = 50;
+    @Input() rows = 20;
     @Input() debounceMs = 300;
     @Input() forceSelection = true;
     @Input() dropdown = true;

@@ -2,69 +2,21 @@
     <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar organização' : 'Nova organização' }}</h2>
-            <p class="text-sm text-surface-500 dark:text-white/64">Preencha os dados obrigatorios antes de salvar.</p>
+            <p class="text-sm text-surface-500 dark:text-white/64">Preencha os dados obrigatórios antes de salvar.</p>
         </div>
         <div class="flex items-center gap-2">
             <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
         </div>
     </div>
 
-    <form [formGroup]="form" class="flex flex-col gap-6">
-        <p-tabs value="principal">
-            <p-tablist>
-                <p-tab value="principal">Principal</p-tab>
-                <p-tab value="endereco">Endereço</p-tab>
-            </p-tablist>
-            <p-tabpanels>
-                <p-tabpanel value="principal">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="nome" formControlName="nome" [maxlength]="150" label="Nome" errorMessage="Informe o nome da organização." />
-                        </div>
+    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" (ngSubmit)="save()">
+        <div class="flex flex-col gap-2">
+            <ui-input-text inputId="name" formControlName="name" [maxlength]="255" label="Nome" errorMessage="Informe o nome da organização." />
+        </div>
 
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="cnpj" formControlName="cnpj" label="CNPJ" mask="99.999.999/9999-99" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="inscricao_estadual" formControlName="inscricao_estadual" [maxlength]="20" label="Inscrição estadual" />
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <ui-checkbox inputId="ativo" formControlName="ativo" label="Organização ativa" [marginTop]="22" />
-                        </div>
-                    </div>
-                </p-tabpanel>
-
-                <p-tabpanel value="endereco">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="logradouro" formControlName="logradouro" [maxlength]="150" label="Logradouro" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="numero" formControlName="numero" [maxlength]="10" label="Número" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="bairro" formControlName="bairro" [maxlength]="80" label="Bairro" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="complemento" formControlName="complemento" [maxlength]="80" label="Complemento" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-input-text inputId="cep" formControlName="cep" label="CEP" mask="99999-999" />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <ui-autocomplete inputId="cidade" formControlName="cidade" label="Cidade" placeholder="Digite para buscar cidade" [optionsProvider]="cidadeOptionsProvider" />
-                        </div>
-                    </div>
-                </p-tabpanel>
-            </p-tabpanels>
-        </p-tabs>
+        <div class="flex items-center gap-2">
+            <ui-checkbox inputId="is_active" formControlName="is_active" label="Organização ativa" [marginTop]="22" />
+        </div>
     </form>
 
     <div class="flex flex-wrap items-center justify-end gap-3">

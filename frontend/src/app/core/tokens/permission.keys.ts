@@ -1,10 +1,11 @@
 export const PERMISSION_KEYS = {
     CONTRATO_VIEW: 'contrato:view',
     CONTRATO_UPDATE: 'contrato:update',
-    ORGANIZACAO_VIEW: 'organizacao:view',
-    ORGANIZACAO_CREATE: 'organizacao:create',
-    ORGANIZACAO_UPDATE: 'organizacao:update',
-    ORGANIZACAO_DELETE: 'organizacao:delete',
+    // Códigos do registry do Core (ADR 0037); os demais são herdados do GIS e ainda sem uso.
+    ORGANIZATION_VIEW: 'organization:view',
+    ORGANIZATION_CREATE: 'organization:create',
+    ORGANIZATION_UPDATE: 'organization:update',
+    ORGANIZATION_DELETE: 'organization:delete',
     SETOR_VIEW: 'setor:view',
     SETOR_CREATE: 'setor:create',
     SETOR_UPDATE: 'setor:update',

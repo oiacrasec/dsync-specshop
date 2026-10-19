@@ -3,14 +3,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
-import { resolveCrudPermissions } from '@/app/shared/ui/table/crud-permissions';
-import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
-import { UiButton } from '@/app/shared/ui/button/button';
-import { UiTable, UiTableAction } from '@/app/shared/ui/table/table';
-import { Organizacao } from '@/app/types/organizacao';
-import { OrganizacaoService } from '@/app/pages/administracao/organizacao/organizacao.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { PERMISSION_KEYS } from '@/app/core/tokens/permission.keys';
+import { problemMessage } from '@/app/core/utils/api-problem';
+import { UiButton } from '@/app/shared/ui/button/button';
+import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
+import { resolveCrudPermissions } from '@/app/shared/ui/table/crud-permissions';
+import { UiTable, UiTableAction } from '@/app/shared/ui/table/table';
+import { Organization } from '@/app/types/organizacao';
+import { OrganizacaoService } from './organizacao.service';
 
 @Component({
     selector: 'app-organizacao',
@@ -28,66 +29,50 @@ export class OrganizacaoPage implements OnInit {
 
     reloadKey = 0;
     canCreate = false;
-    canUpdate = false;
-    canDelete = false;
-    tableActions: UiTableAction<Organizacao>[] = [];
+    tableActions: UiTableAction<Organization>[] = [];
 
     ngOnInit() {
-        this.resolvePermissions();
+        const permissions = resolveCrudPermissions<Organization>(
+            this.permissionContext,
+            {
+                create: PERMISSION_KEYS.ORGANIZATION_CREATE,
+                update: PERMISSION_KEYS.ORGANIZATION_UPDATE,
+                delete: PERMISSION_KEYS.ORGANIZATION_DELETE
+            },
+            {
+                onEdit: (row) => this.edit(row.public_id),
+                onDelete: (row) => this.delete(row)
+            }
+        );
+
+        this.canCreate = permissions.canCreate;
+        this.tableActions = permissions.actions;
     }
 
     create() {
         this.router.navigateByUrl('/pages/administracao/organizacao/novo');
     }
 
-    edit(id: number) {
-        this.router.navigateByUrl(`/pages/administracao/organizacao/${id}`);
+    edit(publicId: string) {
+        this.router.navigateByUrl(`/pages/administracao/organizacao/${publicId}`);
     }
 
-    delete(organizacao: Organizacao) {
+    delete(organization: Organization) {
         this.confirmationService.confirm({
             header: 'Excluir organização',
-            message: `Confirma excluir a organização "${organizacao.nome}"?`,
+            message: `Confirma excluir a organização "${organization.name}"?`,
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
-                this.organizacaoService.remove(organizacao.id).subscribe({
+                this.organizacaoService.remove(organization.public_id).subscribe({
                     next: () => {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Organização removida',
-                            detail: 'Registro excluido com sucesso.'
-                        });
+                        this.messageService.add({ severity: 'success', summary: 'Organização excluída', detail: 'Registro excluído com sucesso.' });
                         this.reloadKey++;
                     },
-                    error: () => {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Falha ao excluir',
-                            detail: 'Verifique dependencias antes de remover.'
-                        });
+                    error: (error: unknown) => {
+                        this.messageService.add({ severity: 'error', summary: 'Falha ao excluir', detail: problemMessage(error, 'Não foi possível excluir a organização.') });
                     }
                 });
             }
         });
-    }
-
-    private resolvePermissions() {
-        const permissionState = resolveCrudPermissions<Organizacao>(
-            this.permissionContext,
-            {
-                create: PERMISSION_KEYS.ORGANIZACAO_CREATE,
-                update: PERMISSION_KEYS.ORGANIZACAO_UPDATE,
-                delete: PERMISSION_KEYS.ORGANIZACAO_DELETE
-            },
-            {
-                onEdit: (row) => this.edit(row.id),
-                onDelete: (row) => this.delete(row)
-            }
-        );
-
-        this.canCreate = permissionState.canCreate;
-        this.canUpdate = permissionState.canUpdate;
-        this.canDelete = permissionState.canDelete;
-        this.tableActions = permissionState.actions;
     }
 }

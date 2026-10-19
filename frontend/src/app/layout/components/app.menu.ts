@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppMenuitem } from './app.menuitem';
@@ -20,7 +20,7 @@ import { PERMISSION_KEYS } from '@/app/core/tokens/permission.keys';
         }
     </ul> `
 })
-export class AppMenu {
+export class AppMenu implements OnInit {
     el: ElementRef = inject(ElementRef);
     private authSession = inject(AuthSessionService);
     private permissionContext = inject(PermissionContextService);
@@ -52,15 +52,13 @@ export class AppMenu {
                     icon: 'pi pi-fw pi-file',
                     visible: () => this.canViewContratos(),
                     routerLink: ['/pages/administracao/contrato']
-                }
-                /* DESABILITADO: fora do escopo atual
+                },
                 {
                     label: 'Organizações',
                     icon: 'pi pi-fw pi-building',
                     visible: () => this.canViewOrganizacoes(),
                     routerLink: ['/pages/administracao/organizacao']
-                },
-                */
+                }
                 /* DESABILITADO: fora do escopo atual
                 {
                     label: 'Setores',
@@ -150,6 +148,11 @@ export class AppMenu {
         */
     ];
 
+    ngOnInit() {
+        // Erros de contexto já são tratados pelo interceptor; o menu só fica sem os itens.
+        this.permissionContext.loadForCurrentContext().subscribe({ error: () => undefined });
+    }
+
     private isSuperuser() {
         return !!this.authSession.getUser()?.is_superuser;
     }
@@ -163,7 +166,7 @@ export class AppMenu {
     }
 
     private canViewOrganizacoes() {
-        return this.isCommonUser() && this.permissionContext.hasPermission(PERMISSION_KEYS.ORGANIZACAO_VIEW);
+        return this.isCommonUser() && this.permissionContext.hasPermission(PERMISSION_KEYS.ORGANIZATION_VIEW);
     }
 
     private canViewSetores() {
