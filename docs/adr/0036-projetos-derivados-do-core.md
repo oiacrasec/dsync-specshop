@@ -36,7 +36,8 @@ um core próprio, sem acesso ao core original.
    ao core, e não feita no projeto.
 5. **Arquivos que pertencem ao projeto.** Alguns arquivos existem no core, mas dizem
    respeito ao estado de cada projeto. Em caso de conflito, vale a versão do projeto:
-   `README.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md`.
+   `README.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md` e
+   `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua).
    Pode-se automatizar com `merge=ours` no `.gitattributes`, mais
    `git config merge.ours.driver true` em cada clone (essa configuração não é versionada).
 6. **Venda de um projeto.** Cria-se uma cópia do core que preserve o histórico
