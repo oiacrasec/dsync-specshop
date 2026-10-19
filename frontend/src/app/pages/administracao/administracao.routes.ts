@@ -103,5 +103,38 @@ export default [
             requireContext: true,
             requiredPermission: PERMISSION_KEYS.USER_UPDATE
         }
+    },
+    {
+        path: 'perfil',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/administracao/perfil/perfil').then((c) => c.PerfilPage),
+        data: {
+            breadcrumb: 'Perfis',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
+            requiredPermission: PERMISSION_KEYS.PROFILE_VIEW
+        }
+    },
+    {
+        path: 'perfil/novo',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/administracao/perfil/formulario/formulario').then((c) => c.PerfilFormPage),
+        data: {
+            breadcrumb: 'Novo perfil',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
+            requiredPermission: PERMISSION_KEYS.PROFILE_CREATE
+        }
+    },
+    {
+        path: 'perfil/:id',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/administracao/perfil/formulario/formulario').then((c) => c.PerfilFormPage),
+        data: {
+            breadcrumb: 'Perfil',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
+            requiredPermission: PERMISSION_KEYS.PROFILE_VIEW
+        }
     }
 ] as Routes;

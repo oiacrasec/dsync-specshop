@@ -171,7 +171,7 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
 | 8.1 | Usuários: `/api/v1/users/` (CRUD, redefinir senha, `user:view`/`user:delete` reservadas) e telas | backend + frontend | 0009, 0015 | ✅ |
-| 8.2 | Perfis do cliente e suas permissões (catálogo do registry com rótulos) | backend + frontend | 0009, 0016 | ⬜ |
+| 8.2 | Perfis do cliente e suas permissões (catálogo do registry com rótulos) | backend + frontend | 0009, 0016 | ✅ |
 | 8.3 | Aba "Permissões" do usuário: organizações à esquerda, grade por recurso, aplicar perfil, admin do contrato | backend + frontend | 0009 | ⬜ |
 
 Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configurações** no menu do

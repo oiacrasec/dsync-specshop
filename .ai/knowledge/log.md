@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 8.2: perfis do contrato
+
+- Backend: registry `profile:view` (reservada); `GET /api/v1/permissions/` (catálogo com rótulos
+  `RESOURCE_LABELS`/`ACTION_LABELS`); `ProfileViewSet` em `/api/v1/profiles/` (perfis do contrato
+  editáveis, do sistema só leitura, `permissions` sincronizadas pelos services de RBAC);
+  `begin_write` autoriza o admin ativo no próprio contrato. Suíte 634.
+- Frontend: tela de perfis (lista, form com `app-permission-grid` por recurso, perfil do sistema
+  só leitura), `PermissionCatalogService` (uma busca por sessão), `PROFILE_*`, menu. 85 testes.
+- Docs: `docs/api/profiles.md`.
+
 ## 2026-10-18 — Etapa 8.1: usuários do contrato
 
 - Decisões 54–57: gestão reservada; username + nome; senha temporária; etapas 8.1→8.2→8.3 com a aba

@@ -1,0 +1,33 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ readOnly() ? 'Perfil do sistema' : isEditing ? 'Editar perfil' : 'Novo perfil' }}</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">{{ readOnly() ? 'Perfis do sistema não podem ser alterados.' : 'Marque as permissões que os usuários com este perfil terão.' }}</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" (ngSubmit)="save()">
+        <div class="flex flex-col gap-2">
+            <ui-input-text inputId="name" formControlName="name" [maxlength]="255" label="Nome" errorMessage="Informe o nome do perfil." />
+        </div>
+
+        <div class="flex items-center gap-2">
+            <ui-checkbox inputId="is_active" formControlName="is_active" label="Perfil ativo" [marginTop]="22" />
+        </div>
+    </form>
+
+    <div class="flex flex-col gap-3">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Permissões</h3>
+        <app-permission-grid [groups]="catalog()" [selected]="permissions()" [disabled]="readOnly()" [includeReserved]="essential()" (selectedChange)="permissions.set($event)" />
+    </div>
+
+    @if (!readOnly()) {
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving" (onClick)="save()"></ui-button>
+    </div>
+    }
+</div>

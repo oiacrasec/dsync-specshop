@@ -45,7 +45,7 @@ export class AppMenu implements OnInit {
             label: 'Administração',
             icon: 'pi pi-fw pi-briefcase',
             path: '/administracao',
-            visible: () => this.canViewContratos() || this.canViewOrganizacoes() || this.canViewSetores() || this.canManageUsers(),
+            visible: () => this.canViewContratos() || this.canViewOrganizacoes() || this.canViewSetores() || this.canManageUsers() || this.canViewPerfis(),
             items: [
                 {
                     label: 'Contratos',
@@ -64,6 +64,12 @@ export class AppMenu implements OnInit {
                     icon: 'pi pi-fw pi-users',
                     visible: () => this.canManageUsers(),
                     routerLink: ['/pages/administracao/usuario']
+                },
+                {
+                    label: 'Perfis',
+                    icon: 'pi pi-fw pi-id-card',
+                    visible: () => this.canViewPerfis(),
+                    routerLink: ['/pages/administracao/perfil']
                 }
                 /* DESABILITADO: fora do escopo atual
                 {
@@ -173,6 +179,10 @@ export class AppMenu implements OnInit {
 
     private canManageUsers() {
         return this.isCommonUser() && this.permissionContext.hasPermission(PERMISSION_KEYS.USER_VIEW);
+    }
+
+    private canViewPerfis() {
+        return this.isCommonUser() && this.permissionContext.hasPermission(PERMISSION_KEYS.PROFILE_VIEW);
     }
 
     private canViewBancos() {
