@@ -69,21 +69,30 @@ class PermissionRegistry:
         return definition
 
 
-# Gestão prevista no ADR 0009 §3.1. Acrescentar códigos quando o domínio os exigir.
-# Leitura genérica e recursos ainda não implementados não são liberados por este catálogo.
+# Acrescentar códigos quando o domínio os exigir; leitura genérica não é liberada por este catálogo.
+# Organizações (ADR 0037): o cliente decide quem vê e gerencia; criar só faz sentido no contrato.
+_ANY_SCOPE = frozenset({PermissionScope.CONTRACT, PermissionScope.ORGANIZATION})
+_CONTRACT_SCOPE = frozenset({PermissionScope.CONTRACT})
+
 PERMISSIONS = PermissionRegistry(
-    PermissionDefinition(code, frozenset({PermissionScope.CONTRACT}), reserved=True)
-    for code in (
-        'organization:create',
-        'organization:update',
-        'organization:delete',
-        'user:create',
-        'user:update',
-        'user:manage',
-        'profile:create',
-        'profile:update',
-        'profile:delete',
-        'assignment:create',
-        'assignment:delete',
-    )
+    [
+        PermissionDefinition('organization:view', _ANY_SCOPE),
+        PermissionDefinition('organization:create', _CONTRACT_SCOPE),
+        PermissionDefinition('organization:update', _ANY_SCOPE),
+        PermissionDefinition('organization:delete', _ANY_SCOPE),
+        # Gestão reservada ao perfil essencial (ADR 0009 §3.1).
+        *(
+            PermissionDefinition(code, _CONTRACT_SCOPE, reserved=True)
+            for code in (
+                'user:create',
+                'user:update',
+                'user:manage',
+                'profile:create',
+                'profile:update',
+                'profile:delete',
+                'assignment:create',
+                'assignment:delete',
+            )
+        ),
+    ]
 )

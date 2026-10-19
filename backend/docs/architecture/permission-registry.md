@@ -8,17 +8,18 @@ antecipada por decisão do usuário antes do contexto. Implementação em
 O módulo usa somente a biblioteca padrão Python. Não consulta o banco, não
 importa Django/DRF e não espelha permissões em `auth_permission`.
 
-## Catálogo inicial
+## Catálogo
 
-Os códigos abaixo representam a gestão prevista no ADR 0009 §3.1. Todos são
-reservados ao perfil essencial Administrador do contrato, com escopo CONTRACT:
+| Recurso | Códigos | Escopos | Reservada |
+|---|---|---|---|
+| organização | `organization:view`, `organization:update`, `organization:delete` | CONTRACT, ORGANIZATION | não (ADR 0037) |
+| organização | `organization:create` | CONTRACT | não (ADR 0037) |
+| usuário | `user:create`, `user:update`, `user:manage` | CONTRACT | sim (ADR 0009 §3.1) |
+| perfil | `profile:create`, `profile:update`, `profile:delete` | CONTRACT | sim |
+| atribuição | `assignment:create`, `assignment:delete` | CONTRACT | sim |
 
-| Recurso | Códigos |
-|---|---|
-| organização | `organization:create`, `organization:update`, `organization:delete` |
-| usuário | `user:create`, `user:update`, `user:manage` |
-| perfil | `profile:create`, `profile:update`, `profile:delete` |
-| atribuição | `assignment:create`, `assignment:delete` |
+Reservadas existem só no perfil essencial Administrador do contrato. As de organização podem
+entrar em perfis do cliente e em atribuições avulsas: o cliente decide quem vê e gerencia.
 
 O catálogo cresce com as operações implementadas. Recursos de exemplo como
 estoque/relatórios não foram cadastrados antecipadamente. Não existe permissão

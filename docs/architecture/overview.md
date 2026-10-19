@@ -53,11 +53,12 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` (revisão 5.2: general_search_fields, busca OR/controles individuais AND, schema general_search separado, validação de tipos/lookups; ADR 0029) | concluído |
 | `backend/` (revisão 5.2: CRUD padrão do DRF, autoria/auditoria nos serializers, validate próprio e hooks; ADR 0030 substitui 0023–0025) | concluído |
 | `backend/` (revisão 5.2: helpers de responses para actions customizadas, RFC 9457/rollback preservados; ADR 0031) | concluído |
-| `backend/` (revisão 5.2: OrganizationViewSet independente somente leitura, queryset RBAC, filtro de contrato e OrganizationSerializer; ADR 0032) | concluído |
+| `backend/` (revisão 5.2: OrganizationViewSet independente somente leitura; ADR 0032, substituído pelo 0037 e removido na 7.1) | concluído |
 | `backend/` (etapa 6.3: API de planos/contratos em administration, models em contracts; plan opcional, contracts.0003; ADR 0033) | concluído |
 | `backend/` (etapa 6.4: must_change_password, resumo no login e troca autenticada, bloqueio global por JWT com superadmin isento; ADR 0034) | concluído |
 | `backend/` (etapa 6.6: provisionamento do contrato, 1ª organização + admin essencial com senha temporária única, 409 `contract-not-provisionable`) | concluído |
 | `backend/` (etapa 6.7: lista de admins do contrato e reset de senha com troca obrigatória e revogação dos refresh; refresh trava usuário → token) | concluído |
+| `backend/` (etapa 7.1: organizações só na área do cliente, rota admin removida, permissões `organization:*` atribuíveis pelo cliente; ADR 0037) | concluído |
 | `frontend/` (etapa 6.5: auth Core, primeiro acesso, seleção UUID, RFC 9457; JWT/contexto localStorage e recarregamento entre abas, ADR 0035) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |

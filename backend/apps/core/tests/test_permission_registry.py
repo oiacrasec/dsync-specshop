@@ -59,9 +59,8 @@ def test_non_reserved_permissions_accept_both_declared_scopes():
     assert registry.require_assignable('record:view', ORGANIZATION) is definition
 
 
-@pytest.mark.parametrize('definition', list(PERMISSIONS), ids=lambda definition: definition.code)
+@pytest.mark.parametrize('definition', [item for item in PERMISSIONS if item.reserved], ids=lambda item: item.code)
 def test_reserved_permissions_are_rejected_for_customer_profiles_and_individual_grants(definition):
-    assert definition.reserved
     assert definition.scopes == frozenset({CONTRACT})
     with pytest.raises(ValueError):
         PERMISSIONS.require_assignable(definition.code, CONTRACT)
@@ -96,3 +95,34 @@ def test_registry_does_not_import_framework_or_project_runtime():
             assert all(
                 alias.name.split('.')[0] not in {'django', 'rest_framework', 'apps', 'config'} for alias in node.names
             )
+
+
+def test_organization_permissions_are_assignable_by_the_customer():
+    # ADR 0037: deixam de ser reservadas; criar só no escopo do contrato.
+    assert {item.code for item in PERMISSIONS if item.code.startswith('organization:')} == {
+        'organization:view',
+        'organization:create',
+        'organization:update',
+        'organization:delete',
+    }
+    for code in ('organization:view', 'organization:update', 'organization:delete'):
+        assert not PERMISSIONS.get(code).reserved
+        assert PERMISSIONS.require_assignable(code, CONTRACT).code == code
+        assert PERMISSIONS.require_assignable(code, ORGANIZATION).code == code
+    assert PERMISSIONS.require_assignable('organization:create', CONTRACT).code == 'organization:create'
+    with pytest.raises(ValueError):
+        PERMISSIONS.require_assignable('organization:create', ORGANIZATION)
+
+
+def test_user_profile_and_assignment_management_stay_reserved():
+    reserved = {item.code for item in PERMISSIONS if item.reserved}
+    assert reserved == {
+        'user:create',
+        'user:update',
+        'user:manage',
+        'profile:create',
+        'profile:update',
+        'profile:delete',
+        'assignment:create',
+        'assignment:delete',
+    }

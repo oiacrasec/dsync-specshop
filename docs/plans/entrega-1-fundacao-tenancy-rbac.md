@@ -54,6 +54,11 @@ e só começa após aprovação do usuário.
 | 42 | 6.6 (usuário): `POST /api/v1/admin/contracts/{public_id}/provision/`; admin com dados mínimos (`username` + `name`); só contrato **disponível** e sem usuários **e** sem organizações não excluídos (inclusive inativos), senão 409 `contract-not-provisionable` |
 | 43 | 6.7 (usuário): admins do contrato = atribuição essencial ativa (perfil ativo), usuário ativo **ou inativo**, não excluído; rotas `GET …/contracts/{public_id}/admins/` (paginada) e `POST …/admins/{user_public_id}/reset-password/`. Refresh passa a travar usuário → token, a mesma ordem do reset |
 | 44 | 6.8 (usuário): formulário de contrato inclui a retenção pós-contrato (`post_termination_retention_days`, 0–365, padrão 90) além do plano opcional |
+| 45 | Revisão do ADR 0032 (usuário): organizações só na área do cliente, menu para o admin do contrato e comuns com permissão; `/admin/organizations/` removida (ADR 0037) |
+| 46 | Permissões de organização não reservadas: o cliente decide quem vê e gerencia (`organization:view` nova; `create` só CONTRACT). Usuários, perfis e atribuições seguem reservados |
+| 47 | Quem tem `organization:view` em qualquer escopo lista todas as organizações do contrato |
+| 48 | Resumo de permissões para a interface: `GET /api/v1/me/permissions/` com `X-Organization-Id` |
+| 49 | Suporte do superadmin dentro de organização (escolha contrato → organização) fica para depois |
 
 ## Bloco 0 — Fundação
 
@@ -142,5 +147,13 @@ Achados da 6.1 (herdados do datasync-gis, a decidir com o usuário):
 | Bundle | resolvido na 6.2a até 1,25 MB (~257 KB gzip); o restante é a base Angular/RxJS/PrimeNG/estilos. Orçamento de 1 MB ainda avisa: ajuste depende do usuário |
 
 A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes; o que a
-6.6/6.7 cobrir sai do escopo delas. O rascunho de organizações (ADR 0032, Proposto) é
-revisado depois do bloco 6.
+6.6/6.7 cobrir sai do escopo delas. Organizações da 5.4 foram antecipadas no Bloco 7.
+
+## Bloco 7 — Organizações na área do cliente (decisões 45 a 49)
+
+| # | Etapa | Lado | ADR | Status |
+|---|---|---|---|---|
+| 7.1 | ADR 0037; remover `/admin/organizations/`; registry com `organization:view` e as quatro permissões não reservadas (`create` só CONTRACT) | backend | 0037 | ✅ |
+| 7.2 | `GET /api/v1/me/permissions/`: códigos efetivos na organização ativa, para a interface | backend | 0037, 0009 §4 | ⬜ |
+| 7.3 | CRUD de organizações em `/api/v1/organizations/` (lista, detalhe, options, schema, criar, editar, excluir), RBAC, auditoria e isolamento | backend | 0037, 0006 | ⬜ |
+| 7.4 | Frontend: tela de organizações no Core, `PermissionContextService` ligado ao 7.2, menu e botões por permissão | frontend | 0037, 0035 | ⬜ |

@@ -1,39 +1,8 @@
-# Organizações acessíveis
+# Organizações
 
-OrganizationViewSet em apps/contracts, com OrganizationSerializer; ADR 0032.
-JWT obrigatório, sem exigir ou usar X-Organization-Id para escolher a organização.
-
-| Método | Rota | Resultado |
-|---|---|---|
-| GET | /api/v1/admin/organizations/ | lista paginada das organizações acessíveis |
-| GET | /api/v1/admin/organizations/{public_id}/ | public_id e name da organização permitida |
-| GET | /api/v1/admin/organizations/options/ | seleção UUID/rótulo, conforme contrato de options |
-| GET | /api/v1/admin/organizations/schema/ | metadados da listagem |
-
-Usuário comum recebe somente organizações alcançadas por suas concessões RBAC
-ativas, no próprio contrato, respeitando exceções e perfis inativos/excluídos.
-Sem concessões, a lista é vazia. Superadmin pode consultar organizações
-de todos os contratos não excluídos, inclusive inativos/vencidos para suporte.
-Em ambos os casos, organizações inativas e excluídas não aparecem na seleção.
-
-Listagem usa first/rows (máximo 100), search, ordering=name/-name e is_active.
-contract é um filtro opcional de UUID público do contrato, aplicado somente à lista:
-
-```http
-GET /api/v1/admin/organizations/?contract=<public_id-do-contrato>&search=filial&rows=20
-```
-
-O filtro nunca amplia o conjunto autorizado; outro contrato retorna lista vazia
-ao usuário comum. Como apenas organizações ativas são elegíveis, is_active=false
-retorna vazio. Query inválida retorna 422 RFC 9457; detalhe sem acesso retorna 404.
-POST/PUT/PATCH/DELETE retornam 405. CRUD de gestão continua na etapa 5.4.
-
-Resposta de lista: {"data": [{"public_id": "UUID", "name": "Filial"}], "total_records": 1}.
-Headers incluem X-Request-Id e Cache-Control sem cache. Options mantém os parâmetros
-q/public_id/first/rows; filtro contract é da lista, não de options.
-
-Substitui GET /api/v1/admin/contracts/{public_id}/organizations/, agora 404.
-GET /api/v1/me/organizations/ permanece disponível com sua resposta existente.
+Organizações ficam só na área do cliente ([ADR 0037](../adr/0037-organizacoes-na-area-do-cliente.md)).
+A rota administrativa `/api/v1/admin/organizations/` (ADR 0032) foi removida na etapa 7.1 e
+responde 404. O CRUD da área comum e o resumo de permissões entram nas etapas 7.2–7.3.
 
 ## Lista do usuário para troca de contexto
 
@@ -53,10 +22,5 @@ contract-inactive (etapa 2.3). Cache-Control: no-cache, no-store.
 
 ## Performance
 
-Usuário com perfil: três consultas de concessões, COUNT e página (cinco SELECTs),
-constantes com 1/30 organizações, em list/options. Querysets filtram no banco,
-selecionam somente campos necessários e materializam no máximo 100 registros.
-Testes não observaram INSERT/UPDATE/DELETE nem FOR UPDATE nas leituras.
-Superadmin usa COUNT/página sem carregar concessões. Não há consulta por item.
-Busca/COUNT/OFFSET podem crescer com o volume; evidência sem JWT real ou ensaio
-de carga nesta revisão, não certifica capacidade. Avaliar volume/concorrência real.
+`/me/organizations/`: três consultas de concessões e uma de organizações, constantes com 1/30
+organizações, sem escritas ou locks. Sem ensaio de carga; não certifica capacidade.

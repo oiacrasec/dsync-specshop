@@ -52,11 +52,9 @@ Selectors ficam para consultas com lógica própria. Views administrativas decla
 `queryset = Contract.objects.unscoped().select_related('plan')`, serializer_class e filterset_class nessa
 ordem (ADR 0028); queryset lazy com unscoped explícito, sem SQL na construção.
 Selectors que dependem de tenant continuam sendo chamados durante a requisição.
-Organizações têm OrganizationViewSet próprio, com OrganizationSerializer e base
-somente leitura em /api/v1/admin/organizations/. Usuário comum vê o conjunto autorizado
-pelo RBAC; superadmin tem acesso global, com filtro contract na lista. Substitui
-a action aninhada do contrato; CRUD de gestão continua na 5.4. Ver
-[organizações acessíveis](../docs/api/organizations.md) e ADR 0032.
+Organizações ficam só na área do cliente (ADR 0037): `/api/v1/admin/organizations/` foi
+removida, e as permissões `organization:*` passam a ser atribuíveis pelo cliente. O CRUD da
+área comum e o resumo de permissões (`/me/permissions/`) estão no Bloco 7 do plano.
 Busca geral: FilterSets declaram general_search_fields, com OR e icontains padrão;
 filtros individuais combinam com AND. Schema descreve general_search separado
 de filters para o frontend montar um campo único e controles independentes (ADR 0029).

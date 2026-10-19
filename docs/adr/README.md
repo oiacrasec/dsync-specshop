@@ -25,7 +25,7 @@ um ADR novo que **substitui** o anterior.
 | [0006](0006-multi-tenancy-contrato-organizacao.md) | Multi-tenancy por Contrato e Organização | Aceito |
 | [0007](0007-identificadores-e-convencoes-de-persistencia.md) | Identificadores e convenções de persistência | Aceito |
 | [0008](0008-administracao-propria.md) | Administração própria, sem o Django Admin | Aceito (trecho substituído por 0010) |
-| [0009](0009-rbac-hibrido.md) | RBAC híbrido: perfis vinculados + permissões avulsas | Aceito |
+| [0009](0009-rbac-hibrido.md) | RBAC híbrido: perfis vinculados + permissões avulsas | Aceito (§3.1 de organizações substituído por 0037) |
 | [0010](0010-gestao-de-usuarios-pelo-superadmin.md) | Gestão de usuários e superadmins pela área administrativa | Aceito |
 | [0011](0011-endpoint-de-opcoes.md) | Endpoint de opções (autocomplete e seleção) | Aceito |
 | [0012](0012-excecoes-ao-escopo-declarado.md) | Exceções ao escopo declarado (`Contract` e `User`) | Aceito |
@@ -48,11 +48,12 @@ um ADR novo que **substitui** o anterior.
 | [0029](0029-busca-geral-e-filtros-individuais.md) | Busca geral e filtros individuais no Core | Aceito |
 | [0030](0030-crud-auditado-nos-serializers.md) | CRUD auditado com serializers padrão do DRF | Aceito |
 | [0031](0031-respostas-de-actions-customizadas.md) | Helpers de resposta para actions customizadas | Aceito |
-| [0032](0032-organizacoes-em-viewset-proprio.md) | Organizações acessíveis em ViewSet próprio | Proposto |
+| [0032](0032-organizacoes-em-viewset-proprio.md) | Organizações acessíveis em ViewSet próprio | Substituído por 0037 |
 | [0033](0033-api-administrativa-separada-do-dominio.md) | API do superadmin em administration, domínio em contracts e plano opcional | Aceito |
 | [0034](0034-primeiro-acesso-e-troca-de-senha.md) | Primeiro acesso e troca de senha com bloqueio global por JWT | Aceito |
 | [0035](0035-jwt-localstorage-e-contexto-entre-abas.md) | JWT em localStorage e organização sincronizada com recarregamento entre abas | Aceito |
 | [0036](0036-projetos-derivados-do-core.md) | Projetos derivados do core: fork com histórico, fluxo só do core para os projetos | Proposto |
+| [0037](0037-organizacoes-na-area-do-cliente.md) | Organizações na área do cliente, com gestão delegável | Aceito |
 
 ## Modelo
 

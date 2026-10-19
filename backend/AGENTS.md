@@ -155,12 +155,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Administração de planos/contratos em `apps/administration`, sob `/api/v1/admin/`,
   com `SuperadminPermission`, sem organização (ADR 0020). Listas limitadas e
   campos de filtro/ordenação declarados; opções usam a mesma permissão administrativa.
-  Rascunho de organizações permanece em contracts, fora do escopo da 6.3 (ADR 0032 Proposto).
-  Organizações não ficam em action do contrato: OrganizationViewSet próprio,
-  BaseReadOnlyModelViewSet e OrganizationSerializer em /api/v1/admin/organizations/.
-  Sem header de organização; AllowAuthenticated e queryset autorizado pelo RBAC
-  (accessible_organizations). Superadmin usa queryset global explícito, com filtro
-  contract na lista; comuns nunca usam esse queryset global. CRUD na 5.4 (ADR 0032).
+  Organizações não ficam na área administrativa (ADR 0037): gestão só na área do cliente
+  (Bloco 7), com `organization:view/create/update/delete` não reservadas (create só CONTRACT).
+  Não recriar rota de organizações sob `/admin/`; suporte do superadmin fica para depois.
   Escritas pelos serializers, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).

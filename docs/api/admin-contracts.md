@@ -21,9 +21,8 @@ nunca aparecem em listagens ou detalhes. Exclusão não remove dependentes nem
 executa expurgo ou encerramento comercial. Inativos e contratos fora de vigência
 continuam disponíveis na administração para suporte.
 
-Organizações agora usam [OrganizationViewSet próprio](organizations.md), em
-`/api/v1/admin/organizations/?contract=<public_id>`. A action aninhada foi removida
-(ADR 0032). O novo endpoint também atende usuários comuns, com queryset RBAC.
+A área administrativa não tem rotas de organização (ADR 0037): a gestão fica na área do
+cliente, e a escolha de organização pelo superadmin para suporte fica para depois.
 
 ## Provisionamento do contrato (6.6)
 

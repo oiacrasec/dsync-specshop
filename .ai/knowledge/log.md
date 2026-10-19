@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 7.1: organizações na área do cliente (ADR 0037)
+
+- Revisão do ADR 0032 com o usuário (decisões 45–49): organizações só na área do cliente;
+  permissões `organization:*` não reservadas (`view` nova, `create` só CONTRACT); `view` em
+  qualquer escopo lista o contrato inteiro; `/me/permissions/` para a interface; suporte do
+  superadmin adiado. ADR 0037 aceito; 0032 substituído; 0009 §3.1 substituído no trecho de organizações.
+- Removidos `contracts/views.py`, `urls.py`, `filters.py`, a rota `admin/` de contracts e
+  `test_organizations_api.py`; `OrganizationSerializer` mantido (provisionamento). Registry e
+  testes atualizados; admin sem rotas de organização (404). 578 testes backend.
+- Docs: ADR 0037/índice/0032/0009, organizations, overview API, admin-contracts, rbac, registry,
+  backend AGENTS/README, plano (Bloco 7), overview, memória e handoff.
+
 ## 2026-10-18 — Ajustes de UX após teste do usuário
 
 - Topbar em tela pequena: botão do menu junto ao breadcrumb, só o logo à direita (commit 4f7610e).

@@ -261,14 +261,10 @@ def test_list_filters_do_not_change_detail_lookup(world):
     assert response.status_code == 200
 
 
-def test_organizations_search_is_limited_to_selected_contract(world):
-    contract = world['contract']
-    own = Organization.objects.create(name='Filial', contract=contract)
-    Organization.objects.create(name='Inativa', contract=contract, is_active=False)
-    other = Contract.objects.create(name='Outro', plan=world['plan'], start_date=date(2020, 1, 1), licenses=5)
-    Organization.objects.create(name='Filial estrangeira', contract=other)
-    response = world['api'].get('/api/v1/admin/organizations/', {'contract': str(contract.public_id)})
-    assert response.json()['data'] == [{'public_id': str(own.public_id), 'name': 'Filial'}]
+@pytest.mark.parametrize('path', ['organizations/', 'organizations/options/', 'organizations/schema/'])
+def test_admin_area_has_no_organization_routes(world, path):
+    # ADR 0037: organizações só na área do cliente; suporte do superadmin fica para depois.
+    assert world['api'].get(f'/api/v1/admin/{path}').status_code == 404
 
 
 def test_jwt_admin_without_context_and_no_access_log(world):

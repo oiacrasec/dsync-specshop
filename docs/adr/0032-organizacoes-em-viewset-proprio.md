@@ -1,7 +1,6 @@
 # 0032 — Organizações em ViewSet próprio
 
-- **Status:** Proposto — revisão pendente (usuário vai ajustar o escopo depois da área administrativa;
-  hoje expõe `/admin/organizations/` ao usuário comum e acesso global ao superadmin)
+- **Status:** Substituído por 0037
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0009, 0020 e 0021; substitui a rota aninhada do ADR 0020.
 

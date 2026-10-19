@@ -132,7 +132,7 @@ O acesso total dinâmico do perfil essencial vale no cálculo (3.3).
 | `selectors.accessible_organizations(user)` | organizações ativas do contrato alcançadas por concessão ativa; fica de fora só o que **todas** as concessões de contrato excluem e nenhuma direta devolve. 4 queries constantes |
 | `GET /api/v1/me/organizations/` | lista para troca de contexto, sem header ([contrato](../api/organizations.md)); superadmin recebe lista vazia |
 | `contracts.selectors.superadmin_contracts(search)` | 1º passo do superadmin: contratos não excluídos (inclui inativos/vencidos para suporte), busca por nome |
-| `contracts.selectors.superadmin_contract_organizations(contract)` | 2º passo: organizações ativas do contrato. Endpoints na área admin (bloco 5) |
+| `contracts.selectors.superadmin_contract_organizations(contract)` | 2º passo: organizações ativas do contrato. Sem endpoint: suporte do superadmin adiado (ADR 0037) |
 
 Toda mudança de permissão é auditada ([auditoria](audit.md), etapa 3.6). Autoria nos models não substitui essa trilha.
 O isolamento automático de queries foi entregue nas etapas 2.4–2.5.
