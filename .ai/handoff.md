@@ -3,19 +3,19 @@
 - **Atualizado em:** 2026-10-18
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 7 = prioridade)
-- **Último commit:** 2ec2e87 docs(adr): treat the dashboards page as a project-owned file
+- **Último commit:** 1de66a2 feat(frontend): add Font Awesome and show boolean columns as icons
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 7.4 frontend de organizações — ✅ implementada, **não commitada**; refactor `model` do backend também pendente |
-| Próximo passo exato | usuário revisar e commitar (refactor(core) + feat(frontend)); Bloco 7 concluído → escolher 5.3/5.4 (usuários, perfis, atribuições) ou 5.5 |
-| Aguardando o usuário? | sim — revisão dos diffs |
+| Etapa atual | Bloco 7 concluído e commitado (7.1–7.4), mais Font Awesome e ícones booleanos |
+| Próximo passo exato | usuário escolher: 5.3/5.4 (usuários, perfis, atribuições) ou 5.5 (OpenAPI) |
+| Aguardando o usuário? | sim — próxima prioridade |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4 (sem commit).
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4.
 Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
@@ -43,4 +43,5 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 - Não reativar telas DESABILITADO sem aprovação (a 7.4 reativa organizações, aprovada).
 - Home virou `/dashboards` em branco (KPI removida a pedido); `pages/dashboards/` é arquivo do projeto (ADR 0036).
 - JWT localStorage (ADR 0035); HTTPS/CSP, cache compartilhado/borda/MFA e expurgo antes de produção.
+- Font Awesome Free 7.3.1 por classe (atribuição CC BY no README do frontend); orçamento de aviso 2 MB.
 - npm audit (88 vulns) adiado pelo usuário até o front ficar mais redondo. Push só quando pedido.
