@@ -94,7 +94,8 @@ para manutenção do perfil essencial. Os services atuais usam o banco padrão.
 | Superadmin sem header em endpoint de negócio | 400 `context-invalid-request`; a área admin terá endpoints próprios (bloco 5) |
 | Contrato do usuário indisponível | 403 `contract-inactive` já na autenticação (etapa 2.3, ver [contratos](contracts.md)) |
 
-O cálculo é feito uma vez por requisição.
+O cálculo é feito uma vez por requisição. `GET /api/v1/me/permissions/` expõe o resultado para a
+interface ([contrato](../api/permissions.md), etapa 7.2).
 
 ## Perfil essencial e etapas seguintes
 
