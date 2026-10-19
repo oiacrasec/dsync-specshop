@@ -41,6 +41,7 @@ describe('UiTable — limpar filtros', () => {
         primeTable.sortField = 'name';
         primeTable.sortOrder = -1;
         const calls = service.list.calls.count();
+        const notified = spyOn(primeTable.tableService, 'onSort').and.callThrough();
 
         const filter = fixture.debugElement.query((element) => element.componentInstance instanceof UiFilter).componentInstance as UiFilter;
 
@@ -50,6 +51,9 @@ describe('UiTable — limpar filtros', () => {
         expect(service.list.calls.mostRecent().args[0].ordering).toBeUndefined();
         expect(service.list.calls.mostRecent().args[0].first).toBe(0);
         expect(primeTable.sortField).toBeUndefined();
-        expect(primeTable.sortOrder).toBe(1);
+        expect(primeTable.sortOrder).toBe(primeTable.defaultSortOrder);
+        expect(notified).toHaveBeenCalledOnceWith(null);
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('th[aria-sort="descending"], th[aria-sort="ascending"]')).toBeNull();
     });
 });

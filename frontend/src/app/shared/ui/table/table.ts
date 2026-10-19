@@ -223,9 +223,11 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         this.sortOrder = undefined;
 
         if (this.table) {
-            // Atribuição direta (sem binding): não dispara outro onLazyLoad, só limpa os ícones.
+            // Mesmo estado do Table.clear() do PrimeNG, sem o onLazyLoad dele (a busca vem do filtersChange).
+            // Os ícones (p-sortIcon/pSortableColumn) só se atualizam pelo aviso do tableService.
             this.table.sortField = undefined;
-            this.table.sortOrder = 1;
+            this.table.sortOrder = this.table.defaultSortOrder;
+            this.table.tableService.onSort(null);
         }
     }
 
