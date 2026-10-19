@@ -59,6 +59,10 @@ e só começa após aprovação do usuário.
 | 47 | Quem tem `organization:view` em qualquer escopo lista todas as organizações do contrato |
 | 48 | Resumo de permissões para a interface: `GET /api/v1/me/permissions/` com `X-Organization-Id` |
 | 49 | Suporte do superadmin dentro de organização (escolha contrato → organização) fica para depois |
+| 50 | Editar/excluir organizações: código concedido em qualquer escopo vale para qualquer organização do contrato, como a visão |
+| 51 | Excluir organização que é escopo de atribuição ou alvo de exceção → 409 `organization-in-use` |
+| 52 | O contrato mantém pelo menos uma organização ativa → 409 `last-active-organization` |
+| 53 | Nome de organização único no contrato, sem diferenciar maiúsculas → 422 |
 
 ## Bloco 0 — Fundação
 
@@ -149,11 +153,11 @@ Achados da 6.1 (herdados do datasync-gis, a decidir com o usuário):
 A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes; o que a
 6.6/6.7 cobrir sai do escopo delas. Organizações da 5.4 foram antecipadas no Bloco 7.
 
-## Bloco 7 — Organizações na área do cliente (decisões 45 a 49)
+## Bloco 7 — Organizações na área do cliente (decisões 45 a 53)
 
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
 | 7.1 | ADR 0037; remover `/admin/organizations/`; registry com `organization:view` e as quatro permissões não reservadas (`create` só CONTRACT) | backend | 0037 | ✅ |
-| 7.2 | `GET /api/v1/me/permissions/`: códigos efetivos na organização ativa, para a interface | backend | 0037, 0009 §4 | ⬜ |
-| 7.3 | CRUD de organizações em `/api/v1/organizations/` (lista, detalhe, options, schema, criar, editar, excluir), RBAC, auditoria e isolamento | backend | 0037, 0006 | ⬜ |
+| 7.2 | `GET /api/v1/me/permissions/`: códigos efetivos na organização ativa, para a interface | backend | 0037, 0009 §4 | ✅ |
+| 7.3 | CRUD de organizações em `/api/v1/organizations/` (lista, detalhe, options, schema, criar, editar, excluir), RBAC, auditoria e isolamento | backend | 0037, 0006 | ✅ |
 | 7.4 | Frontend: tela de organizações no Core, `PermissionContextService` ligado ao 7.2, menu e botões por permissão | frontend | 0037, 0035 | ⬜ |

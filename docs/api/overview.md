@@ -12,10 +12,12 @@ Autenticação JWT e `IsAuthenticated` são globais.
 |---|---|---|
 | `/api/v1/auth/` | login, refresh, logout e troca de senha | [autenticação](authentication.md) |
 | `/api/v1/me/organizations/` | organizações acessíveis do usuário | [organizações](organizations.md) |
+| `/api/v1/organizations/` | organizações do contrato (área do cliente) | [organizações](organizations.md) |
+| `/api/v1/me/permissions/` | permissões efetivas na organização ativa (para a interface) | [permissões](permissions.md) |
 | `/api/v1/admin/plans/`, `/api/v1/admin/contracts/` | administração do superadmin | [administração](admin-contracts.md) |
 
-Seleções seguem o contrato de [options](options.md). Nenhum endpoint de negócio
-com contexto de organização está publicado.
+Seleções seguem o contrato de [options](options.md). Endpoints da área do cliente exigem
+`X-Organization-Id`.
 
 Todas as respostas do backend recebem `X-Request-Id`, gerado pelo servidor,
 para correlação com os logs. Em erros da API, o mesmo valor aparece no corpo.

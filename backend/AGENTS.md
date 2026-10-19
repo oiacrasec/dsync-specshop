@@ -158,6 +158,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Organizações não ficam na área administrativa (ADR 0037): gestão só na área do cliente
   (Bloco 7), com `organization:view/create/update/delete` não reservadas (create só CONTRACT).
   Não recriar rota de organizações sob `/admin/`; suporte do superadmin fica para depois.
+  `GET /api/v1/me/permissions/` (rbac, 7.2) só reflete para a interface; não usar como autorização.
+  CRUD em `/api/v1/organizations/` (contracts, 7.3) com `ContractWidePermission`: código em qualquer
+  escopo vale no contrato inteiro, mas o header e o acesso à organização ativa continuam obrigatórios.
+  Escritas travam a linha do contrato (nome único 422, última ativa e em uso 409).
   Escritas pelos serializers, atomic/lock do registro e AuditEvent; redução de licenças
   não pode ficar abaixo dos usuários não excluídos, contando inativos. Não aplicar
   quotas, cobrança, cascata ou expurgo. Ver [API administrativa](../docs/api/admin-contracts.md).
@@ -214,7 +218,11 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   suas atribuições não excluídas primeiro. Não publicar endpoints antes das proteções.
 - Autorização da API nega por padrão (`IsAuthenticated` + `RequiredPermission`): toda view
   declara `required_permission` (código do registry ou dicionário por action/método) ou
-  `permission_classes = [AllowAuthenticated]`. Contexto pelo header `X-Organization-Id`
+  `permission_classes = [AllowAuthenticated]`. Em CRUD sobre as bases do core, declarar só
+  `permission_resource = '<recurso>'` (ResourcePermissionMixin gera view/create/update/delete);
+  `required_permission` (dict) sobrescreve ações citadas e declara actions customizadas, que
+  nunca recebem código automático. Nunca deduzir o recurso do nome do model (ADR 0021).
+  `options` usa as mesmas `permission_classes` da view; a regra do `:view` fica nas classes. Contexto pelo header `X-Organization-Id`
   (`apps/core/context.py`, preenche `request.organization`); superadmin também precisa do
   header em endpoint de negócio (400 sem ele). Contrato indisponível → 403 na autenticação. Cálculo puro em
   `apps/rbac/evaluation.py`; leitura em `selectors.user_grants`, uma vez por requisição.

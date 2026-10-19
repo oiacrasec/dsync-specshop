@@ -19,8 +19,10 @@ from apps.core.exceptions import (
     ContextInvalidRequest,
     ContractInactive,
     ContractNotProvisionable,
+    LastActiveOrganization,
     LastContractAdmin,
     LicenseLimitReached,
+    OrganizationInUse,
     ProfileInUse,
 )
 from apps.core.log_filters import request_id_context
@@ -110,6 +112,8 @@ def test_routes(settings):
         (ContractInactive(), 403, 'contract-inactive'),
         (LicenseLimitReached(), 409, 'license-limit-reached'),
         (ContractNotProvisionable(), 409, 'contract-not-provisionable'),
+        (OrganizationInUse(), 409, 'organization-in-use'),
+        (LastActiveOrganization(), 409, 'last-active-organization'),
         (ProfileInUse(), 409, 'profile-in-use'),
         (LastContractAdmin(), 409, 'last-contract-admin'),
         (exceptions.PermissionDenied(PRIVATE_DETAIL), 403, 'permission-denied'),

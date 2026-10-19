@@ -63,6 +63,8 @@ Cada `type` novo é cadastrado aqui **e** documentado em `docs/api/errors/<slug>
 | `validation-error` | **422** | JSON válido, mas dados inválidos (campo obrigatório, formato, regra); traz `errors` | RFC 9110 §15.5.21 |
 | `license-limit-reached` | **409** | cadastro de usuário além das licenças do contrato | ADR 0006 §2.1 |
 | `contract-not-provisionable` | **409** | provisionamento em contrato indisponível ou que já tem usuários/organizações | decisão 42 |
+| `organization-in-use` | **409** | excluir organização que é escopo de atribuição ou alvo de exceção | ADR 0037 |
+| `last-active-organization` | **409** | desativar/excluir a única organização ativa do contrato | ADR 0037 |
 | `profile-in-use` | **409** | exclusão de perfil ainda atribuído | ADR 0009 §2 |
 | `last-contract-admin` | **409** | remoção do último admin do contrato | ADR 0009 §5 |
 | `not-found` | 404 | registro inexistente **ou fora do contexto** (nunca revela qual) | ADR 0006 §4 |

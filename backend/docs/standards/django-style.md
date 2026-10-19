@@ -150,6 +150,31 @@ Mesmo formato: os parâmetros da função alimentam o CTE/tabela `parametros`. O
 
 A pasta `.ai/queries/` da raiz é outra coisa: consultas de investigação para agentes de IA.
 
+## Permissões das views de CRUD
+
+Views sobre `BaseModelViewSet`/`BaseReadOnlyModelViewSet` declaram o recurso do registry, e o
+`ResourcePermissionMixin` monta o mapa (`core/constants.RESOURCE_PERMISSION_ACTIONS`):
+
+```python
+class OrganizationViewSet(BaseModelViewSet):
+    permission_resource = 'organization'
+    # list/retrieve/options/schema → organization:view · create → organization:create
+    # update/partial_update → organization:update · destroy → organization:delete
+```
+
+| Regra | Motivo |
+|---|---|
+| Recurso sempre declarado na view, nunca deduzido do model | ADR 0021: configuração explícita |
+| `required_permission = {...}` na mesma classe sobrescreve só as ações citadas | exceções e actions próprias (`'export': 'organization:export'`) |
+| Action customizada sem código declarado fica negada | não dá para adivinhar se é leitura ou escrita (ADR 0009 §4) |
+| Código gerado fora do registry é negado na requisição | falha fechada |
+| Subclasse sem `permission_resource` próprio herda o mapa do pai; com `required_permission` próprio sem recurso, o substitui | atributo de classe comum do Python |
+
+A área administrativa usa `SuperadminPermission` e não lê esse mapa.
+
+`options` usa as mesmas `permission_classes` da view (não existe `options_permission_class`):
+as classes de permissão garantem o `:view` no `options` ([contrato](../../../docs/api/options.md)).
+
 ## Views administrativas e serializers auditados
 
 Na 6.3, a API administrativa de planos/contratos fica em apps/administration:

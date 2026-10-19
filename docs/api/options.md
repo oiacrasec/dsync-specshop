@@ -45,14 +45,17 @@ class CategoryViewSet(LookupOptionsMixin, TenantScopedViewMixin, viewsets.Generi
 ```
 
 O código `category:view` do exemplo precisa existir no registry. Declare para
-`options` a mesma permissão `:view` do recurso; `:manage` e `:create` não substituem
-leitura. O mixin adiciona essa exigência mesmo quando a view usa `AllowAuthenticated`
-e preserva outras restrições declaradas, como acesso exclusivo à administração.
+`options` a mesma permissão `:view` do recurso (com `permission_resource`, já vem gerado);
+`:manage` e `:create` não substituem leitura.
 
-Na área administrativa (ADR 0008/0020), `options_permission_class` é
-`SuperadminPermission`: a mesma autorização da leitura administrativa, sem exigir
-organização ou conceder acesso via RBAC de cliente. Nos recursos comuns permanece
-`LookupOptionsPermission`, com a exigência de `:view` e contexto.
+`options` usa **as mesmas `permission_classes` da view**; não há classe própria de options.
+As regras ficam nas classes:
+
+| Classe da view | No `options` |
+|---|---|
+| `RequiredPermission` e subclasses (`ContractWidePermission`…) | exige código declarado terminado em `:view`, avaliado pela regra da classe (organização ativa ou contrato inteiro) |
+| `AllowAuthenticated` | não fica aberto: exige o `:view` declarado e concedido na organização ativa |
+| `SuperadminPermission` (administração, ADR 0008/0020) | mesma autorização da leitura administrativa, sem organização |
 
 `get_queryset()` fornece o escopo e quaisquer restrições próprias do recurso; não
 deve filtrar inativos, pois isso impediria resolver seleções existentes.

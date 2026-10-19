@@ -2,6 +2,19 @@
 
 from django.utils.translation import gettext_lazy as _
 
+# Ação padrão do DRF → ação do registry, para `permission_resource` (ResourcePermissionMixin).
+# Actions customizadas não entram: ficam negadas até serem declaradas em required_permission.
+RESOURCE_PERMISSION_ACTIONS = {
+    'list': 'view',
+    'retrieve': 'view',
+    'options': 'view',
+    'schema': 'view',
+    'create': 'create',
+    'update': 'update',
+    'partial_update': 'update',
+    'destroy': 'delete',
+}
+
 # Contexto (ADR 0006 §3).
 ORGANIZATION_HEADER = 'X-Organization-Id'
 

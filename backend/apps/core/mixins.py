@@ -6,14 +6,37 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 
-from apps.rbac.permissions import LookupOptionsPermission, RequiredPermission
-
+from .constants import RESOURCE_PERMISSION_ACTIONS
 from .models import HybridScopedModel
 from .responses import build_exception_response, build_result_response
 from .schema import column_schema, filter_schema, model_field
 from .selectors import lookup_options
 from .serializers import OptionsQuerySerializer
 from .utils import context_values
+
+
+class ResourcePermissionMixin:
+    """Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+    `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+    `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+    `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+    actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+    continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+    """
+
+    permission_resource = None
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        resource = cls.__dict__.get('permission_resource')
+        if resource is None:
+            return
+        declared = cls.__dict__.get('required_permission', {})
+        if not isinstance(declared, dict):
+            raise ImproperlyConfigured('With permission_resource, declare required_permission as a dict of overrides.')
+        generated = {action: f'{resource}:{verb}' for action, verb in RESOURCE_PERMISSION_ACTIONS.items()}
+        cls.required_permission = {**generated, **declared}
 
 
 class SerializerDeleteMixin:
@@ -117,15 +140,6 @@ class LookupOptionsMixin:
 
     options_label_field = None
     options_search_fields = ()
-    options_permission_class = LookupOptionsPermission
-
-    def get_permissions(self):
-        permissions = super().get_permissions()
-        if self.action == 'options':
-            # Preserva restrições adicionais (por exemplo, administração).
-            permissions = [permission for permission in permissions if type(permission) is not RequiredPermission]
-            permissions.append(self.options_permission_class())
-        return permissions
 
     @action(detail=False, methods=['get'])
     def options(self, request):

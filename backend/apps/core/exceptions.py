@@ -63,6 +63,20 @@ class ContractNotProvisionable(ProblemException):
     default_detail = _('O provisionamento exige contrato disponível, sem usuários e sem organizações.')
 
 
+class OrganizationInUse(ProblemException):
+    status_code = 409
+    problem_type = 'urn:datasync:problem:organization-in-use'
+    title = _('Organização em uso')
+    default_detail = _('Remova as atribuições e exceções de acesso desta organização antes de excluí-la.')
+
+
+class LastActiveOrganization(ProblemException):
+    status_code = 409
+    problem_type = 'urn:datasync:problem:last-active-organization'
+    title = _('Última organização ativa')
+    default_detail = _('O contrato precisa manter pelo menos uma organização ativa.')
+
+
 class LastContractAdmin(ProblemException):
     status_code = 409
     problem_type = 'urn:datasync:problem:last-contract-admin'

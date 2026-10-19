@@ -11,9 +11,7 @@ from .serializers import OrganizationSerializer
 class OrganizationViewSet(BaseModelViewSet):
     serializer_class = OrganizationSerializer
     filterset_class = OrganizationFilterSet
-    # Permissão concedida em qualquer escopo vale no contrato inteiro (decisões 47 e 50).
     permission_classes = [ContractWidePermission]
-    options_permission_class = ContractWidePermission
     permission_resource = 'organization'
     options_label_field = 'name'
     options_search_fields = ('name',)
@@ -21,7 +19,6 @@ class OrganizationViewSet(BaseModelViewSet):
     schema_filters = ('is_active',)
 
     def get_queryset(self):
-        # Manager com escopo, montado na requisição (o contexto do contrato só existe aqui).
         queryset = Organization.objects.all()
         if self.action in ('update', 'partial_update', 'destroy'):
             return queryset.select_for_update(of=('self',))

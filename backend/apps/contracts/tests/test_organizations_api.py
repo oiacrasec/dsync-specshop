@@ -228,3 +228,13 @@ def test_concurrent_deactivation_keeps_one_active_organization(world):
     with ThreadPoolExecutor(max_workers=2) as pool:
         assert sorted(pool.map(deactivate, (matriz, filial))) == [200, 409]
     assert Organization.objects.filter(contract=world['contract'], is_active=True).count() == 1
+
+
+def test_options_follow_the_view_permission_classes(world):
+    # options usa as mesmas classes da view: view concedido em outra organização vale no contrato.
+    matriz, filial = world['orgs']['Matriz'], world['orgs']['Filial']
+    grant(world, 'organization:view', organization=matriz)
+    grant(world, 'organization:update', organization=filial)
+    response = client(world['maria'], filial).get(URL + 'options/')
+    assert response.status_code == 200, response.content
+    assert [item['label'] for item in response.json()['data']] == ['Filial', 'Matriz']

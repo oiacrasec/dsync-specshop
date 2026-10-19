@@ -1,5 +1,32 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 7.3: CRUD de organizações na área do cliente
+
+- Decisões 50–53 (usuário): editar/excluir com código em qualquer escopo valem no contrato todo;
+  excluir organização em uso → 409; manter uma ativa → 409; nome único sem caixa → 422.
+- rbac: `granted_codes`, `request_grants`/`contract_codes` (concessões uma vez por request),
+  `RequiredPermission.has_context` extraído e `ContractWidePermission`.
+- contracts: `OrganizationViewSet` (`/api/v1/organizations/`), `OrganizationSerializer` CRUD,
+  `OrganizationFilterSet`; administração usa `OrganizationSummarySerializer`. Exceções
+  `OrganizationInUse`/`LastActiveOrganization`, eventos `organization.*` (audit.0009, só choices).
+- 16 testes (contrato inteiro, códigos por ação, contexto, isolamento, nome, última ativa,
+  em uso, auditoria sem nome, essencial, queries constantes, concorrência) + catálogo. Suíte 603.
+- Pedido do usuário: mapa de permissões dinâmico nas bases. `core/mixins.ResourcePermissionMixin`
+  (`permission_resource`, gerado em `__init_subclass__` a partir de
+  `core/constants.RESOURCE_PERMISSION_ACTIONS`); overrides por dict; actions customizadas negadas
+  até declaradas. OrganizationViewSet usa `permission_resource = 'organization'`. 6 testes; 609.
+- Pedido do usuário: options com as mesmas permission_classes da view. Removidos
+  `options_permission_class`, `LookupOptionsPermission` e o `get_permissions` do mixin;
+  `RequiredPermission.has_context` exige `:view` no options e `AllowAuthenticated` delega o
+  options a RequiredPermission. Testes de options inalterados; +1 teste (contrato inteiro). 610.
+
+## 2026-10-18 — Etapa 7.2: resumo de permissões
+
+- `rbac.views.MyPermissionsView` em `GET /api/v1/me/permissions/` (AllowAuthenticated, never_cache):
+  `resolve_organization` + `access_evaluation`; sem acesso → 403 context-forbidden; superadmin e
+  perfil essencial → todos os códigos. 7 testes (efetivos/exceção, 400/403/401, inativo, queries
+  constantes sem escrita). Suíte 585. Doc `docs/api/permissions.md`.
+
 ## 2026-10-18 — KPI vira Dashboards em branco
 
 - Pedido do usuário: a home KPI (dados fictícios do template GIS) virou `/dashboards`, com página

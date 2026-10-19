@@ -60,3 +60,19 @@ def evaluate(grants, organization, *, registry, superuser=False):
             if code in registry and grant.scope in registry.get(code).scopes:
                 permissions.add(code)
     return AccessEvaluation(True, frozenset(permissions))
+
+
+def granted_codes(grants, *, registry, superuser=False):
+    """Códigos concedidos em qualquer escopo do contrato, sem olhar a organização ativa.
+
+    Para recursos cuja permissão vale no contrato inteiro quando dada em qualquer escopo
+    (organizações, ADR 0037). Respeita o escopo permitido de cada código no registry.
+    """
+    if superuser or any(grant.essential for grant in grants):
+        return frozenset(definition.code for definition in registry)
+    return frozenset(
+        code
+        for grant in grants
+        for code in grant.codes
+        if code in registry and grant.scope in registry.get(code).scopes
+    )

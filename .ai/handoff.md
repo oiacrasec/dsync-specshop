@@ -3,20 +3,20 @@
 - **Atualizado em:** 2026-10-18
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 7 = prioridade)
-- **Último commit:** 93792fb fix(frontend): refresh sort icons when clearing table filters
+- **Último commit:** 2ec2e87 docs(adr): treat the dashboards page as a project-owned file
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 7.1 organizações na área do cliente (ADR 0037) — ✅ implementada, **não commitada** (aguarda revisão) |
-| Próximo passo exato | usuário revisar/commitar a 7.1; depois 7.2 (`GET /api/v1/me/permissions/`) |
-| Aguardando o usuário? | sim — revisão do diff da 7.1 |
+| Etapa atual | 7.2 e 7.3 — ✅ concluídas e commitadas |
+| Próximo passo exato | 7.4: tela de organizações no frontend, menu/botões por `/me/permissions/` |
+| Aguardando o usuário? | não — 7.4 autorizada; commit só após revisão |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 (sem commit).
-Pendentes: 7.2 → 7.3 → 7.4; depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3.
+Pendentes: 7.4; depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
   usuário → token), frontend de contratos no Core. audit.0007/0008 aplicadas ao banco local.
@@ -30,8 +30,8 @@ Pendentes: 7.2 → 7.3 → 7.4; depois 5.3, 5.4 (restante: usuários, perfis, at
 
 ## Dúvidas abertas
 
-- 7.3: editar/excluir seguem a lógica da visão? (quem tem `organization:update` em qualquer
-  escopo edita qualquer organização do contrato, ou só as do escopo da concessão). Perguntar.
+- Nenhuma. 7.3 decidida (50–53): código em qualquer escopo vale no contrato todo; em uso 409;
+  última ativa 409; nome único 422. audit.0009 aplicada ao banco local com autorização.
 
 ## Avisos
 
@@ -41,5 +41,6 @@ Pendentes: 7.2 → 7.3 → 7.4; depois 5.3, 5.4 (restante: usuários, perfis, at
 - Regras do frontend em `frontend/AGENTS.md`: reuso antes de tela, URLs só via API_BASE_URL,
   tipo semântico + LOCALE_ID, ids validados/codificados, `safeReturnPath`.
 - Não reativar telas DESABILITADO sem aprovação (a 7.4 reativa organizações, aprovada).
+- Home virou `/dashboards` em branco (KPI removida a pedido); `pages/dashboards/` é arquivo do projeto (ADR 0036).
 - JWT localStorage (ADR 0035); HTTPS/CSP, cache compartilhado/borda/MFA e expurgo antes de produção.
 - npm audit (88 vulns) adiado pelo usuário até o front ficar mais redondo. Push só quando pedido.

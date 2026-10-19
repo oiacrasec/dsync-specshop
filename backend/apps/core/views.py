@@ -7,6 +7,7 @@ from .filters import ValidatedDjangoFilterBackend
 from .mixins import (
     ListFilterMixin,
     LookupOptionsMixin,
+    ResourcePermissionMixin,
     SerializerDeleteMixin,
     TableSchemaMixin,
 )
@@ -21,8 +22,8 @@ def api_not_found(request):
 
 
 # fmt: off
-class BaseModelViewSet(SerializerDeleteMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
-                       viewsets.ModelViewSet,):
+class BaseModelViewSet(ResourcePermissionMixin, SerializerDeleteMixin, ListFilterMixin, LookupOptionsMixin,
+                       TableSchemaMixin, viewsets.ModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'
     lookup_value_converter = 'uuid'
@@ -45,13 +46,12 @@ class BaseAdminModelViewSet(BaseModelViewSet):
     """CRUD global autorizado só ao superadmin, sem contexto organizacional."""
 
     permission_classes = [SuperadminPermission]
-    options_permission_class = SuperadminPermission
     options_label_field = 'name'
     options_search_fields = ('name',)
 
 
 # fmt: off
-class BaseReadOnlyModelViewSet(ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
+class BaseReadOnlyModelViewSet(ResourcePermissionMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
                                viewsets.ReadOnlyModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'

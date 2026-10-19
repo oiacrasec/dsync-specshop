@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.decorators import action
 
 from apps.contracts.models import Contract, Plan
-from apps.contracts.serializers import OrganizationSerializer
 from apps.core.responses import build_exception_response, build_result_response
 from apps.core.views import BaseAdminModelViewSet
 from apps.rbac.selectors import contract_admin_users
+from apps.rbac.serializers import OrganizationSummarySerializer
 from apps.users.serializers import UserSummarySerializer
 
 from .filters import ContractFilterSet, PlanFilterSet
@@ -41,7 +41,7 @@ class ContractViewSet(BaseAdminModelViewSet):
                 contract=contract, actor=request.user, **serializer.validated_data
             )
             result = {
-                'organization': OrganizationSerializer(organization).data,
+                'organization': OrganizationSummarySerializer(organization).data,
                 'user': UserSummarySerializer(user).data,
                 'temporary_password': temporary_password,
             }
