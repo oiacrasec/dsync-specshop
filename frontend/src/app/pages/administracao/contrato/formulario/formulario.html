@@ -129,22 +129,8 @@
     </div>
 
     @if (provisionResult; as result) {
-    <div role="status" class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
-        <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária (exibida uma única vez)</div>
-        <div class="text-sm text-amber-900 dark:text-amber-100">Usuário: <strong>{{ result.user.username }}</strong> · Organização: <strong>{{ result.organization.name }}</strong></div>
-        <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ result.temporary_password }}</div>
-        <div>
-            <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyPassword(result.temporary_password)"></ui-button>
-        </div>
-    </div>
+    <app-temporary-password [username]="result.user.username" [detail]="'Organização: ' + result.organization.name" [password]="result.temporary_password" />
     } @if (resetResult; as result) {
-    <div role="status" class="mt-4 border border-amber-300 dark:border-amber-700 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/20 flex flex-col gap-3">
-        <div class="font-medium text-amber-900 dark:text-amber-200">Senha temporária redefinida (exibida uma única vez)</div>
-        <div class="text-sm text-amber-900 dark:text-amber-100">Usuário: <strong>{{ result.user.username }}</strong></div>
-        <div class="font-mono text-lg tracking-wide text-amber-900 dark:text-amber-100">{{ result.temporary_password }}</div>
-        <div>
-            <ui-button label="Copiar senha" icon="pi pi-copy" severity="secondary" (onClick)="copyPassword(result.temporary_password)"></ui-button>
-        </div>
-    </div>
+    <app-temporary-password [username]="result.user.username" [password]="result.temporary_password" title="Senha temporária redefinida (exibida uma única vez)" />
     }
 </div>

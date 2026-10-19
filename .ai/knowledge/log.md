@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Etapa 8.1: usuários do contrato
+
+- Decisões 54–57: gestão reservada; username + nome; senha temporária; etapas 8.1→8.2→8.3 com a aba
+  de permissões no layout do GIS (analisado a pedido do usuário).
+- Backend: registry `user:view`/`user:delete` (reservadas); `UserViewSet` em `/api/v1/users/`
+  (`users/urls.py` passa a montar `auth/…` e o router); `ContractUserSerializer` (save_user, senha
+  temporária uma vez, username único global); reset em `user:manage`; eventos `user.*` (audit.0010).
+  `BaseFilterSet.default_ordering` e `ListQuerySerializer.ordering` sem default fixo `name`.
+  10 testes; suíte 623.
+- Frontend: tela de usuários reativada (lista, form, reset com confirmação, permissões `USER_*`);
+  componente compartilhado `app-temporary-password` (também no formulário de contrato);
+  `error-message.ts` do GIS removido. 78 testes.
+- Pendência: tela de Configurações (tema) no menu do avatar, depois do Bloco 8.
+
 ## 2026-10-18 — Etapa 7.4: organizações no frontend
 
 - `PermissionContextService` real: `/me/permissions/` uma vez por sessão+organização, signal, nega

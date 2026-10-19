@@ -16,6 +16,7 @@ import { UiConfirmDialog } from '@/app/shared/ui/confirm-dialog/confirm-dialog';
 import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
 import { UiInputNumber } from '@/app/shared/ui/input-number/input-number';
 import { UiInputText } from '@/app/shared/ui/input-text/input-text';
+import { TemporaryPasswordNotice } from '@/app/shared/ui/temporary-password/temporary-password';
 import { Contract, ContractAdmin, ContractAdminPasswordReset, ContractProvision, ContractProvisionResult, ContractWrite } from '@/app/types/contrato';
 
 type ContractTab = 'principal' | 'primeiro-acesso' | 'administradores';
@@ -27,7 +28,7 @@ const MAX_RETENTION_DAYS = 365;
 @Component({
     selector: 'app-contrato-formulario',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiAutocomplete, UiInputNumber, UiInputText, UiInputDate, UiButton, UiCheckbox, UiConfirmDialog, TabsModule, TagModule],
+    imports: [CommonModule, ReactiveFormsModule, UiAutocomplete, UiInputNumber, UiInputText, UiInputDate, UiButton, UiCheckbox, UiConfirmDialog, TabsModule, TagModule, TemporaryPasswordNotice],
     templateUrl: './formulario.html',
     providers: [ConfirmationService]
 })
@@ -210,29 +211,6 @@ export class ContratoFormPage implements OnInit {
 
     isResetting(adminPublicId: string) {
         return this.resettingAdminIds.has(adminPublicId);
-    }
-
-    copyPassword(password: string | undefined) {
-        if (!password) {
-            return;
-        }
-
-        navigator.clipboard
-            .writeText(password)
-            .then(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Senha copiada',
-                    detail: 'Senha temporária copiada para a área de transferência.'
-                });
-            })
-            .catch(() => {
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Cópia indisponível',
-                    detail: 'Não foi possível copiar automaticamente. Copie manualmente.'
-                });
-            });
     }
 
     private resetPassword(admin: ContractAdmin) {

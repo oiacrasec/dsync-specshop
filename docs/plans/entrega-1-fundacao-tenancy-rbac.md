@@ -63,6 +63,10 @@ e só começa após aprovação do usuário.
 | 51 | Excluir organização que é escopo de atribuição ou alvo de exceção → 409 `organization-in-use` |
 | 52 | O contrato mantém pelo menos uma organização ativa → 409 `last-active-organization` |
 | 53 | Nome de organização único no contrato, sem diferenciar maiúsculas → 422 |
+| 54 | 5.4 (usuário): gestão de usuários, perfis e atribuições continua reservada ao admin do contrato (ADR 0009 §3.1) |
+| 55 | Usuário cadastrado pelo admin do contrato: `username` + nome (LGPD, necessidade) |
+| 56 | Senha inicial temporária gerada no servidor, exibida uma vez, troca obrigatória |
+| 57 | 5.4 em etapas: 8.1 usuários → 8.2 perfis → 8.3 permissões do usuário (layout da aba de permissões do GIS) |
 
 ## Bloco 0 — Fundação
 
@@ -161,3 +165,15 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 | 7.2 | `GET /api/v1/me/permissions/`: códigos efetivos na organização ativa, para a interface | backend | 0037, 0009 §4 | ✅ |
 | 7.3 | CRUD de organizações em `/api/v1/organizations/` (lista, detalhe, options, schema, criar, editar, excluir), RBAC, auditoria e isolamento | backend | 0037, 0006 | ✅ |
 | 7.4 | Frontend: tela de organizações no Core, `PermissionContextService` ligado ao 7.2, menu e botões por permissão | frontend | 0037, 0035 | ✅ |
+
+## Bloco 8 — Usuários, perfis e permissões na área do cliente (5.4, decisões 54 a 57)
+
+| # | Etapa | Lado | ADR | Status |
+|---|---|---|---|---|
+| 8.1 | Usuários: `/api/v1/users/` (CRUD, redefinir senha, `user:view`/`user:delete` reservadas) e telas | backend + frontend | 0009, 0015 | ✅ |
+| 8.2 | Perfis do cliente e suas permissões (catálogo do registry com rótulos) | backend + frontend | 0009, 0016 | ⬜ |
+| 8.3 | Aba "Permissões" do usuário: organizações à esquerda, grade por recurso, aplicar perfil, admin do contrato | backend + frontend | 0009 | ⬜ |
+
+Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configurações** no menu do
+avatar, com as opções de tema (cor primária, preset Aura/Lara/Nora, claro/escuro) e remoção do
+painel "Settings" da tela de login.

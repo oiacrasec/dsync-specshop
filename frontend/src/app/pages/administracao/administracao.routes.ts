@@ -70,47 +70,7 @@ export default [
             requireContext: true,
             requiredPermission: PERMISSION_KEYS.ORGANIZATION_UPDATE
         }
-    }
-    /* DESABILITADO: fora do escopo atual
-    {
-        path: 'setor',
-        canActivate: [accessGuard, permissionGuard],
-        loadComponent: () => import('@/app/pages/administracao/setor/setor').then((c) => c.SetorPage),
-        data: {
-            breadcrumb: 'Setores',
-            audience: ACCESS_AUDIENCE.COMMON,
-            requireContext: true,
-            requiredPermission: PERMISSION_KEYS.SETOR_VIEW
-        }
     },
-    */
-    /* DESABILITADO: fora do escopo atual
-    {
-        path: 'setor/novo',
-        canActivate: [accessGuard, permissionGuard],
-        loadComponent: () => import('@/app/pages/administracao/setor/formulario/formulario').then((c) => c.SetorFormPage),
-        data: {
-            breadcrumb: 'Novo setor',
-            audience: ACCESS_AUDIENCE.COMMON,
-            requireContext: true,
-            requiredPermission: PERMISSION_KEYS.SETOR_CREATE
-        }
-    },
-    */
-    /* DESABILITADO: fora do escopo atual
-    {
-        path: 'setor/:id',
-        canActivate: [accessGuard, permissionGuard],
-        loadComponent: () => import('@/app/pages/administracao/setor/formulario/formulario').then((c) => c.SetorFormPage),
-        data: {
-            breadcrumb: 'Editar setor',
-            audience: ACCESS_AUDIENCE.COMMON,
-            requireContext: true,
-            requiredPermission: PERMISSION_KEYS.SETOR_UPDATE
-        }
-    },
-    */
-    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario',
         canActivate: [accessGuard, permissionGuard],
@@ -119,11 +79,9 @@ export default [
             breadcrumb: 'Usuários',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
+            requiredPermission: PERMISSION_KEYS.USER_VIEW
         }
     },
-    */
-    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario/novo',
         canActivate: [accessGuard, permissionGuard],
@@ -132,11 +90,9 @@ export default [
             breadcrumb: 'Novo usuário',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
+            requiredPermission: PERMISSION_KEYS.USER_CREATE
         }
     },
-    */
-    /* DESABILITADO: fora do escopo atual
     {
         path: 'usuario/:id',
         canActivate: [accessGuard, permissionGuard],
@@ -145,8 +101,7 @@ export default [
             breadcrumb: 'Editar usuário',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
-            requiredPermission: PERMISSION_KEYS.USUARIO_MANAGE
+            requiredPermission: PERMISSION_KEYS.USER_UPDATE
         }
     }
-    */
 ] as Routes;

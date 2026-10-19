@@ -29,7 +29,7 @@ export default tseslint.config(
             '!src/app/pages/examples/notfound/**/*',
             '!src/app/pages/examples/oops/**/*',
             'src/app/pages/geoespacial/**/*',
-            'src/app/pages/administracao/{setor,cidade,usuario}/**/*',
+            'src/app/pages/administracao/{setor,cidade}/**/*',
             'src/app/pages/auth/{register,forgotpassword,newpassword,verification,lockscreen}.ts'
         ]
     },

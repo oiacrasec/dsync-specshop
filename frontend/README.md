@@ -77,6 +77,12 @@ Custo: ~80 KB a mais no CSS inicial (~13 KB comprimido); as fontes só baixam qu
 O aviso de orçamento do bundle inicial é 2 MB (decisão do usuário; erro em 5 MB).
 Os prefixos não colidem com o PrimeIcons.
 
+## Usuários (etapa 8.1)
+
+Menu "Usuários" (`user:view`, reservado ao admin do contrato): lista, criação (senha temporária
+exibida uma vez pelo componente `app-temporary-password`), edição, exclusão e redefinição de senha
+com confirmação. Aba de permissões entra na 8.3.
+
 ## Organizações (etapa 7.4)
 
 Menu "Organizações" da área do cliente (ADR 0037): lista, criação, edição e exclusão em

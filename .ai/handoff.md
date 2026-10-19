@@ -9,13 +9,13 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Bloco 7 concluído e commitado (7.1–7.4), mais Font Awesome e ícones booleanos |
-| Próximo passo exato | usuário escolher: 5.3/5.4 (usuários, perfis, atribuições) ou 5.5 (OpenAPI) |
-| Aguardando o usuário? | sim — próxima prioridade |
+| Etapa atual | 8.1 usuários do contrato — ✅ concluída e commitada; audit.0010 aplicada |
+| Próximo passo exato | 8.2: perfis do cliente e catálogo de permissões com rótulos |
+| Aguardando o usuário? | não — 8.2 autorizada; commit só após revisão |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4 · 8.1.
 Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
@@ -44,4 +44,5 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 - Home virou `/dashboards` em branco (KPI removida a pedido); `pages/dashboards/` é arquivo do projeto (ADR 0036).
 - JWT localStorage (ADR 0035); HTTPS/CSP, cache compartilhado/borda/MFA e expurgo antes de produção.
 - Font Awesome Free 7.3.1 por classe (atribuição CC BY no README do frontend); orçamento de aviso 2 MB.
+- Pendência pedida: tela de Configurações (tema) no menu do avatar, sem o painel Settings no login; depois do Bloco 8.
 - npm audit (88 vulns) adiado pelo usuário até o front ficar mais redondo. Push só quando pedido.
