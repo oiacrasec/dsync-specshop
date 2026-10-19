@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — Ajustes de UX após teste do usuário
+
+- Topbar em tela pequena: botão do menu junto ao breadcrumb, só o logo à direita (commit 4f7610e).
+- AppLayout sem menu (seleção de organização e troca de senha após login) centraliza o card na
+  vertical; layout completo inalterado.
+- Seleção de organização: com exatamente uma organização disponível (a API lista só ativas) e que
+  ainda não é a ativa, entra direto; com mais de uma, ou já ativa, mantém a tela. 60 testes.
+
 ## 2026-10-18 — Tipo nas colunas do schema e locale pt-BR
 
 - Pedido do usuário: máscara de data na grid de contratos. Escolha do usuário pensando em

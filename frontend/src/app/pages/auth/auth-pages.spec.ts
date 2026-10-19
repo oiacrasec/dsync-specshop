@@ -17,6 +17,11 @@ import { ContextoSelecaoPage } from './contexto-selecao';
 
 const USER_ID = '019a0000-0000-7000-8000-000000000001';
 const ORG_ID = '019a0000-0000-7000-8000-000000000002';
+const OTHER_ORG_ID = '019a0000-0000-7000-8000-000000000003';
+const TWO_ORGS = [
+    { public_id: ORG_ID, name: 'Organização' },
+    { public_id: OTHER_ORG_ID, name: 'Outra organização' }
+];
 
 function response(overrides: Partial<LoginResponse['user']> = {}): LoginResponse {
     const token = `e30.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
@@ -118,8 +123,9 @@ describe('Core auth pages and route guards', () => {
         const fixture = TestBed.createComponent(ContextoSelecaoPage);
 
         fixture.detectChanges();
-        controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
+        controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
         await fixture.whenStable();
+        expect(open).not.toHaveBeenCalled();
         const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
 
         expect(fixture.nativeElement.querySelector('label').htmlFor).toBe(select.id);
@@ -178,12 +184,36 @@ describe('Core auth pages and route guards', () => {
 
         page.ngOnInit();
         page.loadOrganizations();
-        controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
+        controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
+        expect(open).not.toHaveBeenCalled();
         page.form.controls.organization.setValue(ORG_ID);
         page.confirm();
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
         expect(open).toHaveBeenCalledWith('/kpi');
         controller.expectNone('/api/v1/me/permissoes-contexto/');
+    });
+
+    it('enters the only available organization directly, preserving returnUrl rules', () => {
+        session.setSession(response());
+        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const open = spyOn(contexts, 'openContext');
+
+        page.ngOnInit();
+        controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
+        expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
+        expect(open).toHaveBeenCalledOnceWith('/kpi');
+    });
+
+    it('keeps the screen when the only organization is already active (switch from inside the app)', () => {
+        session.setSession(response());
+        contexts.setActiveContext({ organization_public_id: ORG_ID, organization_name: 'Organização' });
+        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const open = spyOn(contexts, 'openContext');
+
+        page.ngOnInit();
+        controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
+        expect(open).not.toHaveBeenCalled();
+        expect(page.form.controls.organization.value).toBe(ORG_ID);
     });
 
     it('rejects a manually inserted organization outside the accessible list', () => {

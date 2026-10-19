@@ -9,6 +9,7 @@ login → POST /api/v1/auth/login/ → access + refresh + user
   superadmin → /kpi (sem organização)
   comum marcado → trocar senha → resumo user atualizado → selecionar organização
   comum → GET /api/v1/me/organizations/ → selecionar UUID → abrir conteúdo
+         (só uma organização ativa e ainda não ativa → entra direto, sem mostrar a seleção)
 
 requisição → Bearer + X-Organization-Id (somente área de negócio)
 access expirando → lock entre abas → refresh único → repetir pedido, no máximo uma vez
@@ -46,6 +47,9 @@ primeiro acesso. Erros de contexto voltam à seleção; 403 de permissão não a
 422 mostra `errors`; payload não reconhecido usa mensagem segura. Respostas de sessão
 ou organização anterior são descartadas. Confirmar a organização exige um UUID da
 lista acessível, mas isso não substitui a validação RBAC do backend.
+
+Sem menu (após login, sem organização ou com troca de senha pendente), o `AppLayout` centraliza o card
+na vertical. Troca de organização aberta de dentro do app continua no layout completo.
 
 Senhas: autocomplete apropriado, mínimo de 12 caracteres e confirmação na UI;
 validadores completos continuam no Django. Senhas não entram no storage e campos

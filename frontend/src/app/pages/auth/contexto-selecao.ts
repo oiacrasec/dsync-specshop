@@ -79,7 +79,17 @@ export class ContextoSelecaoPage implements OnInit {
 
                     this.organizations.set(organizations);
                     this.contexts.syncActiveContextLabelsFromAvailableContexts(organizations);
-                    this.form.controls.organization.setValue(this.contexts.getActiveContext()?.organization_public_id ?? '');
+                    const activeId = this.contexts.getActiveContext()?.organization_public_id;
+
+                    // Única organização disponível (a API só lista ativas): entra direto. Com mais de uma,
+                    // ou se ela já é a ativa (troca aberta de dentro do app), o usuário escolhe na tela.
+                    if (organizations.length === 1 && organizations[0].public_id !== activeId) {
+                        this.enter(organizations[0]);
+
+                        return;
+                    }
+
+                    this.form.controls.organization.setValue(activeId ?? '');
                 },
                 error: (error) => this.errorMessage.set(problemMessage(error, 'Não foi possível carregar as organizações.'))
             });
@@ -99,6 +109,10 @@ export class ContextoSelecaoPage implements OnInit {
             return;
         }
 
+        this.enter(organization);
+    }
+
+    private enter(organization: AvailableOrganization) {
         this.contexts.setActiveContext({ organization_public_id: organization.public_id, organization_name: organization.name });
         // Recria também esta aba: componentes e chamadas anteriores são descartados.
         this.contexts.openContext(this.route.snapshot.queryParamMap.get('returnUrl'));
