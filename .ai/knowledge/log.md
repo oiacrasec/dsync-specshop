@@ -7,6 +7,11 @@
   vertical; layout completo inalterado.
 - Seleção de organização: com exatamente uma organização disponível (a API lista só ativas) e que
   ainda não é a ativa, entra direto; com mais de uma, ou já ativa, mantém a tela. 60 testes.
+- Revisão automática de segurança (open redirect): `returnUrl` passava por checagem textual e
+  `/\t/host` virava `//host`. `core/utils/return-url.safeReturnPath` recusa controle/espaço/`\`,
+  exige mesma origem via `URL` e bloqueia telas de entrada; usado em `openContext`.
+- "Limpar" do ui-filter emite `cleared`; ui-table zera a ordenação (estado e ícones do p-table, sem
+  outro onLazyLoad) e o filtersChange seguinte busca sem `ordering`. 64 testes.
 
 ## 2026-10-18 — Tipo nas colunas do schema e locale pt-BR
 

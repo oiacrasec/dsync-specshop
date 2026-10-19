@@ -53,6 +53,8 @@ export class UiFilter implements OnChanges, OnDestroy {
 
     @Input() filters: UiFilterField[] = [];
     @Output() filtersChange = new EventEmitter<Record<string, any>>();
+    /** Emitido pelo botão "Limpar", antes do filtersChange vazio (a tabela também zera a ordenação). */
+    @Output() cleared = new EventEmitter<void>();
 
     advancedOpen = false;
     generalTerm = '';
@@ -144,6 +146,7 @@ export class UiFilter implements OnChanges, OnDestroy {
     clear() {
         this.generalTerm = '';
         this.advancedValues = {};
+        this.cleared.emit();
         this.emitFilters();
     }
 

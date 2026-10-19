@@ -1,5 +1,5 @@
 @if (tableFilters.length) {
-<ui-filter [filters]="tableFilters" (filtersChange)="handleFiltersChange($event)"></ui-filter>
+<ui-filter [filters]="tableFilters" (cleared)="handleFiltersCleared()" (filtersChange)="handleFiltersChange($event)"></ui-filter>
 }
 
 <p-table

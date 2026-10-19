@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ContentChild, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ContentChild, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -145,6 +145,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     @Output() lazyLoad = new EventEmitter<TableLazyLoadEvent>();
 
     @ContentChild('actions', { read: TemplateRef }) actionsTemplate?: TemplateRef<any>;
+    @ViewChild(Table) private table?: Table;
 
     private destroy$ = new Subject<void>();
     private internalValue: T[] = [];
@@ -214,6 +215,18 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         }
 
         this.fetch();
+    }
+
+    /** "Limpar" também volta à ordenação padrão da API; o filtersChange seguinte refaz a busca. */
+    handleFiltersCleared() {
+        this.sortField = undefined;
+        this.sortOrder = undefined;
+
+        if (this.table) {
+            // Atribuição direta (sem binding): não dispara outro onLazyLoad, só limpa os ícones.
+            this.table.sortField = undefined;
+            this.table.sortOrder = 1;
+        }
     }
 
     handleFiltersChange(query: Record<string, any>) {
