@@ -1,4 +1,4 @@
-const DEFAULT_PATH = '/kpi';
+const DEFAULT_PATH = '/dashboards';
 // Telas de autenticação/contexto nunca são destino de retorno (evita voltar ao fluxo de entrada).
 const BLOCKED_PATH = /^\/(contexto|primeiro-acesso|landing)(\/|$)/;
 

@@ -6,7 +6,7 @@ Implementado na etapa 6.5, conforme ADR 0035 da documentação global.
 
 ```text
 login → POST /api/v1/auth/login/ → access + refresh + user
-  superadmin → /kpi (sem organização)
+  superadmin → /dashboards (sem organização)
   comum marcado → trocar senha → resumo user atualizado → selecionar organização
   comum → GET /api/v1/me/organizations/ → selecionar UUID → abrir conteúdo
          (só uma organização ativa e ainda não ativa → entra direto, sem mostrar a seleção)

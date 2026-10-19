@@ -21,7 +21,7 @@
   negócio comum. RFC 9457: refresh máximo uma repetição; auth/contrato → login;
   password-change-required → troca; contexto → seleção; 403 permissão preserva sessão.
   Respostas de sessão/contexto anterior descartadas. ETag global URL-only desabilitado.
-- Login superadmin → kpi; comum marcado → troca (12+ caracteres/confirmar na UI,
+- Login superadmin → dashboards; comum marcado → troca (12+ caracteres/confirmar na UI,
   validadores completos Django), depois seleção; comum → seleção de organizações
   acessíveis array {public_id,name}. Sem id interno/contrato/setores no contexto.
 - Guards UX; backend autoriza. PermissionContextService legado sem endpoint no

@@ -69,7 +69,8 @@ docker build -t datasync-core-frontend .
 ```
 
 Telas ativas (etapa 6.2): login, primeiro acesso, seleção de organização, administração
-de contratos, home KPI (dados fictícios do template) e páginas de erro. As demais ficam
+de contratos, home **Dashboards** (`/dashboards`, em branco no core:
+cada projeto derivado implementa os seus) e páginas de erro. As demais ficam
 comentadas nas rotas e no menu com `DESABILITADO: fora do escopo atual`
 (`grep -rn DESABILITADO src`). Padrões herdados: [docs/standards/patterns-frontend.md](docs/standards/patterns-frontend.md).
 Regras para agentes: [AGENTS.md](AGENTS.md). `LICENSE.md` mantém o aviso da PrimeTek.

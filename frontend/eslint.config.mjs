@@ -26,7 +26,6 @@ export default tseslint.config(
     {
         ignores: [
             'src/app/pages/examples/**/*',
-            '!src/app/pages/examples/dashboards/kpi/**/*',
             '!src/app/pages/examples/notfound/**/*',
             '!src/app/pages/examples/oops/**/*',
             'src/app/pages/geoespacial/**/*',

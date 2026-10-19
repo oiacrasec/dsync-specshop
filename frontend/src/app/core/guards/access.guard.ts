@@ -7,7 +7,7 @@ import { ACCESS_AUDIENCE, AccessAudience, AccessGuardData } from '@/app/core/tok
 
 const CONTEXT_SELECTION_PATH = '/contexto/selecao';
 const FIRST_ACCESS_PASSWORD_PATH = '/primeiro-acesso/trocar-senha';
-const ADMIN_HOME_PATH = '/kpi';
+const ADMIN_HOME_PATH = '/dashboards';
 
 function resolveGuardData(route: ActivatedRouteSnapshot): Required<AccessGuardData> {
     let audience: AccessAudience = ACCESS_AUDIENCE.AUTHENTICATED;

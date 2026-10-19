@@ -328,7 +328,7 @@ export class AppTopbar {
 
     switchContext(event: Event) {
         event.preventDefault();
-        const currentUrl = this.router.url || '/kpi';
+        const currentUrl = this.router.url || '/dashboards';
 
         this.router.navigate(['/contexto/selecao'], { queryParams: { returnUrl: currentUrl } });
     }

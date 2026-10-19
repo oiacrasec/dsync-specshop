@@ -18,7 +18,7 @@ export const appRoutes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: 'kpi',
+                redirectTo: 'dashboards',
                 pathMatch: 'full'
             },
             {
@@ -43,11 +43,11 @@ export const appRoutes: Routes = [
                 }
             },
             {
-                path: 'kpi',
+                path: 'dashboards',
                 canActivate: [accessGuard],
-                loadComponent: () => import('@/app/pages/examples/dashboards/kpi/kpidashboard').then((c) => c.KpiDashboard),
+                loadComponent: () => import('@/app/pages/dashboards/dashboards').then((c) => c.DashboardsPage),
                 data: {
-                    breadcrumb: 'KPI',
+                    breadcrumb: 'Dashboards',
                     audience: ACCESS_AUDIENCE.AUTHENTICATED
                 }
             },

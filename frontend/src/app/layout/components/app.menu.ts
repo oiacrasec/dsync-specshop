@@ -34,9 +34,9 @@ export class AppMenu {
             path: '/dashboards',
             items: [
                 {
-                    label: 'KPI',
+                    label: 'Dashboards',
                     icon: 'pi pi-fw pi-chart-line',
-                    routerLink: ['/kpi']
+                    routerLink: ['/dashboards']
                 }
             ]
         },

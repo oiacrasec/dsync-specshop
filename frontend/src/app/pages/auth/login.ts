@@ -124,7 +124,7 @@ export class Login {
         const user = this.authSession.getUser();
 
         if (user?.is_superuser) {
-            this.router.navigateByUrl('/kpi');
+            this.router.navigateByUrl('/dashboards');
 
             return;
         }

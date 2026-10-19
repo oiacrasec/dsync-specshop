@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-18 — KPI vira Dashboards em branco
+
+- Pedido do usuário: a home KPI (dados fictícios do template GIS) virou `/dashboards`, com página
+  `pages/dashboards/` vazia no core; projetos derivados implementam os seus. Removida a pasta
+  `pages/examples/dashboards/kpi`; rotas, menu, guard, login, acesso negado, topbar e
+  `safeReturnPath` usam `/dashboards`. 64 testes; bundle inicial ~1,24 MB.
+
 ## 2026-10-18 — Etapa 7.1: organizações na área do cliente (ADR 0037)
 
 - Revisão do ADR 0032 com o usuário (decisões 45–49): organizações só na área do cliente;

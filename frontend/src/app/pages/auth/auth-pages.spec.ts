@@ -46,7 +46,7 @@ describe('Core auth pages and route guards', () => {
                 provideHttpClient(),
                 provideHttpClientTesting(),
                 { provide: API_BASE_URL, useValue: '/api/v1' },
-                { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: () => '/kpi' } } } },
+                { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: { get: () => '/dashboards' } } } },
                 MessageService
             ]
         });
@@ -71,7 +71,7 @@ describe('Core auth pages and route guards', () => {
         page.form.setValue({ username: 'tester', password: 'temporary' });
         page.submit();
         controller.expectOne('/api/v1/auth/login/').flush(response({ is_superuser: true }));
-        expect(navigate).toHaveBeenCalledWith('/kpi');
+        expect(navigate).toHaveBeenCalledWith('/dashboards');
         expect(page.form.controls.password.value).toBe('');
     });
 
@@ -133,7 +133,7 @@ describe('Core auth pages and route guards', () => {
         select.value = ORG_ID;
         select.dispatchEvent(new Event('change'));
         fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-        expect(open).toHaveBeenCalledWith('/kpi');
+        expect(open).toHaveBeenCalledWith('/dashboards');
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
     });
 
@@ -189,7 +189,7 @@ describe('Core auth pages and route guards', () => {
         page.form.controls.organization.setValue(ORG_ID);
         page.confirm();
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
-        expect(open).toHaveBeenCalledWith('/kpi');
+        expect(open).toHaveBeenCalledWith('/dashboards');
         controller.expectNone('/api/v1/me/permissoes-contexto/');
     });
 
@@ -201,7 +201,7 @@ describe('Core auth pages and route guards', () => {
         page.ngOnInit();
         controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
-        expect(open).toHaveBeenCalledOnceWith('/kpi');
+        expect(open).toHaveBeenCalledOnceWith('/dashboards');
     });
 
     it('keeps the screen when the only organization is already active (switch from inside the app)', () => {
@@ -236,20 +236,20 @@ describe('Core auth pages and route guards', () => {
     }
 
     it('redirects unauthenticated users to login', () => {
-        expect(router.serializeUrl(guard('/kpi') as ReturnType<Router['createUrlTree']>)).toBe('/landing/login');
+        expect(router.serializeUrl(guard('/dashboards') as ReturnType<Router['createUrlTree']>)).toBe('/landing/login');
     });
 
     it('blocks business routes until the mandatory password change', () => {
         session.setSession(response({ must_change_password: true }));
-        expect(router.serializeUrl(guard('/kpi') as ReturnType<Router['createUrlTree']>)).toContain('/primeiro-acesso/trocar-senha');
+        expect(router.serializeUrl(guard('/dashboards') as ReturnType<Router['createUrlTree']>)).toContain('/primeiro-acesso/trocar-senha');
         expect(guard('/primeiro-acesso/trocar-senha')).toBeTrue();
     });
 
     it('requires organization for ordinary users but exempts superadmins', () => {
         session.setSession(response());
-        expect(router.serializeUrl(guard('/kpi') as ReturnType<Router['createUrlTree']>)).toContain('/contexto/selecao');
+        expect(router.serializeUrl(guard('/dashboards') as ReturnType<Router['createUrlTree']>)).toContain('/contexto/selecao');
         session.setSession(response({ is_superuser: true }));
-        expect(guard('/kpi')).toBeTrue();
+        expect(guard('/dashboards')).toBeTrue();
     });
 
     it('denies administrative routes to ordinary users', () => {

@@ -182,6 +182,6 @@ export class Access {
             return;
         }
 
-        void this.router.navigateByUrl('/kpi');
+        void this.router.navigateByUrl('/dashboards');
     }
 }
