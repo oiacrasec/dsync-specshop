@@ -39,6 +39,24 @@ class ResourcePermissionMixin:
         cls.required_permission = {**generated, **declared}
 
 
+class ModelQuerysetMixin:
+    """`model = X` monta `X.objects.all()` a cada requisição (manager com escopo de tenant).
+
+    Recursos da área do cliente não podem declarar `queryset` na classe: o manager exige o
+    contexto, que só existe na requisição. Recursos globais (administração) seguem com
+    `queryset = X.objects.unscoped()` (ADR 0028). Declarar os dois é erro de configuração.
+    """
+
+    model = None
+
+    def get_queryset(self):
+        if self.model is None:
+            return super().get_queryset()
+        if self.queryset is not None:
+            raise ImproperlyConfigured('Declare model or queryset, not both.')
+        return self.model.objects.all()
+
+
 class SerializerDeleteMixin:
     """Exclusão com autoria e auditoria pelo serializer base."""
 

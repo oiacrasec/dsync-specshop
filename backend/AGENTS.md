@@ -222,7 +222,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `permission_resource = '<recurso>'` (ResourcePermissionMixin gera view/create/update/delete);
   `required_permission` (dict) sobrescreve ações citadas e declara actions customizadas, que
   nunca recebem código automático. Nunca deduzir o recurso do nome do model (ADR 0021).
-  `options` usa as mesmas `permission_classes` da view; a regra do `:view` fica nas classes. Contexto pelo header `X-Organization-Id`
+  `options` usa as mesmas `permission_classes` da view; a regra do `:view` fica nas classes.
+  Recurso de tenant nas bases: declarar `model = X` (queryset com escopo montado na requisição e
+  lock em update/destroy pela base); nunca `queryset` de classe com manager com escopo nem os dois. Contexto pelo header `X-Organization-Id`
   (`apps/core/context.py`, preenche `request.organization`); superadmin também precisa do
   header em endpoint de negócio (400 sem ele). Contrato indisponível → 403 na autenticação. Cálculo puro em
   `apps/rbac/evaluation.py`; leitura em `selectors.user_grants`, uma vez por requisição.

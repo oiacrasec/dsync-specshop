@@ -172,6 +172,11 @@ class OrganizationViewSet(BaseModelViewSet):
 
 A área administrativa usa `SuperadminPermission` e não lê esse mapa.
 
+Recursos da área do cliente declaram `model = Organization` em vez de `queryset`: o
+`ModelQuerysetMixin` monta `Organization.objects.all()` (manager com escopo) a cada requisição, e o
+`BaseModelViewSet` aplica o lock de update/destroy. Recursos globais da administração continuam
+com `queryset = X.objects.unscoped()` (ADR 0028). Declarar os dois falha.
+
 `options` usa as mesmas `permission_classes` da view (não existe `options_permission_class`):
 as classes de permissão garantem o `:view` no `options` ([contrato](../../../docs/api/options.md)).
 

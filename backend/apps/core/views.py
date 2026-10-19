@@ -7,6 +7,7 @@ from .filters import ValidatedDjangoFilterBackend
 from .mixins import (
     ListFilterMixin,
     LookupOptionsMixin,
+    ModelQuerysetMixin,
     ResourcePermissionMixin,
     SerializerDeleteMixin,
     TableSchemaMixin,
@@ -23,7 +24,7 @@ def api_not_found(request):
 
 # fmt: off
 class BaseModelViewSet(ResourcePermissionMixin, SerializerDeleteMixin, ListFilterMixin, LookupOptionsMixin,
-                       TableSchemaMixin, viewsets.ModelViewSet,):
+                       TableSchemaMixin, ModelQuerysetMixin, viewsets.ModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'
     lookup_value_converter = 'uuid'
@@ -52,7 +53,7 @@ class BaseAdminModelViewSet(BaseModelViewSet):
 
 # fmt: off
 class BaseReadOnlyModelViewSet(ResourcePermissionMixin, ListFilterMixin, LookupOptionsMixin, TableSchemaMixin,
-                               viewsets.ReadOnlyModelViewSet,):
+                               ModelQuerysetMixin, viewsets.ReadOnlyModelViewSet,):
     # fmt: on
     lookup_field = 'public_id'
     lookup_value_converter = 'uuid'

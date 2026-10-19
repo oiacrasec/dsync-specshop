@@ -9,6 +9,7 @@ from .serializers import OrganizationSerializer
 
 
 class OrganizationViewSet(BaseModelViewSet):
+    model = Organization
     serializer_class = OrganizationSerializer
     filterset_class = OrganizationFilterSet
     permission_classes = [ContractWidePermission]
@@ -17,9 +18,3 @@ class OrganizationViewSet(BaseModelViewSet):
     options_search_fields = ('name',)
     schema_columns = ('name', 'is_active')
     schema_filters = ('is_active',)
-
-    def get_queryset(self):
-        queryset = Organization.objects.all()
-        if self.action in ('update', 'partial_update', 'destroy'):
-            return queryset.select_for_update(of=('self',))
-        return queryset

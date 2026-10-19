@@ -63,3 +63,29 @@ def test_subclass_does_not_mutate_the_parent_map():
 
     assert ChildViewSet.required_permission['list'] == 'other:view'
     assert OrganizationViewSet.required_permission == CRUD
+
+
+@pytest.mark.django_db
+def test_model_builds_scoped_queryset_per_request_and_rejects_both():
+    from apps.contracts.models import Organization
+    from apps.core.tenancy import system_context
+
+    class ScopedViewSet(BaseModelViewSet):
+        model = Organization
+
+    view = ScopedViewSet()
+    view.action = 'partial_update'
+    with system_context():
+        assert 'FOR UPDATE' in str(view.get_queryset().query)
+    view.action = 'list'
+    with system_context():
+        assert 'FOR UPDATE' not in str(view.get_queryset().query)
+
+    class BothViewSet(BaseModelViewSet):
+        model = Organization
+        queryset = Organization.objects.none()
+
+    both = BothViewSet()
+    both.action = 'list'
+    with pytest.raises(ImproperlyConfigured):
+        both.get_queryset()
