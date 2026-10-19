@@ -13,6 +13,7 @@ Autenticação JWT e `IsAuthenticated` são globais.
 | `/api/v1/auth/` | login, refresh, logout e troca de senha | [autenticação](authentication.md) |
 | `/api/v1/me/organizations/` | organizações acessíveis do usuário | [organizações](organizations.md) |
 | `/api/v1/users/` | usuários do contrato (área do cliente, reservada ao admin) | [usuários](users.md) |
+| `/api/v1/profiles/`, `/api/v1/permissions/` | perfis do contrato e catálogo de permissões (reservado ao admin) | [perfis](profiles.md) |
 | `/api/v1/organizations/` | organizações do contrato (área do cliente) | [organizações](organizations.md) |
 | `/api/v1/me/permissions/` | permissões efetivas na organização ativa (para a interface) | [permissões](permissions.md) |
 | `/api/v1/admin/plans/`, `/api/v1/admin/contracts/` | administração do superadmin | [administração](admin-contracts.md) |

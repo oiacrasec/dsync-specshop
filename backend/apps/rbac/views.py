@@ -1,3 +1,4 @@
+from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
@@ -5,10 +6,15 @@ from rest_framework.views import APIView
 
 from apps.core.context import resolve_organization
 from apps.core.exceptions import ContextForbidden
+from apps.core.permission_registry import PERMISSIONS
+from apps.core.views import BaseModelViewSet
 
+from .constants import ACTION_LABELS, RESOURCE_LABELS
+from .filters import ProfileFilterSet
+from .models import Profile, ProfilePermission
 from .permissions import AllowAuthenticated
 from .selectors import accessible_organizations
-from .serializers import OrganizationSummarySerializer
+from .serializers import OrganizationSummarySerializer, ProfileSerializer
 from .utils import access_evaluation
 
 
@@ -41,3 +47,43 @@ class MyPermissionsView(APIView):
         if not evaluation.has_access:
             raise ContextForbidden()
         return Response({'permissions': sorted(evaluation.permissions)})
+
+
+class PermissionCatalogView(APIView):
+    """Catálogo do registry com rótulos, agrupado por recurso, para montar as telas de acesso."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def get(self, request):
+        groups = {}
+        for definition in PERMISSIONS:
+            resource, action = definition.code.split(':', 1)
+            group = groups.setdefault(
+                resource,
+                {'resource': resource, 'label': str(RESOURCE_LABELS.get(resource, resource)), 'permissions': []},
+            )
+            group['permissions'].append(
+                {
+                    'code': definition.code,
+                    'action': action,
+                    'label': str(ACTION_LABELS.get(action, action)),
+                    'scopes': sorted(scope.value for scope in definition.scopes),
+                    'reserved': definition.reserved,
+                }
+            )
+        return Response(list(groups.values()))
+
+
+class ProfileViewSet(BaseModelViewSet):
+    model = Profile
+    serializer_class = ProfileSerializer
+    filterset_class = ProfileFilterSet
+    permission_resource = 'profile'
+    options_label_field = 'name'
+    options_search_fields = ('name',)
+    schema_columns = ('name', 'is_active')
+    schema_filters = ('is_active',)
+
+    def get_queryset(self):
+        permissions = Prefetch('permissions', queryset=ProfilePermission.objects.only('profile_id', 'permission_code'))
+        return super().get_queryset().prefetch_related(permissions)

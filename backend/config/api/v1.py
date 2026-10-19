@@ -6,5 +6,5 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path('admin/', include('apps.administration.urls')),
     path('', include('apps.users.urls')),
     path('', include('apps.contracts.urls')),
-    path('me/', include('apps.rbac.urls')),
+    path('', include('apps.rbac.urls')),
 ]

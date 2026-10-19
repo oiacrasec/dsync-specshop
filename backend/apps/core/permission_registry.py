@@ -89,6 +89,7 @@ PERMISSIONS = PermissionRegistry(
                 'user:update',
                 'user:delete',
                 'user:manage',
+                'profile:view',
                 'profile:create',
                 'profile:update',
                 'profile:delete',

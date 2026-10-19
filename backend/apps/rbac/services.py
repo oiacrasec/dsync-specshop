@@ -18,17 +18,36 @@ from .selectors import (
     conflicting_profile_names,
     duplicate_client_contracts,
     profile_is_assigned,
+    user_is_active_admin,
 )
 
 
-def begin_write(actor):
-    """Exige superadmin ativo e serializa a configuração RBAC; chamar antes de outros locks."""
-    if actor is None or not get_user_model().objects.filter(pk=actor.pk, is_active=True, is_superuser=True).exists():
+def begin_write(actor, contract_id=None):
+    """Autoriza a escrita RBAC e serializa a configuração; chamar antes de outros locks.
+
+    Superadmin ativo escreve em qualquer contrato (devolve None). Administrador ativo do
+    contrato escreve só no próprio (decisão 54); registros do sistema (contrato nulo) só o
+    superadmin. Devolve o contrato permitido para conferir os registros carregados.
+    """
+    user = get_user_model().objects.filter(pk=actor.pk, is_active=True).first() if actor is not None else None
+    if user is not None and user.is_superuser:
+        allowed = None
+    elif (
+        user is not None and contract_id is not None and user.contract_id == contract_id and user_is_active_admin(user)
+    ):
+        allowed = contract_id
+    else:
         raise PermissionDenied(_('A gestão de acesso exige autorização administrativa.'))
     # Catálogo pequeno de configuração; serializa escritas RBAC, inclusive nome híbrido.
     # Lock de transação liberado em commit/rollback; SQL fixo e parâmetro fixo.
     with connection.cursor() as cursor:
         cursor.execute('SELECT pg_advisory_xact_lock(%s)', [0x44534352424143])
+    return allowed
+
+
+def _ensure_contract(allowed, contract_id):
+    if allowed is not None and contract_id != allowed:
+        raise PermissionDenied(_('A gestão de acesso exige autorização administrativa.'))
 
 
 @system_scope
@@ -101,11 +120,13 @@ def _permission(code, scope=None):
 @system_scope
 @transaction.atomic
 def save_profile(*, profile, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, profile.contract_id)
+    _ensure_contract(allowed, profile.contract_id)
     if profile.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de perfil.')
     if not profile._state.adding:
         current = Profile.objects.select_for_update().get(pk=profile.pk)
+        _ensure_contract(allowed, current.contract_id)
         _mutable_profile(current)
         if current.contract_id != profile.contract_id:
             _invalid('contract', 'O contrato de um perfil existente não pode ser alterado.')
@@ -125,8 +146,9 @@ def save_profile(*, profile, actor):
 @system_scope
 @transaction.atomic
 def delete_profile(*, profile, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, profile.contract_id)
     current = Profile.objects.select_for_update().get(pk=profile.pk)
+    _ensure_contract(allowed, current.contract_id)
     _mutable_profile(current)
     if profile_is_assigned(current):
         raise ProfileInUse()
@@ -149,10 +171,11 @@ def delete_profile(*, profile, actor):
 @system_scope
 @transaction.atomic
 def save_profile_permission(*, permission, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, permission.contract_id)
     if permission.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de permissão do perfil.')
     profile = _profile(permission.profile_id)
+    _ensure_contract(allowed, profile.contract_id)
     _mutable_profile(profile)
     if permission.contract_id != profile.contract_id:
         _invalid('contract', 'A permissão deve ter o mesmo contrato do perfil.')
@@ -174,8 +197,9 @@ def save_profile_permission(*, permission, actor):
 @system_scope
 @transaction.atomic
 def delete_profile_permission(*, permission, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, permission.contract_id)
     current = ProfilePermission.objects.get(pk=permission.pk)
+    _ensure_contract(allowed, current.contract_id)
     _mutable_profile(_profile(current.profile_id))
     before = _snapshot(current)
     current.delete(actor=actor)
@@ -204,7 +228,8 @@ def _assignment_profile(assignment):
 @system_scope
 @transaction.atomic
 def save_assignment(*, assignment, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, assignment.contract_id)
+    _ensure_contract(allowed, assignment.contract_id)
     if assignment.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de atribuição.')
     try:
@@ -248,8 +273,9 @@ def save_assignment(*, assignment, actor):
 @system_scope
 @transaction.atomic
 def delete_assignment(*, assignment, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, assignment.contract_id)
     current = Assignment.objects.get(pk=assignment.pk)
+    _ensure_contract(allowed, current.contract_id)
     if _is_active_admin_grant(current):
         ensure_contract_keeps_admin(current.contract_id, exclude_assignment_id=current.pk)
     before = _snapshot(current)
@@ -271,7 +297,8 @@ def delete_assignment(*, assignment, actor):
 @system_scope
 @transaction.atomic
 def save_exclusion(*, exclusion, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, exclusion.contract_id)
+    _ensure_contract(allowed, exclusion.contract_id)
     if exclusion.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de exceção.')
     assignment = Assignment.objects.get(pk=exclusion.assignment_id)
@@ -297,8 +324,9 @@ def save_exclusion(*, exclusion, actor):
 @system_scope
 @transaction.atomic
 def delete_exclusion(*, exclusion, actor):
-    begin_write(actor)
+    allowed = begin_write(actor, exclusion.contract_id)
     current = AssignmentExclusion.objects.get(pk=exclusion.pk)
+    _ensure_contract(allowed, current.contract_id)
     before = _snapshot(current)
     current.delete(actor=actor)
     record(Event.EXCLUSION_REMOVED, actor=actor, contract_id=current.contract_id, target=current, before=before)

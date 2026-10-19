@@ -122,6 +122,7 @@ def test_user_profile_and_assignment_management_stay_reserved():
         'user:update',
         'user:delete',
         'user:manage',
+        'profile:view',
         'profile:create',
         'profile:update',
         'profile:delete',
