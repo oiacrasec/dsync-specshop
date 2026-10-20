@@ -77,6 +77,17 @@ Custo: ~80 KB a mais no CSS inicial (~13 KB comprimido); as fontes só baixam qu
 O aviso de orçamento do bundle inicial é 2 MB (decisão do usuário; erro em 5 MB).
 Os prefixos não colidem com o PrimeIcons.
 
+## Documentações (etapa 5.5)
+
+Menu do avatar → **Documentações** → **API** (`/documentacoes/api`): Swagger UI do schema
+`GET /api/v1/schema/`, buscado com a sessão. O "Try it out" executa com o token e a organização
+ativa, enviados só para a origem e o prefixo da API (mesma regra do `authInterceptor`, em
+`needsOrganizationHeader`). O pacote e o CSS só carregam nesta tela (chunk sob demanda).
+
+| Biblioteca | Uso | Licença |
+|---|---|---|
+| [swagger-ui-dist](https://github.com/swagger-api/swagger-ui) 5.33.1 | tela de documentação da API | Apache-2.0 |
+
 ## Configurações (etapa 8.5)
 
 Menu do avatar → **Configurações** (`/configuracoes`): cor principal, estilo dos componentes,

@@ -4,7 +4,7 @@ import { catchError, concatMap, map, throwError } from 'rxjs';
 import { API_BASE_URL } from '../tokens/api-base-url';
 import { AuthSessionService } from '../services/auth-session.service';
 import { UserContextService } from '../services/user-context.service';
-import { apiPath } from '../utils/api-url';
+import { PUBLIC_AUTH_PATHS, apiPath, needsOrganizationHeader } from '../utils/api-url';
 import { apiProblem } from '../utils/api-problem';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const contexts = inject(UserContextService);
     const path = apiPath(req.url, baseUrl);
 
-    if (!path || ['/auth/login/', '/auth/refresh/', '/auth/logout/'].includes(path)) {
+    if (!path || PUBLIC_AUTH_PATHS.includes(path)) {
         return next(req);
     }
 
@@ -35,7 +35,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             headers = headers.set('Authorization', `Bearer ${token}`);
         }
 
-        if (token && organization && !session.getUser()?.is_superuser && !path.startsWith('/auth/') && !path.startsWith('/admin/') && path !== '/me/organizations/') {
+        if (token && organization && needsOrganizationHeader(path, !!session.getUser()?.is_superuser)) {
             headers = headers.set('X-Organization-Id', organization);
         }
 

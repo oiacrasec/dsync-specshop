@@ -33,6 +33,7 @@
         "primeng": "^21.0.4",
         "quill": "^2.0.3",
         "rxjs": "~7.8.0",
+        "swagger-ui-dist": "5.33.1",
         "tailwindcss-primeui": "^0.6.1",
         "tslib": "^2.8.1"
     },

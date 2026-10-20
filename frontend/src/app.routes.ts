@@ -110,6 +110,15 @@ export const appRoutes: Routes = [
                 }
             },
             {
+                path: 'documentacoes',
+                canActivate: [accessGuard],
+                loadChildren: () => import('@/app/pages/documentacoes/documentacoes.routes'),
+                data: {
+                    breadcrumb: 'Documentações',
+                    audience: ACCESS_AUDIENCE.AUTHENTICATED
+                }
+            },
+            {
                 path: 'pages',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/pages.routes'),

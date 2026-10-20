@@ -22,6 +22,7 @@
                         "browser": "src/main.ts",
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
+                        "allowedCommonJsDependencies": ["swagger-ui-dist"],
                         "assets": [
                             {
                                 "glob": "**/*",
@@ -32,6 +33,7 @@
                             "node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css",
                             "node_modules/@fortawesome/fontawesome-free/css/solid.min.css",
                             "node_modules/@fortawesome/fontawesome-free/css/regular.min.css",
+                            { "input": "node_modules/swagger-ui-dist/swagger-ui.css", "bundleName": "swagger-ui", "inject": false },
                             "src/assets/styles.scss",
                             "src/assets/tailwind.css"
                         ],

@@ -76,6 +76,8 @@ e só começa após aprovação do usuário.
 | 64 | Perfil vinculado com customização livre: desmarcar o que veio do perfil grava exceção de permissão (por atribuição, opcionalmente por organização); sem cadeados nem bloco de herdados (ADR 0038) |
 | 65 | Aparência (tela de Configurações) guardada no usuário, no backend (`/me/preferences/`); login com a aparência padrão |
 | 66 | Configurações: cor principal, estilo (Aura/Lara/Nora), modo claro/escuro e tipo de menu, em português; painel "Settings" removido do login e das demais telas |
+| 67 | 5.5: Swagger UI dentro do frontend (`/documentacoes/api`, menu do avatar → Documentações → API), com o schema buscado pela sessão JWT; o backend só serve `/api/v1/schema/` |
+| 68 | 5.5: qualquer autenticado vê a documentação da área do cliente; `/admin/` só o superadmin (ADR 0004) |
 
 ## Bloco 0 — Fundação
 
@@ -127,7 +129,7 @@ e só começa após aprovação do usuário.
 | 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008, 0020 | ✅ |
 | 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
 | 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ✅ (Blocos 7 e 8) |
-| 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ⬜ |
+| 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ✅ |
 
 ## Bloco 6 — Área administrativa e frontend (prioridade, decisões 37 a 39)
 

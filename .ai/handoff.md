@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Bloco 8 (8.1–8.5) ✅ commitado; rbac.0004 e users.0005 aplicadas ao banco local |
-| Próximo passo exato | Usuário escolher o próximo bloco entre as pendências listadas abaixo |
-| Aguardando o usuário? | sim — escolha do próximo bloco |
+| Etapa atual | 5.5 OpenAPI implementada; aguardando revisão/commit |
+| Próximo passo exato | Revisão da 5.5; depois 5.3 (admin de usuários) ou outra pendência |
+| Aguardando o usuário? | sim — revisar a 5.5 |
 
 ## Concluído
 
@@ -23,7 +23,6 @@
 | Item | O que falta | Origem |
 |---|---|---|
 | 5.3 Admin de usuários | CRUD de superadmins na área admin (auditar criação e mudança de `is_superuser`); admins adicionais de um contrato pelo superadmin (6.6 cria só o 1º; 6.7 lista e reseta) | ADR 0010 |
-| 5.5 OpenAPI | `drf-spectacular` não instalado; schema/Swagger só para autenticados | ADR 0004 |
 | Suporte do superadmin | entrar numa organização de cliente (contrato → organização), com auditoria | ADR 0037 §5, decisão 49 |
 | Antes de produção | MFA do superadmin; HTTPS/CSP; cache compartilhado/borda; expurgo pós-contrato | ADRs 0010, 0035 |
 | Frontend | `npm audit` (88 vulns, adiado); itens "Perfil" e "Agenda" do avatar sem ação; telas DESABILITADO (setores, geoespacial) | handoff |
@@ -45,6 +44,8 @@
   8.4: exceção de permissão na atribuição (ADR 0038, decisão 64): caixas livres, perfil vinculado.
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
+- 5.5 (decisões 67–68): `/api/v1/schema/` + `docs/api/openapi-v1.yaml` (regenerar a cada mudança
+  de API; teste acusa divergência); Swagger UI no frontend `/documentacoes/api`.
 - 8.5 (decisões 65–66): tela `/configuracoes` (menu do avatar); aparência no usuário
   (`/me/preferences/`, `users.0005`); `ThemeService` substitui o configurador do template.
 

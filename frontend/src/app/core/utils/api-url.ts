@@ -44,3 +44,11 @@ export function serverUrl(path: string, baseUrl: string): string {
 
     return base.origin === window.location.origin ? path : `${base.origin}${path}`;
 }
+
+// Rotas da API sem credencial (sessão ainda não existe ou é a própria renovação).
+export const PUBLIC_AUTH_PATHS = ['/auth/login/', '/auth/refresh/', '/auth/logout/'];
+
+// X-Organization-Id só na área do cliente: superadmin, autenticação, admin e troca de organização ficam sem.
+export function needsOrganizationHeader(path: string, superuser: boolean): boolean {
+    return !superuser && !path.startsWith('/auth/') && !path.startsWith('/admin/') && path !== '/me/organizations/';
+}

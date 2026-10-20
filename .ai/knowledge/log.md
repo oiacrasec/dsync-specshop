@@ -1,5 +1,18 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 5.5: OpenAPI
+
+- Decisões 67–68. Backend: `drf-spectacular` 0.30.0; `apps/core/openapi.py` (AutoSchema com
+  `X-Organization-Id` nas views com `RequiredPermission` ou `organization_header`, JWT bearer,
+  respostas RFC 9457 por hook, gerador em `system_context`, `api_schema` em cache por processo);
+  `GET /api/v1/schema/` autenticado, `/admin/` só superadmin; paginação `{data, total_records}` e
+  `first`/`rows` no schema; `@extend_schema` nas APIViews e actions. Action `schema` renomeada
+  para `table_schema` (URL igual) por colidir com `view.schema` do DRF. `docs/api/openapi-v1.yaml`
+  versionado com teste de divergência. Suíte 669.
+- Frontend: `/documentacoes/api` (menu do avatar) com `swagger-ui-dist` 5.33.1 (Apache-2.0) sob
+  demanda; Try it out com token/organização só para a API (`needsOrganizationHeader` extraído do
+  interceptor). 99 testes.
+
 ## 2026-10-19 — Etapa 8.5: tela de Configurações e preferências no usuário
 
 - Decisões 65–66. Backend: `User.preferences` (JSONField, `users.0005`), `GET/PUT /api/v1/me/preferences/`
