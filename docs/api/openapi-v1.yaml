@@ -1430,6 +1430,44 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/media/{token}/:
+    get:
+      operationId: media_retrieve
+      description: |-
+        Arquivo de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
+
+        Aberto sem JWT porque `<img>` não envia o header; token adulterado, vencido ou modo `s3`
+        respondem 404, sem revelar se o arquivo existe.
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - media
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/organizations/:
     get:
       operationId: organizations_list

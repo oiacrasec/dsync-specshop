@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 9.1: armazenamento de mídia (ADR 0039)
+
+- Decisões 69–75 registradas (Bloco 9). `config/storage.py` monta `STORAGES['default']`:
+  `filesystem` → `apps.core.storage.SignedFileSystemStorage` (url = `/api/v1/media/<token>/`,
+  `signing` com validade `DJANGO_MEDIA_URL_EXPIRE`), `s3` → `storages.backends.s3.S3Storage`
+  privado com pre-signed SigV4 (endpoint/addressing para MinIO). `MediaFileView` sem JWT (token é
+  a credencial; 404 se adulterado/vencido/ausente/modo s3; `private` + CSP sandbox). Produção só
+  troca `staticfiles`. `django-storages[s3]` 1.14.6 + boto3. 6 testes; suíte 675. OpenAPI regenerado.
+
 ## 2026-10-19 — Etapa 5.5: OpenAPI
 
 - Decisões 67–68. Backend: `drf-spectacular` 0.30.0; `apps/core/openapi.py` (AutoSchema com

@@ -1,7 +1,7 @@
 """Settings de produção."""
 
 from .base import *  # noqa: F403
-from .base import MIDDLEWARE, env
+from .base import MIDDLEWARE, STORAGES, env
 
 DEBUG = False
 
@@ -18,9 +18,7 @@ MIDDLEWARE = [
 ]
 
 STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-    },
+    **STORAGES,
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },

@@ -10,8 +10,8 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 5.5 OpenAPI ✅ commitada; Blocos 7 e 8 concluídos |
-| Próximo passo exato | Definir com o usuário o conteúdo da página de Perfil e o armazenamento de mídia (Bloco 9) |
-| Aguardando o usuário? | sim — decisões do Perfil (conteúdo, foto, fuso, storage) |
+| Próximo passo exato | Revisão da 9.1; depois 9.2 (foto, nome, fuso) |
+| Aguardando o usuário? | sim — revisar a 9.1 |
 
 ## Concluído
 
@@ -22,7 +22,7 @@
 
 | Item | O que falta | Origem |
 |---|---|---|
-| **9 Perfil do usuário** (pedido em 2026-10-19) | Página do item "Perfil" do avatar: foto do usuário, troca de senha, fuso horário e o que mais for definido com o usuário. Mídia configurável por `.env`: sistema de arquivos ou bucket S3 | usuário |
+| **9 Perfil do usuário** (decisões 69–75) | 9.1 mídia → 9.2 foto/nome/fuso → 9.3 senha/sessões → 9.4 2FA TOTP → 9.5 meu acesso (ver plano) | usuário |
 | 5.3 Admin de usuários | CRUD de superadmins na área admin (auditar criação e mudança de `is_superuser`); admins adicionais de um contrato pelo superadmin (6.6 cria só o 1º; 6.7 lista e reseta) | ADR 0010 |
 | Suporte do superadmin | entrar numa organização de cliente (contrato → organização), com auditoria | ADR 0037 §5, decisão 49 |
 | Antes de produção | MFA do superadmin; HTTPS/CSP; cache compartilhado/borda; expurgo pós-contrato | ADRs 0010, 0035 |

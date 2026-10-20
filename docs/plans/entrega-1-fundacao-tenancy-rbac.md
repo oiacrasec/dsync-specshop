@@ -204,7 +204,7 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
-| 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados | backend | nova | ⬜ |
+| 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados | backend | 0039 | ✅ |
 | 9.2 | Perfil: foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas | backend + frontend | — | ⬜ |
 | 9.3 | Segurança: trocar senha; sessões com navegador/IP, encerrar uma e sair de todas | backend + frontend | — | ⬜ |
 | 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |

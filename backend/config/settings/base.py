@@ -13,6 +13,8 @@ import environ
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import constant_time_compare
 
+from config.storage import media_storage
+
 # backend/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -142,7 +144,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = env.path('DJANGO_MEDIA_ROOT', default=BASE_DIR / 'media')
+MEDIA_STORAGE = env.str('DJANGO_MEDIA_STORAGE', default='filesystem')
+# Validade das URLs assinadas de mídia, em segundos.
+MEDIA_URL_EXPIRE = env.int('DJANGO_MEDIA_URL_EXPIRE', default=300)
+
+STORAGES = {
+    'default': media_storage(env, backend=MEDIA_STORAGE, media_root=MEDIA_ROOT, url_expire=MEDIA_URL_EXPIRE),
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

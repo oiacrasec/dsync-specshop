@@ -206,6 +206,11 @@ marcados pelas views, fora de suas transações. Registros históricos preservad
 atrás do proxy, configurar `DJANGO_ACCESS_LOG_IP_HEADER` e `DJANGO_ACCESS_LOG_PORT_HEADER`
 ([ADR 0018](../docs/adr/0018-registro-de-acesso.md)). Ainda não há endpoints de gestão.
 
+Mídia (ADR 0039): `DJANGO_MEDIA_STORAGE=filesystem` (padrão, pasta `DJANGO_MEDIA_ROOT`) ou `s3`
+(`DJANGO_MEDIA_S3_BUCKET` obrigatório; endpoint/addressing para MinIO). Arquivos sempre privados,
+entregues por URL assinada válida por `DJANGO_MEDIA_URL_EXPIRE` segundos. Variáveis em `.env.example`.
+Com mais de um servidor no modo `filesystem`, a pasta precisa ser um volume compartilhado.
+
 Performance é premissa global: revisar queries, escritas, locks, CPU, memória,
 tráfego e concorrência de cada mudança. Consultas constantes não provam, sozinhas,
 eficiência; medir os caminhos afetados conforme o risco antes de entregar.
