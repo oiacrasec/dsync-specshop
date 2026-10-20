@@ -190,3 +190,9 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configurações** no menu do
 avatar, com as opções de tema (cor primária, preset Aura/Lara/Nora, claro/escuro) e remoção do
 painel "Settings" da tela de login. ✅ Etapa 8.5.
+
+## Bloco 9 — Perfil do usuário (pedido em 2026-10-19; etapas a definir)
+
+Página do item "Perfil" do menu do avatar: foto do usuário, troca de senha, fuso horário e
+outros itens a definir com o usuário. Requisito: armazenamento de mídia configurável por `.env`
+(sistema de arquivos ou bucket compatível com S3). Etapas e decisões entram após a definição.
