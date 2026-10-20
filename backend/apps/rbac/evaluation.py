@@ -15,6 +15,9 @@ class Grant:
 
     Exemplo: Leitor no contrato inteiro, exceto a Matriz →
     Grant(CONTRACT, None, frozenset({matriz}), frozenset({'record:view'})).
+
+    `excluded_codes`: pares (organização ou None, código) que esta concessão não dá; None vale
+    em toda organização que ela alcança (ADR 0038). Só restringe a própria concessão.
     """
 
     scope: PermissionScope
@@ -22,11 +25,19 @@ class Grant:
     excluded_organizations: frozenset
     codes: frozenset
     essential: bool = False
+    excluded_codes: frozenset = frozenset()
 
     def reaches(self, organization):
         if self.scope is PermissionScope.CONTRACT:
             return organization not in self.excluded_organizations
         return self.scope_organization == organization
+
+    def codes_at(self, organization):
+        removed = {code for where, code in self.excluded_codes if where is None or where == organization}
+        return self.codes - removed
+
+    def codes_anywhere(self):
+        return self.codes - {code for where, code in self.excluded_codes if where is None}
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,7 +67,7 @@ def evaluate(grants, organization, *, registry, superuser=False):
         return AccessEvaluation(True, frozenset(definition.code for definition in registry))
     permissions = set()
     for grant in reaching:
-        for code in grant.codes:
+        for code in grant.codes_at(organization):
             if code in registry and grant.scope in registry.get(code).scopes:
                 permissions.add(code)
     return AccessEvaluation(True, frozenset(permissions))
@@ -73,6 +84,6 @@ def granted_codes(grants, *, registry, superuser=False):
     return frozenset(
         code
         for grant in grants
-        for code in grant.codes
+        for code in grant.codes_anywhere()
         if code in registry and grant.scope in registry.get(code).scopes
     )

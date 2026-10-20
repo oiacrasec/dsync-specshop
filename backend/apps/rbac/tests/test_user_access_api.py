@@ -9,7 +9,8 @@ from rest_framework.test import APIClient
 from apps.audit.models import AuditEvent, AuditEventType
 from apps.contracts.models import Contract, Organization
 from apps.core.permission_registry import PERMISSIONS
-from apps.rbac.models import Assignment, AssignmentExclusion
+from apps.rbac import services
+from apps.rbac.models import Assignment, AssignmentExclusion, ProfilePermission
 from apps.rbac.tests.test_permissions import assign, profile_with
 
 pytestmark = pytest.mark.django_db
@@ -118,6 +119,39 @@ def test_essential_profile_is_applied_like_any_profile_and_keeps_last_admin_rule
     assert Assignment.objects.filter(user=world['manager'], profile=world['essential']).exists()
 
 
+def test_permission_exceptions_customize_a_linked_profile(world):
+    operator = profile_with(world['root'], world['contract'], 'Operador', 'organization:view', 'organization:update')
+    matriz = str(world['matriz'].public_id)
+    payload = {
+        'grants': [
+            {
+                'scope': 'CONTRACT',
+                'profile': str(operator.public_id),
+                'excluded_permissions': [{'organization': matriz, 'permission': 'organization:update'}],
+            }
+        ]
+    }
+    response = put(world, payload)
+    assert response.status_code == 200, response.content
+    assert response.json()['grants'][0]['excluded_permissions'] == [
+        {'organization': matriz, 'permission': 'organization:update'}
+    ]
+    maria = world['maria']
+    in_matriz = client(maria, world['matriz']).get('/api/v1/me/permissions/').json()['permissions']
+    in_filial = client(maria, world['filial']).get('/api/v1/me/permissions/').json()['permissions']
+    assert in_matriz == ['organization:view']
+    assert in_filial == ['organization:update', 'organization:view']
+    # Perfil vinculado: o código novo chega a todos, e a exceção continua valendo.
+    services.save_profile_permission(
+        permission=ProfilePermission(
+            profile=operator, contract=world['contract'], permission_code='organization:delete'
+        ),
+        actor=world['root'],
+    )
+    in_matriz = client(maria, world['matriz']).get('/api/v1/me/permissions/').json()['permissions']
+    assert in_matriz == ['organization:delete', 'organization:view']
+
+
 @pytest.mark.parametrize(
     'grant',
     [
@@ -134,15 +168,37 @@ def test_essential_profile_is_applied_like_any_profile_and_keeps_last_admin_rule
         {'scope': 'CONTRACT'},
         {'scope': 'ORGANIZATION', 'profile': 'ESSENTIAL', 'organization': 'MATRIZ'},  # Essencial só CONTRACT.
         {'scope': 'CONTRACT', 'profile': 'ESSENTIAL', 'excluded_organizations': ['MATRIZ']},  # Sem exceção.
+        {'scope': 'CONTRACT', 'profile': 'ESSENTIAL', 'excluded_permissions': [{'permission': 'user:view'}]},
+        {
+            'scope': 'CONTRACT',
+            'permission': 'organization:view',
+            'excluded_permissions': [{'permission': 'organization:view'}],
+        },
+        {
+            'scope': 'ORGANIZATION',
+            'profile': 'READER',
+            'organization': 'MATRIZ',
+            'excluded_permissions': [{'organization': 'MATRIZ', 'permission': 'organization:view'}],
+        },
+        {'scope': 'CONTRACT', 'profile': 'READER', 'excluded_permissions': [{'permission': 'record:view'}]},
     ],
 )
 def test_invalid_grants_are_rejected_without_writes(world, grant):
     assign(world['root'], world['maria'], profile=world['reader'])
-    ids = {'MATRIZ': str(world['matriz'].public_id), 'ESSENTIAL': str(world['essential'].public_id)}
-    grant = {
-        key: ids.get(value, value) if isinstance(value, str) else [ids[item] for item in value]
-        for key, value in grant.items()
+    ids = {
+        'MATRIZ': str(world['matriz'].public_id),
+        'ESSENTIAL': str(world['essential'].public_id),
+        'READER': str(world['reader'].public_id),
     }
+
+    def resolve(value):
+        if isinstance(value, dict):
+            return {key: resolve(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [resolve(item) for item in value]
+        return ids.get(value, value)
+
+    grant = resolve(grant)
     before = Assignment.objects.count()
     response = put(world, {'grants': [grant]})
     assert response.status_code == 422, response.content

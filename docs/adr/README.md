@@ -25,7 +25,7 @@ um ADR novo que **substitui** o anterior.
 | [0006](0006-multi-tenancy-contrato-organizacao.md) | Multi-tenancy por Contrato e Organização | Aceito |
 | [0007](0007-identificadores-e-convencoes-de-persistencia.md) | Identificadores e convenções de persistência | Aceito |
 | [0008](0008-administracao-propria.md) | Administração própria, sem o Django Admin | Aceito (trecho substituído por 0010) |
-| [0009](0009-rbac-hibrido.md) | RBAC híbrido: perfis vinculados + permissões avulsas | Aceito (§3.1 de organizações substituído por 0037) |
+| [0009](0009-rbac-hibrido.md) | RBAC híbrido: perfis vinculados + permissões avulsas | Aceito (§3.1 de organizações substituído por 0037; exceções complementadas por 0038) |
 | [0010](0010-gestao-de-usuarios-pelo-superadmin.md) | Gestão de usuários e superadmins pela área administrativa | Aceito |
 | [0011](0011-endpoint-de-opcoes.md) | Endpoint de opções (autocomplete e seleção) | Aceito |
 | [0012](0012-excecoes-ao-escopo-declarado.md) | Exceções ao escopo declarado (`Contract` e `User`) | Aceito |
@@ -54,6 +54,7 @@ um ADR novo que **substitui** o anterior.
 | [0035](0035-jwt-localstorage-e-contexto-entre-abas.md) | JWT em localStorage e organização sincronizada com recarregamento entre abas | Aceito |
 | [0036](0036-projetos-derivados-do-core.md) | Projetos derivados do core: fork com histórico, fluxo só do core para os projetos | Proposto |
 | [0037](0037-organizacoes-na-area-do-cliente.md) | Organizações na área do cliente, com gestão delegável | Aceito |
+| [0038](0038-excecao-de-permissao-na-atribuicao.md) | Exceção de permissão na atribuição de perfil | Aceito |
 
 ## Modelo
 

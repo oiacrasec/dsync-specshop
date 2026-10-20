@@ -94,23 +94,28 @@ class Assignment(ContractScopedModel):
 
 
 class AssignmentExclusion(ContractScopedModel):
-    """Organização que uma atribuição no contrato não alcança.
+    """O que uma atribuição não concede: uma organização inteira ou uma permissão (ADR 0038).
 
-    Exemplo: Leitor no contrato inteiro, exceto a filial Matriz. A exceção só
-    restringe esta atribuição; outra atribuição pode conceder acesso à Matriz.
+    Só organização (atribuição no contrato): Leitor no contrato inteiro, exceto a Matriz.
+    Só permissão: o perfil Operador sem "Editar". Organização + permissão (atribuição no
+    contrato): o Operador sem "Editar" só na Matriz. A exceção só restringe esta atribuição;
+    outra atribuição pode conceder o mesmo acesso.
     """
 
     assignment = models.ForeignKey(Assignment, verbose_name=_('atribuição'), on_delete=models.PROTECT,
                                    related_name='exclusions',)
     excluded_organization = models.ForeignKey('contracts.Organization', verbose_name=_('organização excluída'),
-                                              on_delete=models.PROTECT, related_name='+',)
+                                              on_delete=models.PROTECT, null=True, blank=True, related_name='+',)
+    permission_code = models.CharField(verbose_name=_('permissão excluída'), max_length=128, blank=True, default='')
 
     class Meta(ContractScopedModel.Meta):
         abstract = False
         verbose_name = _('exceção de organização')
         verbose_name_plural = _('exceções de organização')
         constraints = [
-            models.UniqueConstraint(fields=['assignment', 'excluded_organization'],
-                                    condition=models.Q(deleted_at__isnull=True),
+            models.UniqueConstraint(fields=['assignment', 'excluded_organization', 'permission_code'],
+                                    condition=models.Q(deleted_at__isnull=True), nulls_distinct=False,
                                     name='dsc_assignment_exclusion_unique'),
+            models.CheckConstraint(condition=models.Q(excluded_organization__isnull=False) |
+                                   ~models.Q(permission_code=''), name='dsc_assignment_exclusion_target'),
         ]

@@ -27,6 +27,7 @@ AUDIT_FIELDS = {
     'rbac.AssignmentExclusion': {
         'assignment': 'assignment__public_id',
         'excluded_organization': 'excluded_organization__public_id',
+        'permission_code': 'permission_code',
         'is_active': 'is_active',
     },
 }

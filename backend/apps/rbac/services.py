@@ -256,9 +256,18 @@ def save_assignment(*, assignment, actor):
     else:
         profile = None
         _permission(assignment.permission_code, assignment.scope)
-    if not assignment._state.adding and AssignmentExclusion.objects.filter(assignment=assignment).exists():
-        if assignment.scope != PermissionScope.CONTRACT or (profile is not None and profile.system_key):
-            _invalid('scope', 'Remova as exceções antes de alterar o escopo ou atribuir o perfil essencial.')
+    if not assignment._state.adding:
+        exclusions = AssignmentExclusion.objects.filter(assignment=assignment)
+        conflicts = (
+            exclusions.exists()
+            if profile is not None and profile.system_key
+            else (
+                assignment.scope != PermissionScope.CONTRACT and exclusions.exclude(excluded_organization=None).exists()
+            )
+            or (profile is None and exclusions.exclude(permission_code='').exists())
+        )
+        if conflicts:
+            _invalid('scope', 'Remova as exceções antes de alterar o escopo, o perfil ou atribuir o essencial.')
     if not assignment._state.adding and _is_active_admin_grant(current):
         stays_admin = assignment.is_active and profile is not None and profile.system_key == ESSENTIAL_PROFILE_KEY
         ensure_contract_keeps_admin(
@@ -280,7 +289,10 @@ def delete_assignment(*, assignment, actor):
         ensure_contract_keeps_admin(current.contract_id, exclude_assignment_id=current.pk)
     before = _snapshot(current)
     exclusions = AssignmentExclusion.objects.filter(assignment=current)
-    removed = sorted(str(item) for item in exclusions.values_list('excluded_organization__public_id', flat=True))
+    removed = sorted(
+        ':'.join(str(part) for part in (organization, code) if part)
+        for organization, code in exclusions.values_list('excluded_organization__public_id', 'permission_code')
+    )
     current.delete(actor=actor)
     exclusions.delete(actor=actor)
     record(
@@ -302,14 +314,23 @@ def save_exclusion(*, exclusion, actor):
     if exclusion.deleted_at is not None:
         _invalid('deleted_at', 'Use o serviço de exclusão de exceção.')
     assignment = Assignment.objects.get(pk=exclusion.assignment_id)
-    if assignment.contract_id != exclusion.contract_id or assignment.scope != PermissionScope.CONTRACT:
-        _invalid('assignment', 'Exceções exigem uma atribuição de contrato no mesmo contrato.')
+    if assignment.contract_id != exclusion.contract_id:
+        _invalid('assignment', 'A exceção e a atribuição devem pertencer ao mesmo contrato.')
     if assignment.profile_id is not None and _profile(assignment.profile_id).system_key:
-        _invalid('assignment', 'O administrador do contrato não admite exceções de organização.')
-    if not Organization.objects.filter(
-        pk=exclusion.excluded_organization_id, contract_id=exclusion.contract_id, is_active=True
-    ).exists():
-        _invalid('excluded_organization', 'Informe uma organização disponível no contrato.')
+        _invalid('assignment', 'O administrador do contrato não admite exceções.')
+    if exclusion.excluded_organization_id is not None:
+        if assignment.scope != PermissionScope.CONTRACT:
+            _invalid('excluded_organization', 'Exceção de organização exige uma atribuição de contrato.')
+        if not Organization.objects.filter(
+            pk=exclusion.excluded_organization_id, contract_id=exclusion.contract_id, is_active=True
+        ).exists():
+            _invalid('excluded_organization', 'Informe uma organização disponível no contrato.')
+    if exclusion.permission_code:
+        # ADR 0038: tira uma permissão do perfil; avulsa se remove apagando a própria atribuição.
+        if assignment.profile_id is None:
+            _invalid('permission_code', 'Exceção de permissão exige uma atribuição de perfil.')
+        if exclusion.permission_code not in PERMISSIONS:
+            _invalid('permission_code', 'Informe uma permissão do registry.')
     if not exclusion._state.adding:
         current = AssignmentExclusion.objects.get(pk=exclusion.pk)
         if current.assignment_id != exclusion.assignment_id:
@@ -343,15 +364,15 @@ def replace_user_access(*, user, grants, actor):
     """Substitui as concessões do usuário pelo conjunto informado (8.3, decisões 58–60 e 63).
 
     `grants`: dicionários com scope, scope_organization_id, profile_id, permission_code e
-    excluded_organization_ids (só CONTRACT). Cria e reativa antes de excluir, para que a
-    regra do último administrador veja o estado final. Só grava o que mudou.
+    exclusions: pares (organização ou None, código ou '') da ADR 0038. Cria e reativa antes de
+    excluir, para que a regra do último administrador veja o estado final. Só grava o que mudou.
     """
     allowed = begin_write(actor, user.contract_id)
     _ensure_contract(allowed, user.contract_id)
     desired = {}
     for grant in grants:
         key = (grant['scope'], grant['scope_organization_id'], grant['profile_id'], grant['permission_code'])
-        desired[key] = set(grant.get('excluded_organization_ids', ()))
+        desired[key] = set(grant.get('exclusions', ()))
     current = {
         _grant_key(item): item
         for item in Assignment.objects.filter(user=user, contract_id=user.contract_id).prefetch_related('exclusions')
@@ -374,13 +395,18 @@ def replace_user_access(*, user, grants, actor):
             if not assignment.is_active:
                 assignment.is_active = True
                 save_assignment(assignment=assignment, actor=actor)
-            existing = {item.excluded_organization_id: item for item in assignment.exclusions.all()}
-        for organization_id in sorted(excluded - existing.keys()):
+            existing = {
+                (item.excluded_organization_id, item.permission_code): item for item in assignment.exclusions.all()
+            }
+        for organization_id, code in sorted(excluded - existing.keys(), key=str):
             exclusion = AssignmentExclusion(
-                assignment=assignment, contract_id=user.contract_id, excluded_organization_id=organization_id
+                assignment=assignment,
+                contract_id=user.contract_id,
+                excluded_organization_id=organization_id,
+                permission_code=code,
             )
             save_exclusion(exclusion=exclusion, actor=actor)
-        for organization_id in sorted(existing.keys() - excluded):
-            delete_exclusion(exclusion=existing[organization_id], actor=actor)
+        for target in sorted(existing.keys() - excluded, key=str):
+            delete_exclusion(exclusion=existing[target], actor=actor)
     for key in sorted(current.keys() - desired.keys(), key=str):
         delete_assignment(assignment=current[key], actor=actor)

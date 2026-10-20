@@ -36,12 +36,14 @@ Escritas passam por `save_user`/`delete_user` (licenças, contrato disponível, 
 registram `user.created/updated/deleted` (só `is_active`/excluído; nunca senha). Leituras com
 queries constantes (1/31 usuários) e sem escritas.
 
-## Acesso do usuário (aba Permissões, etapa 8.3, decisões 58–60 e 63)
+## Acesso do usuário (aba Permissões, etapas 8.3–8.4, decisões 58–60, 63 e 64)
 
 `GET …/access/` devolve tudo o que a aba precisa: `organizations` (do contrato, com `is_active`),
 `profiles` (do contrato e do sistema, com `is_essential` e `permissions`; o essencial traz todos os
 códigos do registry) e `grants`. Cada concessão: `scope` (`CONTRACT`/`ORGANIZATION`), `organization` (só no escopo de
-organização), `profile` **ou** `permission`, `excluded_organizations` (só CONTRACT) e `is_active`.
+organização), `profile` **ou** `permission`, `excluded_organizations` (só CONTRACT),
+`excluded_permissions` (só perfil: `[{"organization": uuid|null, "permission": código}]`, ADR 0038;
+`organization` só no CONTRACT, null = em todo lugar) e `is_active`.
 
 `PUT …/access/` recebe `{"grants": [...]}` (até 500) e **substitui** o conjunto inteiro numa
 transação; responde como o GET. O perfil é vinculado (ADR 0009 §2): mudar o perfil muda o acesso
@@ -54,6 +56,7 @@ Só grava o que mudou (cria e reativa antes de excluir), com auditoria `assignme
 | Perfil **e** permissão, ou nenhum; organização fora do escopo de organização; exceção fora do contrato | 422 |
 | Código reservado, fora do registry ou em escopo não permitido; perfil incompatível com o escopo | 422 |
 | Organização ou perfil de outro contrato; essencial fora do CONTRACT ou com exceção | 422 |
+| Exceção de permissão em avulsa, fora do registry, ou com organização numa concessão de organização | 422 |
 | Tirar o último administrador ativo | 409 `last-contract-admin` |
 | Usuário de outro contrato | 404 |
 

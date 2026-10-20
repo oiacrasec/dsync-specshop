@@ -1,6 +1,7 @@
 # 0009 — RBAC híbrido: perfis vinculados + permissões avulsas
 
-- **Status:** Aceito (§3.1, no trecho de organizações, substituído pelo ADR 0037)
+- **Status:** Aceito (§3.1, no trecho de organizações, substituído pelo ADR 0037; exceções de
+  permissão na atribuição no ADR 0038)
 - **Data:** 2026-10-03
 
 ## Contexto

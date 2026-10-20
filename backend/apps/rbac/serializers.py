@@ -97,12 +97,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile.__dict__.pop('_prefetched_objects_cache', None)
 
 
+class ExcludedPermissionSerializer(serializers.Serializer):
+    organization = serializers.UUIDField(required=False, allow_null=True, default=None)
+    permission = serializers.CharField(max_length=128)
+
+
 class AccessGrantSerializer(serializers.Serializer):
     scope = serializers.ChoiceField(choices=[scope.value for scope in PermissionScope])
     organization = serializers.UUIDField(required=False, allow_null=True, default=None)
     profile = serializers.UUIDField(required=False, allow_null=True, default=None)
     permission = serializers.CharField(required=False, allow_blank=True, default='', max_length=128)
     excluded_organizations = serializers.ListField(child=serializers.UUIDField(), required=False, default=list)
+    excluded_permissions = ExcludedPermissionSerializer(many=True, required=False, default=list, max_length=200)
 
     def validate(self, attrs):
         if (attrs['profile'] is None) == (not attrs['permission']):
@@ -110,7 +116,9 @@ class AccessGrantSerializer(serializers.Serializer):
         if (attrs['scope'] == PermissionScope.ORGANIZATION.value) == (attrs['organization'] is None):
             raise serializers.ValidationError(_('Informe a organização só no escopo de organização.'))
         if attrs['excluded_organizations'] and attrs['scope'] != PermissionScope.CONTRACT.value:
-            raise serializers.ValidationError(_('Exceções só valem no escopo de contrato.'))
+            raise serializers.ValidationError(_('Exceções de organização só valem no escopo de contrato.'))
+        if attrs['excluded_permissions'] and attrs['profile'] is None:
+            raise serializers.ValidationError(_('Exceções de permissão só valem para perfis.'))
         return attrs
 
 
@@ -131,7 +139,11 @@ class UserAccessSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'grants': _('Informe uma organização do contrato.')})
             if grant['profile'] is not None and grant['profile'] not in profiles:
                 raise serializers.ValidationError({'grants': _('Informe um perfil disponível.')})
-            if any(item not in organizations for item in grant['excluded_organizations']):
+            excluded = [
+                *grant['excluded_organizations'],
+                *(item['organization'] for item in grant['excluded_permissions']),
+            ]
+            if any(item is not None and item not in organizations for item in excluded):
                 raise serializers.ValidationError({'grants': _('Informe uma organização do contrato.')})
             grants.append(
                 {
@@ -139,7 +151,11 @@ class UserAccessSerializer(serializers.Serializer):
                     'scope_organization_id': organizations.get(grant['organization']),
                     'profile_id': profiles.get(grant['profile']),
                     'permission_code': grant['permission'],
-                    'excluded_organization_ids': {organizations[item] for item in grant['excluded_organizations']},
+                    'exclusions': {(organizations[item], '') for item in grant['excluded_organizations']}
+                    | {
+                        (organizations.get(item['organization']), item['permission'])
+                        for item in grant['excluded_permissions']
+                    },
                 }
             )
         attrs['grants'] = grants

@@ -2,7 +2,7 @@ import ast
 from pathlib import Path
 
 from apps.core.permission_registry import PermissionDefinition, PermissionRegistry, PermissionScope
-from apps.rbac.evaluation import Grant, evaluate
+from apps.rbac.evaluation import Grant, evaluate, granted_codes
 
 CONTRACT, ORGANIZATION = PermissionScope.CONTRACT, PermissionScope.ORGANIZATION
 REGISTRY = PermissionRegistry(
@@ -15,8 +15,8 @@ REGISTRY = PermissionRegistry(
 ALL = frozenset({'record:view', 'record:create', 'record:contract'})
 
 
-def grant(scope=CONTRACT, organization=None, excluded=(), codes=('record:view',), essential=False):
-    return Grant(scope, organization, frozenset(excluded), frozenset(codes), essential)
+def grant(scope=CONTRACT, organization=None, excluded=(), codes=('record:view',), essential=False, without=()):
+    return Grant(scope, organization, frozenset(excluded), frozenset(codes), essential, frozenset(without))
 
 
 def test_contract_grant_reaches_every_organization_except_exclusions():
@@ -77,3 +77,21 @@ def test_evaluation_does_not_import_framework_or_database():
             assert not node.module.startswith('apps.') or node.module == 'apps.core.permission_registry'
         elif isinstance(node, ast.Import):
             assert all(alias.name.split('.')[0] not in {'django', 'rest_framework'} for alias in node.names)
+
+
+def test_permission_exception_removes_one_code_of_the_profile_only_where_declared():
+    # ADR 0038: Operador no contrato, sem "create" só em Obras.
+    grants = [grant(codes=('record:view', 'record:create'), without={('obras', 'record:create')})]
+    assert evaluate(grants, 'obras', registry=REGISTRY).permissions == {'record:view'}
+    assert evaluate(grants, 'saude', registry=REGISTRY).permissions == {'record:view', 'record:create'}
+    assert granted_codes(grants, registry=REGISTRY) == {'record:view', 'record:create'}
+
+
+def test_permission_exception_without_organization_applies_everywhere_but_other_grants_still_count():
+    grants = [
+        grant(ORGANIZATION, 'obras', codes=('record:view', 'record:create'), without={(None, 'record:create')}),
+        grant(ORGANIZATION, 'saude', codes=('record:create',)),
+    ]
+    assert evaluate(grants, 'obras', registry=REGISTRY).permissions == {'record:view'}
+    assert evaluate(grants, 'saude', registry=REGISTRY).permissions == {'record:create'}
+    assert granted_codes(grants[:1], registry=REGISTRY) == {'record:view'}

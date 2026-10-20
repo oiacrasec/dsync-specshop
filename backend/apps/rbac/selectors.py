@@ -52,7 +52,10 @@ def user_grants(user):
         .prefetch_related(
             Prefetch('profile__permissions', queryset=ProfilePermission.objects.only('profile_id', 'permission_code')),
             Prefetch(
-                'exclusions', queryset=AssignmentExclusion.objects.only('assignment_id', 'excluded_organization_id')
+                'exclusions',
+                queryset=AssignmentExclusion.objects.only(
+                    'assignment_id', 'excluded_organization_id', 'permission_code'
+                ),
             ),
         )
         .only('scope', 'scope_organization_id', 'permission_code', 'profile__system_key')
@@ -69,9 +72,16 @@ def user_grants(user):
             Grant(
                 scope=PermissionScope(assignment.scope),
                 scope_organization=assignment.scope_organization_id,
-                excluded_organizations=frozenset(item.excluded_organization_id for item in assignment.exclusions.all()),
+                excluded_organizations=frozenset(
+                    item.excluded_organization_id for item in assignment.exclusions.all() if not item.permission_code
+                ),
                 codes=codes,
                 essential=essential,
+                excluded_codes=frozenset(
+                    (item.excluded_organization_id, item.permission_code)
+                    for item in assignment.exclusions.all()
+                    if item.permission_code
+                ),
             )
         )
     return grants
@@ -173,6 +183,7 @@ def user_access(user):
     all_codes = sorted(definition.code for definition in PERMISSIONS)
     grants = []
     for assignment in assignments:
+        exclusions = assignment.exclusions.all()
         grants.append(
             {
                 'scope': assignment.scope,
@@ -180,7 +191,20 @@ def user_access(user):
                 'profile': assignment.profile.public_id if assignment.profile else None,
                 'permission': assignment.permission_code,
                 'excluded_organizations': sorted(
-                    (item.excluded_organization.public_id for item in assignment.exclusions.all()), key=str
+                    (item.excluded_organization.public_id for item in exclusions if not item.permission_code), key=str
+                ),
+                'excluded_permissions': sorted(
+                    (
+                        {
+                            'organization': item.excluded_organization.public_id
+                            if item.excluded_organization
+                            else None,
+                            'permission': item.permission_code,
+                        }
+                        for item in exclusions
+                        if item.permission_code
+                    ),
+                    key=lambda item: (str(item['organization'] or ''), item['permission']),
                 ),
                 'is_active': assignment.is_active,
             }
