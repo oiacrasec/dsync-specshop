@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { TabsModule } from 'primeng/tabs';
 
 import { PermissionCatalogService } from '@/app/core/services/permission-catalog.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
@@ -18,7 +19,7 @@ import { PerfilService } from '../perfil.service';
 @Component({
     selector: 'app-perfil-formulario',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiInputText, UiCheckbox, UiButton, PermissionGrid],
+    imports: [CommonModule, TabsModule, ReactiveFormsModule, UiInputText, UiCheckbox, UiButton, PermissionGrid],
     templateUrl: './formulario.html'
 })
 export class PerfilFormPage implements OnInit {

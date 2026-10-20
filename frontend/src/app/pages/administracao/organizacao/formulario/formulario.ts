@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { TabsModule } from 'primeng/tabs';
 
 import { UserContextService } from '@/app/core/services/user-context.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
@@ -16,7 +17,7 @@ import { OrganizacaoService } from '../organizacao.service';
 @Component({
     selector: 'app-organizacao-formulario',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, UiInputText, UiCheckbox, UiButton],
+    imports: [CommonModule, TabsModule, ReactiveFormsModule, UiInputText, UiCheckbox, UiButton],
     templateUrl: './formulario.html'
 })
 export class OrganizacaoFormPage implements OnInit {

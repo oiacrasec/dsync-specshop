@@ -9,15 +9,26 @@
         </div>
     </div>
 
-    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" (ngSubmit)="save()">
-        <div class="flex flex-col gap-2">
-            <ui-input-text inputId="name" formControlName="name" [maxlength]="255" label="Nome" errorMessage="Informe o nome da organização." />
-        </div>
+    <div class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="name" formControlName="name" [maxlength]="255" label="Nome" errorMessage="Informe o nome da organização." />
+                        </div>
 
-        <div class="flex items-center gap-2">
-            <ui-checkbox inputId="is_active" formControlName="is_active" label="Organização ativa" [marginTop]="22" />
-        </div>
-    </form>
+                        <div class="flex items-center gap-2">
+                            <ui-checkbox inputId="is_active" formControlName="is_active" label="Organização ativa" [marginTop]="22" />
+                        </div>
+                    </form>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </div>
 
     <div class="flex flex-wrap items-center justify-end gap-3">
         <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
