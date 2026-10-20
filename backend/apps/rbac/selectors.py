@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Exists, OuterRef, Prefetch, Q
 
-from apps.core.permission_registry import PermissionScope
+from apps.core.permission_registry import PERMISSIONS, PermissionScope
 
 from .constants import ESSENTIAL_PROFILE_KEY
 from .evaluation import Grant
@@ -139,3 +139,66 @@ def accessible_organizations(user):
     # Fica de fora só o que todas as concessões de contrato excluem e nenhuma direta devolve.
     excluded = frozenset.intersection(*(grant.excluded_organizations for grant in contract_wide)) - direct
     return organizations.exclude(pk__in=excluded)
+
+
+def user_access(user):
+    """Tela de acesso do usuário (8.3): organizações, perfis atribuíveis e concessões atuais.
+
+    O essencial vem com todos os códigos do registry; é aplicado como os demais (decisão 63).
+
+    Queries constantes: organizações, perfis + permissões, atribuições + exceções.
+    """
+    from apps.contracts.models import Organization
+
+    organizations = list(
+        Organization.objects.filter(contract_id=user.contract_id)
+        .order_by('name', 'pk')
+        .values('public_id', 'name', 'is_active')
+    )
+    profiles = (
+        Profile.objects.filter(Q(contract_id=user.contract_id) | Q(contract__isnull=True))
+        .prefetch_related(
+            Prefetch('permissions', queryset=ProfilePermission.objects.only('profile_id', 'permission_code'))
+        )
+        .order_by('name', 'pk')
+    )
+    assignments = (
+        Assignment.objects.filter(user=user, contract_id=user.contract_id)
+        .select_related('profile', 'scope_organization')
+        .prefetch_related(
+            Prefetch('exclusions', queryset=AssignmentExclusion.objects.select_related('excluded_organization'))
+        )
+        .order_by('pk')
+    )
+    all_codes = sorted(definition.code for definition in PERMISSIONS)
+    grants = []
+    for assignment in assignments:
+        grants.append(
+            {
+                'scope': assignment.scope,
+                'organization': assignment.scope_organization.public_id if assignment.scope_organization else None,
+                'profile': assignment.profile.public_id if assignment.profile else None,
+                'permission': assignment.permission_code,
+                'excluded_organizations': sorted(
+                    (item.excluded_organization.public_id for item in assignment.exclusions.all()), key=str
+                ),
+                'is_active': assignment.is_active,
+            }
+        )
+    return {
+        'organizations': organizations,
+        'profiles': [
+            {
+                'public_id': profile.public_id,
+                'name': profile.name,
+                'is_active': profile.is_active,
+                'is_system': profile.contract_id is None,
+                'is_essential': profile.system_key == ESSENTIAL_PROFILE_KEY,
+                'permissions': all_codes
+                if profile.system_key == ESSENTIAL_PROFILE_KEY
+                else sorted(item.permission_code for item in profile.permissions.all()),
+            }
+            for profile in profiles
+        ],
+        'grants': grants,
+    }

@@ -331,3 +331,56 @@ def delete_exclusion(*, exclusion, actor):
     current.delete(actor=actor)
     record(Event.EXCLUSION_REMOVED, actor=actor, contract_id=current.contract_id, target=current, before=before)
     return current
+
+
+def _grant_key(assignment):
+    return (assignment.scope, assignment.scope_organization_id, assignment.profile_id, assignment.permission_code)
+
+
+@system_scope
+@transaction.atomic
+def replace_user_access(*, user, grants, actor):
+    """Substitui as concessões do usuário pelo conjunto informado (8.3, decisões 58–60 e 63).
+
+    `grants`: dicionários com scope, scope_organization_id, profile_id, permission_code e
+    excluded_organization_ids (só CONTRACT). Cria e reativa antes de excluir, para que a
+    regra do último administrador veja o estado final. Só grava o que mudou.
+    """
+    allowed = begin_write(actor, user.contract_id)
+    _ensure_contract(allowed, user.contract_id)
+    desired = {}
+    for grant in grants:
+        key = (grant['scope'], grant['scope_organization_id'], grant['profile_id'], grant['permission_code'])
+        desired[key] = set(grant.get('excluded_organization_ids', ()))
+    current = {
+        _grant_key(item): item
+        for item in Assignment.objects.filter(user=user, contract_id=user.contract_id).prefetch_related('exclusions')
+    }
+    for key, excluded in desired.items():
+        assignment = current.get(key)
+        if assignment is None:
+            scope, organization_id, profile_id, code = key
+            assignment = Assignment(
+                user=user,
+                contract_id=user.contract_id,
+                scope=scope,
+                scope_organization_id=organization_id,
+                profile_id=profile_id,
+                permission_code=code,
+            )
+            save_assignment(assignment=assignment, actor=actor)
+            existing = {}
+        else:
+            if not assignment.is_active:
+                assignment.is_active = True
+                save_assignment(assignment=assignment, actor=actor)
+            existing = {item.excluded_organization_id: item for item in assignment.exclusions.all()}
+        for organization_id in sorted(excluded - existing.keys()):
+            exclusion = AssignmentExclusion(
+                assignment=assignment, contract_id=user.contract_id, excluded_organization_id=organization_id
+            )
+            save_exclusion(exclusion=exclusion, actor=actor)
+        for organization_id in sorted(existing.keys() - excluded):
+            delete_exclusion(exclusion=existing[organization_id], actor=actor)
+    for key in sorted(current.keys() - desired.keys(), key=str):
+        delete_assignment(assignment=current[key], actor=actor)

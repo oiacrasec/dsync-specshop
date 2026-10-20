@@ -17,7 +17,10 @@ from apps.audit.utils import mark_auth_access
 from apps.core.exceptions import ContractInactive
 from apps.core.responses import build_exception_response, build_result_response
 from apps.core.views import BaseModelViewSet
+from apps.rbac import services as rbac_services
 from apps.rbac.permissions import AllowAuthenticated
+from apps.rbac.selectors import user_access
+from apps.rbac.serializers import UserAccessSerializer
 from apps.users import services
 from apps.users.filters import UserFilterSet
 from apps.users.models import User
@@ -109,7 +112,11 @@ class UserViewSet(BaseModelViewSet):
     serializer_class = ContractUserSerializer
     filterset_class = UserFilterSet
     permission_resource = 'user'
-    required_permission = {'reset_password': 'user:manage'}
+    required_permission = {
+        'reset_password': 'user:manage',
+        'access': 'user:view',
+        'replace_access': 'assignment:create',
+    }
     options_label_field = 'username'
     options_search_fields = ('username', 'first_name')
     schema_columns = ('username', 'first_name', 'is_active', 'must_change_password')
@@ -130,3 +137,15 @@ class UserViewSet(BaseModelViewSet):
             response = build_exception_response(exception=exc, request=request)
         add_never_cache_headers(response)
         return response
+
+    @action(detail=True, methods=['get'])
+    def access(self, request, *args, **kwargs):
+        return Response(user_access(self.get_object()))
+
+    @access.mapping.put
+    def replace_access(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = UserAccessSerializer(data=request.data, context={'request': request, 'user': user})
+        serializer.is_valid(raise_exception=True)
+        rbac_services.replace_user_access(user=user, actor=request.user, **serializer.validated_data)
+        return Response(user_access(user))

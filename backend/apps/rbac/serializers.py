@@ -1,8 +1,9 @@
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.contracts.models import Organization
-from apps.core.permission_registry import PERMISSIONS
+from apps.core.permission_registry import PERMISSIONS, PermissionScope
 from apps.core.tenancy import get_context
 
 from . import services
@@ -94,3 +95,52 @@ class ProfileSerializer(serializers.ModelSerializer):
             permission = ProfilePermission(profile=profile, contract_id=profile.contract_id, permission_code=code)
             services.save_profile_permission(permission=permission, actor=actor)
         profile.__dict__.pop('_prefetched_objects_cache', None)
+
+
+class AccessGrantSerializer(serializers.Serializer):
+    scope = serializers.ChoiceField(choices=[scope.value for scope in PermissionScope])
+    organization = serializers.UUIDField(required=False, allow_null=True, default=None)
+    profile = serializers.UUIDField(required=False, allow_null=True, default=None)
+    permission = serializers.CharField(required=False, allow_blank=True, default='', max_length=128)
+    excluded_organizations = serializers.ListField(child=serializers.UUIDField(), required=False, default=list)
+
+    def validate(self, attrs):
+        if (attrs['profile'] is None) == (not attrs['permission']):
+            raise serializers.ValidationError(_('Informe um perfil ou uma permissão.'))
+        if (attrs['scope'] == PermissionScope.ORGANIZATION.value) == (attrs['organization'] is None):
+            raise serializers.ValidationError(_('Informe a organização só no escopo de organização.'))
+        if attrs['excluded_organizations'] and attrs['scope'] != PermissionScope.CONTRACT.value:
+            raise serializers.ValidationError(_('Exceções só valem no escopo de contrato.'))
+        return attrs
+
+
+class UserAccessSerializer(serializers.Serializer):
+    """Concessões do usuário na aba Permissões (8.3); PUT substitui o conjunto inteiro."""
+
+    grants = AccessGrantSerializer(many=True, max_length=500)
+
+    def validate(self, attrs):
+        contract_id = self.context['user'].contract_id
+        organizations = dict(Organization.objects.filter(contract_id=contract_id).values_list('public_id', 'pk'))
+        profiles = dict(
+            Profile.objects.filter(Q(contract_id=contract_id) | Q(contract__isnull=True)).values_list('public_id', 'pk')
+        )
+        grants = []
+        for grant in attrs['grants']:
+            if grant['organization'] is not None and grant['organization'] not in organizations:
+                raise serializers.ValidationError({'grants': _('Informe uma organização do contrato.')})
+            if grant['profile'] is not None and grant['profile'] not in profiles:
+                raise serializers.ValidationError({'grants': _('Informe um perfil disponível.')})
+            if any(item not in organizations for item in grant['excluded_organizations']):
+                raise serializers.ValidationError({'grants': _('Informe uma organização do contrato.')})
+            grants.append(
+                {
+                    'scope': grant['scope'],
+                    'scope_organization_id': organizations.get(grant['organization']),
+                    'profile_id': profiles.get(grant['profile']),
+                    'permission_code': grant['permission'],
+                    'excluded_organization_ids': {organizations[item] for item in grant['excluded_organizations']},
+                }
+            )
+        attrs['grants'] = grants
+        return attrs
