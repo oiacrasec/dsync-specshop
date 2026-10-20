@@ -2,21 +2,32 @@
 
 - **Atualizado em:** 2026-10-19
 - **Agente:** Claude
-- **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 7 = prioridade)
-- **Último commit:** feat(frontend): add the permissions tab to the user form
+- **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Blocos 7 e 8 concluídos)
+- **Último commit:** a7038cb feat(frontend): add the settings screen and drop the theme drawer
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 8.5 Configurações implementada; aguardando revisão/commit e users.0005 no banco local |
-| Próximo passo exato | Revisão do usuário da 8.5; depois, definir o próximo bloco no plano |
-| Aguardando o usuário? | sim — revisar a 8.5 e autorizar users.0005 no banco local |
+| Etapa atual | Bloco 8 (8.1–8.5) ✅ commitado; rbac.0004 e users.0005 aplicadas ao banco local |
+| Próximo passo exato | Usuário escolher o próximo bloco entre as pendências listadas abaixo |
+| Aguardando o usuário? | sim — escolha do próximo bloco |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1–7.4 · 8.1–8.3.
-Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 5.4 (via Blocos 7–8) · 6.1–6.8 · 7.1–7.4 ·
+8.1–8.5.
+
+## Pendências (para escolher o próximo bloco)
+
+| Item | O que falta | Origem |
+|---|---|---|
+| 5.3 Admin de usuários | CRUD de superadmins na área admin (auditar criação e mudança de `is_superuser`); admins adicionais de um contrato pelo superadmin (6.6 cria só o 1º; 6.7 lista e reseta) | ADR 0010 |
+| 5.5 OpenAPI | `drf-spectacular` não instalado; schema/Swagger só para autenticados | ADR 0004 |
+| Suporte do superadmin | entrar numa organização de cliente (contrato → organização), com auditoria | ADR 0037 §5, decisão 49 |
+| Antes de produção | MFA do superadmin; HTTPS/CSP; cache compartilhado/borda; expurgo pós-contrato | ADRs 0010, 0035 |
+| Frontend | `npm audit` (88 vulns, adiado); itens "Perfil" e "Agenda" do avatar sem ação; telas DESABILITADO (setores, geoespacial) | handoff |
+| Repositório | push para o remoto (só quando pedido) | — |
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
   usuário → token), frontend de contratos no Core. audit.0007/0008 aplicadas ao banco local.
@@ -25,8 +36,8 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
   topbar mobile; card centralizado sem menu; entrada direta com organização única; open redirect
   corrigido (`safeReturnPath`); "Limpar" zera ordenação e ícones.
 - 7.1/decisões 45–49: organizações só na área do cliente; `/admin/organizations/` removida (404);
-  `organization:view/create/update/delete` não reservadas (`create` só CONTRACT); `view` em
-  qualquer escopo lista o contrato inteiro; suporte do superadmin adiado.
+  `organization:view/create/update/delete` não reservadas (`create` em qualquer escopo desde a 62);
+  `view` em qualquer escopo lista o contrato inteiro; suporte do superadmin adiado.
 
 - 8.2/8.3: perfis do cliente + catálogo `/permissions/`; aba Permissões do usuário
   (`GET/PUT /users/{id}/access/`, perfil vinculado, "Todas as organizações" = CONTRACT com exceções,
@@ -34,6 +45,8 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
   8.4: exceção de permissão na atribuição (ADR 0038, decisão 64): caixas livres, perfil vinculado.
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
+- 8.5 (decisões 65–66): tela `/configuracoes` (menu do avatar); aparência no usuário
+  (`/me/preferences/`, `users.0005`); `ThemeService` substitui o configurador do template.
 
 ## Dúvidas abertas
 

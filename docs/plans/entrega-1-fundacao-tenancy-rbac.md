@@ -126,7 +126,7 @@ e só começa após aprovação do usuário.
 | 5.1 | Mixin `options` | 0011 | ✅ |
 | 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008, 0020 | ✅ |
 | 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
-| 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ⬜ |
+| 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ✅ (Blocos 7 e 8) |
 | 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ⬜ |
 
 ## Bloco 6 — Área administrativa e frontend (prioridade, decisões 37 a 39)
