@@ -98,20 +98,17 @@ def test_registry_does_not_import_framework_or_project_runtime():
 
 
 def test_organization_permissions_are_assignable_by_the_customer():
-    # ADR 0037: deixam de ser reservadas; criar só no escopo do contrato.
+    # ADR 0037: deixam de ser reservadas e valem em qualquer escopo (visão por contrato, decisão 62).
     assert {item.code for item in PERMISSIONS if item.code.startswith('organization:')} == {
         'organization:view',
         'organization:create',
         'organization:update',
         'organization:delete',
     }
-    for code in ('organization:view', 'organization:update', 'organization:delete'):
+    for code in ('organization:view', 'organization:create', 'organization:update', 'organization:delete'):
         assert not PERMISSIONS.get(code).reserved
         assert PERMISSIONS.require_assignable(code, CONTRACT).code == code
         assert PERMISSIONS.require_assignable(code, ORGANIZATION).code == code
-    assert PERMISSIONS.require_assignable('organization:create', CONTRACT).code == 'organization:create'
-    with pytest.raises(ValueError):
-        PERMISSIONS.require_assignable('organization:create', ORGANIZATION)
 
 
 def test_user_profile_and_assignment_management_stay_reserved():

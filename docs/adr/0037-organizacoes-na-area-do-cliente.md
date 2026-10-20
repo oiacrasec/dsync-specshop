@@ -18,8 +18,9 @@ exclusivo do superadmin. Nenhuma tela usava a rota; o usuário comum troca de or
    contrato e para usuários comuns com permissão. `/api/v1/admin/organizations/` é removida.
 2. **O cliente decide quem gerencia.** `organization:view` (nova), `organization:create`,
    `organization:update` e `organization:delete` deixam de ser reservadas: podem entrar em perfis
-   do cliente e em permissões avulsas. `organization:create` só no escopo CONTRACT (criar uma
-   organização dentro de outra não faz sentido); as demais em CONTRACT ou ORGANIZATION. O perfil
+   do cliente e em permissões avulsas, em CONTRACT ou ORGANIZATION. Revisão (decisão 62):
+   `organization:create` também vale em ORGANIZATION; o escopo só diz por qual atribuição a pessoa
+   recebeu o código, e a organização nova é sempre do contrato (visão por contrato, item 3). O perfil
    essencial continua com tudo. Usuários, perfis e atribuições continuam reservados (ADR 0009 §3.1).
 3. **Visão do contrato inteiro.** Quem tem `organization:view`, em qualquer escopo, lista todas as
    organizações do contrato: a permissão foi concedida pelo cliente.

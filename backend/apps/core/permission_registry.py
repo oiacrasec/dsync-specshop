@@ -77,7 +77,7 @@ _CONTRACT_SCOPE = frozenset({PermissionScope.CONTRACT})
 PERMISSIONS = PermissionRegistry(
     [
         PermissionDefinition('organization:view', _ANY_SCOPE),
-        PermissionDefinition('organization:create', _CONTRACT_SCOPE),
+        PermissionDefinition('organization:create', _ANY_SCOPE),
         PermissionDefinition('organization:update', _ANY_SCOPE),
         PermissionDefinition('organization:delete', _ANY_SCOPE),
         # Gestão reservada ao perfil essencial (ADR 0009 §3.1).

@@ -9,7 +9,7 @@ responde 404.
 | Método | Rota | Permissão |
 |---|---|---|
 | GET | `/api/v1/organizations/` (lista), `{public_id}/`, `options/`, `schema/` | `organization:view` |
-| POST | `/api/v1/organizations/` | `organization:create` (só concedida no escopo do contrato) |
+| POST | `/api/v1/organizations/` | `organization:create` (concedida em qualquer escopo; cria no contrato) |
 | PUT / PATCH | `/api/v1/organizations/{public_id}/` | `organization:update` |
 | DELETE | `/api/v1/organizations/{public_id}/` | `organization:delete` (soft delete) |
 

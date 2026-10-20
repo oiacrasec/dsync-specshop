@@ -89,6 +89,14 @@ def test_create_needs_contract_scope_and_writes_contract_from_context(world):
     assert set(response.json()) == {'public_id', 'name', 'is_active', 'created_at', 'updated_at'}
 
 
+def test_create_granted_in_one_organization_creates_for_the_contract(world):
+    filial = world['orgs']['Filial']
+    grant(world, 'organization:create', organization=filial)
+    response = client(world['maria'], filial).post(URL, {'name': 'Nova'}, format='json')
+    assert response.status_code == 201, response.content
+    assert Organization.objects.get(public_id=response.json()['public_id']).contract_id == world['contract'].pk
+
+
 def test_each_action_requires_its_own_code(world):
     filial = world['orgs']['Filial']
     grant(world, 'organization:view', organization=filial)
