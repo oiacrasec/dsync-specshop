@@ -1,22 +1,22 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRouteSnapshot, Router, RouterModule } from '@angular/router';
 import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { LayoutService } from '@/app/layout/service/layout.service';
-import { AppConfigurator } from './app.configurator';
 import { AppBreadcrumb } from '@/app/layout/components/app.breadcrumb';
 import { AppFooter } from '@/app/layout/components/app.footer';
 import { AppSearch } from '@/app/layout/components/app.search';
 import { AppRightMenu } from '@/app/layout/components/app.rightmenu';
 import { ToastModule } from 'primeng/toast';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
+import { PreferencesService } from '@/app/core/services/preferences.service';
 import { UserContextService } from '@/app/core/services/user-context.service';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppConfigurator, AppBreadcrumb, AppFooter, AppSearch, AppRightMenu, ToastModule],
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppBreadcrumb, AppFooter, AppSearch, AppRightMenu, ToastModule],
     template: `
         <div class="layout-wrapper" [ngClass]="containerClass()">
             @if (shouldShowAppShell()) {
@@ -33,7 +33,6 @@ import { UserContextService } from '@/app/core/services/user-context.service';
                         <div app-footer></div>
                     </div>
                 </div>
-                <app-configurator />
                 <div app-search></div>
                 <div app-rightmenu></div>
                 <div class="layout-mask"></div>
@@ -50,8 +49,9 @@ import { UserContextService } from '@/app/core/services/user-context.service';
         </div>
     `
 })
-export class AppLayout {
+export class AppLayout implements OnInit {
     layoutService: LayoutService = inject(LayoutService);
+    private preferences = inject(PreferencesService);
     private authSession = inject(AuthSessionService);
     private userContextService = inject(UserContextService);
     private router = inject(Router);
@@ -75,6 +75,10 @@ export class AppLayout {
             'layout-sidebar-anchored': layoutState.anchored
         };
     });
+
+    ngOnInit() {
+        this.preferences.load().subscribe({ error: () => undefined });
+    }
 
     shouldShowAppShell() {
         const user = this.authSession.getUser();

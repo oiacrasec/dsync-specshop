@@ -101,6 +101,15 @@ export const appRoutes: Routes = [
             },
             */
             {
+                path: 'configuracoes',
+                canActivate: [accessGuard],
+                loadComponent: () => import('@/app/pages/configuracoes/configuracoes').then((c) => c.ConfiguracoesPage),
+                data: {
+                    breadcrumb: 'Configurações',
+                    audience: ACCESS_AUDIENCE.AUTHENTICATED
+                }
+            },
+            {
                 path: 'pages',
                 canActivate: [accessGuard],
                 loadChildren: () => import('@/app/pages/pages.routes'),

@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Bloco 8 (8.1–8.4) ✅; 8.4 (ADR 0038) aguardando revisão/commit e rbac.0004 no banco local |
-| Próximo passo exato | Tela de Configurações (tema) no menu do avatar; tirar o painel Settings do login |
-| Aguardando o usuário? | sim — confirmar início da tela de Configurações |
+| Etapa atual | 8.5 Configurações implementada; aguardando revisão/commit e users.0005 no banco local |
+| Próximo passo exato | Revisão do usuário da 8.5; depois, definir o próximo bloco no plano |
+| Aguardando o usuário? | sim — revisar a 8.5 e autorizar users.0005 no banco local |
 
 ## Concluído
 
@@ -51,5 +51,4 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 - Home virou `/dashboards` em branco (KPI removida a pedido); `pages/dashboards/` é arquivo do projeto (ADR 0036).
 - JWT localStorage (ADR 0035); HTTPS/CSP, cache compartilhado/borda/MFA e expurgo antes de produção.
 - Font Awesome Free 7.3.1 por classe (atribuição CC BY no README do frontend); orçamento de aviso 2 MB.
-- Pendência pedida: tela de Configurações (tema) no menu do avatar, sem o painel Settings no login; depois do Bloco 8.
 - npm audit (88 vulns) adiado pelo usuário até o front ficar mais redondo. Push só quando pedido.

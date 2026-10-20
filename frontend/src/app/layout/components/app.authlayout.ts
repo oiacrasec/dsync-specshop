@@ -1,22 +1,23 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AppConfigurator } from './app.configurator';
-import { LayoutService } from '@/app/layout/service/layout.service';
 
+import { PreferencesService } from '@/app/core/services/preferences.service';
+
+// Telas sem sessão: aparência padrão; a do usuário vem da tela de Configurações após entrar.
 @Component({
     selector: 'app-auth-layout',
     standalone: true,
-    imports: [RouterModule, AppConfigurator],
+    imports: [RouterModule],
     template: `
         <main>
             <router-outlet></router-outlet>
         </main>
-        <button class="layout-config-button config-link" (click)="layoutService.toggleConfigSidebar()">
-            <i class="pi pi-cog"></i>
-        </button>
-        <app-configurator location="landing" />
     `
 })
-export class AuthLayout {
-    layoutService: LayoutService = inject(LayoutService);
+export class AuthLayout implements OnInit {
+    private preferences = inject(PreferencesService);
+
+    ngOnInit() {
+        this.preferences.resetToDefault();
+    }
 }

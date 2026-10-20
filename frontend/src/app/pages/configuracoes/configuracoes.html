@@ -1,0 +1,66 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Configurações</h2>
+            <p class="text-sm text-surface-500 dark:text-white/64">Aparência do sistema para você. As mudanças aparecem na hora; salve para guardar.</p>
+        </div>
+    </div>
+
+    @if (draft(); as current) {
+    <div class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <div class="flex flex-col gap-8">
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Cor principal</h3>
+                            <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Cor principal">
+                                @for (color of primaryColors(); track color.name) {
+                                <button
+                                    type="button"
+                                    role="radio"
+                                    [attr.aria-checked]="current.primary === color.name"
+                                    [attr.aria-label]="primaryLabel(color.name)"
+                                    [title]="primaryLabel(color.name)"
+                                    class="w-8 h-8 rounded-lg flex items-center justify-center outline-offset-2 transition-transform hover:scale-110"
+                                    [ngClass]="{ 'outline-2 outline-primary': current.primary === color.name }"
+                                    [style.background-color]="color.name === 'noir' ? 'var(--p-text-color)' : color.palette?.['500']"
+                                    (click)="change({ primary: color.name! })"
+                                >
+                                    @if (current.primary === color.name) {
+                                    <i class="fa-solid fa-check text-white text-sm" aria-hidden="true"></i>
+                                    }
+                                </button>
+                                }
+                            </div>
+                        </section>
+
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Estilo dos componentes</h3>
+                            <p-selectbutton [options]="presetOptions" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="current.preset" (ngModelChange)="change({ preset: $event })" ariaLabelledBy="Estilo dos componentes" />
+                        </section>
+
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Modo</h3>
+                            <p-selectbutton [options]="schemeOptions" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="current.dark_mode" (ngModelChange)="change({ dark_mode: $event })" />
+                        </section>
+
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Menu</h3>
+                            <p-selectbutton class="flex-wrap" [options]="menuOptions" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="current.menu_mode" (ngModelChange)="change({ menu_mode: $event })" />
+                        </section>
+                    </div>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="cancel()"></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving" [disabled]="!dirty()" (onClick)="save()"></ui-button>
+    </div>
+    }
+</div>

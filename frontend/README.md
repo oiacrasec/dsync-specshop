@@ -77,6 +77,13 @@ Custo: ~80 KB a mais no CSS inicial (~13 KB comprimido); as fontes só baixam qu
 O aviso de orçamento do bundle inicial é 2 MB (decisão do usuário; erro em 5 MB).
 Os prefixos não colidem com o PrimeIcons.
 
+## Configurações (etapa 8.5)
+
+Menu do avatar → **Configurações** (`/configuracoes`): cor principal, estilo dos componentes,
+modo claro/escuro e tipo de menu, guardados no usuário (`/api/v1/me/preferences/`). A aplicação
+do tema fica no `ThemeService` (`layout/service/theme.service.ts`); o painel de engrenagem do
+template foi removido. Login e telas sem sessão usam a aparência padrão.
+
 ## Usuários (etapa 8.1)
 
 Menu "Usuários" (`user:view`, reservado ao admin do contrato): lista, criação (senha temporária

@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 8.5: tela de Configurações e preferências no usuário
+
+- Decisões 65–66. Backend: `User.preferences` (JSONField, `users.0005`), `GET/PUT /api/v1/me/preferences/`
+  (`MyPreferencesView`, `PreferencesSerializer` com listas fechadas em `users/constants.py`; leitura
+  completa com o padrão; gravação com `update_fields`). 8 testes; suíte 664.
+- Frontend: `ThemeService` (extraído do `app.configurator`, removido), `PreferencesService`, página
+  `/configuracoes` (aba Principal, aplica na hora, Salvar grava, sair sem salvar reverte); `AppLayout`
+  carrega as preferências; `AuthLayout` volta ao padrão; engrenagem removida do login/landing/erro.
+  97 testes. Docs: `docs/api/preferences.md`, README do frontend.
+
 ## 2026-10-19 — Etapa 8.4: exceção de permissão na atribuição (ADR 0038)
 
 - Decisão 64: perfil vinculado com customização livre. `AssignmentExclusion` com `permission_code` e
