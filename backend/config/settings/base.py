@@ -38,6 +38,7 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_spectacular',
 ]
 
 LOCAL_APPS = [
@@ -159,6 +160,22 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
         'apps.rbac.permissions.RequiredPermission',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'apps.core.openapi.AutoSchema',
+}
+
+# OpenAPI gerado do código (ADR 0004); arquivo em docs/api/openapi-v1.yaml.
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'datasync-core API',
+    'DESCRIPTION': 'API v1. Erros em RFC 9457 (application/problem+json); contexto pelo header X-Organization-Id.',
+    'VERSION': '1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': r'/api/v1',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'DEFAULT_GENERATOR_CLASS': 'apps.core.openapi.SchemaGenerator',
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
+        'apps.core.openapi.add_problem_responses',
     ],
 }
 

@@ -17,6 +17,7 @@ Autenticação JWT e `IsAuthenticated` são globais.
 | `/api/v1/organizations/` | organizações do contrato (área do cliente) | [organizações](organizations.md) |
 | `/api/v1/me/permissions/` | permissões efetivas na organização ativa (para a interface) | [permissões](permissions.md) |
 | `/api/v1/me/preferences/` | aparência da interface do próprio usuário | [preferências](preferences.md) |
+| `/api/v1/schema/` | OpenAPI 3 gerado do código (autenticado; `/admin/` só para superadmin) | [openapi-v1.yaml](openapi-v1.yaml) |
 | `/api/v1/admin/plans/`, `/api/v1/admin/contracts/` | administração do superadmin | [administração](admin-contracts.md) |
 
 Seleções seguem o contrato de [options](options.md). Endpoints da área do cliente exigem

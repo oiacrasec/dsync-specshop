@@ -1,6 +1,8 @@
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -18,6 +20,7 @@ from .serializers import OrganizationSummarySerializer, ProfileSerializer
 from .utils import access_evaluation
 
 
+@extend_schema(responses={200: OrganizationSummarySerializer(many=True)})
 @method_decorator(never_cache, name='dispatch')
 class MyOrganizationsView(APIView):
     """Lista para troca de contexto; sem X-Organization-Id (ADR 0006 §3.1).
@@ -32,6 +35,13 @@ class MyOrganizationsView(APIView):
         return Response(OrganizationSummarySerializer(organizations, many=True).data)
 
 
+@extend_schema(
+    responses={
+        200: inline_serializer(
+            'PermissionSummary', {'permissions': serializers.ListField(child=serializers.CharField())}
+        )
+    }
+)
 @method_decorator(never_cache, name='dispatch')
 class MyPermissionsView(APIView):
     """Códigos efetivos na organização ativa, só para a interface (ADR 0037).
@@ -42,6 +52,8 @@ class MyPermissionsView(APIView):
 
     permission_classes = [AllowAuthenticated]
 
+    organization_header = True
+
     def get(self, request):
         evaluation = access_evaluation(request, resolve_organization(request))
         if not evaluation.has_access:
@@ -49,6 +61,28 @@ class MyPermissionsView(APIView):
         return Response({'permissions': sorted(evaluation.permissions)})
 
 
+CATALOG_ITEM = inline_serializer(
+    'PermissionCatalogItem',
+    {
+        'code': serializers.CharField(),
+        'action': serializers.CharField(),
+        'label': serializers.CharField(),
+        'scopes': serializers.ListField(child=serializers.CharField()),
+        'reserved': serializers.BooleanField(),
+    },
+    many=True,
+)
+
+
+@extend_schema(
+    responses={
+        200: inline_serializer(
+            'PermissionCatalogGroup',
+            {'resource': serializers.CharField(), 'label': serializers.CharField(), 'permissions': CATALOG_ITEM},
+            many=True,
+        )
+    }
+)
 class PermissionCatalogView(APIView):
     """Catálogo do registry com rótulos, agrupado por recurso, para montar as telas de acesso."""
 

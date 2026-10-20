@@ -78,8 +78,8 @@ traz tudo) e a resposta mistura camelCase e snake_case.
 | Geração | `drf-spectacular` (BSD-3, suporta Django 5.2), a partir do código |
 | Erros | tipos da skill `erros-api-rfc9457` documentados no schema |
 | Por versão | um schema por versão (ex.: `/api/v1/schema/`) |
-| Arquivo | schema gerado salvo em `docs/api/`; o CI acusa divergência com o código |
-| Documentação navegável (Swagger UI / Redoc) | **só para autenticados**; a parte administrativa (`/api/v1/admin/…`) só para superadmins |
+| Arquivo | schema gerado salvo em `docs/api/openapi-v1.yaml`; um teste acusa divergência com o código |
+| Documentação navegável (Swagger UI / Redoc) | **só para autenticados**; a parte administrativa (`/api/v1/admin/…`) só para superadmins. Como a API é só JWT, a tela fica no frontend (`/documentacoes/api`), que busca `/api/v1/schema/` com a sessão (etapa 5.5) |
 
 Referência: o `datasync-spatial` não gera OpenAPI; documenta com coleção do Postman.
 

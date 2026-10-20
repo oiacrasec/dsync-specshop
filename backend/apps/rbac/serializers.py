@@ -43,10 +43,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('public_id', 'created_at', 'updated_at')
 
-    def get_is_system(self, profile):
+    def get_is_system(self, profile) -> bool:
         return profile.contract_id is None
 
-    def get_is_essential(self, profile):
+    def get_is_essential(self, profile) -> bool:
         return profile.system_key == ESSENTIAL_PROFILE_KEY
 
     def to_representation(self, profile):
@@ -160,3 +160,30 @@ class UserAccessSerializer(serializers.Serializer):
             )
         attrs['grants'] = grants
         return attrs
+
+
+class AccessOrganizationSerializer(serializers.Serializer):
+    public_id = serializers.UUIDField()
+    name = serializers.CharField()
+    is_active = serializers.BooleanField()
+
+
+class AccessProfileSerializer(serializers.Serializer):
+    public_id = serializers.UUIDField()
+    name = serializers.CharField()
+    is_active = serializers.BooleanField()
+    is_system = serializers.BooleanField()
+    is_essential = serializers.BooleanField()
+    permissions = serializers.ListField(child=serializers.CharField())
+
+
+class AccessGrantOutputSerializer(AccessGrantSerializer):
+    is_active = serializers.BooleanField()
+
+
+class UserAccessOutputSerializer(serializers.Serializer):
+    """Formato de `selectors.user_access` (GET/PUT …/access/), só para o OpenAPI."""
+
+    organizations = AccessOrganizationSerializer(many=True)
+    profiles = AccessProfileSerializer(many=True)
+    grants = AccessGrantOutputSerializer(many=True)

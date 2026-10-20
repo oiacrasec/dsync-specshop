@@ -3,7 +3,8 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-from rest_framework import status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.parsers import JSONParser
@@ -15,12 +16,13 @@ from rest_framework.views import APIView
 from apps.audit.models import AccessLogAction
 from apps.audit.utils import mark_auth_access
 from apps.core.exceptions import ContractInactive
+from apps.core.openapi import temporary_password_response
 from apps.core.responses import build_exception_response, build_result_response
 from apps.core.views import BaseModelViewSet
 from apps.rbac import services as rbac_services
 from apps.rbac.permissions import AllowAuthenticated
 from apps.rbac.selectors import user_access
-from apps.rbac.serializers import UserAccessSerializer
+from apps.rbac.serializers import UserAccessOutputSerializer, UserAccessSerializer
 from apps.users import services
 from apps.users.constants import DEFAULT_PREFERENCES
 from apps.users.filters import UserFilterSet
@@ -45,6 +47,12 @@ class AuthView(APIView):
     renderer_classes = [JSONRenderer]
 
 
+TOKENS = {'access': serializers.CharField(), 'refresh': serializers.CharField()}
+LOGIN_RESPONSE = inline_serializer('LoginResponse', {**TOKENS, 'user': UserSummarySerializer()})
+USER_RESPONSE = inline_serializer('PasswordChangeResponse', {'user': UserSummarySerializer()})
+
+
+@extend_schema(request=LoginSerializer, responses={200: LOGIN_RESPONSE})
 class LoginView(AuthView):
     throttle_classes = [LoginThrottle]
 
@@ -69,6 +77,7 @@ class LoginView(AuthView):
         return Response({**tokens, 'user': UserSummarySerializer(request.user).data})
 
 
+@extend_schema(request=RefreshSerializer, responses={200: inline_serializer('TokenPair', TOKENS)})
 class RefreshView(AuthView):
     def post(self, request):
         serializer = RefreshSerializer(data=request.data)
@@ -78,6 +87,7 @@ class RefreshView(AuthView):
         return Response(tokens)
 
 
+@extend_schema(request=RefreshSerializer, responses={204: None})
 class LogoutView(AuthView):
     def post(self, request):
         serializer = RefreshSerializer(data=request.data)
@@ -90,6 +100,7 @@ class LogoutView(AuthView):
 @method_decorator(
     sensitive_post_parameters('current_password', 'new_password', 'new_password_confirm'), name='dispatch'
 )
+@extend_schema(request=PasswordChangeSerializer, responses={200: USER_RESPONSE})
 class PasswordChangeView(APIView):
     permission_classes = [AllowAuthenticated]
     parser_classes = [JSONParser]
@@ -109,6 +120,7 @@ class PasswordChangeView(APIView):
 
 
 @method_decorator(never_cache, name='dispatch')
+@extend_schema(request=PreferencesSerializer, responses={200: PreferencesSerializer})
 class MyPreferencesView(APIView):
     """Aparência da interface do próprio usuário; sem X-Organization-Id (vale para o superadmin)."""
 
@@ -153,6 +165,10 @@ class UserViewSet(BaseModelViewSet):
     }
     schema_filters = ('is_active',)
 
+    @extend_schema(
+        request=None,
+        responses={200: temporary_password_response('ContractUserPasswordReset', ContractUserSerializer())},
+    )
     @action(detail=True, methods=['post'], url_path='reset-password')
     def reset_password(self, request, *args, **kwargs):
         try:
@@ -164,10 +180,12 @@ class UserViewSet(BaseModelViewSet):
         add_never_cache_headers(response)
         return response
 
+    @extend_schema(request=None, responses={200: UserAccessOutputSerializer})
     @action(detail=True, methods=['get'])
     def access(self, request, *args, **kwargs):
         return Response(user_access(self.get_object()))
 
+    @extend_schema(request=UserAccessSerializer, responses={200: UserAccessOutputSerializer})
     @access.mapping.put
     def replace_access(self, request, *args, **kwargs):
         user = self.get_object()

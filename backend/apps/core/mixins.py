@@ -3,11 +3,13 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 
 from .constants import RESOURCE_PERMISSION_ACTIONS
 from .models import HybridScopedModel
+from .openapi import OPTIONS_PARAMETERS, OPTIONS_RESPONSE, TABLE_SCHEMA_RESPONSE
 from .responses import build_exception_response, build_result_response
 from .schema import column_schema, filter_schema, model_field
 from .selectors import lookup_options
@@ -102,8 +104,10 @@ class TableSchemaMixin:
             result.append(filter_schema(model, name, overrides, options_url))
         return result
 
-    @action(detail=False, methods=['get'])
-    def schema(self, request):
+    # Nome Python diferente de `schema`: o DRF usa `view.schema` para o OpenAPI.
+    @extend_schema(request=None, responses={200: TABLE_SCHEMA_RESPONSE})
+    @action(detail=False, methods=['get'], url_path='schema', url_name='schema')
+    def table_schema(self, request):
         try:
             result = {
                 'columns': self.get_schema_columns(),
@@ -159,6 +163,7 @@ class LookupOptionsMixin:
     options_label_field = None
     options_search_fields = ()
 
+    @extend_schema(request=None, parameters=OPTIONS_PARAMETERS, responses={200: OPTIONS_RESPONSE})
     @action(detail=False, methods=['get'])
     def options(self, request):
         try:

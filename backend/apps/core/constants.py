@@ -8,7 +8,7 @@ RESOURCE_PERMISSION_ACTIONS = {
     'list': 'view',
     'retrieve': 'view',
     'options': 'view',
-    'schema': 'view',
+    'table_schema': 'view',
     'create': 'create',
     'update': 'update',
     'partial_update': 'update',

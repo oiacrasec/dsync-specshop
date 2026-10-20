@@ -1,9 +1,11 @@
 from django.utils.cache import add_never_cache_headers
 from django.utils.translation import gettext_lazy as _
-from rest_framework import status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 
 from apps.contracts.models import Contract, Plan
+from apps.core.openapi import page_of, temporary_password_response
 from apps.core.responses import build_exception_response, build_result_response
 from apps.core.views import BaseAdminModelViewSet
 from apps.rbac.selectors import contract_admin_users
@@ -30,6 +32,19 @@ class ContractViewSet(BaseAdminModelViewSet):
     schema_column_overrides = {'start_date': {'label': _('Início')}}
     schema_filters = ('plan',)
 
+    @extend_schema(
+        request=ContractProvisionSerializer,
+        responses={
+            201: inline_serializer(
+                'ContractProvisionResult',
+                {
+                    'organization': OrganizationSummarySerializer(),
+                    'user': UserSummarySerializer(),
+                    'temporary_password': serializers.CharField(),
+                },
+            )
+        },
+    )
     @action(detail=True, methods=['post'])
     def provision(self, request, *args, **kwargs):
         """Cria a 1ª organização e o admin do contrato; senha temporária só nesta resposta."""
@@ -51,6 +66,7 @@ class ContractViewSet(BaseAdminModelViewSet):
         add_never_cache_headers(response)
         return response
 
+    @extend_schema(request=None, responses={200: page_of('ContractAdminPage', ContractAdminSerializer(many=True))})
     @action(detail=True, methods=['get'])
     def admins(self, request, *args, **kwargs):
         """Admins do contrato (atribuição essencial ativa), ativos ou não, paginados."""
@@ -64,6 +80,10 @@ class ContractViewSet(BaseAdminModelViewSet):
         add_never_cache_headers(response)
         return response
 
+    @extend_schema(
+        request=None,
+        responses={200: temporary_password_response('ContractAdminPasswordReset', ContractAdminSerializer())},
+    )
     @action(detail=True, methods=['post'], url_path='admins/<uuid:user_public_id>/reset-password')
     def admin_password_reset(self, request, user_public_id, *args, **kwargs):
         """Nova senha temporária do admin; devolvida só nesta resposta."""

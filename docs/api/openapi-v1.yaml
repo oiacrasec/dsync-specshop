@@ -1,0 +1,4520 @@
+openapi: 3.0.3
+info:
+  title: datasync-core API
+  version: '1'
+  description: API v1. Erros em RFC 9457 (application/problem+json); contexto pelo
+    header X-Organization-Id.
+paths:
+  /api/v1/admin/contracts/:
+    get:
+      operationId: admin_contracts_list
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - -end_date
+            - -licenses
+            - -name
+            - -start_date
+            - -updated_at
+            - created_at
+            - end_date
+            - licenses
+            - name
+            - start_date
+            - updated_at
+        description: |-
+          Ordenado
+
+          * `name` - Name
+          * `-name` - Name (decrescente)
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (decrescente)
+          * `start_date` - Start date
+          * `-start_date` - Start date (decrescente)
+          * `end_date` - End date
+          * `-end_date` - End date (decrescente)
+          * `licenses` - Licenses
+          * `-licenses` - Licenses (decrescente)
+        explode: false
+        style: form
+      - in: query
+        name: plan
+        schema:
+          type: string
+          format: uuid
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContractList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: admin_contracts_create
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/{public_id}/:
+    get:
+      operationId: admin_contracts_retrieve
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: admin_contracts_update
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContractRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    patch:
+      operationId: admin_contracts_partial_update
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContractRequest'
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      operationId: admin_contracts_destroy
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/{public_id}/admins/:
+    get:
+      operationId: admin_contracts_admins_retrieve
+      description: Admins do contrato (atribuição essencial ativa), ativos ou não,
+        paginados.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractAdminPage'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/{public_id}/admins/{user_public_id}/reset-password/:
+    post:
+      operationId: admin_contracts_admins_reset_password_create
+      description: Nova senha temporária do admin; devolvida só nesta resposta.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractAdminPasswordReset'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/{public_id}/provision/:
+    post:
+      operationId: admin_contracts_provision_create
+      description: Cria a 1ª organização e o admin do contrato; senha temporária só
+        nesta resposta.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractProvisionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContractProvisionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContractProvisionRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractProvisionResult'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/options/:
+    get:
+      operationId: admin_contracts_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/schema/:
+    get:
+      operationId: admin_contracts_schema_retrieve
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/plans/:
+    get:
+      operationId: admin_plans_list
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - -name
+            - -updated_at
+            - created_at
+            - name
+            - updated_at
+        description: |-
+          Ordenado
+
+          * `name` - Name
+          * `-name` - Name (decrescente)
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (decrescente)
+        explode: false
+        style: form
+      - in: query
+        name: plan
+        schema:
+          type: string
+          format: uuid
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlanList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: admin_plans_create
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/plans/{public_id}/:
+    get:
+      operationId: admin_plans_retrieve
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: admin_plans_update
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PlanRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    patch:
+      operationId: admin_plans_partial_update
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPlanRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPlanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPlanRequest'
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      operationId: admin_plans_destroy
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/plans/options/:
+    get:
+      operationId: admin_plans_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/admin/plans/schema/:
+    get:
+      operationId: admin_plans_schema_retrieve
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/change-password/:
+    post:
+      operationId: auth_change_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChangeResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/organizations/:
+    get:
+      operationId: me_organizations_list
+      description: |-
+        Lista para troca de contexto; sem X-Organization-Id (ADR 0006 §3.1).
+
+        Superadmin não tem contrato: recebe lista vazia e usa a busca contrato → organização.
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationSummary'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/permissions/:
+    get:
+      operationId: me_permissions_retrieve
+      description: |-
+        Códigos efetivos na organização ativa, só para a interface (ADR 0037).
+
+        Mesmo contexto e cálculo dos endpoints de negócio: header ausente/malformado → 400,
+        organização fora do alcance → 403. Não autoriza nada: cada endpoint revalida.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionSummary'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/preferences/:
+    get:
+      operationId: me_preferences_retrieve
+      description: Aparência da interface do próprio usuário; sem X-Organization-Id
+        (vale para o superadmin).
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: me_preferences_update
+      description: Aparência da interface do próprio usuário; sem X-Organization-Id
+        (vale para o superadmin).
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/organizations/:
+    get:
+      operationId: organizations_list
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - -name
+            - -updated_at
+            - created_at
+            - name
+            - updated_at
+        description: |-
+          Ordenado
+
+          * `name` - Name
+          * `-name` - Name (decrescente)
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (decrescente)
+        explode: false
+        style: form
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - organizations
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrganizationList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: organizations_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/organizations/{public_id}/:
+    get:
+      operationId: organizations_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: organizations_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    patch:
+      operationId: organizations_partial_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationRequest'
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      operationId: organizations_destroy
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - organizations
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/organizations/options/:
+    get:
+      operationId: organizations_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - organizations
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/organizations/schema/:
+    get:
+      operationId: organizations_schema_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - organizations
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/permissions/:
+    get:
+      operationId: permissions_list
+      description: Catálogo do registry com rótulos, agrupado por recurso, para montar
+        as telas de acesso.
+      tags:
+      - permissions
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PermissionCatalogGroup'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/profiles/:
+    get:
+      operationId: profiles_list
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - -name
+            - -updated_at
+            - created_at
+            - name
+            - updated_at
+        description: |-
+          Ordenado
+
+          * `name` - Name
+          * `-name` - Name (decrescente)
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (decrescente)
+        explode: false
+        style: form
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - profiles
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProfileList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: profiles_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/profiles/{public_id}/:
+    get:
+      operationId: profiles_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - profiles
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: profiles_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProfileRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    patch:
+      operationId: profiles_partial_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileRequest'
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      operationId: profiles_destroy
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - profiles
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/profiles/options/:
+    get:
+      operationId: profiles_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - profiles
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/profiles/schema/:
+    get:
+      operationId: profiles_schema_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - profiles
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/:
+    get:
+      operationId: users_list
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - -first_name
+            - -updated_at
+            - -username
+            - created_at
+            - first_name
+            - updated_at
+            - username
+        description: |-
+          Ordenado
+
+          * `username` - Nome de usuário
+          * `-username` - Nome de usuário (decrescente)
+          * `first_name` - First name
+          * `-first_name` - First name (decrescente)
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+          * `updated_at` - Updated at
+          * `-updated_at` - Updated at (decrescente)
+        explode: false
+        style: form
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContractUserList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: users_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUser'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{public_id}/:
+    get:
+      operationId: users_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUser'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: users_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContractUserRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUser'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    patch:
+      operationId: users_partial_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContractUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedContractUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContractUserRequest'
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUser'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      operationId: users_destroy
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{public_id}/access/:
+    get:
+      operationId: users_access_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccessOutput'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      operationId: users_access_update
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserAccessRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserAccessRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAccessRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccessOutput'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/{public_id}/reset-password/:
+    post:
+      operationId: users_reset_password_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractUserPasswordReset'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/options/:
+    get:
+      operationId: users_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/users/schema/:
+    get:
+      operationId: users_schema_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    AccessGrantOutput:
+      type: object
+      properties:
+        scope:
+          $ref: '#/components/schemas/ScopeEnum'
+        organization:
+          type: string
+          format: uuid
+          nullable: true
+        profile:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+          default: ''
+          maxLength: 128
+        excluded_organizations:
+          type: array
+          items:
+            type: string
+            format: uuid
+        excluded_permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExcludedPermission'
+        is_active:
+          type: boolean
+      required:
+      - is_active
+      - scope
+    AccessGrantRequest:
+      type: object
+      properties:
+        scope:
+          $ref: '#/components/schemas/ScopeEnum'
+        organization:
+          type: string
+          format: uuid
+          nullable: true
+        profile:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+          default: ''
+          maxLength: 128
+        excluded_organizations:
+          type: array
+          items:
+            type: string
+            format: uuid
+        excluded_permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExcludedPermissionRequest'
+      required:
+      - scope
+    AccessOrganization:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_active:
+          type: boolean
+      required:
+      - is_active
+      - name
+      - public_id
+    AccessProfile:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_active:
+          type: boolean
+        is_system:
+          type: boolean
+        is_essential:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - is_active
+      - is_essential
+      - is_system
+      - name
+      - permissions
+      - public_id
+    Contract:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          title: Nome
+          maxLength: 255
+        plan:
+          type: string
+          format: uuid
+          title: Plano
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          title: Início da vigência
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fim da vigência
+        licenses:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          title: Licenças
+        post_termination_retention_days:
+          type: integer
+          maximum: 365
+          minimum: 0
+          title: Dias de retenção após encerramento
+        is_active:
+          type: boolean
+          title: Ativo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Atualizado em
+      required:
+      - created_at
+      - licenses
+      - name
+      - public_id
+      - start_date
+      - updated_at
+    ContractAdmin:
+      type: object
+      description: 'Admin do contrato na administração: só identificação e situação
+        de acesso.'
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        username:
+          type: string
+          readOnly: true
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+        name:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+        must_change_password:
+          type: boolean
+          readOnly: true
+          title: Deve trocar a senha
+      required:
+      - is_active
+      - must_change_password
+      - name
+      - public_id
+      - username
+    ContractAdminPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractAdmin'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    ContractAdminPasswordReset:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/ContractAdmin'
+        temporary_password:
+          type: string
+      required:
+      - temporary_password
+      - user
+    ContractProvisionRequest:
+      type: object
+      description: Entrada do provisionamento; dados mínimos do admin (username e
+        nome).
+      properties:
+        organization_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        username:
+          type: string
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+      required:
+      - name
+      - organization_name
+      - username
+    ContractProvisionResult:
+      type: object
+      properties:
+        organization:
+          $ref: '#/components/schemas/OrganizationSummary'
+        user:
+          $ref: '#/components/schemas/UserSummary'
+        temporary_password:
+          type: string
+      required:
+      - organization
+      - temporary_password
+      - user
+    ContractRequest:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        plan:
+          type: string
+          format: uuid
+          title: Plano
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          title: Início da vigência
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fim da vigência
+        licenses:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          title: Licenças
+        post_termination_retention_days:
+          type: integer
+          maximum: 365
+          minimum: 0
+          title: Dias de retenção após encerramento
+        is_active:
+          type: boolean
+          title: Ativo
+      required:
+      - licenses
+      - name
+      - start_date
+    ContractUser:
+      type: object
+      description: |-
+        Usuários do contrato na área do cliente (8.1, decisões 54–56).
+
+        Cadastro com username + nome e senha temporária gerada, devolvida uma única vez;
+        escritas passam por save_user/delete_user (licenças, contrato e último admin).
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        username:
+          type: string
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        name:
+          type: string
+          maxLength: 150
+        is_active:
+          type: boolean
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+        must_change_password:
+          type: boolean
+          readOnly: true
+          title: Deve trocar a senha
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Atualizado em
+      required:
+      - created_at
+      - must_change_password
+      - name
+      - public_id
+      - updated_at
+      - username
+    ContractUserPasswordReset:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/ContractUser'
+        temporary_password:
+          type: string
+      required:
+      - temporary_password
+      - user
+    ContractUserRequest:
+      type: object
+      description: |-
+        Usuários do contrato na área do cliente (8.1, decisões 54–56).
+
+        Cadastro com username + nome e senha temporária gerada, devolvida uma única vez;
+        escritas passam por save_user/delete_user (licenças, contrato e último admin).
+      properties:
+        username:
+          type: string
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        is_active:
+          type: boolean
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+      required:
+      - name
+      - username
+    ExcludedPermission:
+      type: object
+      properties:
+        organization:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+          maxLength: 128
+      required:
+      - permission
+    ExcludedPermissionRequest:
+      type: object
+      properties:
+        organization:
+          type: string
+          format: uuid
+          nullable: true
+        permission:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+      - permission
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    LoginResponse:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserSummary'
+      required:
+      - access
+      - refresh
+      - user
+    MenuModeEnum:
+      enum:
+      - static
+      - overlay
+      - slim
+      - compact
+      - reveal
+      - drawer
+      - horizontal
+      type: string
+      description: |-
+        * `static` - static
+        * `overlay` - overlay
+        * `slim` - slim
+        * `compact` - compact
+        * `reveal` - reveal
+        * `drawer` - drawer
+        * `horizontal` - horizontal
+    Option:
+      type: object
+      properties:
+        value:
+          type: string
+          format: uuid
+        label:
+          type: string
+      required:
+      - label
+      - value
+    OptionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        total_records:
+          type: integer
+        has_next:
+          type: boolean
+      required:
+      - data
+      - has_next
+      - total_records
+    Organization:
+      type: object
+      description: |-
+        CRUD da área do cliente (ADR 0037); contrato vem do contexto, nunca do payload.
+
+        Escritas bloqueiam a linha do contrato: nome único e "pelo menos uma ativa" ficam
+        serializados entre requisições concorrentes (decisões 52 e 53).
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Atualizado em
+      required:
+      - created_at
+      - name
+      - public_id
+      - updated_at
+    OrganizationRequest:
+      type: object
+      description: |-
+        CRUD da área do cliente (ADR 0037); contrato vem do contexto, nunca do payload.
+
+        Escritas bloqueiam a linha do contrato: nome único e "pelo menos uma ativa" ficam
+        serializados entre requisições concorrentes (decisões 52 e 53).
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+      required:
+      - name
+    OrganizationSummary:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          readOnly: true
+          title: Nome
+      required:
+      - name
+      - public_id
+    PaginatedContractList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    PaginatedContractUserList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractUser'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    PaginatedOrganizationList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    PaginatedPlanList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    PaginatedProfileList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Profile'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
+    PasswordChangeRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - current_password
+      - new_password
+      - new_password_confirm
+    PasswordChangeResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserSummary'
+      required:
+      - user
+    PatchedContractRequest:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        plan:
+          type: string
+          format: uuid
+          title: Plano
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          title: Início da vigência
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          title: Fim da vigência
+        licenses:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+          title: Licenças
+        post_termination_retention_days:
+          type: integer
+          maximum: 365
+          minimum: 0
+          title: Dias de retenção após encerramento
+        is_active:
+          type: boolean
+          title: Ativo
+    PatchedContractUserRequest:
+      type: object
+      description: |-
+        Usuários do contrato na área do cliente (8.1, decisões 54–56).
+
+        Cadastro com username + nome e senha temporária gerada, devolvida uma única vez;
+        escritas passam por save_user/delete_user (licenças, contrato e último admin).
+      properties:
+        username:
+          type: string
+          minLength: 1
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        is_active:
+          type: boolean
+          title: Ativo
+          description: Indica que o usuário será tratado como ativo. Ao invés de excluir
+            contas de usuário, desmarque isso.
+    PatchedOrganizationRequest:
+      type: object
+      description: |-
+        CRUD da área do cliente (ADR 0037); contrato vem do contexto, nunca do payload.
+
+        Escritas bloqueiam a linha do contrato: nome único e "pelo menos uma ativa" ficam
+        serializados entre requisições concorrentes (decisões 52 e 53).
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+    PatchedPlanRequest:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        max_organizations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de organizações
+        max_storage_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de armazenamento em bytes
+        max_integrations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de integrações
+        max_operations_per_month:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de operações por mês
+        is_active:
+          type: boolean
+          title: Ativo
+    PatchedProfileRequest:
+      type: object
+      description: |-
+        Perfis da área do cliente (8.2): do contrato (editáveis) e do sistema (só leitura).
+
+        Escritas passam pelos services de RBAC (autorização no contrato, nomes, registry,
+        escopos das atribuições existentes, perfil em uso e auditoria).
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+        permissions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+          writeOnly: true
+    PermissionCatalogGroup:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionCatalogItem'
+        resource:
+          type: string
+        label:
+          type: string
+      required:
+      - label
+      - permissions
+      - resource
+    PermissionCatalogItem:
+      type: object
+      properties:
+        code:
+          type: string
+        action:
+          type: string
+        label:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        reserved:
+          type: boolean
+      required:
+      - action
+      - code
+      - label
+      - reserved
+      - scopes
+    PermissionSummary:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - permissions
+    Plan:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          title: Nome
+          maxLength: 255
+        max_organizations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de organizações
+        max_storage_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de armazenamento em bytes
+        max_integrations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de integrações
+        max_operations_per_month:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de operações por mês
+        is_active:
+          type: boolean
+          title: Ativo
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Atualizado em
+      required:
+      - created_at
+      - name
+      - public_id
+      - updated_at
+    PlanRequest:
+      type: object
+      description: Escrita administrativa global, autorizada explicitamente ao superadmin.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        max_organizations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de organizações
+        max_storage_bytes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de armazenamento em bytes
+        max_integrations:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+          title: Limite de integrações
+        max_operations_per_month:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          title: Limite de operações por mês
+        is_active:
+          type: boolean
+          title: Ativo
+      required:
+      - name
+    Preferences:
+      type: object
+      description: Aparência da interface do usuário (`/me/preferences/`); PUT envia
+        o conjunto inteiro.
+      properties:
+        preset:
+          $ref: '#/components/schemas/PresetEnum'
+        primary:
+          $ref: '#/components/schemas/PrimaryEnum'
+        dark_mode:
+          type: boolean
+        menu_mode:
+          $ref: '#/components/schemas/MenuModeEnum'
+      required:
+      - dark_mode
+      - menu_mode
+      - preset
+      - primary
+    PreferencesRequest:
+      type: object
+      description: Aparência da interface do usuário (`/me/preferences/`); PUT envia
+        o conjunto inteiro.
+      properties:
+        preset:
+          $ref: '#/components/schemas/PresetEnum'
+        primary:
+          $ref: '#/components/schemas/PrimaryEnum'
+        dark_mode:
+          type: boolean
+        menu_mode:
+          $ref: '#/components/schemas/MenuModeEnum'
+      required:
+      - dark_mode
+      - menu_mode
+      - preset
+      - primary
+    PresetEnum:
+      enum:
+      - Aura
+      - Lara
+      - Nora
+      type: string
+      description: |-
+        * `Aura` - Aura
+        * `Lara` - Lara
+        * `Nora` - Nora
+    PrimaryEnum:
+      enum:
+      - noir
+      - emerald
+      - green
+      - lime
+      - orange
+      - amber
+      - yellow
+      - teal
+      - cyan
+      - sky
+      - blue
+      - indigo
+      - violet
+      - purple
+      - fuchsia
+      - pink
+      - rose
+      type: string
+      description: |-
+        * `noir` - noir
+        * `emerald` - emerald
+        * `green` - green
+        * `lime` - lime
+        * `orange` - orange
+        * `amber` - amber
+        * `yellow` - yellow
+        * `teal` - teal
+        * `cyan` - cyan
+        * `sky` - sky
+        * `blue` - blue
+        * `indigo` - indigo
+        * `violet` - violet
+        * `purple` - purple
+        * `fuchsia` - fuchsia
+        * `pink` - pink
+        * `rose` - rose
+    Profile:
+      type: object
+      description: |-
+        Perfis da área do cliente (8.2): do contrato (editáveis) e do sistema (só leitura).
+
+        Escritas passam pelos services de RBAC (autorização no contrato, nomes, registry,
+        escopos das atribuições existentes, perfil em uso e auditoria).
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+        is_system:
+          type: boolean
+          readOnly: true
+        is_essential:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Atualizado em
+      required:
+      - created_at
+      - is_essential
+      - is_system
+      - name
+      - public_id
+      - updated_at
+    ProfileRequest:
+      type: object
+      description: |-
+        Perfis da área do cliente (8.2): do contrato (editáveis) e do sistema (só leitura).
+
+        Escritas passam pelos services de RBAC (autorização no contrato, nomes, registry,
+        escopos das atribuições existentes, perfil em uso e auditoria).
+      properties:
+        name:
+          type: string
+          minLength: 1
+          title: Nome
+          maxLength: 255
+        is_active:
+          type: boolean
+          title: Ativo
+        permissions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+          writeOnly: true
+      required:
+      - name
+    RefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - refresh
+    ScopeEnum:
+      enum:
+      - CONTRACT
+      - ORGANIZATION
+      type: string
+      description: |-
+        * `CONTRACT` - CONTRACT
+        * `ORGANIZATION` - ORGANIZATION
+    TableSchema:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        filters:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        general_search:
+          type: object
+          additionalProperties: {}
+          nullable: true
+        ordering_fields:
+          type: array
+          items:
+            type: string
+      required:
+      - columns
+      - filters
+      - general_search
+      - ordering_fields
+    TokenPair:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    UserAccessOutput:
+      type: object
+      description: Formato de `selectors.user_access` (GET/PUT …/access/), só para
+        o OpenAPI.
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessOrganization'
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessProfile'
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessGrantOutput'
+      required:
+      - grants
+      - organizations
+      - profiles
+    UserAccessRequest:
+      type: object
+      description: Concessões do usuário na aba Permissões (8.3); PUT substitui o
+        conjunto inteiro.
+      properties:
+        grants:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessGrantRequest'
+      required:
+      - grants
+    UserSummary:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        username:
+          type: string
+          readOnly: true
+          title: Usuário
+          description: Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_
+            apenas.
+        name:
+          type: string
+          readOnly: true
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Status de superusuário
+          description: Indica que este usuário tem todas as permissões sem atribuí-las
+            explicitamente.
+        must_change_password:
+          type: boolean
+          readOnly: true
+      required:
+      - is_superuser
+      - must_change_password
+      - name
+      - public_id
+      - username
+    Problem:
+      type: object
+      description: Problem Details (RFC 9457); `type` é urn:datasync:problem:<slug>.
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        request_id:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+      - type
+      - title
+      - status
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

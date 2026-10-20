@@ -137,7 +137,7 @@ desconhecidos são ignorados, sem criar filtros dinâmicos.
 
 `schema` retorna colunas com `field`/`label`/`type`, filtros com `field`/`label`/`type` e
 `ordering_fields`. O filtro de relação `plan` tem `options_url` apontando para
-`/api/v1/admin/plans/options/`. Documentação OpenAPI entra na etapa 5.5.
+`/api/v1/admin/plans/options/`. O schema OpenAPI está em [openapi-v1.yaml](openapi-v1.yaml).
 O `type` da coluna (`text`, `number`, `boolean`, `choice`, `date`, `datetime`, `relation`) vem do
 campo do model, como nos filtros: é semântico e neutro de idioma. O cliente escolhe o formato
 pelo locale (no Angular, `LOCALE_ID` pt-BR → `01/10/2026`).

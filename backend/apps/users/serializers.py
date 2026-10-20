@@ -32,7 +32,7 @@ class UserSummarySerializer(serializers.ModelSerializer):
         fields = ['public_id', 'username', 'name', 'is_superuser', 'must_change_password']
         read_only_fields = fields
 
-    def get_must_change_password(self, user):
+    def get_must_change_password(self, user) -> bool:
         return user.must_change_password and not user.is_superuser
 
 

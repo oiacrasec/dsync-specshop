@@ -9,7 +9,7 @@ CRUD = {
     'list': 'organization:view',
     'retrieve': 'organization:view',
     'options': 'organization:view',
-    'schema': 'organization:view',
+    'table_schema': 'organization:view',
     'create': 'organization:create',
     'update': 'organization:update',
     'partial_update': 'organization:update',

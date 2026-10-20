@@ -68,6 +68,12 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Rotas da API em `config/api/v1.py`, sob `/api/v1/`. Erros via exceções e handler
   global RFC 9457 (classes em `apps.core.exceptions`, respostas e handler em
   `apps.core.problems`), nunca corpo de erro manual na view.
+- OpenAPI (ADR 0004, `drf-spectacular`): `APIView` e actions customizadas declaram
+  `@extend_schema` (request/responses reais; helpers em `apps/core/openapi.py`). Toda mudança
+  de API regenera `docs/api/openapi-v1.yaml` com
+  `manage.py spectacular --validate --fail-on-warn --file ../docs/api/openapi-v1.yaml`;
+  o teste `test_versioned_schema_file_matches_the_code` acusa divergência. Views que exigem
+  a organização ativa sem `RequiredPermission` declaram `organization_header = True`.
 - Usar `serializer.is_valid(raise_exception=True)`; validação retorna 422. Mensagens
   de validação não devem incluir dados pessoais ou detalhes internos.
 - Actions customizadas usam try/except e helpers de core/responses.py:

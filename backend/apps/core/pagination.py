@@ -17,3 +17,16 @@ class StandardResultsSetPagination(BasePagination):
 
     def get_paginated_response(self, data):
         return Response({'data': data, 'total_records': self.total_records})
+
+    def get_paginated_response_schema(self, schema):
+        return {
+            'type': 'object',
+            'properties': {'data': schema, 'total_records': {'type': 'integer'}},
+            'required': ['data', 'total_records'],
+        }
+
+    def get_schema_operation_parameters(self, view):
+        return [
+            {'name': 'first', 'in': 'query', 'required': False, 'schema': {'type': 'integer', 'minimum': 0}},
+            {'name': 'rows', 'in': 'query', 'required': False, 'schema': {'type': 'integer', 'minimum': 1}},
+        ]
