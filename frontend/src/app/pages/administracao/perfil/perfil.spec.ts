@@ -148,6 +148,23 @@ describe('Grade de permissões', () => {
         expect(fixture.componentInstance.visibleGroups().length).toBe(2);
     });
 
+    it('o botão do recurso marca todas as caixas visíveis e depois desmarca', () => {
+        const fixture = TestBed.createComponent(PermissionGrid);
+        const emitted: string[][] = [];
+
+        fixture.componentRef.setInput('groups', CATALOG);
+        fixture.componentRef.setInput('selected', ['organization:view']);
+        fixture.componentInstance.selectedChange.subscribe((codes) => emitted.push(codes));
+        const users = fixture.componentInstance.visibleGroups()[0];
+
+        expect(fixture.componentInstance.allChecked(users)).toBeFalse();
+        fixture.componentInstance.toggleGroup(users);
+        fixture.componentRef.setInput('selected', emitted[0]);
+        expect(fixture.componentInstance.allChecked(users)).toBeTrue();
+        fixture.componentInstance.toggleGroup(users);
+        expect(emitted).toEqual([['organization:view', 'user:view'], ['organization:view']]);
+    });
+
     it('emite a seleção ordenada ao marcar e desmarcar', () => {
         const fixture = TestBed.createComponent(PermissionGrid);
         const emitted: string[][] = [];
