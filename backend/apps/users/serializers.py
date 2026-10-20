@@ -7,6 +7,7 @@ from apps.audit.models import AuditEventType as Event
 from apps.core.serializers import BaseModelSerializer
 from apps.core.tenancy import get_context
 
+from .constants import MENU_MODES, THEME_PRESETS, THEME_PRIMARY_COLORS
 from .utils import generate_temporary_password
 
 
@@ -97,3 +98,12 @@ class ContractUserSerializer(BaseModelSerializer):
         if getattr(self, 'temporary_password', None):
             data['temporary_password'] = self.temporary_password
         return data
+
+
+class PreferencesSerializer(serializers.Serializer):
+    """Aparência da interface do usuário (`/me/preferences/`); PUT envia o conjunto inteiro."""
+
+    preset = serializers.ChoiceField(choices=THEME_PRESETS)
+    primary = serializers.ChoiceField(choices=THEME_PRIMARY_COLORS)
+    dark_mode = serializers.BooleanField()
+    menu_mode = serializers.ChoiceField(choices=MENU_MODES)

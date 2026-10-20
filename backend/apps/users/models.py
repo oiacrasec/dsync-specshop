@@ -21,6 +21,8 @@ class User(AbstractUser, BaseModel):
     contract = models.ForeignKey('contracts.Contract', verbose_name=_('contrato'), on_delete=models.PROTECT,
                                  null=True, blank=True, related_name='+',)
     must_change_password = models.BooleanField(verbose_name=_('deve trocar a senha'), default=False)
+    # Só aparência da interface (finalidade: personalização; sem dado pessoal sensível).
+    preferences = models.JSONField(verbose_name=_('preferências'), default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         abstract = False

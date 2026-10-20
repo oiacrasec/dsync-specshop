@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apps.core.routers import SchemaRouter
-from apps.users.views import LoginView, LogoutView, PasswordChangeView, RefreshView, UserViewSet
+from apps.users.views import LoginView, LogoutView, MyPreferencesView, PasswordChangeView, RefreshView, UserViewSet
 
 app_name = 'users'
 
@@ -13,5 +13,6 @@ urlpatterns = [
     path('auth/refresh/', RefreshView.as_view(), name='refresh'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/change-password/', PasswordChangeView.as_view(), name='change-password'),
+    path('me/preferences/', MyPreferencesView.as_view(), name='my-preferences'),
     *router.urls,
 ]

@@ -22,12 +22,14 @@ from apps.rbac.permissions import AllowAuthenticated
 from apps.rbac.selectors import user_access
 from apps.rbac.serializers import UserAccessSerializer
 from apps.users import services
+from apps.users.constants import DEFAULT_PREFERENCES
 from apps.users.filters import UserFilterSet
 from apps.users.models import User
 from apps.users.serializers import (
     ContractUserSerializer,
     LoginSerializer,
     PasswordChangeSerializer,
+    PreferencesSerializer,
     RefreshSerializer,
     UserSummarySerializer,
 )
@@ -104,6 +106,30 @@ class PasswordChangeView(APIView):
             new_password=serializer.validated_data['new_password'],
         )
         return Response({'user': UserSummarySerializer(user).data})
+
+
+@method_decorator(never_cache, name='dispatch')
+class MyPreferencesView(APIView):
+    """Aparência da interface do próprio usuário; sem X-Organization-Id (vale para o superadmin)."""
+
+    permission_classes = [AllowAuthenticated]
+    parser_classes = [JSONParser]
+
+    def get(self, request):
+        return Response(self.current(request.user))
+
+    def put(self, request):
+        serializer = PreferencesSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        user.preferences = serializer.validated_data
+        user.save(update_fields=['preferences'], actor=user)
+        return Response(self.current(user))
+
+    @staticmethod
+    def current(user):
+        stored = PreferencesSerializer(data={**DEFAULT_PREFERENCES, **user.preferences})
+        return stored.validated_data if stored.is_valid() else dict(DEFAULT_PREFERENCES)
 
 
 @method_decorator(never_cache, name='dispatch')
