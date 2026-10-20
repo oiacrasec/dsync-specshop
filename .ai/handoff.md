@@ -3,15 +3,15 @@
 - **Atualizado em:** 2026-10-19
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Blocos 7 e 8 concluídos)
-- **Último commit:** e80f5f3 feat(frontend): add the documentation area with the API reference
+- **Último commit:** a0e8dce feat(core): configure private media storage on filesystem or S3
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 5.5 OpenAPI ✅ commitada; Blocos 7 e 8 concluídos |
-| Próximo passo exato | Revisão da 9.1; depois 9.2 (foto, nome, fuso) |
-| Aguardando o usuário? | sim — revisar a 9.1 |
+| Etapa atual | 9.1 mídia ✅ commitada (ADR 0039); Blocos 5 (exceto 5.3), 7 e 8 concluídos |
+| Próximo passo exato | 9.2 Perfil: foto (256 px WebP sem metadados), nome editável, fuso IANA aplicado às datas; usuário pediu para seguir no dia seguinte |
+| Aguardando o usuário? | não — 9.2 autorizada; confirmar início na sessão |
 
 ## Concluído
 
@@ -45,6 +45,8 @@
   8.4: exceção de permissão na atribuição (ADR 0038, decisão 64): caixas livres, perfil vinculado.
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
+- 9.1 (decisões 69–75, ADR 0039): `DJANGO_MEDIA_STORAGE=filesystem|s3` em `config/storage.py`;
+  URL assinada `/api/v1/media/<token>/` (filesystem) ou pre-signed (S3); mídia sempre privada.
 - 5.5 (decisões 67–68): `/api/v1/schema/` + `docs/api/openapi-v1.yaml` (regenerar a cada mudança
   de API; teste acusa divergência); Swagger UI no frontend `/documentacoes/api`.
 - 8.5 (decisões 65–66): tela `/configuracoes` (menu do avatar); aparência no usuário
