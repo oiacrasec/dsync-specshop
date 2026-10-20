@@ -81,7 +81,7 @@ Os prefixos não colidem com o PrimeIcons.
 
 Menu "Usuários" (`user:view`, reservado ao admin do contrato): lista, criação (senha temporária
 exibida uma vez pelo componente `app-temporary-password`), edição, exclusão e redefinição de senha
-com confirmação. Aba de permissões entra na 8.3.
+com confirmação. Aba Permissões (8.3): organizações à esquerda, perfis vinculados, avulsas e exceções.
 
 ## Organizações (etapa 7.4)
 

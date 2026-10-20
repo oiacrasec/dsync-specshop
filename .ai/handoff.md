@@ -1,21 +1,21 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-18
+- **Atualizado em:** 2026-10-19
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Bloco 7 = prioridade)
-- **Último commit:** 1de66a2 feat(frontend): add Font Awesome and show boolean columns as icons
+- **Último commit:** feat(frontend): add the permissions tab to the user form
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 8.1 usuários do contrato — ✅ concluída e commitada; audit.0010 aplicada |
-| Próximo passo exato | 8.2: perfis do cliente e catálogo de permissões com rótulos |
-| Aguardando o usuário? | não — 8.2 autorizada; commit só após revisão |
+| Etapa atual | Bloco 8 (8.1–8.3) ✅ concluído e commitado; decisões 58–63 |
+| Próximo passo exato | Tela de Configurações (tema) no menu do avatar; tirar o painel Settings do login |
+| Aguardando o usuário? | sim — confirmar início da tela de Configurações |
 
 ## Concluído
 
-0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1 · 7.2 · 7.3 · 7.4 · 8.1.
+0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 6.1–6.8 · 7.1–7.4 · 8.1–8.3.
 Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 
 - 6.6–6.8: provisionamento (409 contract-not-provisionable), admins/reset (refresh trava
@@ -27,6 +27,12 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 - 7.1/decisões 45–49: organizações só na área do cliente; `/admin/organizations/` removida (404);
   `organization:view/create/update/delete` não reservadas (`create` só CONTRACT); `view` em
   qualquer escopo lista o contrato inteiro; suporte do superadmin adiado.
+
+- 8.2/8.3: perfis do cliente + catálogo `/permissions/`; aba Permissões do usuário
+  (`GET/PUT /users/{id}/access/`, perfil vinculado, "Todas as organizações" = CONTRACT com exceções,
+  Salvar único). Admin do contrato = perfil essencial aplicado pelo seletor (decisão 63).
+  `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
+  Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
 
 ## Dúvidas abertas
 

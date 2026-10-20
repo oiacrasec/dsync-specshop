@@ -15,6 +15,8 @@ export const PERMISSION_KEYS = {
     PROFILE_CREATE: 'profile:create',
     PROFILE_UPDATE: 'profile:update',
     PROFILE_DELETE: 'profile:delete',
+    ASSIGNMENT_CREATE: 'assignment:create',
+    ASSIGNMENT_DELETE: 'assignment:delete',
     SETOR_VIEW: 'setor:view',
     SETOR_CREATE: 'setor:create',
     SETOR_UPDATE: 'setor:update',

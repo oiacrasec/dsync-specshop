@@ -13,19 +13,38 @@
     <app-temporary-password [username]="user.username" [password]="user.temporary_password" />
     }
 
-    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6" (ngSubmit)="save()">
-        <div class="flex flex-col gap-2">
-            <ui-input-text inputId="username" formControlName="username" [maxlength]="150" label="Usuário de acesso" autocomplete="off" errorMessage="Informe o usuário de acesso." />
-        </div>
+    <div class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+                @if (isEditing && access()) {
+                <p-tab value="permissoes">Permissões</p-tab>
+                }
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="username" formControlName="username" [maxlength]="150" label="Usuário de acesso" autocomplete="off" errorMessage="Informe o usuário de acesso." />
+                        </div>
 
-        <div class="flex flex-col gap-2">
-            <ui-input-text inputId="name" formControlName="name" [maxlength]="150" label="Nome" errorMessage="Informe o nome do usuário." />
-        </div>
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="name" formControlName="name" [maxlength]="150" label="Nome" errorMessage="Informe o nome do usuário." />
+                        </div>
 
-        <div class="flex items-center gap-2">
-            <ui-checkbox inputId="is_active" formControlName="is_active" label="Usuário ativo" [marginTop]="22" />
-        </div>
-    </form>
+                        <div class="flex items-center gap-2">
+                            <ui-checkbox inputId="is_active" formControlName="is_active" label="Usuário ativo" [marginTop]="22" />
+                        </div>
+                    </form>
+                </p-tabpanel>
+                @if (access(); as userAccess) {
+                <p-tabpanel value="permissoes">
+                    <app-user-access [access]="userAccess" [catalog]="catalog()" [disabled]="!canEditAccess()" />
+                </p-tabpanel>
+                }
+            </p-tabpanels>
+        </p-tabs>
+    </div>
 
     <div class="flex flex-wrap items-center justify-end gap-3">
         <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>

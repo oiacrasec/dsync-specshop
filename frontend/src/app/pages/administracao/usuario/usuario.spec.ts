@@ -13,12 +13,14 @@ import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import { CONTEXT_KEY, SESSION_KEY } from '@/app/core/utils/session-data';
 import { LoginResponse } from '@/app/types/auth';
 import { UsuarioFormPage } from './formulario/formulario';
+import { ALL_ORGANIZATIONS } from './permissoes/permissoes';
 import { UsuarioPage } from './usuario';
 import { UsuarioService } from './usuario.service';
 
 const USER_ID = '019a0000-0000-7000-8000-000000000001';
 const ORG_ID = '019a0000-0000-7000-8000-000000000002';
 const OTHER_ID = '019a0000-0000-7000-8000-000000000003';
+const ESSENTIAL = { public_id: '019a0000-0000-7000-8000-000000000009', name: 'Administrador do contrato', is_active: true, is_system: true, is_essential: true, permissions: ['user:view'] };
 const USER = { public_id: OTHER_ID, username: 'joao', name: 'João', is_active: true, must_change_password: true, created_at: '', updated_at: '' };
 
 function login(superuser = false): LoginResponse {
@@ -117,6 +119,37 @@ describe('Usuários na área do cliente', () => {
         controller.expectOne('/api/v1/users/').flush({ type: 'urn:datasync:problem:license-limit-reached', status: 409, title: 'Limite de licenças atingido', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
         expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail }));
         expect(page.created).toBeNull();
+    });
+
+    it('salva os dados e depois as permissões alteradas na aba', async () => {
+        const { controller, permissions } = configure(OTHER_ID);
+        const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
+
+        permissions.loadForCurrentContext().subscribe();
+        flushPermissions(controller, ['user:update', 'assignment:create', 'assignment:delete']);
+        const fixture = TestBed.createComponent(UsuarioFormPage);
+        const page = fixture.componentInstance;
+
+        fixture.detectChanges();
+        controller.expectOne(`/api/v1/users/${OTHER_ID}/`).flush(USER);
+        controller.expectOne('/api/v1/permissions/').flush([]);
+        controller.expectOne(`/api/v1/users/${OTHER_ID}/access/`).flush({ organizations: [], profiles: [ESSENTIAL], grants: [] });
+        expect(page.canEditAccess()).toBeTrue();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        const editor = fixture.debugElement.query((element) => element.name === 'app-user-access').componentInstance;
+
+        editor.select(ALL_ORGANIZATIONS);
+        editor.selectedProfile = ESSENTIAL.public_id;
+        editor.applyProfile();
+        page.save();
+        controller.expectOne(`/api/v1/users/${OTHER_ID}/`).flush(USER);
+        const request = controller.expectOne(`/api/v1/users/${OTHER_ID}/access/`);
+
+        expect(request.request.method).toBe('PUT');
+        expect(request.request.body).toEqual({ grants: [{ scope: 'CONTRACT', organization: null, profile: ESSENTIAL.public_id, permission: '', excluded_organizations: [] }] });
+        request.flush({ organizations: [], profiles: [ESSENTIAL], grants: [] });
+        expect(navigate).toHaveBeenCalledWith('/pages/administracao/usuario');
     });
 
     it('volta para a lista sem chamar a API quando o id da rota não é UUID', () => {

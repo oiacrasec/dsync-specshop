@@ -1,5 +1,21 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 8.3: permissões do usuário; padrão de abas nos formulários
+
+- Decisões 58–61: perfil vinculado; "Todas as organizações" = escopo CONTRACT com exceções por
+  organização; Salvar único; formulários com a aba Principal (como contratos).
+- Backend: `GET/PUT /api/v1/users/{id}/access/` (`UserViewSet.access`, `user:view` /
+  `assignment:create`); `rbac.selectors.user_access`; `UserAccessSerializer` resolve UUIDs no
+  contrato; `rbac.services.replace_user_access` grava só a diferença. 13 testes; suíte 647.
+- Frontend: `usuario/permissoes/` (`app-user-access`); `app-permission-grid` com `locked` e `scope`;
+  formulários de organização, usuário e perfil em `p-tabs` (perfil: aba Permissões). 90 testes.
+- Docs: `docs/api/users.md`, `frontend/AGENTS.md`, `frontend/docs/standards/patterns-frontend.md`.
+- Decisão 62: `organization:create` em qualquer escopo (registry `_ANY_SCOPE`; ADR 0037 §2 revisto;
+  `docs/api/organizations.md`); teste de criação com concessão só numa organização. Suíte 648.
+- Decisão 63: sem a flag `contract_admin`; o essencial entra no seletor de perfis da aba (só em
+  "Todas as organizações", sem exceção) e no `GET …/access/` com `is_essential` e todos os códigos.
+- Catálogo: `PERMISSION_LABELS` sobrepõe o rótulo da ação (`user:manage` → "Redefinir senha").
+
 ## 2026-10-19 — Etapa 8.2: perfis do contrato
 
 - Backend: registry `profile:view` (reservada); `GET /api/v1/permissions/` (catálogo com rótulos

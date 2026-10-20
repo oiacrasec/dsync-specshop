@@ -3,12 +3,14 @@ export interface PermissionSummary {
     permissions: string[];
 }
 
+export type PermissionScope = 'CONTRACT' | 'ORGANIZATION';
+
 // GET /api/v1/permissions/: catálogo do registry com rótulos, por recurso.
 export interface PermissionCatalogItem {
     code: string;
     action: string;
     label: string;
-    scopes: Array<'CONTRACT' | 'ORGANIZATION'>;
+    scopes: PermissionScope[];
     reserved: boolean;
 }
 

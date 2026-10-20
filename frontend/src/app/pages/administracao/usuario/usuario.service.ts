@@ -4,7 +4,7 @@ import { tap } from 'rxjs/operators';
 
 import { BaseCrudService } from '@/app/core/services/base-crud.service';
 import { UiTableListResponse } from '@/app/shared/ui/table/table';
-import { ContractUser, ContractUserCreated, ContractUserPasswordReset, ContractUserWrite } from '@/app/types/usuario';
+import { ContractUser, ContractUserCreated, ContractUserPasswordReset, ContractUserWrite, UserAccess, UserAccessWrite } from '@/app/types/usuario';
 
 const USERS = 'users';
 
@@ -32,6 +32,14 @@ export class UsuarioService extends BaseCrudService {
 
     resetPassword(publicId: string) {
         return this.http.post<ContractUserPasswordReset>(`${this.userUrl(publicId)}reset-password/`, {}).pipe(tap(() => this.invalidateTableCache()));
+    }
+
+    getAccess(publicId: string) {
+        return this.http.get<UserAccess>(`${this.userUrl(publicId)}access/`);
+    }
+
+    replaceAccess(publicId: string, payload: UserAccessWrite) {
+        return this.http.put<UserAccess>(`${this.userUrl(publicId)}access/`, payload);
     }
 
     private userUrl(publicId: string) {

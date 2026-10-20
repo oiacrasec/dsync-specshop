@@ -2,9 +2,10 @@ import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
-import { PermissionCatalogGroup } from '@/app/types/permission';
+import { PermissionCatalogGroup, PermissionScope } from '@/app/types/permission';
 
 // Grade de permissões por recurso (um bloco por recurso, uma caixa por ação), no layout do GIS.
+// `locked`: códigos herdados (perfil ou contrato), mostrados marcados e sem edição.
 @Component({
     selector: 'app-permission-grid',
     standalone: true,
@@ -19,7 +20,13 @@ import { PermissionCatalogGroup } from '@/app/types/permission';
                     <div class="p-4 overflow-x-auto">
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                             @for (permission of group.permissions; track permission.code) {
-                                <ui-checkbox [inputId]="idPrefix() + permission.code" [label]="permission.label" [disabled]="disabled()" [ngModel]="selectedSet().has(permission.code)" (ngModelChange)="toggle(permission.code, $event)" />
+                                <ui-checkbox
+                                    [inputId]="idPrefix() + permission.code"
+                                    [label]="permission.label"
+                                    [disabled]="disabled() || lockedSet().has(permission.code)"
+                                    [ngModel]="selectedSet().has(permission.code) || lockedSet().has(permission.code)"
+                                    (ngModelChange)="toggle(permission.code, $event)"
+                                />
                             }
                         </div>
                     </div>
@@ -35,13 +42,16 @@ export class PermissionGrid {
     readonly selected = input<string[]>([]);
     readonly disabled = input(false);
     readonly includeReserved = input(false);
+    readonly locked = input<string[]>([]);
+    readonly scope = input<PermissionScope | null>(null);
     readonly idPrefix = input('perm_');
     readonly selectedChange = output<string[]>();
 
     readonly selectedSet = computed(() => new Set(this.selected()));
+    readonly lockedSet = computed(() => new Set(this.locked()));
     readonly visibleGroups = computed(() =>
         this.groups()
-            .map((group) => ({ ...group, permissions: group.permissions.filter((item) => this.includeReserved() || !item.reserved) }))
+            .map((group) => ({ ...group, permissions: group.permissions.filter((item) => (this.includeReserved() || !item.reserved) && this.allowedInScope(item.scopes)) }))
             .filter((group) => group.permissions.length > 0)
     );
 
@@ -55,5 +65,11 @@ export class PermissionGrid {
         }
 
         this.selectedChange.emit([...next].sort());
+    }
+
+    private allowedInScope(scopes: PermissionScope[]) {
+        const scope = this.scope();
+
+        return scope === null || scopes.includes(scope);
     }
 }

@@ -55,7 +55,7 @@ e só começa após aprovação do usuário.
 | 43 | 6.7 (usuário): admins do contrato = atribuição essencial ativa (perfil ativo), usuário ativo **ou inativo**, não excluído; rotas `GET …/contracts/{public_id}/admins/` (paginada) e `POST …/admins/{user_public_id}/reset-password/`. Refresh passa a travar usuário → token, a mesma ordem do reset |
 | 44 | 6.8 (usuário): formulário de contrato inclui a retenção pós-contrato (`post_termination_retention_days`, 0–365, padrão 90) além do plano opcional |
 | 45 | Revisão do ADR 0032 (usuário): organizações só na área do cliente, menu para o admin do contrato e comuns com permissão; `/admin/organizations/` removida (ADR 0037) |
-| 46 | Permissões de organização não reservadas: o cliente decide quem vê e gerencia (`organization:view` nova; `create` só CONTRACT). Usuários, perfis e atribuições seguem reservados |
+| 46 | Permissões de organização não reservadas: o cliente decide quem vê e gerencia (`organization:view` nova; `create` só CONTRACT, revisto na 62). Usuários, perfis e atribuições seguem reservados |
 | 47 | Quem tem `organization:view` em qualquer escopo lista todas as organizações do contrato |
 | 48 | Resumo de permissões para a interface: `GET /api/v1/me/permissions/` com `X-Organization-Id` |
 | 49 | Suporte do superadmin dentro de organização (escolha contrato → organização) fica para depois |
@@ -67,6 +67,12 @@ e só começa após aprovação do usuário.
 | 55 | Usuário cadastrado pelo admin do contrato: `username` + nome (LGPD, necessidade) |
 | 56 | Senha inicial temporária gerada no servidor, exibida uma vez, troca obrigatória |
 | 57 | 5.4 em etapas: 8.1 usuários → 8.2 perfis → 8.3 permissões do usuário (layout da aba de permissões do GIS) |
+| 58 | 8.3 (usuário): aplicar perfil **vincula** a atribuição (ADR 0009 §2), não copia como o GIS; caixas livres viram avulsas |
+| 59 | 8.3: item "Todas as organizações" edita o escopo CONTRACT; cada organização mostra o herdado com a exceção "não vale nesta organização" |
+| 60 | 8.3: a aba grava num Salvar único, `PUT /users/{id}/access/` substitui o conjunto numa transação |
+| 61 | Formulários: campos na aba **Principal** (`p-tabs`), como o de contratos; seções extras em outras abas |
+| 62 | Revisão da 46 (usuário): `organization:create` em qualquer escopo; visão por contrato, como view/update/delete (ADR 0037 §2) |
+| 63 | Aba Permissões sem a caixa "Administrador do contrato": o perfil essencial é aplicado pelo seletor de perfis, só em "Todas as organizações" (escopo CONTRACT, sem exceções); continua visível, só leitura, na tela de Perfis |
 
 ## Bloco 0 — Fundação
 
@@ -172,7 +178,7 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 |---|---|---|---|---|
 | 8.1 | Usuários: `/api/v1/users/` (CRUD, redefinir senha, `user:view`/`user:delete` reservadas) e telas | backend + frontend | 0009, 0015 | ✅ |
 | 8.2 | Perfis do cliente e suas permissões (catálogo do registry com rótulos) | backend + frontend | 0009, 0016 | ✅ |
-| 8.3 | Aba "Permissões" do usuário: organizações à esquerda, grade por recurso, aplicar perfil, admin do contrato | backend + frontend | 0009 | ⬜ |
+| 8.3 | Aba "Permissões" do usuário: organizações à esquerda, grade por recurso, aplicar perfil, admin do contrato | backend + frontend | 0009 | ✅ |
 
 Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configurações** no menu do
 avatar, com as opções de tema (cor primária, preset Aura/Lara/Nora, claro/escuro) e remoção do
