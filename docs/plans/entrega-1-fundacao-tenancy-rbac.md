@@ -78,6 +78,13 @@ e só começa após aprovação do usuário.
 | 66 | Configurações: cor principal, estilo (Aura/Lara/Nora), modo claro/escuro e tipo de menu, em português; painel "Settings" removido do login e das demais telas |
 | 67 | 5.5: Swagger UI dentro do frontend (`/documentacoes/api`, menu do avatar → Documentações → API), com o schema buscado pela sessão JWT; o backend só serve `/api/v1/schema/` |
 | 68 | 5.5: qualquer autenticado vê a documentação da área do cliente; `/admin/` só o superadmin (ADR 0004) |
+| 69 | Perfil (Bloco 9): foto, nome editável, fuso horário, troca de senha, sessões, 2FA e "meu acesso"; aparência continua em Configurações |
+| 70 | Mídia configurável por `.env`: `DJANGO_MEDIA_STORAGE=filesystem` ou `s3` (compatível com MinIO por endpoint) |
+| 71 | Foto entregue por URL temporária assinada nos dois modos; bucket e pasta privados |
+| 72 | Sem e-mail no perfil por enquanto (decisão 55 mantida); entra quando houver finalidade |
+| 73 | 2FA por app autenticador (TOTP, RFC 6238); WebAuthn fica para depois |
+| 74 | 2FA opcional para todos, inclusive superadmin (risco do ADR 0010 continua aceito) |
+| 75 | Recuperação do 2FA: 10 códigos reserva de uso único + reset por admin (contrato: admin do contrato; admins e superadmins: superadmin), auditado |
 
 ## Bloco 0 — Fundação
 
@@ -191,8 +198,14 @@ Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configu
 avatar, com as opções de tema (cor primária, preset Aura/Lara/Nora, claro/escuro) e remoção do
 painel "Settings" da tela de login. ✅ Etapa 8.5.
 
-## Bloco 9 — Perfil do usuário (pedido em 2026-10-19; etapas a definir)
+## Bloco 9 — Perfil do usuário (decisões 69 a 75)
 
-Página do item "Perfil" do menu do avatar: foto do usuário, troca de senha, fuso horário e
-outros itens a definir com o usuário. Requisito: armazenamento de mídia configurável por `.env`
-(sistema de arquivos ou bucket compatível com S3). Etapas e decisões entram após a definição.
+Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segurança e Acesso.
+
+| # | Etapa | Lado | ADR | Status |
+|---|---|---|---|---|
+| 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados | backend | nova | ⬜ |
+| 9.2 | Perfil: foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas | backend + frontend | — | ⬜ |
+| 9.3 | Segurança: trocar senha; sessões com navegador/IP, encerrar uma e sair de todas | backend + frontend | — | ⬜ |
+| 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |
+| 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |
