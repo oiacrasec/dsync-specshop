@@ -147,7 +147,7 @@ describe('Usuários na área do cliente', () => {
         const request = controller.expectOne(`/api/v1/users/${OTHER_ID}/access/`);
 
         expect(request.request.method).toBe('PUT');
-        expect(request.request.body).toEqual({ grants: [{ scope: 'CONTRACT', organization: null, profile: ESSENTIAL.public_id, permission: '', excluded_organizations: [] }] });
+        expect(request.request.body).toEqual({ grants: [{ scope: 'CONTRACT', organization: null, profile: ESSENTIAL.public_id, permission: '', excluded_organizations: [], excluded_permissions: [] }] });
         request.flush({ organizations: [], profiles: [ESSENTIAL], grants: [] });
         expect(navigate).toHaveBeenCalledWith('/pages/administracao/usuario');
     });

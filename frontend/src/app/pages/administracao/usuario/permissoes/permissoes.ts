@@ -6,27 +6,20 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 
 import { UiButton } from '@/app/shared/ui/button/button';
-import { UiCheckbox } from '@/app/shared/ui/checkbox/checkbox';
 import { PermissionGrid } from '@/app/shared/ui/permission-grid/permission-grid';
 import { PermissionCatalogGroup, PermissionScope } from '@/app/types/permission';
 import { AccessGrant, AccessProfile, UserAccess, UserAccessWrite } from '@/app/types/usuario';
 
 export const ALL_ORGANIZATIONS = 'contract';
 
-interface InheritedGrant {
-    grant: AccessGrant;
-    label: string;
-    excluded: boolean;
-    essential: boolean;
-}
-
-// Aba Permissões do usuário (8.3): "Todas as organizações" edita o escopo CONTRACT; cada organização
-// edita o próprio escopo e mostra as concessões herdadas do contrato, com a exceção por organização.
-// O perfil essencial (administrador do contrato) só vale em "Todas" e não admite exceção (decisão 63).
+// Aba Permissões do usuário (8.3/8.4). "Todas as organizações" edita o escopo CONTRACT; cada
+// organização edita o que vale nela. O perfil fica vinculado e as caixas ficam livres: desmarcar
+// algo que veio de um perfil grava uma exceção de permissão (ADR 0038), marcar algo novo grava
+// uma avulsa. O perfil essencial (administrador do contrato) só vale em "Todas" e não tem exceção.
 @Component({
     selector: 'app-user-access',
     standalone: true,
-    imports: [NgClass, FormsModule, ChipModule, MessageModule, SelectModule, UiButton, UiCheckbox, PermissionGrid],
+    imports: [NgClass, FormsModule, ChipModule, MessageModule, SelectModule, UiButton, PermissionGrid],
     templateUrl: './permissoes.html'
 })
 export class UserAccessEditor {
@@ -48,36 +41,14 @@ export class UserAccessEditor {
         return target === ALL_ORGANIZATIONS ? 'Todas as organizações' : (this.organizations().find((organization) => organization.public_id === target)?.name ?? '');
     });
     readonly scope = computed<PermissionScope>(() => (this.target() === ALL_ORGANIZATIONS ? 'CONTRACT' : 'ORGANIZATION'));
-    readonly targetGrants = computed(() => this.grants().filter((grant) => this.isAtTarget(grant)));
     readonly appliedProfiles = computed(() =>
-        this.targetGrants()
-            .filter((grant) => grant.profile !== null)
-            .map((grant) => this.profiles().get(grant.profile!) ?? { public_id: grant.profile!, name: 'Perfil indisponível', is_active: false, is_system: false, is_essential: false, permissions: [] })
+        this.grants()
+            .filter((grant) => grant.profile !== null && this.isAtTarget(grant))
+            .map((grant) => this.profile(grant.profile!))
     );
-    readonly directCodes = computed(() => this.targetGrants().flatMap((grant) => (grant.permission ? [grant.permission] : [])));
-    readonly inherited = computed<InheritedGrant[]>(() => {
-        const target = this.target();
-
-        if (target === ALL_ORGANIZATIONS) {
-            return [];
-        }
-
-        return this.grants()
-            .filter((grant) => grant.scope === 'CONTRACT')
-            .map((grant) => ({ grant, label: this.grantLabel(grant), excluded: grant.excluded_organizations.includes(target), essential: this.isEssential(grant) }));
-    });
-    readonly lockedCodes = computed(() => {
-        const codes = new Set(this.appliedProfiles().flatMap((profile) => profile.permissions));
-
-        for (const item of this.inherited()) {
-            if (!item.excluded) {
-                this.grantCodes(item.grant).forEach((code) => codes.add(code));
-            }
-        }
-
-        return [...codes];
-    });
     readonly contractAdmin = computed(() => this.grants().some((grant) => grant.scope === 'CONTRACT' && this.isEssential(grant)));
+    readonly allCodes = computed(() => this.catalog().flatMap((group) => group.permissions.map((item) => item.code)));
+    readonly checkedCodes = computed(() => [...this.effectiveCodes(this.grants(), this.target())]);
     readonly profileOptions = computed(() => {
         const applied = new Set(this.appliedProfiles().map((profile) => profile.public_id));
         const allowed = this.allowedCodes();
@@ -87,19 +58,20 @@ export class UserAccessEditor {
             .map((profile) => ({ label: profile.name, value: profile.public_id }));
     });
     readonly profileEmptyMessage = computed(() => (this.access().profiles.some((profile) => profile.is_active) ? 'Nenhum outro perfil compatível com este escopo.' : 'Nenhum perfil cadastrado. Crie perfis no menu Perfis.'));
-    private readonly labels = computed(() => new Map(this.catalog().flatMap((group) => group.permissions.map((item) => [item.code, `${group.label}: ${item.label}`] as const))));
 
     constructor() {
         effect(() => {
             const access = this.access();
 
-            this.grants.set(access.grants.map((grant) => ({ ...grant, excluded_organizations: [...grant.excluded_organizations] })));
+            this.grants.set(access.grants.map((grant) => ({ ...grant, excluded_organizations: [...grant.excluded_organizations], excluded_permissions: grant.excluded_permissions.map((item) => ({ ...item })) })));
             this.dirty.set(false);
         });
     }
 
     value(): UserAccessWrite {
-        return { grants: this.grants().map(({ scope, organization, profile, permission, excluded_organizations }) => ({ scope, organization, profile, permission, excluded_organizations })) };
+        return {
+            grants: this.grants().map(({ scope, organization, profile, permission, excluded_organizations, excluded_permissions }) => ({ scope, organization, profile, permission, excluded_organizations, excluded_permissions }))
+        };
     }
 
     select(target: string) {
@@ -107,10 +79,25 @@ export class UserAccessEditor {
         this.selectedProfile = null;
     }
 
-    setDirectCodes(codes: string[]) {
-        const keep = this.grants().filter((grant) => !(this.isAtTarget(grant) && grant.permission));
+    setCodes(codes: string[]) {
+        const target = this.target();
+        const before = this.effectiveCodes(this.grants(), target);
+        const after = new Set(codes);
+        let grants = this.grants();
 
-        this.update([...keep, ...codes.map((code) => this.newGrant({ permission: code }))]);
+        for (const code of before) {
+            if (!after.has(code)) {
+                grants = this.uncheck(grants, target, code);
+            }
+        }
+
+        for (const code of after) {
+            if (!before.has(code)) {
+                grants = this.check(grants, target, code);
+            }
+        }
+
+        this.update(grants);
     }
 
     applyProfile() {
@@ -118,18 +105,12 @@ export class UserAccessEditor {
             return;
         }
 
-        this.update([...this.grants(), this.newGrant({ profile: this.selectedProfile })]);
+        this.update([...this.grants(), this.newGrant(this.target(), { profile: this.selectedProfile })]);
         this.selectedProfile = null;
     }
 
     removeProfile(profile: AccessProfile) {
         this.update(this.grants().filter((grant) => !(this.isAtTarget(grant) && grant.profile === profile.public_id)));
-    }
-
-    setExcluded(item: InheritedGrant, excluded: boolean) {
-        const target = this.target();
-
-        this.update(this.grants().map((grant) => (grant === item.grant ? { ...grant, excluded_organizations: excluded ? [...grant.excluded_organizations, target] : grant.excluded_organizations.filter((id) => id !== target) } : grant)));
     }
 
     buttonClass(target: string) {
@@ -138,33 +119,99 @@ export class UserAccessEditor {
             : 'border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-100 hover:bg-surface-50 dark:hover:bg-surface-800/60';
     }
 
+    private effectiveCodes(grants: AccessGrant[], target: string) {
+        const codes = new Set<string>();
+        const organization = target === ALL_ORGANIZATIONS ? null : target;
+
+        for (const grant of grants) {
+            const reaches = grant.scope === 'CONTRACT' ? organization === null || !grant.excluded_organizations.includes(organization) : grant.organization === organization && organization !== null;
+
+            if (reaches) {
+                this.grantCodes(grant)
+                    .filter((code) => !this.isExcluded(grant, organization, code))
+                    .forEach((code) => codes.add(code));
+            }
+        }
+
+        return codes;
+    }
+
+    private uncheck(grants: AccessGrant[], target: string, code: string) {
+        const organization = target === ALL_ORGANIZATIONS ? null : target;
+
+        return grants
+            .filter((grant) => !(this.isAt(grant, target) && grant.permission === code))
+            .map((grant) => {
+                if (grant.profile !== null && !this.isEssential(grant) && this.grantCodes(grant).includes(code) && !this.isExcluded(grant, organization, code)) {
+                    const where = grant.scope === 'CONTRACT' ? organization : null;
+
+                    const reaches = grant.scope === 'CONTRACT' ? organization === null || !grant.excluded_organizations.includes(organization) : this.isAt(grant, target);
+
+                    if (reaches) {
+                        return { ...grant, excluded_permissions: [...grant.excluded_permissions, { organization: where, permission: code }] };
+                    }
+                }
+
+                if (organization !== null && grant.scope === 'CONTRACT' && grant.permission === code && !grant.excluded_organizations.includes(organization)) {
+                    return { ...grant, excluded_organizations: [...grant.excluded_organizations, organization] };
+                }
+
+                return grant;
+            });
+    }
+
+    private check(grants: AccessGrant[], target: string, code: string) {
+        const organization = target === ALL_ORGANIZATIONS ? null : target;
+        const restored = grants.map((grant) => {
+            if (grant.scope === 'CONTRACT' && grant.permission === code && organization !== null) {
+                return { ...grant, excluded_organizations: grant.excluded_organizations.filter((id) => id !== organization) };
+            }
+
+            const own = grant.scope === 'CONTRACT' ? organization : null;
+
+            if (grant.profile !== null && (grant.scope === 'CONTRACT' || this.isAt(grant, target))) {
+                return { ...grant, excluded_permissions: grant.excluded_permissions.filter((item) => !(item.permission === code && item.organization === own)) };
+            }
+
+            return grant;
+        });
+
+        return this.effectiveCodes(restored, target).has(code) ? restored : [...restored, this.newGrant(target, { permission: code })];
+    }
+
     private update(grants: AccessGrant[]) {
         this.grants.set(grants);
         this.dirty.set(true);
     }
 
-    private newGrant(grant: Pick<AccessGrant, 'profile'> | Pick<AccessGrant, 'permission'>): AccessGrant {
-        const target = this.target();
+    private newGrant(target: string, grant: Pick<AccessGrant, 'profile'> | Pick<AccessGrant, 'permission'>): AccessGrant {
+        const all = target === ALL_ORGANIZATIONS;
 
-        return { scope: this.scope(), organization: target === ALL_ORGANIZATIONS ? null : target, profile: null, permission: '', excluded_organizations: [], ...grant };
+        return { scope: all ? 'CONTRACT' : 'ORGANIZATION', organization: all ? null : target, profile: null, permission: '', excluded_organizations: [], excluded_permissions: [], ...grant };
     }
 
     private isAtTarget(grant: AccessGrant) {
-        const target = this.target();
+        return this.isAt(grant, this.target());
+    }
 
+    private isAt(grant: AccessGrant, target: string) {
         return target === ALL_ORGANIZATIONS ? grant.scope === 'CONTRACT' : grant.scope === 'ORGANIZATION' && grant.organization === target;
     }
 
+    private isExcluded(grant: AccessGrant, organization: string | null, code: string) {
+        return grant.excluded_permissions.some((item) => item.permission === code && (item.organization === null || item.organization === organization));
+    }
+
     private isEssential(grant: AccessGrant) {
-        return grant.profile !== null && (this.profiles().get(grant.profile)?.is_essential ?? false);
+        return grant.profile !== null && this.profile(grant.profile).is_essential;
+    }
+
+    private profile(publicId: string): AccessProfile {
+        return this.profiles().get(publicId) ?? { public_id: publicId, name: 'Perfil indisponível', is_active: false, is_system: false, is_essential: false, permissions: [] };
     }
 
     private grantCodes(grant: AccessGrant) {
-        return grant.profile ? (this.profiles().get(grant.profile)?.permissions ?? []) : [grant.permission];
-    }
-
-    private grantLabel(grant: AccessGrant) {
-        return grant.profile ? `Perfil ${this.profiles().get(grant.profile)?.name ?? 'indisponível'}` : (this.labels().get(grant.permission) ?? grant.permission);
+        return grant.profile ? this.profile(grant.profile).permissions : [grant.permission];
     }
 
     private allowedCodes() {

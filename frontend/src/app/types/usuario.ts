@@ -26,6 +26,12 @@ export interface ContractUserPasswordReset {
     temporary_password: string;
 }
 
+// Permissão que a concessão de um perfil não dá; organization null = em todo lugar (ADR 0038).
+export interface ExcludedPermission {
+    organization: string | null;
+    permission: string;
+}
+
 // GET/PUT /api/v1/users/{public_id}/access/ (docs/api/users.md, etapa 8.3).
 export interface AccessGrant {
     scope: PermissionScope;
@@ -33,6 +39,7 @@ export interface AccessGrant {
     profile: string | null;
     permission: string;
     excluded_organizations: string[];
+    excluded_permissions: ExcludedPermission[];
     is_active?: boolean;
 }
 

@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-19 — Etapa 8.4: exceção de permissão na atribuição (ADR 0038)
+
+- Decisão 64: perfil vinculado com customização livre. `AssignmentExclusion` com `permission_code` e
+  `excluded_organization` opcional (rbac.0004, restrição de alvo); `Grant.excluded_codes`,
+  `codes_at`/`codes_anywhere` no avaliador; `save_exclusion` aceita exceção de permissão em
+  atribuição de perfil (organização só no CONTRACT; essencial sem exceção).
+- `…/access/`: `excluded_permissions` por concessão. Aba sem bloco de herdados nem cadeados (só o
+  admin trava a grade); desmarcar código de perfil grava exceção, marcar grava avulsa.
+- Testes: avaliador, API (propagação de código novo com exceção mantida). Back 656, front 93.
+
 ## 2026-10-19 — Etapa 8.3: permissões do usuário; padrão de abas nos formulários
 
 - Decisões 58–61: perfil vinculado; "Todas as organizações" = escopo CONTRACT com exceções por

@@ -73,6 +73,7 @@ e só começa após aprovação do usuário.
 | 61 | Formulários: campos na aba **Principal** (`p-tabs`), como o de contratos; seções extras em outras abas |
 | 62 | Revisão da 46 (usuário): `organization:create` em qualquer escopo; visão por contrato, como view/update/delete (ADR 0037 §2) |
 | 63 | Aba Permissões sem a caixa "Administrador do contrato": o perfil essencial é aplicado pelo seletor de perfis, só em "Todas as organizações" (escopo CONTRACT, sem exceções); continua visível, só leitura, na tela de Perfis |
+| 64 | Perfil vinculado com customização livre: desmarcar o que veio do perfil grava exceção de permissão (por atribuição, opcionalmente por organização); sem cadeados nem bloco de herdados (ADR 0038) |
 
 ## Bloco 0 — Fundação
 
@@ -179,6 +180,7 @@ A 5.3 (admin de usuários/superadmins) e a 5.4 (área comum) continuam pendentes
 | 8.1 | Usuários: `/api/v1/users/` (CRUD, redefinir senha, `user:view`/`user:delete` reservadas) e telas | backend + frontend | 0009, 0015 | ✅ |
 | 8.2 | Perfis do cliente e suas permissões (catálogo do registry com rótulos) | backend + frontend | 0009, 0016 | ✅ |
 | 8.3 | Aba "Permissões" do usuário: organizações à esquerda, grade por recurso, aplicar perfil, admin do contrato | backend + frontend | 0009 | ✅ |
+| 8.4 | Exceção de permissão na atribuição (ADR 0038): modelo, avaliador, `…/access/` e aba sem cadeados | backend + frontend | 0009, 0038 | ✅ |
 
 Pendência registrada (pedido do usuário, depois do Bloco 8): tela de **Configurações** no menu do
 avatar, com as opções de tema (cor primária, preset Aura/Lara/Nora, claro/escuro) e remoção do

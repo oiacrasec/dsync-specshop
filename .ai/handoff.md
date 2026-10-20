@@ -9,7 +9,7 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | Bloco 8 (8.1–8.3) ✅ concluído e commitado; decisões 58–63 |
+| Etapa atual | Bloco 8 (8.1–8.4) ✅; 8.4 (ADR 0038) aguardando revisão/commit e rbac.0004 no banco local |
 | Próximo passo exato | Tela de Configurações (tema) no menu do avatar; tirar o painel Settings do login |
 | Aguardando o usuário? | sim — confirmar início da tela de Configurações |
 
@@ -31,6 +31,7 @@ Pendentes: depois 5.3, 5.4 (restante: usuários, perfis, atribuições) e 5.5.
 - 8.2/8.3: perfis do cliente + catálogo `/permissions/`; aba Permissões do usuário
   (`GET/PUT /users/{id}/access/`, perfil vinculado, "Todas as organizações" = CONTRACT com exceções,
   Salvar único). Admin do contrato = perfil essencial aplicado pelo seletor (decisão 63).
+  8.4: exceção de permissão na atribuição (ADR 0038, decisão 64): caixas livres, perfil vinculado.
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
 
