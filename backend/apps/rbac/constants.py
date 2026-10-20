@@ -46,3 +46,7 @@ ACTION_LABELS = {
     'manage': _('Gerenciar'),
     'export': _('Exportar'),
 }
+# Rótulo próprio quando a ação genérica não descreve o que a permissão libera.
+PERMISSION_LABELS = {
+    'user:manage': _('Redefinir senha'),
+}

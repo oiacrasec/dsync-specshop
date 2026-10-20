@@ -61,6 +61,8 @@ def test_catalog_groups_codes_with_labels():
         'scopes': ['CONTRACT', 'ORGANIZATION'],
         'reserved': False,
     }
+    users = next(group for group in catalog if group['resource'] == 'user')
+    assert {item['code']: item['label'] for item in users['permissions']}['user:manage'] == 'Redefinir senha'
     assert sum(len(group['permissions']) for group in catalog) == len(list(PERMISSIONS))
     assert APIClient().get('/api/v1/permissions/').status_code == 401
 

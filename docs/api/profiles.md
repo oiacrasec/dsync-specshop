@@ -7,7 +7,7 @@ exigem o header de uma organização acessível (400/403 como nos endpoints de n
 ## Catálogo
 
 `GET /api/v1/permissions/` (qualquer usuário autenticado) devolve o registry agrupado por recurso,
-com rótulos para a interface. Não autoriza nada.
+com rótulos para a interface (pela ação; `user:manage` aparece como "Redefinir senha"). Não autoriza nada.
 
 ```json
 [{"resource": "user", "label": "Usuários", "permissions": [

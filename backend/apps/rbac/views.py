@@ -9,7 +9,7 @@ from apps.core.exceptions import ContextForbidden
 from apps.core.permission_registry import PERMISSIONS
 from apps.core.views import BaseModelViewSet
 
-from .constants import ACTION_LABELS, RESOURCE_LABELS
+from .constants import ACTION_LABELS, PERMISSION_LABELS, RESOURCE_LABELS
 from .filters import ProfileFilterSet
 from .models import Profile, ProfilePermission
 from .permissions import AllowAuthenticated
@@ -66,7 +66,7 @@ class PermissionCatalogView(APIView):
                 {
                     'code': definition.code,
                     'action': action,
-                    'label': str(ACTION_LABELS.get(action, action)),
+                    'label': str(PERMISSION_LABELS.get(definition.code) or ACTION_LABELS.get(action, action)),
                     'scopes': sorted(scope.value for scope in definition.scopes),
                     'reserved': definition.reserved,
                 }
