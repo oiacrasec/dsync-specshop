@@ -82,6 +82,7 @@ Os prefixos não colidem com o PrimeIcons.
 Menu do avatar → **Perfil** (`/perfil`): aba Principal (foto, nome, usuário só leitura, fuso
 horário) num `PUT /api/v1/me/profile/` multipart e aba Senha no `POST /auth/change-password/`.
 `ProfileService` carrega o perfil ao entrar: foto (ou iniciais) no topo e fuso nas datas.
+Aba Sessões (9.3, só leitura): sessões ativas e últimos 20 logins, buscados ao abrir a aba.
 Colunas de data e hora (`zoned`) usam o pipe `zonedDate` (deslocamento calculado por instante,
 `core/utils/time-zone.ts`); data pura não muda de dia.
 

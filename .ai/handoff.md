@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.2 Perfil ✅ commitada; users.0006 aplicada ao banco local |
-| Próximo passo exato | 9.3 Sessões (navegador/IP, encerrar uma, sair de todas) — aguardar confirmação |
-| Aguardando o usuário? | sim — confirmar início da 9.3 |
+| Etapa atual | 9.3 Sessões ✅ commitada; users.0007 aplicada ao banco local |
+| Próximo passo exato | 9.4 2FA TOTP (opcional, QR, 10 códigos reserva, 2º passo no login, reset por admin) — aguardar confirmação |
+| Aguardando o usuário? | sim — confirmar início da 9.4 |
 
 ## Concluído
 
@@ -46,6 +46,8 @@
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
 - Mídia só pela fachada `apps.core.media` (decisão 79): `MediaFileField`/`MediaImageField`; teste-trava.
+- 9.3 (decisões 83–85): `UserSession` + claim `sid`; aba Sessões só leitura (ativas + 20 logins);
+  rotas de encerrar prontas na API. Bases `BaseAPIView`/`BaseSerializer` obrigatórias (decisão 82).
 - 9.2 (decisões 77, 80, 81): `/perfil` (Principal + Senha; sem Voltar/Cancelar), `GET/PUT /me/profile/`
   multipart, foto em `<public_id do contrato|system>/avatars/`, fuso nas colunas datetime (`zonedDate`),
   `ui-image-preview` (p-dialog no body com girar/zoom/espelhar/baixar). Pastas vazias somem no filesystem.

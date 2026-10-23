@@ -14,3 +14,19 @@ export interface MyProfileWrite {
 }
 
 export const SYSTEM_TIME_ZONE = 'America/Sao_Paulo';
+
+// GET /api/v1/me/sessions/ (9.3): onde a conta está conectada agora.
+export interface UserSession {
+    public_id: string;
+    device: string;
+    ip: string;
+    created_at: string;
+    last_seen_at: string;
+    current: boolean;
+}
+
+// GET /api/v1/me/logins/: últimos logins da conta.
+export interface LoginHistoryItem {
+    occurred_at: string;
+    ip: string;
+}

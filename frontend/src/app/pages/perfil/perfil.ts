@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { SelectModule } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
-import { concatMap, of } from 'rxjs';
+import { concatMap, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '@/app/core/services/auth.service';
 import { ProfileService } from '@/app/core/services/profile.service';
@@ -14,6 +14,8 @@ import { UiButton } from '@/app/shared/ui/button/button';
 import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
 import { UiImagePreview } from '@/app/shared/ui/image-preview/image-preview';
 import { UiInputText } from '@/app/shared/ui/input-text/input-text';
+import { ZonedDatePipe } from '@/app/shared/pipes/zoned-date.pipe';
+import { LoginHistoryItem, UserSession } from '@/app/types/profile';
 
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -23,7 +25,7 @@ const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 @Component({
     selector: 'app-perfil',
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText],
+    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText, ZonedDatePipe],
     templateUrl: './perfil.html'
 })
 export class PerfilPage implements OnInit, OnDestroy {
@@ -38,6 +40,9 @@ export class PerfilPage implements OnInit, OnDestroy {
     readonly previewUrl = signal<string | null>(null);
     readonly removeAvatar = signal(false);
     readonly previewOpen = signal(false);
+    readonly timeZone = this.profileService.timeZone;
+    readonly sessions = signal<UserSession[] | null>(null);
+    readonly logins = signal<LoginHistoryItem[]>([]);
     readonly avatarSrc = computed(() => this.previewUrl() ?? (this.removeAvatar() ? null : this.currentAvatar()));
     readonly timeZoneOptions = signal<string[]>(supportedTimeZones());
     saving = false;
@@ -69,6 +74,25 @@ export class PerfilPage implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.revokePreview();
+    }
+
+    deviceIcon(device: string) {
+        return /\b(Android|iOS|iPadOS)$/.test(device) ? 'fa-solid fa-mobile-screen' : 'fa-solid fa-display';
+    }
+
+    // A aba Sessões só busca os dados quando é aberta pela primeira vez.
+    onTabChange(tab: string | number | undefined) {
+        if (tab !== 'sessoes' || this.sessions() !== null) {
+            return;
+        }
+
+        forkJoin({ sessions: this.profileService.sessions(), logins: this.profileService.logins() }).subscribe({
+            next: ({ sessions, logins }) => {
+                this.sessions.set(sessions);
+                this.logins.set(logins);
+            },
+            error: (error: unknown) => this.messages.add({ severity: 'error', summary: 'Falha ao carregar', detail: problemMessage(error, 'Não foi possível carregar as sessões.') })
+        });
     }
 
     chooseAvatar(event: Event) {

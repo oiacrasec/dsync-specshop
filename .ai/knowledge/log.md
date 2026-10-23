@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-10-23 — Etapa 9.3: sessões
+
+- Decisões 83–85. `users.UserSession` (registro técnico em `UNSCOPED_RECORDS`; `users.0007`):
+  public_id, user, refresh_jti, device (rótulo), ip, created/last_seen/expires. Claim `sid` no
+  refresh e no access. Login abre (e apaga expiradas), refresh trava e atualiza (usuário → token →
+  sessão; sem sessão → 401; token antigo ganha sessão), logout e reset apagam; `end_sessions`
+  revoga refresh e apaga. `users.devices.UserAgent` (regras próprias). Rotas `me/sessions/`,
+  `me/sessions/<id>/` (DELETE), `me/sessions/end-others/`, `me/logins/` (AccessLog LOGIN_SUCCESS,
+  unscoped filtrado pelo dono). Queries do login 8→10, refresh 20→22, logout 13→14 (constantes).
+  Isolamento: `OWNER_ONLY = {UserSession}`. 17 testes; suíte 724.
+- Frontend: aba Sessões do Perfil (só leitura, carregada ao abrir), ícone celular/computador. 108.
+
 ## 2026-10-23 — Bases de view e serializer (decisão 82)
 
 - `apps/core/views.BaseAPIView` (`no_store=True` via `finalize_response`, também em erro; parser JSON;

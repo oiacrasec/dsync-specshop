@@ -85,6 +85,26 @@ describe('Perfil', () => {
     });
 });
 
+describe('Perfil — aba Sessões', () => {
+    afterEach(() => TestBed.resetTestingModule());
+
+    it('busca sessões e acessos só ao abrir a aba, uma vez', () => {
+        const { page, controller } = configure();
+
+        page.onTabChange('senha');
+        controller.verify();
+        page.onTabChange('sessoes');
+        controller.expectOne('/api/v1/me/sessions/').flush([{ public_id: 's1', device: 'Safari no iOS', ip: '10.0.0.1', created_at: '2026-10-23T10:00:00Z', last_seen_at: '2026-10-23T11:00:00Z', current: true }]);
+        controller.expectOne('/api/v1/me/logins/').flush([{ occurred_at: '2026-10-23T10:00:00Z', ip: '10.0.0.1' }]);
+        expect(page.sessions()?.length).toBe(1);
+        expect(page.logins().length).toBe(1);
+        expect(page.deviceIcon('Safari no iOS')).toContain('mobile');
+        expect(page.deviceIcon('Chrome no Windows')).toContain('display');
+        page.onTabChange('sessoes');
+        controller.verify();
+    });
+});
+
 describe('zonedDate', () => {
     beforeAll(() => registerLocaleData(localePt));
 

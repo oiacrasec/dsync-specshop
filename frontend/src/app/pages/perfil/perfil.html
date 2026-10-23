@@ -7,10 +7,11 @@
     </div>
 
     <div class="flex flex-col gap-6">
-        <p-tabs value="principal">
+        <p-tabs value="principal" (valueChange)="onTabChange($event)">
             <p-tablist>
                 <p-tab value="principal">Principal</p-tab>
                 <p-tab value="senha">Senha</p-tab>
+                <p-tab value="sessoes">Sessões</p-tab>
             </p-tablist>
             <p-tabpanels>
                 <p-tabpanel value="principal">
@@ -75,6 +76,52 @@
                             <ui-input-password inputId="new_password_confirm" autocomplete="new-password" formControlName="new_password_confirm" label="Confirmar nova senha" [feedback]="false" />
                         </div>
                     </form>
+                </p-tabpanel>
+                <p-tabpanel value="sessoes">
+                    @if (sessions(); as active) {
+                    <div class="flex flex-col gap-8">
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Conectado agora</h3>
+                            <ul class="flex flex-col gap-2">
+                                @for (session of active; track session.public_id) {
+                                <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-surface-200 dark:border-surface-700 px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <i [class]="deviceIcon(session.device)" class="text-surface-500" aria-hidden="true"></i>
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-surface-900 dark:text-surface-0">
+                                                {{ session.device }} @if (session.current) {
+                                                <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-200">Este navegador</span>
+                                                }
+                                            </span>
+                                            <span class="text-sm text-surface-500 dark:text-white/64">IP {{ session.ip }} · desde {{ session.created_at | zonedDate: 'short' : timeZone() }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-surface-500 dark:text-white/64">Último uso {{ session.last_seen_at | zonedDate: 'short' : timeZone() }}</span>
+                                </li>
+                                } @empty {
+                                <li class="text-sm text-surface-500 dark:text-white/64">Nenhuma sessão ativa.</li>
+                                }
+                            </ul>
+                        </section>
+
+                        <section class="flex flex-col gap-3">
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-surface-0">Últimos acessos</h3>
+                            <ul class="flex flex-col divide-y divide-surface-200 dark:divide-surface-700 rounded-xl border border-surface-200 dark:border-surface-700">
+                                @for (item of logins(); track $index) {
+                                <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-2 text-sm">
+                                    <span class="text-surface-700 dark:text-surface-100">{{ item.occurred_at | zonedDate: 'short' : timeZone() }}</span>
+                                    <span class="text-surface-500 dark:text-white/64">IP {{ item.ip }}</span>
+                                </li>
+                                } @empty {
+                                <li class="px-4 py-2 text-sm text-surface-500 dark:text-white/64">Nenhum acesso registrado.</li>
+                                }
+                            </ul>
+                            <small class="text-surface-500 dark:text-white/64">Os 20 logins mais recentes desta conta.</small>
+                        </section>
+                    </div>
+                    } @else {
+                    <small class="text-surface-500 dark:text-white/64">Carregando…</small>
+                    }
                 </p-tabpanel>
             </p-tabpanels>
         </p-tabs>

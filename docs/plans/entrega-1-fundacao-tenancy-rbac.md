@@ -92,6 +92,9 @@ e só começa após aprovação do usuário.
 | 80 | Perfil envia o formulário inteiro num `PUT /me/profile/` multipart (nome, fuso, foto, remover foto); só a senha fica separada, no `POST /auth/change-password/`. Rota de mídia só leitura e limitada por IP |
 | 81 | Mídia separada por contrato: `<public_id do contrato>/<pasta>/…`, e `system/…` para o que não é de cliente, para separar um cliente levando a pasta inteira |
 | 82 | Bases obrigatórias `BaseAPIView` (no-store por padrão) e `BaseSerializer`, com teste-trava; ADR 0021 revisado |
+| 83 | Sessões: encerrar revoga o refresh (corte na próxima renovação, até 15 min, sem consulta por requisição); encerradas e expiradas são apagadas (LGPD) |
+| 84 | Dispositivo pelo User-Agent com classe própria `users.devices.UserAgent` (sem dependência); guarda só o rótulo |
+| 85 | Aba Sessões do Perfil só de visualização: sessões ativas + últimos 20 logins do registro de acesso; rotas de encerrar mantidas na API |
 
 ## Bloco 0 — Fundação
 
@@ -213,6 +216,6 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 |---|---|---|---|---|
 | 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados; comando `transfer_media` para migrar entre os modos; fachada `media` com campos próprios | backend | 0039 | ✅ |
 | 9.2 | Perfil `/perfil` (formulário no padrão, abas): Principal com foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas; aba Senha (troca pelo próprio usuário) | backend + frontend | 0039 | ✅ |
-| 9.3 | Sessões: navegador/IP de cada sessão, encerrar uma e sair de todas | backend + frontend | — | ⬜ |
+| 9.3 | Sessões: navegador/IP de cada sessão (claim `sid`), aba Sessões só leitura com ativas + últimos logins; rotas de encerrar uma e as outras prontas na API | backend + frontend | 0004 | ✅ |
 | 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |
 | 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |
