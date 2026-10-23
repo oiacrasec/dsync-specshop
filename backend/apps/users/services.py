@@ -384,8 +384,17 @@ def end_sessions(*, user, session_ids=None, keep=None):
         sessions = sessions.filter(public_id__in=session_ids)
     if keep is not None:
         sessions = sessions.exclude(public_id=keep)
-    jtis = list(sessions.values_list('refresh_jti', flat=True))
-    pending = OutstandingToken.objects.filter(jti__in=jtis, blacklistedtoken__isnull=True).values_list('pk', flat=True)
+    if session_ids is None:
+        # Todas menos a mantida: revoga todo refresh pendente da conta, inclusive os sem sessão
+        # (emitidos antes da 9.3), que de outro modo ganhariam sessão nova ao renovar.
+        kept = UserSession.objects.filter(user_id=user.pk, public_id=keep).values_list('refresh_jti', flat=True)
+        pending = OutstandingToken.objects.filter(
+            user_id=user.pk, blacklistedtoken__isnull=True, expires_at__gt=timezone.now()
+        ).exclude(jti__in=list(kept))
+    else:
+        jtis = list(sessions.values_list('refresh_jti', flat=True))
+        pending = OutstandingToken.objects.filter(jti__in=jtis, blacklistedtoken__isnull=True)
+    pending = pending.values_list('pk', flat=True)
     BlacklistedToken.objects.bulk_create([BlacklistedToken(token_id=pk) for pk in pending], ignore_conflicts=True)
     count, _ = sessions.delete()
     return count

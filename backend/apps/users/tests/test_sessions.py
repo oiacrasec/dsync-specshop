@@ -155,3 +155,11 @@ def test_login_history_shows_only_this_accounts_successful_logins(maria, user_co
     data = api.get('/api/v1/me/logins/').json()
     assert [item['ip'] for item in data] == ['10.0.0.8', '10.0.0.7']
     assert set(data[0]) == {'occurred_at', 'ip'}
+
+
+def test_end_others_also_revokes_tokens_issued_before_sessions(maria):
+    legacy = RefreshToken.for_user(maria)  # Sem claim sid: não pertence a nenhuma sessão.
+    api, current = login()
+    assert api.post('/api/v1/me/sessions/end-others/').status_code == 200
+    assert refresh(str(legacy)).status_code == 401
+    assert refresh(current['refresh']).status_code == 200

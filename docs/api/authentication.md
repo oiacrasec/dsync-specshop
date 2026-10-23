@@ -79,7 +79,7 @@ requisição). Tokens anteriores às sessões ganham uma na primeira renovação
 | `GET /api/v1/me/sessions/` | sessões em vigor da conta; `current` marca a deste navegador |
 | `GET /api/v1/me/logins/` | últimos 20 logins da conta (data e IP), do registro de acesso |
 | `DELETE /api/v1/me/sessions/{public_id}/` | encerra uma sessão da própria conta (outra conta → 404) |
-| `POST /api/v1/me/sessions/end-others/` | encerra todas menos a atual; `{"ended": n}` |
+| `POST /api/v1/me/sessions/end-others/` | encerra todas menos a atual e revoga todo refresh pendente da conta fora dela (inclusive os emitidos antes das sessões); `{"ended": n}` |
 
 A tela (aba Sessões do Perfil) só exibe; as rotas de encerrar ficam prontas na API.
 
