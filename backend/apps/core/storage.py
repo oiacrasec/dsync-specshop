@@ -4,6 +4,8 @@ A pasta não é servida diretamente: `url()` devolve `/api/v1/media/<token>/`, e
 (nome do arquivo + horário) é a credencial, válida por `MEDIA_URL_EXPIRE` segundos.
 """
 
+from dataclasses import dataclass, field
+
 from django.conf import settings
 from django.core import signing
 from django.core.files.storage import FileSystemStorage
@@ -24,3 +26,44 @@ def media_name_from_token(token):
         return signing.loads(token, salt=MEDIA_SIGNING_SALT, max_age=settings.MEDIA_URL_EXPIRE)
     except signing.BadSignature:
         return None
+
+
+@dataclass
+class TransferReport:
+    copied: list = field(default_factory=list)
+    skipped: list = field(default_factory=list)
+    failed: list = field(default_factory=list)
+
+
+def walk(storage, path=''):
+    """Nomes relativos de todos os arquivos (os mesmos que o banco guarda)."""
+    directories, files = storage.listdir(path)
+    for name in sorted(files):
+        yield f'{path}/{name}' if path else name
+    for directory in sorted(directories):
+        yield from walk(storage, f'{path}/{directory}' if path else directory)
+
+
+def transfer_media(source, target, *, dry_run=False):
+    """Copia a mídia mantendo os nomes, para trocar de storage sem mexer no banco (ADR 0039).
+
+    Incremental: pula o que já existe no destino com o mesmo tamanho. Nunca apaga a origem.
+    """
+    report = TransferReport()
+    for name in walk(source):
+        size = source.size(name)
+        try:
+            if target.exists(name) and target.size(name) == size:
+                report.skipped.append(name)
+                continue
+            if not dry_run:
+                if target.exists(name):
+                    target.delete(name)  # Tamanho diferente: cópia anterior incompleta.
+                with source.open(name, 'rb') as content:
+                    saved = target.save(name, content)
+                if saved != name or target.size(name) != size:
+                    raise OSError('cópia divergente')
+            report.copied.append(name)
+        except Exception as exc:  # noqa: BLE001 — falha de um arquivo não interrompe os demais
+            report.failed.append((name, str(exc)))
+    return report

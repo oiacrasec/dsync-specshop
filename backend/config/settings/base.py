@@ -148,6 +148,8 @@ MEDIA_ROOT = env.path('DJANGO_MEDIA_ROOT', default=BASE_DIR / 'media')
 MEDIA_STORAGE = env.str('DJANGO_MEDIA_STORAGE', default='filesystem')
 # Validade das URLs assinadas de mídia, em segundos.
 MEDIA_URL_EXPIRE = env.int('DJANGO_MEDIA_URL_EXPIRE', default=300)
+# Downloads de mídia por IP (links assinados podem vazar; limita o tráfego de saída).
+MEDIA_DOWNLOAD_RATE = env.str('DJANGO_MEDIA_DOWNLOAD_RATE', default='120/min')
 
 STORAGES = {
     'default': media_storage(env, backend=MEDIA_STORAGE, media_root=MEDIA_ROOT, url_expire=MEDIA_URL_EXPIRE),

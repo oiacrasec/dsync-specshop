@@ -3,7 +3,6 @@
 import mimetypes
 
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.http import FileResponse
 from django.utils.decorators import method_decorator
@@ -17,6 +16,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from . import media
 from .filters import ValidatedDjangoFilterBackend
 from .mixins import (
     ListFilterMixin,
@@ -30,7 +30,8 @@ from .openapi import api_schema
 from .pagination import StandardResultsSetPagination
 from .permissions import SuperadminPermission
 from .problems import problem_http_response
-from .storage import SignedFileSystemStorage, media_name_from_token
+from .storage import media_name_from_token
+from .throttles import MediaDownloadThrottle
 
 
 @transaction.non_atomic_requests
@@ -92,22 +93,26 @@ class OpenApiSchemaView(SpectacularAPIView):
 
 
 class MediaFileView(APIView):
-    """Arquivo de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
+    """Download de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
 
-    Aberto sem JWT porque `<img>` não envia o header; token adulterado, vencido ou modo `s3`
-    respondem 404, sem revelar se o arquivo existe.
+    Sem JWT porque `<img>` não envia o header; o link só é gerado para quem está autenticado e
+    pode ver o arquivo. Token adulterado, vencido ou modo `s3` → 404 antes de tocar no disco.
+    Limite por IP (`DJANGO_MEDIA_DOWNLOAD_RATE`) → 429.
     """
 
+    # Só leitura: nenhum envio de arquivo passa por aqui (envio é sempre autenticado, no recurso).
+    http_method_names = ['get', 'head']
     authentication_classes = []
     permission_classes = [AllowAny]
+    throttle_classes = [MediaDownloadThrottle]
 
     @extend_schema(responses={(200, '*/*'): OpenApiTypes.BINARY})
     def get(self, request, token):
         name = media_name_from_token(token)
-        if name is None or not isinstance(default_storage, SignedFileSystemStorage) or not default_storage.exists(name):
+        if name is None or not media.is_signed_local() or not media.exists(name):
             raise NotFound()
         content_type = mimetypes.guess_type(name)[0] or 'application/octet-stream'
-        response = FileResponse(default_storage.open(name, 'rb'), content_type=content_type)
+        response = FileResponse(media.open_file(name), content_type=content_type)
         response['Cache-Control'] = f'private, max-age={settings.MEDIA_URL_EXPIRE}'
         response['Content-Security-Policy'] = "default-src 'none'; sandbox"
         response['Content-Disposition'] = 'inline'

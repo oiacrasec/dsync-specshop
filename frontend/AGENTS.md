@@ -37,6 +37,7 @@ Regras do frontend do datasync-core. As regras globais estão no `AGENTS.md` da 
 - Formulários: campos dentro de `p-tabs` com a aba **Principal** (`value="principal"`), como o de
   contratos; seções extras (ex.: Permissões) viram outras abas. Cabeçalho, Voltar e os botões
   Cancelar/Salvar ficam fora das abas.
+- URL de mídia (foto, anexos) só via `mediaUrl` (`core/utils/media-url.ts`); telas não montam `src`.
 - Ícones: Font Awesome por classe (`fa-solid fa-*`) nas telas e componentes próprios; PrimeIcons
   continua nos componentes do PrimeNG. Não remover a atribuição de licença (README, Ícones).
 - Redirecionamento por parâmetro (`returnUrl`): só via `safeReturnPath` (`core/utils/return-url.ts`);

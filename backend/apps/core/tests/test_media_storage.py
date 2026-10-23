@@ -87,3 +87,25 @@ def test_signed_route_is_inert_in_s3_mode(local_media):
     with override_settings(STORAGES=s3):
         assert not isinstance(default_storage, SignedFileSystemStorage)
         assert APIClient().get(url).status_code == 404
+
+
+@pytest.mark.django_db
+def test_media_route_is_read_only(local_media):
+    url = default_storage.url(local_media)
+    api = APIClient()
+    for method in ('post', 'put', 'patch', 'delete'):
+        assert getattr(api, method)(url, b'x', content_type='application/octet-stream').status_code == 405
+    assert api.head(url).status_code == 200
+
+
+@pytest.mark.django_db
+def test_downloads_are_rate_limited_per_client_ip(local_media):
+    from django.core.cache import cache
+
+    cache.clear()
+    url = default_storage.url(local_media)
+    with override_settings(MEDIA_DOWNLOAD_RATE='2/min'):
+        assert [APIClient().get(url, REMOTE_ADDR='10.0.0.1').status_code for _ in range(3)] == [200, 200, 429]
+        assert APIClient().get(url, REMOTE_ADDR='10.0.0.2').status_code == 200
+        assert APIClient().get(url[:-3] + 'xx/', REMOTE_ADDR='10.0.0.1').status_code == 429
+    cache.clear()

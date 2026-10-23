@@ -1434,10 +1434,11 @@ paths:
     get:
       operationId: media_retrieve
       description: |-
-        Arquivo de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
+        Download de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
 
-        Aberto sem JWT porque `<img>` não envia o header; token adulterado, vencido ou modo `s3`
-        respondem 404, sem revelar se o arquivo existe.
+        Sem JWT porque `<img>` não envia o header; o link só é gerado para quem está autenticado e
+        pode ver o arquivo. Token adulterado, vencido ou modo `s3` → 404 antes de tocar no disco.
+        Limite por IP (`DJANGO_MEDIA_DOWNLOAD_RATE`) → 429.
       parameters:
       - in: path
         name: token

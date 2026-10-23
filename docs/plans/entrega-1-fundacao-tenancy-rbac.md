@@ -85,6 +85,11 @@ e só começa após aprovação do usuário.
 | 73 | 2FA por app autenticador (TOTP, RFC 6238); WebAuthn fica para depois |
 | 74 | 2FA opcional para todos, inclusive superadmin (risco do ADR 0010 continua aceito) |
 | 75 | Recuperação do 2FA: 10 códigos reserva de uso único + reset por admin (contrato: admin do contrato; admins e superadmins: superadmin), auditado |
+| 76 | Migração de mídia entre filesystem e S3 pelo comando `transfer_media` (incremental, mantém os nomes, não apaga a origem); o banco não muda |
+| 77 | Perfil é um formulário em `/perfil` no padrão das telas (abas); troca de senha pelo próprio usuário na aba Senha (9.2) |
+| 78 | Um ADR por assunto: revisão decidida pelo usuário é corrigida no próprio ADR, com linha "Revisões" |
+| 79 | Fachada única de mídia `apps/core/media.py`: campos `MediaFileField`/`MediaImageField` (herdam os do Django) e funções; nunca o storage do Django direto (teste-trava); `mediaUrl` no frontend |
+| 80 | Perfil envia o formulário inteiro num `PUT /me/profile/` multipart (nome, fuso, foto, remover foto); só a senha fica separada, no `POST /auth/change-password/`. Rota de mídia só leitura e limitada por IP |
 
 ## Bloco 0 — Fundação
 
@@ -204,8 +209,8 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 
 | # | Etapa | Lado | ADR | Status |
 |---|---|---|---|---|
-| 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados | backend | 0039 | ✅ |
-| 9.2 | Perfil: foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas | backend + frontend | — | ⬜ |
-| 9.3 | Segurança: trocar senha; sessões com navegador/IP, encerrar uma e sair de todas | backend + frontend | — | ⬜ |
+| 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados; comando `transfer_media` para migrar entre os modos; fachada `media` com campos próprios | backend | 0039 | ✅ |
+| 9.2 | Perfil `/perfil` (formulário no padrão, abas): Principal com foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas; aba Senha (troca pelo próprio usuário) | backend + frontend | — | ⬜ |
+| 9.3 | Sessões: navegador/IP de cada sessão, encerrar uma e sair de todas | backend + frontend | — | ⬜ |
 | 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |
 | 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |

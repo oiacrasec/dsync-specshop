@@ -1,5 +1,23 @@
 # Histórico do conhecimento
 
+## 2026-10-23 — Migração de mídia e regra de ADR
+
+- Decisão 76: `manage.py transfer_media --from filesystem|s3 --to s3|filesystem [--dry-run]`
+  (`apps/core/storage.transfer_media`: copia mantendo nomes, pula mesmo tamanho, substitui cópia
+  incompleta, confere, não apaga a origem, falha no fim se houver erro); storages montados do mesmo
+  `.env` (`config/storage.media_storage`). 6 testes. Procedimento no ADR 0039 §5 e no README.
+- Decisão 77: senha na aba Senha do formulário `/perfil` (9.2); 9.3 fica só com sessões.
+- Decisão 79: fachada `apps/core/media.py` (get_storage como função; save/url/open_file/exists/
+  delete/delete_on_commit; detect_content_type por assinatura; imagens → WebP sem metadados;
+  `MediaFileField`/`MediaImageField` com UUID v7, validador, pre_save e limpeza pós-commit;
+  build_storage/transfer). `MediaFileView` e `transfer_media` passam pela fachada. Teste-trava contra
+  storage direto. Pillow 12.3.0 (13.0 recém-lançada, evitada). Front `mediaUrl`. Back 692, front 101.
+- `MediaFileView` só leitura (`http_method_names` get/head) e `MediaDownloadThrottle` por IP real
+  (`client_address`, `DJANGO_MEDIA_DOWNLOAD_RATE=120/min`). Perfil (9.2): um `PUT /me/profile/` multipart
+  com nome, fuso e foto; senha continua no `POST /auth/change-password/` (decisão 80).
+- Decisão 78: um ADR por assunto; revisões no próprio ADR (linha "Revisões"); skill
+  `modo-de-trabalho` e `docs/adr/README.md` ajustados; 0004 e 0037 com as revisões de 2026-10-19.
+
 ## 2026-10-19 — Etapa 9.1: armazenamento de mídia (ADR 0039)
 
 - Decisões 69–75 registradas (Bloco 9). `config/storage.py` monta `STORAGES['default']`:

@@ -10,8 +10,8 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 9.1 mídia ✅ commitada (ADR 0039); Blocos 5 (exceto 5.3), 7 e 8 concluídos |
-| Próximo passo exato | 9.2 Perfil: foto (256 px WebP sem metadados), nome editável, fuso IANA aplicado às datas; usuário pediu para seguir no dia seguinte |
-| Aguardando o usuário? | não — 9.2 autorizada; confirmar início na sessão |
+| Próximo passo exato | 9.2 Perfil `/perfil`: aba Principal (foto, nome, usuário, fuso) + aba Senha |
+| Aguardando o usuário? | sim — revisar regra de ADR, `transfer_media` e a fachada de mídia (sem commit) |
 
 ## Concluído
 
@@ -45,6 +45,7 @@
   8.4: exceção de permissão na atribuição (ADR 0038, decisão 64): caixas livres, perfil vinculado.
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
+- Mídia só pela fachada `apps.core.media` (decisão 79): `MediaFileField`/`MediaImageField`; teste-trava.
 - 9.1 (decisões 69–75, ADR 0039): `DJANGO_MEDIA_STORAGE=filesystem|s3` em `config/storage.py`;
   URL assinada `/api/v1/media/<token>/` (filesystem) ou pre-signed (S3); mídia sempre privada.
 - 5.5 (decisões 67–68): `/api/v1/schema/` + `docs/api/openapi-v1.yaml` (regenerar a cada mudança

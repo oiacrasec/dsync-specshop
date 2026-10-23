@@ -208,8 +208,22 @@ atrás do proxy, configurar `DJANGO_ACCESS_LOG_IP_HEADER` e `DJANGO_ACCESS_LOG_P
 
 Mídia (ADR 0039): `DJANGO_MEDIA_STORAGE=filesystem` (padrão, pasta `DJANGO_MEDIA_ROOT`) ou `s3`
 (`DJANGO_MEDIA_S3_BUCKET` obrigatório; endpoint/addressing para MinIO). Arquivos sempre privados,
-entregues por URL assinada válida por `DJANGO_MEDIA_URL_EXPIRE` segundos. Variáveis em `.env.example`.
+entregues por URL assinada válida por `DJANGO_MEDIA_URL_EXPIRE` segundos, com download limitado por IP
+(`DJANGO_MEDIA_DOWNLOAD_RATE`, padrão `120/min`). Variáveis em `.env.example`.
 Com mais de um servidor no modo `filesystem`, a pasta precisa ser um volume compartilhado.
+
+Migrar a mídia do disco para o bucket (sem mexer no banco; o comando é incremental e não apaga a origem):
+
+```bash
+# 1. preencha DJANGO_MEDIA_S3_* no .env, mantendo DJANGO_MEDIA_STORAGE=filesystem
+python manage.py transfer_media --from filesystem --to s3 --dry-run   # confere o que vai copiar
+python manage.py transfer_media --from filesystem --to s3
+# 2. troque para DJANGO_MEDIA_STORAGE=s3 e reinicie a aplicação
+python manage.py transfer_media --from filesystem --to s3             # copia o que chegou no meio
+# 3. depois de conferir, a pasta DJANGO_MEDIA_ROOT pode ser apagada
+```
+
+O caminho inverso é `--from s3 --to filesystem`.
 
 Performance é premissa global: revisar queries, escritas, locks, CPU, memória,
 tráfego e concorrência de cada mudança. Consultas constantes não provam, sozinhas,

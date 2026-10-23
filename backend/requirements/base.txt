@@ -5,6 +5,7 @@ django-filter~=26.2
 djangorestframework-simplejwt~=5.5.1
 drf-spectacular~=0.30.0  # OpenAPI gerado do código (ADR 0004), BSD-3
 django-storages[s3]~=1.14.6  # mídia em bucket S3/compatível (ADR 0039), BSD-3; boto3 Apache-2.0
+Pillow~=12.3.0  # ImageField e reprocessamento de imagens (ADR 0039), MIT-CMU
 PyJWT~=2.15.1  # restrição da dependência transitiva de assinatura JWT
 django-environ~=0.14.0
 psycopg[binary]~=3.3.6
