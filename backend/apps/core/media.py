@@ -6,7 +6,9 @@ teste trava). Trocar o mecanismo de armazenamento = mudar só este módulo.
 
     avatar = MediaImageField(folder='avatars', max_size=2 * MB, square=256)
     user.avatar.url          # link assinado (filesystem) ou pre-signed (S3)
-    name = media.save(arquivo, folder='relatorios', allowed=(PDF,), max_size=10 * MB)
+    name = media.save(arquivo, contract=contrato, folder='relatorios', allowed=(PDF,), max_size=10 * MB)
+
+Todo nome segue `<public_id do contrato | system>/<pasta>/<uuid7>.<ext>` (decisão 81).
 """
 
 import io
@@ -16,7 +18,7 @@ import environ
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.core.files.storage import storages
+from django.core.files.storage import default_storage
 from django.db import models, transaction
 from django.db.models.signals import post_delete, post_init, post_save
 from django.utils.deconstruct import deconstructible
@@ -34,12 +36,18 @@ JPEG, PNG, WEBP, PDF = 'image/jpeg', 'image/png', 'image/webp', 'application/pdf
 IMAGE_TYPES = (JPEG, PNG, WEBP)
 EXTENSIONS = {JPEG: '.jpg', PNG: '.png', WEBP: '.webp', PDF: '.pdf'}
 MAX_IMAGE_PIXELS = 40_000_000
+SYSTEM_FOLDER = 'system'
 WEBP_QUALITY = 85
 
 
 def get_storage():
-    """Único ponto que resolve o storage; os campos o recebem como função (não fixam a instância)."""
-    return storages['default']
+    """Único ponto que resolve o storage.
+
+    Devolve o proxy preguiçoso do Django (resolve `STORAGES['default']` no uso e é reiniciado quando
+    a configuração muda). O campo do Django chama esta função uma vez, ao carregar o model: com o
+    proxy, ele nunca fica preso a uma instância.
+    """
+    return default_storage
 
 
 def is_signed_local():
@@ -125,15 +133,41 @@ def prepare_upload(file, content_type, *, square=None, max_side=None):
     return ContentFile(output.getvalue()), WEBP
 
 
-def new_name(folder, content_type):
-    return f'{folder}/{uuid.uuid7().hex}{EXTENSIONS[content_type]}'
+def owner_folder(contract):
+    """Primeira pasta de todo arquivo: public_id do contrato dono, ou `system` (decisão 81).
+
+    Separar um cliente (outro banco ou outra instalação) leva a pasta inteira; o public_id não
+    muda entre bancos e não expõe o id interno nos links (ADR 0007).
+    """
+    if contract is None:
+        return SYSTEM_FOLDER
+    return str(getattr(contract, 'public_id', contract))
 
 
-def save(file, *, folder, allowed=IMAGE_TYPES, max_size=2 * MB, square=None, max_side=None):
-    """Valida, prepara e grava fora de models; devolve o nome relativo (o que se guarda)."""
+def contract_of(instance):
+    """Contrato dono de um registro: o próprio contrato, o `contract` do registro ou nenhum."""
+    from apps.contracts.models import Contract
+
+    if isinstance(instance, Contract):
+        return instance.public_id
+    contract_id = getattr(instance, 'contract_id', None)
+    if contract_id is None:
+        return None
+    return Contract.objects.unscoped().filter(pk=contract_id).values_list('public_id', flat=True).first()
+
+
+def new_name(contract, folder, extension):
+    return f'{owner_folder(contract)}/{folder}/{uuid.uuid7().hex}{extension}'
+
+
+def save(file, *, contract, folder, allowed=IMAGE_TYPES, max_size=2 * MB, square=None, max_side=None):
+    """Valida, prepara e grava fora de models; devolve o nome relativo (o que se guarda).
+
+    `contract`: contrato dono (instância ou public_id) ou None para arquivos da plataforma.
+    """
     content_type = validate_upload(file, allowed=allowed, max_size=max_size)
     content, content_type = prepare_upload(file, content_type, square=square, max_side=max_side)
-    return get_storage().save(new_name(folder, content_type), content)
+    return get_storage().save(new_name(contract, folder, EXTENSIONS[content_type]), content)
 
 
 def build_storage(backend):
@@ -150,14 +184,14 @@ def transfer(source_backend, target_backend, *, dry_run=False):
 
 @deconstructible
 class MediaUploadTo:
-    """Pasta + UUID v7; a extensão vem do tipo detectado (o nome original nunca é usado)."""
+    """Contrato dono + pasta + UUID v7; a extensão vem do tipo detectado (nunca o nome original)."""
 
     def __init__(self, folder):
         self.folder = folder
 
     def __call__(self, instance, filename):
         extension = filename[filename.rfind('.') :] if '.' in filename else ''
-        return f'{self.folder}/{uuid.uuid7().hex}{extension}'
+        return new_name(contract_of(instance), self.folder, extension)
 
     def __eq__(self, other):
         return isinstance(other, MediaUploadTo) and other.folder == self.folder

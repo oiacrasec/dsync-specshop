@@ -13,7 +13,7 @@ from PIL import Image
 
 from apps.core import media
 
-NAME = re.compile(r'^avatars/[0-9a-f]{32}\.webp$')
+NAME = re.compile(r'^system/avatars/[0-9a-f]{32}\.webp$')
 
 
 def image_bytes(fmt='PNG', size=(400, 300), exif=None):
@@ -33,7 +33,7 @@ def local_media(tmp_path):
 
 
 def test_save_reencodes_images_to_webp_with_a_uuid_name_and_signed_url():
-    name = media.save(ContentFile(image_bytes(), name='minha foto.png'), folder='avatars', square=256)
+    name = media.save(ContentFile(image_bytes(), name='minha foto.png'), contract=None, folder='avatars', square=256)
     assert NAME.match(name) and media.exists(name)
     with media.open_file(name) as stored, Image.open(stored) as image:
         assert image.format == 'WEBP' and image.size == (256, 256)
@@ -44,7 +44,7 @@ def test_save_reencodes_images_to_webp_with_a_uuid_name_and_signed_url():
 def test_metadata_such_as_gps_is_dropped():
     exif = Image.Exif()
     exif[0x8825] = {1: 'S', 2: (23.0, 33.0, 0.0)}  # GPSInfo
-    name = media.save(ContentFile(image_bytes('JPEG', exif=exif.tobytes())), folder='avatars')
+    name = media.save(ContentFile(image_bytes('JPEG', exif=exif.tobytes())), contract=None, folder='avatars')
     with media.open_file(name) as stored, Image.open(stored) as image:
         assert not image.getexif() and 'exif' not in image.info
 
@@ -59,19 +59,29 @@ def test_metadata_such_as_gps_is_dropped():
 )
 def test_type_is_checked_by_content_not_by_name(content, message):
     with pytest.raises(ValidationError, match=message):
-        media.save(ContentFile(content, name='foto.png'), folder='avatars')
+        media.save(ContentFile(content, name='foto.png'), contract=None, folder='avatars')
 
 
 def test_size_limit_and_tolerant_delete():
     with pytest.raises(ValidationError, match='maior que o permitido'):
-        media.save(ContentFile(image_bytes(size=(800, 800))), folder='avatars', max_size=1 * media.KB)
+        media.save(ContentFile(image_bytes(size=(800, 800))), contract=None, folder='avatars', max_size=1 * media.KB)
     media.delete('')
     media.delete('avatars/ausente.webp')
 
 
 def test_pdf_is_kept_as_is_when_allowed():
-    name = media.save(ContentFile(b'%PDF-1.7 conteudo'), folder='docs', allowed=(media.PDF,), max_size=media.MB)
-    assert name.endswith('.pdf') and media.open_file(name).read() == b'%PDF-1.7 conteudo'
+    name = media.save(
+        ContentFile(b'%PDF-1.7 conteudo'), contract=None, folder='docs', allowed=(media.PDF,), max_size=media.MB
+    )
+    assert name.startswith('system/docs/') and name.endswith('.pdf')
+    assert media.open_file(name).read() == b'%PDF-1.7 conteudo'
+
+
+def test_files_of_a_client_live_under_its_contract_public_id():
+    contract = '019a0000-0000-7000-8000-0000000000aa'
+    name = media.save(ContentFile(image_bytes()), contract=contract, folder='avatars')
+    assert re.match(rf'^{contract}/avatars/[0-9a-f]{{32}}\.webp$', name)
+    assert media.owner_folder(None) == 'system'
 
 
 @pytest.fixture
@@ -92,13 +102,16 @@ def photo_model(db):
         yield Photo
 
 
-def test_field_validates_prepares_and_cleans_old_files_after_commit(photo_model, django_capture_on_commit_callbacks):
+def test_field_validates_prepares_and_cleans_old_files_after_commit(
+    photo_model, local_media, django_capture_on_commit_callbacks
+):
     photo = photo_model(image=ContentFile(image_bytes(), name='original.png'))
     photo.full_clean()
     with django_capture_on_commit_callbacks(execute=True):
         photo.save()
     first = photo.image.name
     assert NAME.match(first) and photo.image.width == 64 and photo.image.url.startswith('/api/v1/media/')
+    assert (local_media / first).is_file()  # O campo segue o storage em uso, não o da importação.
     photo = photo_model.objects.get(pk=photo.pk)
     photo.image = ContentFile(image_bytes(size=(80, 90)), name='nova.jpg')
     with django_capture_on_commit_callbacks(execute=True):
@@ -144,3 +157,14 @@ def test_nobody_uses_django_file_storage_directly():
         and FORBIDDEN.search(path.read_text())
     ]
     assert offenders == [], f'Use apps.core.media em vez do storage do Django: {offenders}'
+
+
+def test_deleting_the_last_file_removes_empty_folders_but_keeps_the_media_root(local_media):
+    contract = '019a0000-0000-7000-8000-0000000000aa'
+    first = media.save(ContentFile(image_bytes()), contract=contract, folder='avatars')
+    second = media.save(ContentFile(image_bytes()), contract=contract, folder='avatars')
+    media.delete(first)
+    assert (local_media / contract / 'avatars').is_dir()  # Ainda tem arquivo: fica.
+    media.delete(second)
+    assert not (local_media / contract).exists()
+    assert local_media.is_dir()

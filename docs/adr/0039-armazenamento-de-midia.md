@@ -3,7 +3,8 @@
 - **Status:** Aceito
 - **Data:** 2026-10-19
 - **Revisões:** 2026-10-23 — migração entre filesystem e S3 pelo comando `transfer_media` (decisão 76, §5);
-  fachada única `apps/core/media.py` com `MediaFileField`/`MediaImageField` (decisão 79, §6)
+  fachada única `apps/core/media.py` com `MediaFileField`/`MediaImageField` (decisão 79, §6);
+  arquivos separados por contrato: `<public_id do contrato | system>/<pasta>/…` (decisão 81, §7)
 
 ## Contexto
 
@@ -47,6 +48,14 @@ autenticação.
    não disparam a limpeza: o service do domínio chama `media.delete_on_commit`. Um teste falha se
    algum arquivo fora da fachada usar `models.FileField/ImageField`, `default_storage` ou `storages`.
    No frontend, `core/utils/media-url.ts` (`mediaUrl`) é o único ponto que monta o `src`.
+
+7. **Separação por contrato:** todo nome segue `<public_id do contrato>/<pasta>/<uuid7>.<ext>`;
+   o que não é de cliente (ex.: foto de superadmin) vai para `system/<pasta>/…`. O campo descobre
+   o dono pelo registro (o próprio `Contract` ou o `contract` do registro); `media.save` recebe
+   `contract=` explícito. Separar um cliente para outro banco ou instalação leva a pasta inteira;
+   o public_id não muda entre bancos e não expõe o id interno (ADR 0007). No modo `filesystem`,
+   apagar o último arquivo de uma pasta remove as pastas que ficaram vazias, até a raiz da mídia
+   (no S3 os prefixos somem sozinhos).
 
 ## Consequências
 

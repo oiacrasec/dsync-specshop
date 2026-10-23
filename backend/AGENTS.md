@@ -78,6 +78,7 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `MediaImageField`; fora de models `media.save/url/open_file/delete`. Nunca `models.FileField`,
   `models.ImageField`, `default_storage` ou `storages` direto (teste-trava em `test_media_facade.py`).
   Soft delete/`update` não limpam arquivos: o service chama `media.delete_on_commit`.
+  Nomes sempre `<public_id do contrato | system>/<pasta>/…`; `media.save` exige `contract=` (None = system).
 - Usar `serializer.is_valid(raise_exception=True)`; validação retorna 422. Mensagens
   de validação não devem incluir dados pessoais ou detalhes internos.
 - Actions customizadas usam try/except e helpers de core/responses.py:

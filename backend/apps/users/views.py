@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.parsers import JSONParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -30,6 +30,7 @@ from apps.users.models import User
 from apps.users.serializers import (
     ContractUserSerializer,
     LoginSerializer,
+    MyProfileSerializer,
     PasswordChangeSerializer,
     PreferencesSerializer,
     RefreshSerializer,
@@ -142,6 +143,23 @@ class MyPreferencesView(APIView):
     def current(user):
         stored = PreferencesSerializer(data={**DEFAULT_PREFERENCES, **user.preferences})
         return stored.validated_data if stored.is_valid() else dict(DEFAULT_PREFERENCES)
+
+
+@extend_schema(request={'multipart/form-data': MyProfileSerializer}, responses={200: MyProfileSerializer})
+@method_decorator(never_cache, name='dispatch')
+class MyProfileView(APIView):
+    """Perfil do próprio usuário (9.2): nome, fuso e foto num envio só (multipart)."""
+
+    permission_classes = [AllowAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get(self, request):
+        return Response(MyProfileSerializer(request.user).data)
+
+    def put(self, request):
+        serializer = MyProfileSerializer(request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(MyProfileSerializer(serializer.save()).data)
 
 
 @method_decorator(never_cache, name='dispatch')

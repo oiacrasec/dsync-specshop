@@ -1,13 +1,16 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.audit.models import AuditEventType as Event
+from apps.core import media
 from apps.core.serializers import BaseModelSerializer
 from apps.core.tenancy import get_context
 
-from .constants import MENU_MODES, THEME_PRESETS, THEME_PRIMARY_COLORS
+from .constants import MENU_MODES, THEME_PRESETS, THEME_PRIMARY_COLORS, TIME_ZONES
 from .utils import generate_temporary_password
 
 
@@ -107,3 +110,51 @@ class PreferencesSerializer(serializers.Serializer):
     primary = serializers.ChoiceField(choices=THEME_PRIMARY_COLORS)
     dark_mode = serializers.BooleanField()
     menu_mode = serializers.ChoiceField(choices=MENU_MODES)
+
+
+class MyProfileSerializer(serializers.Serializer):
+    """Perfil do próprio usuário (`/me/profile/`, 9.2): o formulário inteiro num envio só.
+
+    A senha não entra aqui: fica no `POST /auth/change-password/` (decisão 80).
+    """
+
+    username = serializers.CharField(read_only=True)
+    name = serializers.CharField(source='first_name', max_length=150)
+    time_zone = serializers.ChoiceField(choices=TIME_ZONES)
+    avatar = serializers.ImageField(required=False, allow_null=True, write_only=True)
+    remove_avatar = serializers.BooleanField(required=False, default=False, write_only=True)
+    avatar_url = serializers.SerializerMethodField()
+
+    def validate_name(self, value):
+        name = value.strip()
+        if not name:
+            raise serializers.ValidationError(_('Informe o nome.'))
+        return name
+
+    def validate_avatar(self, value):
+        if value is not None:
+            field = get_user_model()._meta.get_field('avatar')
+            try:
+                media.validate_upload(value, allowed=field.media_allowed, max_size=field.media_max_size)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError(exc.messages) from None
+        return value
+
+    def get_avatar_url(self, user) -> str:
+        return media.url(user.avatar.name)
+
+    def to_representation(self, user):
+        data = super().to_representation(user)
+        data['time_zone'] = user.time_zone or settings.TIME_ZONE
+        return data
+
+    def update(self, user, validated_data):
+        user.first_name = validated_data['first_name']
+        user.time_zone = '' if validated_data['time_zone'] == settings.TIME_ZONE else validated_data['time_zone']
+        avatar = validated_data.get('avatar')
+        if avatar is not None:
+            user.avatar = avatar
+        elif validated_data['remove_avatar']:
+            user.avatar = None
+        user.save(update_fields=['first_name', 'time_zone', 'avatar'], actor=user)
+        return user

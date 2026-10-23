@@ -1,4 +1,6 @@
-"""Constantes de users: só valores literais."""
+"""Constantes de users: só valores literais (e o catálogo de fusos do sistema)."""
+
+from zoneinfo import available_timezones
 
 # Campos que mexem em papel, contrato, licença ou último admin (save_user).
 RULE_FIELDS = frozenset({'is_active', 'is_superuser', 'contract', 'contract_id', 'deleted_at'})
@@ -34,3 +36,6 @@ THEME_PRIMARY_COLORS = (
 )
 MENU_MODES = ('static', 'overlay', 'slim', 'compact', 'reveal', 'drawer', 'horizontal')
 DEFAULT_PREFERENCES = {'preset': 'Aura', 'primary': 'blue', 'dark_mode': False, 'menu_mode': 'static'}
+
+# Fusos IANA aceitos no perfil, lidos uma vez por processo.
+TIME_ZONES = tuple(sorted(available_timezones()))

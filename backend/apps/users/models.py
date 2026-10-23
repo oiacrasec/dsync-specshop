@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.media import MB, MediaImageField
 from apps.core.models import BaseModel
 from apps.users.managers import AllUsersManager, UserManager
 
@@ -23,6 +24,10 @@ class User(AbstractUser, BaseModel):
     must_change_password = models.BooleanField(verbose_name=_('deve trocar a senha'), default=False)
     # Só aparência da interface (finalidade: personalização; sem dado pessoal sensível).
     preferences = models.JSONField(verbose_name=_('preferências'), default=dict, blank=True)
+    # Foto opcional (finalidade: identificação visual na interface; sai na exclusão do usuário).
+    avatar = MediaImageField(verbose_name=_('foto'), folder='avatars', max_size=2 * MB, square=256)
+    # Fuso para exibir datas; vazio = TIME_ZONE do sistema. O banco segue em UTC.
+    time_zone = models.CharField(verbose_name=_('fuso horário'), max_length=64, blank=True, default='')
 
     class Meta(BaseModel.Meta):
         abstract = False

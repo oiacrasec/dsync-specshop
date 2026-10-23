@@ -1,7 +1,15 @@
 from django.urls import path
 
 from apps.core.routers import SchemaRouter
-from apps.users.views import LoginView, LogoutView, MyPreferencesView, PasswordChangeView, RefreshView, UserViewSet
+from apps.users.views import (
+    LoginView,
+    LogoutView,
+    MyPreferencesView,
+    MyProfileView,
+    PasswordChangeView,
+    RefreshView,
+    UserViewSet,
+)
 
 app_name = 'users'
 
@@ -14,5 +22,6 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/change-password/', PasswordChangeView.as_view(), name='change-password'),
     path('me/preferences/', MyPreferencesView.as_view(), name='my-preferences'),
+    path('me/profile/', MyProfileView.as_view(), name='my-profile'),
     *router.urls,
 ]

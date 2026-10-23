@@ -4,7 +4,9 @@ A pasta não é servida diretamente: `url()` devolve `/api/v1/media/<token>/`, e
 (nome do arquivo + horário) é a credencial, válida por `MEDIA_URL_EXPIRE` segundos.
 """
 
+import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from django.conf import settings
 from django.core import signing
@@ -15,6 +17,21 @@ MEDIA_SIGNING_SALT = 'datasync.media'
 
 
 class SignedFileSystemStorage(FileSystemStorage):
+    def delete(self, name):
+        """Apaga o arquivo e as pastas que ficarem vazias, até a raiz da mídia (que fica).
+
+        No S3 não há pastas: o prefixo some sozinho com o último arquivo.
+        """
+        super().delete(name)
+        root = Path(self.location).resolve()
+        folder = Path(self.path(name)).parent
+        while folder != root and root in folder.parents:
+            try:
+                os.rmdir(folder)  # Só remove pasta vazia; outra em uso falha e para aqui.
+            except OSError:
+                break
+            folder = folder.parent
+
     def url(self, name):
         token = signing.dumps(name, salt=MEDIA_SIGNING_SALT)
         return reverse('media-file', kwargs={'token': token})

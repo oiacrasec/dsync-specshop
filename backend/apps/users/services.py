@@ -13,6 +13,7 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.contracts.models import Contract
+from apps.core import media
 from apps.core.exceptions import ContractInactive, LicenseLimitReached
 from apps.core.managers import SoftDeleteQuerySet
 from apps.core.tenancy import system_scope
@@ -146,6 +147,10 @@ def delete_user(*, user, actor=None, using=None):
                 ensure_contract_keeps_admin(current.contract_id, exclude_user_id=current.pk)
         base = type(user).all_objects.using(database).filter(pk=current.pk)
         count, _ = SoftDeleteQuerySet.delete(base, actor=actor)
+        if count and current.avatar:
+            # Soft delete não dispara a limpeza do campo: a foto (dado pessoal) sai junto.
+            media.delete_on_commit(current.avatar.name)
+            base.update(avatar='')
         if count and current.is_superuser:
             from apps.audit.models import AuditEventType
             from apps.audit.services import record
