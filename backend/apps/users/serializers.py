@@ -154,3 +154,22 @@ class MyProfileSerializer(BaseSerializer):
             user.avatar = None
         user.save(update_fields=['first_name', 'time_zone', 'avatar'], actor=user)
         return user
+
+
+class UserSessionSerializer(BaseSerializer):
+    """Sessão da própria conta (`/me/sessions/`); `current` marca a deste navegador."""
+
+    public_id = serializers.UUIDField(read_only=True)
+    device = serializers.CharField(read_only=True)
+    ip = serializers.IPAddressField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    last_seen_at = serializers.DateTimeField(read_only=True)
+    current = serializers.SerializerMethodField()
+
+    def get_current(self, session) -> bool:
+        return str(session.public_id) == self.context.get('current_session')
+
+
+class LoginHistorySerializer(BaseSerializer):
+    occurred_at = serializers.DateTimeField(read_only=True)
+    ip = serializers.IPAddressField(read_only=True)

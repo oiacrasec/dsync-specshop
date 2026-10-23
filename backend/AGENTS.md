@@ -111,7 +111,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `users.utils.generate_temporary_password`, devolvida uma vez, nunca em log/auditoria.
 - Admins do contrato (6.7, decisão 43): `rbac.selectors.contract_admin_users` (unscoped,
   só administração) e `users.services.reset_password` (flag + revoga refresh + auditoria).
-  Locks de conta e refresh sempre usuário → OutstandingToken (refresh, reset); não inverter.
+  Locks de conta e refresh sempre usuário → OutstandingToken → UserSession (refresh, reset,
+  encerrar sessões); não inverter.
 - Chave JWT independente via `DJANGO_JWT_SIGNING_KEY`; nunca versionar seu valor,
   logar tokens ou retornar respostas de autenticação cacheáveis.
 - Limite de login conta apenas falhas por conta: `DJANGO_AUTH_LOGIN_RATE=5/min`,

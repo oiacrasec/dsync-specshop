@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from django.contrib.auth import authenticate, get_user_model
@@ -18,7 +19,7 @@ from apps.core.exceptions import ContractInactive, LicenseLimitReached
 from apps.core.managers import SoftDeleteQuerySet
 from apps.core.tenancy import system_scope
 
-from .constants import RULE_FIELDS
+from .constants import RULE_FIELDS, SESSION_CLAIM
 
 
 @system_scope
@@ -187,7 +188,37 @@ def login(*, request, username, password):
     ensure_contract_available(user)  # Só depois da senha válida: não revela nada a quem errou.
     request.user = user  # Usuário validado para o registro de autenticação (ADR 0019).
     refresh = RefreshToken.for_user(user)
+    _start_session(user, refresh, request)
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
+
+
+def _client_ip(request):
+    from apps.audit.utils import client_address
+
+    return client_address(request)[0] if request is not None else '0.0.0.0'  # noqa: S104 — origem desconhecida.
+
+
+def _expires_at(token):
+    return datetime.fromtimestamp(token['exp'], tz=UTC)
+
+
+def _start_session(user, refresh, request):
+    """Abre a sessão do login e grava o id no token (o access herda a claim)."""
+    from .devices import UserAgent
+    from .models import UserSession
+
+    now = timezone.now()
+    UserSession.objects.filter(user=user, expires_at__lte=now).delete()  # Expiradas saem (LGPD).
+    session = UserSession.objects.create(
+        user=user,
+        refresh_jti=refresh[api_settings.JTI_CLAIM],
+        device=UserAgent.from_request(request).label,
+        ip=_client_ip(request),
+        last_seen_at=now,
+        expires_at=_expires_at(refresh),
+    )
+    refresh[SESSION_CLAIM] = str(session.public_id)
+    return session
 
 
 def _decode_refresh(raw_token):
@@ -198,6 +229,19 @@ def _decode_refresh(raw_token):
     except TokenError, KeyError, ValueError, TypeError, AttributeError:
         raise InvalidToken() from None
     return token, public_id
+
+
+def _lock_session(token, user):
+    """Sessão do token, travada; encerrada → token inválido. Sem claim (token antigo) → None."""
+    from .models import UserSession
+
+    session_id = token.get(SESSION_CLAIM)
+    if session_id is None:
+        return None
+    session = UserSession.objects.select_for_update().filter(public_id=session_id, user=user).first()
+    if session is None:
+        raise InvalidToken()
+    return session
 
 
 def _lock_outstanding(token):
@@ -227,10 +271,19 @@ def refresh_tokens(*, refresh, request=None):
         if not api_settings.USER_AUTHENTICATION_RULE(user):
             raise AuthenticationFailed()
         ensure_contract_available(user)
+        session = _lock_session(token, user)  # Ordem de locks: usuário → token → sessão.
         token.blacklist()
         token.set_jti()
         token.set_exp()
         token.set_iat()
+        if session is None:
+            _start_session(user, token, request)  # Token anterior às sessões (9.3).
+        else:
+            session.refresh_jti = token[api_settings.JTI_CLAIM]
+            session.last_seen_at = timezone.now()
+            session.expires_at = _expires_at(token)
+            session.ip = _client_ip(request) if request is not None else session.ip
+            session.save(update_fields=['refresh_jti', 'last_seen_at', 'expires_at', 'ip'])
         token.outstand()
         if request is not None:
             request.user = user
@@ -246,8 +299,16 @@ def logout(*, refresh):
         token, _ = _decode_refresh(refresh)
         _lock_outstanding(token)
         token.blacklist()
+        _delete_session(token.get(SESSION_CLAIM))
     except TokenError:
         raise InvalidToken() from None
+
+
+def _delete_session(session_id):
+    from .models import UserSession
+
+    if session_id:
+        UserSession.objects.filter(public_id=session_id).delete()
 
 
 @system_scope
@@ -302,6 +363,32 @@ def _revoke_refresh_tokens(user):
         user_id=user.pk, blacklistedtoken__isnull=True, expires_at__gt=timezone.now()
     ).values_list('pk', flat=True)
     BlacklistedToken.objects.bulk_create([BlacklistedToken(token_id=pk) for pk in pending], ignore_conflicts=True)
+    from .models import UserSession
+
+    UserSession.objects.filter(user_id=user.pk).delete()
+
+
+@system_scope
+@transaction.atomic
+def end_sessions(*, user, session_ids=None, keep=None):
+    """Encerra sessões da própria conta: as informadas, ou todas menos `keep` (a atual).
+
+    Revoga o refresh de cada uma (o dispositivo perde o acesso na próxima renovação, até a
+    validade do access) e apaga a sessão. Ordem de locks usuário → token → sessão.
+    """
+    from .models import UserSession
+
+    get_user_model().objects.unscoped().select_for_update(of=('self',)).get(pk=user.pk)
+    sessions = UserSession.objects.select_for_update().filter(user_id=user.pk)
+    if session_ids is not None:
+        sessions = sessions.filter(public_id__in=session_ids)
+    if keep is not None:
+        sessions = sessions.exclude(public_id=keep)
+    jtis = list(sessions.values_list('refresh_jti', flat=True))
+    pending = OutstandingToken.objects.filter(jti__in=jtis, blacklistedtoken__isnull=True).values_list('pk', flat=True)
+    BlacklistedToken.objects.bulk_create([BlacklistedToken(token_id=pk) for pk in pending], ignore_conflicts=True)
+    count, _ = sessions.delete()
+    return count
 
 
 @system_scope

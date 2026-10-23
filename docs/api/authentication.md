@@ -64,10 +64,27 @@ Todas as respostas dessas rotas incluem `Cache-Control` com `no-store` e
 | Identidade | claim `public_id`, UUID v7 do usuário; sem PK interna, username ou email |
 | Algoritmo | HS256, chave independente em `DJANGO_JWT_SIGNING_KEY` |
 | Renovação | revoga refresh anterior e registra o novo |
-| Logout | revoga o refresh apresentado |
+| Logout | revoga o refresh apresentado e apaga a sessão |
+| Sessão (9.3) | claim `sid` (public_id da sessão) no refresh e no access; uma sessão por login |
 
-Ordem de locks na renovação: usuário → token (a mesma do reset de senha da 6.7, que revoga
-todos os refresh da conta). O cliente deve substituir o refresh anterior pelo novo após renovar. Reutilizar
+**Sessões (9.3, decisões 83–85):** o login abre uma sessão (dispositivo pelo `User-Agent`, só o
+rótulo, ex.: "Chrome no Windows"; IP; início; último uso) e apaga as expiradas da conta. A
+renovação mantém o `sid`, atualiza último uso, IP e o refresh atual; sessão encerrada → 401.
+Logout e reset de senha apagam as sessões. Encerrar uma sessão revoga o refresh dela: o
+dispositivo perde o acesso na próxima renovação, em até 15 min (sem consulta extra por
+requisição). Tokens anteriores às sessões ganham uma na primeira renovação.
+
+| Rota | Uso |
+|---|---|
+| `GET /api/v1/me/sessions/` | sessões em vigor da conta; `current` marca a deste navegador |
+| `GET /api/v1/me/logins/` | últimos 20 logins da conta (data e IP), do registro de acesso |
+| `DELETE /api/v1/me/sessions/{public_id}/` | encerra uma sessão da própria conta (outra conta → 404) |
+| `POST /api/v1/me/sessions/end-others/` | encerra todas menos a atual; `{"ended": n}` |
+
+A tela (aba Sessões do Perfil) só exibe; as rotas de encerrar ficam prontas na API.
+
+Ordem de locks na renovação: usuário → token → sessão (a mesma do reset de senha da 6.7, que
+revoga todos os refresh da conta). O cliente deve substituir o refresh anterior pelo novo após renovar. Reutilizar
 um refresh revogado retorna 401. Renovação e logout são transacionais e usam lock
 de linha do token no PostgreSQL; duas renovações simultâneas do mesmo refresh
 não podem emitir dois novos pares válidos.

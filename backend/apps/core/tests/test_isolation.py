@@ -19,6 +19,7 @@ from apps.core.models import HybridScopedModel, OrganizationScopedModel, SharedM
 from apps.core.tenancy import TenantContext, TenantContextMissing, use_context
 from apps.core.tests.scoping.models import ScopingCategory, ScopingCountry, ScopingMovement, ScopingProduct
 from apps.rbac.models import Assignment, AssignmentExclusion, Profile, ProfilePermission
+from apps.users.models import UserSession
 
 pytestmark = pytest.mark.django_db
 _sequence = count()
@@ -81,6 +82,9 @@ FACTORIES = {
 SHARED = {Plan, ScopingCountry}
 # Registros fora dos tipos de escopo (ADR 0018): leitura só global explícita.
 GLOBAL_ONLY = {AccessLog}
+# Registros do próprio usuário (sessões, 9.3): sem contrato; toda leitura filtra pelo dono
+# (`users.selectors.active_sessions`, `users.services.end_sessions`), coberto em test_sessions.py.
+OWNER_ONLY = {UserSession}
 
 
 def own_models():
@@ -94,7 +98,7 @@ def own_models():
 
 
 def test_every_model_is_covered():
-    covered = FACTORIES.keys() | SHARED | GLOBAL_ONLY
+    covered = FACTORIES.keys() | SHARED | GLOBAL_ONLY | OWNER_ONLY
     missing = [model._meta.label for model in own_models() if model not in covered]
     assert missing == [], f'Registre uma fábrica de isolamento para: {missing}'
     assert all(issubclass(model, SharedModel) for model in SHARED)

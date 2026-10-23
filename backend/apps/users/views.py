@@ -6,7 +6,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, NotFound
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
@@ -23,16 +23,19 @@ from apps.rbac.permissions import AllowAuthenticated
 from apps.rbac.selectors import user_access
 from apps.rbac.serializers import UserAccessOutputSerializer, UserAccessSerializer
 from apps.users import services
-from apps.users.constants import DEFAULT_PREFERENCES
+from apps.users.constants import DEFAULT_PREFERENCES, SESSION_CLAIM
 from apps.users.filters import UserFilterSet
 from apps.users.models import User
+from apps.users.selectors import active_sessions, recent_logins
 from apps.users.serializers import (
     ContractUserSerializer,
+    LoginHistorySerializer,
     LoginSerializer,
     MyProfileSerializer,
     PasswordChangeSerializer,
     PreferencesSerializer,
     RefreshSerializer,
+    UserSessionSerializer,
     UserSummarySerializer,
 )
 from apps.users.throttles import LoginThrottle, PasswordChangeThrottle
@@ -156,6 +159,56 @@ class MyProfileView(BaseAPIView):
         serializer = MyProfileSerializer(request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(MyProfileSerializer(serializer.save()).data)
+
+
+def current_session_id(request):
+    """public_id da sessão deste navegador, vindo do access token (claim `sid`)."""
+    token = getattr(request, 'auth', None)
+    return token.get(SESSION_CLAIM) if token is not None else None
+
+
+@extend_schema(responses={200: UserSessionSerializer(many=True)})
+class MySessionsView(BaseAPIView):
+    """Sessões em vigor da própria conta (9.3)."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def get(self, request):
+        context = {'current_session': current_session_id(request)}
+        return Response(UserSessionSerializer(active_sessions(request.user), many=True, context=context).data)
+
+
+@extend_schema(responses={200: LoginHistorySerializer(many=True)})
+class MyLoginHistoryView(BaseAPIView):
+    """Últimos logins da própria conta (só leitura)."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def get(self, request):
+        return Response(LoginHistorySerializer(recent_logins(request.user), many=True).data)
+
+
+@extend_schema(request=None, responses={204: None})
+class MySessionView(BaseAPIView):
+    """Encerra uma sessão da própria conta; de outra conta (ou inexistente) → 404."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def delete(self, request, public_id):
+        if not services.end_sessions(user=request.user, session_ids=[public_id]):
+            raise NotFound()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(request=None, responses={200: inline_serializer('EndedSessions', {'ended': serializers.IntegerField()})})
+class EndOtherSessionsView(BaseAPIView):
+    """Encerra todas as sessões da conta, menos a deste navegador."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def post(self, request):
+        ended = services.end_sessions(user=request.user, keep=current_session_id(request))
+        return Response({'ended': ended})
 
 
 @method_decorator(never_cache, name='dispatch')

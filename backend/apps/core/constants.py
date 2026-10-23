@@ -40,8 +40,9 @@ HTTP_PROBLEMS = {
 
 # Escopo declarado: exceções da lista fechada do ADR 0012.
 SCOPE_EXCEPTIONS = frozenset({'users.User', 'contracts.Contract'})
-# Registros fora do BaseModel e dos tipos de escopo (ADR 0018): só inserção, leitura global explícita.
-UNSCOPED_RECORDS = frozenset({'audit.AccessLog'})
+# Registros técnicos fora do BaseModel e dos tipos de escopo, com leitura global explícita:
+# acesso (ADR 0018, só inserção) e sessões de login (9.3, apagadas ao encerrar ou expirar).
+UNSCOPED_RECORDS = frozenset({'audit.AccessLog', 'users.UserSession'})
 
 # Serializer com escopo: contexto e id interno nunca entram nem saem (ADR 0006 §4, ADR 0007).
 SERIALIZER_HIDDEN_FIELDS = ('id', 'contract', 'organization')

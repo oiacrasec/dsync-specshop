@@ -3,7 +3,8 @@
 - **Status:** Aceito
 - **Data:** 2026-10-03
 - **Revisões:** 2026-10-19 — OpenAPI: arquivo `docs/api/openapi-v1.yaml` com teste de divergência e
-  documentação navegável no frontend (decisões 67–68, etapa 5.5)
+  documentação navegável no frontend (decisões 67–68, etapa 5.5); 2026-10-23 — claim `sid` (sessão) no
+  refresh e no access, uma sessão por login (decisões 83–85, etapa 9.3)
 
 ## Contexto
 
@@ -38,7 +39,8 @@ Biblioteca: `djangorestframework-simplejwt` (suporta Django 5.2).
 | Refresh token | **1 dia** |
 | Rotação | cada renovação emite um refresh novo |
 | Blacklist | app `rest_framework_simplejwt.token_blacklist` **instalado**: rotação e logout invalidam o refresh anterior |
-| Logout | invalida o refresh token |
+| Logout | invalida o refresh token e apaga a sessão |
+| Sessão | claim `sid` com o public_id da sessão (uma por login); encerrar revoga o refresh dela (corte na próxima renovação, até 15 min) |
 | Contrato vencido ou inativo | barrado na próxima requisição (ADR 0006 §2.1) |
 | Armazenamento no navegador | definido no ADR 0003 |
 

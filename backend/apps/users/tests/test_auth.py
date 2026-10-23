@@ -359,11 +359,12 @@ def test_auth_endpoints_have_constant_query_counts(user, api_client, django_asse
         [get_user_model()(username=f'extra-{i}', contract=user.contract) for i in range(quantity)]
     )
     # ADR 0019: +1 INSERT apenas no login e refresh bem-sucedidos; logout não grava AccessLog.
-    with django_assert_num_queries(8):  # Inclui o contrato conferido no login (ADR 0006 §2.1).
+    # Login: contrato conferido (ADR 0006 §2.1) + limpar sessões expiradas e abrir a sessão (9.3).
+    with django_assert_num_queries(10):
         tokens = login_client(api_client).json()
-    with django_assert_num_queries(20):
+    with django_assert_num_queries(22):  # +2 da sessão: trava e atualiza (9.3).
         response = api_client.post(REFRESH, {'refresh': tokens['refresh']}, format='json')
         assert response.status_code == 200
-    with django_assert_num_queries(13):
+    with django_assert_num_queries(14):  # +1: apaga a sessão (9.3).
         response = api_client.post(LOGOUT, {'refresh': response.json()['refresh']}, format='json')
         assert response.status_code == 204

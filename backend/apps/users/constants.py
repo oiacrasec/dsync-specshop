@@ -39,3 +39,6 @@ DEFAULT_PREFERENCES = {'preset': 'Aura', 'primary': 'blue', 'dark_mode': False, 
 
 # Fusos IANA aceitos no perfil, lidos uma vez por processo.
 TIME_ZONES = tuple(sorted(available_timezones()))
+
+# Claim do JWT com o public_id da sessão (9.3); refresh e access carregam.
+SESSION_CLAIM = 'sid'

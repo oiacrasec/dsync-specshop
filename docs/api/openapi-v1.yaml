@@ -1263,6 +1263,41 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/me/logins/:
+    get:
+      operationId: me_logins_list
+      description: Últimos logins da própria conta (só leitura).
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoginHistory'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/me/organizations/:
     get:
       operationId: me_organizations_list
@@ -1484,6 +1519,129 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyProfile'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/sessions/:
+    get:
+      operationId: me_sessions_list
+      description: Sessões em vigor da própria conta (9.3).
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSession'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/sessions/{public_id}/:
+    delete:
+      operationId: me_sessions_destroy
+      description: Encerra uma sessão da própria conta; de outra conta (ou inexistente)
+        → 404.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/sessions/end-others/:
+    post:
+      operationId: me_sessions_end_others_create
+      description: Encerra todas as sessões da conta, menos a deste navegador.
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndedSessions'
           description: ''
         '400':
           description: Requisição malformada ou header de contexto inválido.
@@ -3814,6 +3972,13 @@ components:
       required:
       - name
       - username
+    EndedSessions:
+      type: object
+      properties:
+        ended:
+          type: integer
+      required:
+      - ended
     ExcludedPermission:
       type: object
       properties:
@@ -3839,6 +4004,19 @@ components:
           maxLength: 128
       required:
       - permission
+    LoginHistory:
+      type: object
+      properties:
+        occurred_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ip:
+          type: string
+          readOnly: true
+      required:
+      - ip
+      - occurred_at
     LoginRequest:
       type: object
       properties:
@@ -5829,6 +6007,39 @@ components:
             $ref: '#/components/schemas/AccessGrantRequest'
       required:
       - grants
+    UserSession:
+      type: object
+      description: Sessão da própria conta (`/me/sessions/`); `current` marca a deste
+        navegador.
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+        device:
+          type: string
+          readOnly: true
+        ip:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_seen_at:
+          type: string
+          format: date-time
+          readOnly: true
+        current:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - current
+      - device
+      - ip
+      - last_seen_at
+      - public_id
     UserSummary:
       type: object
       properties:

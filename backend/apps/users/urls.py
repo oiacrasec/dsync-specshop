@@ -2,10 +2,14 @@ from django.urls import path
 
 from apps.core.routers import SchemaRouter
 from apps.users.views import (
+    EndOtherSessionsView,
     LoginView,
     LogoutView,
+    MyLoginHistoryView,
     MyPreferencesView,
     MyProfileView,
+    MySessionsView,
+    MySessionView,
     PasswordChangeView,
     RefreshView,
     UserViewSet,
@@ -23,5 +27,9 @@ urlpatterns = [
     path('auth/change-password/', PasswordChangeView.as_view(), name='change-password'),
     path('me/preferences/', MyPreferencesView.as_view(), name='my-preferences'),
     path('me/profile/', MyProfileView.as_view(), name='my-profile'),
+    path('me/sessions/', MySessionsView.as_view(), name='my-sessions'),
+    path('me/logins/', MyLoginHistoryView.as_view(), name='my-logins'),
+    path('me/sessions/end-others/', EndOtherSessionsView.as_view(), name='my-sessions-end-others'),
+    path('me/sessions/<uuid:public_id>/', MySessionView.as_view(), name='my-session'),
     *router.urls,
 ]
