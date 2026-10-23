@@ -126,6 +126,7 @@ Guards:
 - Sempre limpar cache relevante em mutacoes e troca de contexto.
 - Nao hardcodar schemas de tabela/filtro quando API ja entrega dinamicamente.
 - Em requests de imagem/tile disparados fora do `HttpClient` (OpenLayers/DOM APIs), lembrar que interceptors Angular nao serao aplicados.
+- Imagem ampliada (foto, anexo): `ui-image-preview` (`shared/ui/image-preview`, sobre o `p-dialog`), com `[(visible)]`, `src`, `title`, `alt`; não criar modal próprio para isso.
 - Textos de apoio de campo devem usar `helpText` em componentes compartilhados (`ui-autocomplete`, `ui-input-text`, `ui-input-number`, `ui-input-password`, `ui-input-date`, `ui-multi-select`, `ui-checkbox`), evitando `<small>` solto no formulario.
 - Todo formulário usa `p-tabs` (`TabsModule`) com a primeira aba **Principal** (`value="principal"`),
   mesmo quando só tem ela; seções extras viram abas seguintes (ex.: Permissões em perfil e

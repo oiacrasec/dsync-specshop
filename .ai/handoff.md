@@ -1,6 +1,6 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-19
+- **Atualizado em:** 2026-10-23
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Blocos 7 e 8 concluídos)
 - **Último commit:** a0e8dce feat(core): configure private media storage on filesystem or S3
@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.1 mídia ✅ commitada (ADR 0039); Blocos 5 (exceto 5.3), 7 e 8 concluídos |
-| Próximo passo exato | 9.2 Perfil `/perfil`: aba Principal (foto, nome, usuário, fuso) + aba Senha |
-| Aguardando o usuário? | sim — revisar regra de ADR, `transfer_media` e a fachada de mídia (sem commit) |
+| Etapa atual | 9.2 Perfil ✅ commitada; users.0006 aplicada ao banco local |
+| Próximo passo exato | 9.3 Sessões (navegador/IP, encerrar uma, sair de todas) — aguardar confirmação |
+| Aguardando o usuário? | sim — confirmar início da 9.3 |
 
 ## Concluído
 
@@ -46,6 +46,9 @@
   `organization:create` em qualquer escopo (62). Formulários com aba Principal (61).
   Usuários/perfis/atribuições continuam reservados (decisão 54 mantida em 2026-10-19).
 - Mídia só pela fachada `apps.core.media` (decisão 79): `MediaFileField`/`MediaImageField`; teste-trava.
+- 9.2 (decisões 77, 80, 81): `/perfil` (Principal + Senha; sem Voltar/Cancelar), `GET/PUT /me/profile/`
+  multipart, foto em `<public_id do contrato|system>/avatars/`, fuso nas colunas datetime (`zonedDate`),
+  `ui-image-preview` (p-dialog no body com girar/zoom/espelhar/baixar). Pastas vazias somem no filesystem.
 - 9.1 (decisões 69–75, ADR 0039): `DJANGO_MEDIA_STORAGE=filesystem|s3` em `config/storage.py`;
   URL assinada `/api/v1/media/<token>/` (filesystem) ou pre-signed (S3); mídia sempre privada.
 - 5.5 (decisões 67–68): `/api/v1/schema/` + `docs/api/openapi-v1.yaml` (regenerar a cada mudança

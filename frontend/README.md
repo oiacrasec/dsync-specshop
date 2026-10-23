@@ -77,6 +77,14 @@ Custo: ~80 KB a mais no CSS inicial (~13 KB comprimido); as fontes só baixam qu
 O aviso de orçamento do bundle inicial é 2 MB (decisão do usuário; erro em 5 MB).
 Os prefixos não colidem com o PrimeIcons.
 
+## Perfil (etapa 9.2)
+
+Menu do avatar → **Perfil** (`/perfil`): aba Principal (foto, nome, usuário só leitura, fuso
+horário) num `PUT /api/v1/me/profile/` multipart e aba Senha no `POST /auth/change-password/`.
+`ProfileService` carrega o perfil ao entrar: foto (ou iniciais) no topo e fuso nas datas.
+Colunas de data e hora (`zoned`) usam o pipe `zonedDate` (deslocamento calculado por instante,
+`core/utils/time-zone.ts`); data pura não muda de dia.
+
 ## Documentações (etapa 5.5)
 
 Menu do avatar → **Documentações** → **API** (`/documentacoes/api`): Swagger UI do schema

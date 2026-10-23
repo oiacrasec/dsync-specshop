@@ -28,7 +28,7 @@ export class AuthService {
         return defer(() => this.http.get<UserContextsResponse>(apiEndpoint(this.baseUrl, '/me/organizations/')));
     }
 
-    firstAccessChangePassword(payload: FirstAccessPasswordChangeRequest) {
+    changePassword(payload: FirstAccessPasswordChangeRequest) {
         return defer(() => this.http.post<FirstAccessPasswordChangeResponse>(apiEndpoint(this.baseUrl, '/auth/change-password/'), payload));
     }
 }

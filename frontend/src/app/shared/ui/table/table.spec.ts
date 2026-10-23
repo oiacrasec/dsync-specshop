@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { Table } from 'primeng/table';
+import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 
 import { UiFilter } from '@/app/shared/ui/filter/filter';
 import { UiTable, UiTableListResponse } from './table';
@@ -17,7 +18,7 @@ describe('UiTable — limpar filtros', () => {
     };
 
     beforeEach(() => {
-        TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient()] });
+        TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient(), { provide: API_BASE_URL, useValue: '/api/v1' }] });
     });
 
     afterEach(() => TestBed.resetTestingModule());

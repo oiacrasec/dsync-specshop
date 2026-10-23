@@ -104,7 +104,7 @@ export class PrimeiroAcessoTrocarSenhaPage {
         const revision = this.authSessionService.getRevision();
 
         this.authService
-            .firstAccessChangePassword(this.form.getRawValue())
+            .changePassword(this.form.getRawValue())
             .pipe(finalize(() => this.saving.set(false)))
             .subscribe({
                 next: (response) => {

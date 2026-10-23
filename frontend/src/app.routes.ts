@@ -101,6 +101,15 @@ export const appRoutes: Routes = [
             },
             */
             {
+                path: 'perfil',
+                canActivate: [accessGuard],
+                loadComponent: () => import('@/app/pages/perfil/perfil').then((c) => c.PerfilPage),
+                data: {
+                    breadcrumb: 'Perfil',
+                    audience: ACCESS_AUDIENCE.AUTHENTICATED
+                }
+            },
+            {
                 path: 'configuracoes',
                 canActivate: [accessGuard],
                 loadComponent: () => import('@/app/pages/configuracoes/configuracoes').then((c) => c.ConfiguracoesPage),

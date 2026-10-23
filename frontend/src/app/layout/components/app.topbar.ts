@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, model, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, model, signal, ViewChild, viewChild } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -14,6 +14,7 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { AvatarModule } from 'primeng/avatar';
 import { FormsModule } from '@angular/forms';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
+import { ProfileService } from '@/app/core/services/profile.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
@@ -126,14 +127,19 @@ interface NotificationsBars {
                 </li>
                 <li class="profile-item static sm:relative">
                     <a class="right-sidebar-button relative z-50" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveActiveClass="animate-fadeout" leaveToClass="hidden" [hideOnOutsideClick]="true">
-                        <p-avatar class="w-10! h-10!">
-                            <img src="/layout/images/profile.jpg" />
-                        </p-avatar>
+                        @if (profile.avatarSrc(); as avatar) {
+                            <p-avatar class="w-10! h-10!" shape="circle">
+                                <img [src]="avatar" alt="Sua foto" />
+                            </p-avatar>
+                        } @else {
+                            <p-avatar class="w-10! h-10!" shape="circle" [label]="initials()" aria-label="Seu perfil" />
+                        }
                     </a>
                     <div
+                        #profileMenu
                         class="list-none p-2 m-0 rounded-2xl border border-surface overflow-hidden absolute bg-surface-0 dark:bg-surface-900 hidden origin-top w-52 mt-2 right-0 z-999 top-auto shadow-[0px_56px_16px_0px_rgba(0,0,0,0.00),0px_36px_14px_0px_rgba(0,0,0,0.01),0px_20px_12px_0px_rgba(0,0,0,0.02),0px_9px_9px_0px_rgba(0,0,0,0.03),0px_2px_5px_0px_rgba(0,0,0,0.04)]"
                     >
-                        <ul class="flex flex-col gap-1">
+                        <ul class="flex flex-col gap-1" (click)="closeProfileMenu()">
                             @if (canSwitchContext()) {
                                 <li>
                                     <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer" (click)="switchContext($event)">
@@ -143,7 +149,7 @@ interface NotificationsBars {
                                 </li>
                             }
                             <li>
-                                <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
+                                <a routerLink="/perfil" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
                                     <i class="pi pi-user"></i>
                                     <span>Perfil</span>
                                 </a>
@@ -186,6 +192,15 @@ export class AppTopbar {
     private router = inject(Router);
     private messages = inject(MessageService);
     private leaving = false;
+
+    readonly profile = inject(ProfileService);
+    private profileMenu = viewChild<ElementRef<HTMLElement>>('profileMenu');
+    readonly initials = computed(() => {
+        const name = this.profile.profile()?.name || this.authSession.getUser()?.name || '';
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+
+        return ((parts[0]?.[0] ?? '') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase() || '?';
+    });
 
     isDarkTheme = computed(() => this.layoutService.isDarkTheme());
 
@@ -296,6 +311,11 @@ export class AppTopbar {
         }
 
         return true;
+    }
+
+    // O pStyleClass só fecha com clique fora; escolher um item também fecha o menu.
+    closeProfileMenu() {
+        this.profileMenu()?.nativeElement.classList.add('hidden');
     }
 
     onMenuButtonClick() {

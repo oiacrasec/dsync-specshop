@@ -45,7 +45,8 @@
         <tr>
             @for (col of tableColumns; track col.field) {
             <td>
-                @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { {{ getCellValue(row, col) | date: (col.format || 'shortDate') }} } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean') {
+                @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { @if (col.zoned) { {{ getCellValue(row, col) | zonedDate: (col.format || 'short') : timeZone() }} } @else { {{ getCellValue(row, col) | date: (col.format ||
+                'shortDate') }} } } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean') {
                 <i class="fa-solid" [ngClass]="getCellValue(row, col) ? 'fa-square-check text-green-500' : 'fa-square-xmark text-red-500'" aria-hidden="true"></i>
                 <span class="sr-only">{{ getCellValue(row, col) ? 'Sim' : 'Não' }}</span>
                 } @case ('boolean-tag') {

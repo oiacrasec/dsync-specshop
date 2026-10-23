@@ -11,6 +11,7 @@ import { AppRightMenu } from '@/app/layout/components/app.rightmenu';
 import { ToastModule } from 'primeng/toast';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { PreferencesService } from '@/app/core/services/preferences.service';
+import { ProfileService } from '@/app/core/services/profile.service';
 import { UserContextService } from '@/app/core/services/user-context.service';
 
 @Component({
@@ -52,6 +53,7 @@ import { UserContextService } from '@/app/core/services/user-context.service';
 export class AppLayout implements OnInit {
     layoutService: LayoutService = inject(LayoutService);
     private preferences = inject(PreferencesService);
+    private profile = inject(ProfileService);
     private authSession = inject(AuthSessionService);
     private userContextService = inject(UserContextService);
     private router = inject(Router);
@@ -78,6 +80,7 @@ export class AppLayout implements OnInit {
 
     ngOnInit() {
         this.preferences.load().subscribe({ error: () => undefined });
+        this.profile.load().subscribe({ error: () => undefined });
     }
 
     shouldShowAppShell() {

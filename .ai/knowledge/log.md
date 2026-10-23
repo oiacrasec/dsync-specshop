@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-23 — Etapa 9.2: Perfil
+
+- Backend: `User.avatar` (`MediaImageField` avatars, 2 MB, 256 px) e `User.time_zone` (vazio =
+  TIME_ZONE), `users.0006`; `GET/PUT /api/v1/me/profile/` multipart (`MyProfileSerializer`,
+  `TIME_ZONES` de zoneinfo); `delete_user` apaga a foto (soft delete). Fachada: `get_storage` passou
+  a devolver o `default_storage` (proxy preguiçoso) porque o Django avalia o storage do campo uma vez
+  na carga do model; testes tinham gravado em `backend/media/` (limpo). 10 testes; suíte 704.
+- Frontend: `/perfil` (abas Principal e Senha, um Salvar; senha só se preenchida), `ProfileService`
+  (foto/iniciais no topo, fuso), pipe `zonedDate` + `timeZoneOffset` nas colunas datetime,
+  `AuthService.changePassword` (renomeado). 106 testes. Docs: `docs/api/profile.md`.
+- Melhorias: `ui-image-preview` (p-dialog no body, reaproveitável) com olho sobre a foto; menu do
+  avatar fecha ao escolher item; aba Senha sem o texto de apoio.
+- Decisão 81: mídia por contrato (`media.owner_folder`/`contract_of`; `media.save(contract=…)`;
+  `system/` sem contrato). Foto local existente do `admin_x` movida para a pasta do contrato. Back 705.
+- `SignedFileSystemStorage.delete` remove pastas vazias até a raiz da mídia (`os.rmdir`, para na
+  primeira com conteúdo). Back 706.
+
 ## 2026-10-23 — Migração de mídia e regra de ADR
 
 - Decisão 76: `manage.py transfer_media --from filesystem|s3 --to s3|filesystem [--dry-run]`

@@ -9,10 +9,11 @@ import { PageResponse, SchemaFieldType, SchemaFilter, TableSchema } from '@/app/
 // herdados do GIS (ui-table, ui-filter, ui-autocomplete). Serviços de tela não repetem mapeamento.
 
 // O backend informa só o tipo; o formato vem do LOCALE_ID (pt-BR: shortDate 01/10/2026, short com hora).
+// Data e hora (instante) seguem o fuso do Perfil (`zoned`); data pura não muda de dia.
 const COLUMN_FORMATS: Partial<Record<SchemaFieldType, Partial<UiTableColumn>>> = {
     boolean: { type: 'boolean' },
     date: { type: 'date' },
-    datetime: { type: 'date', format: 'short' }
+    datetime: { type: 'date', format: 'short', zoned: true }
 };
 
 export function toTableResponse<T>(schema: TableSchema, page: PageResponse<T>, baseUrl: string): UiTableListResponse<T> {

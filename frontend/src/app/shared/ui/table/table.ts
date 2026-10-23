@@ -10,6 +10,8 @@ import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { UiFilter, UiFilterField } from '@/app/shared/ui/filter/filter';
 import { TableQueryCacheService } from '@/app/core/services/table-query-cache.service';
+import { ProfileService } from '@/app/core/services/profile.service';
+import { ZonedDatePipe } from '@/app/shared/pipes/zoned-date.pipe';
 
 type TagSeverity = 'secondary' | 'info' | 'success' | 'warn' | 'danger' | 'contrast' | null | undefined;
 
@@ -19,6 +21,8 @@ export interface UiTableColumn {
     sortable?: boolean;
     type?: 'text' | 'number' | 'date' | 'boolean' | 'boolean-tag' | 'choice' | 'relation';
     format?: string;
+    // Instante (data e hora): exibido no fuso do Perfil.
+    zoned?: boolean;
     nullablePlaceholder?: string;
     booleanTag?: {
         trueLabel: string;
@@ -53,7 +57,7 @@ export interface UiTableDataService {
 @Component({
     selector: 'ui-table',
     standalone: true,
-    imports: [CommonModule, TableModule, TagModule, UiButton, MenuModule, UiFilter],
+    imports: [CommonModule, TableModule, TagModule, UiButton, MenuModule, UiFilter, ZonedDatePipe],
     templateUrl: './table.html',
     styles: [
         `
@@ -119,6 +123,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     private cdRef = inject(ChangeDetectorRef);
     private router = inject(Router);
     private tableQueryCache = inject(TableQueryCacheService);
+    readonly timeZone = inject(ProfileService).timeZone;
     @Input() service?: UiTableDataService;
     @Input() value: T[] = [];
     @Input() columns: UiTableColumn[] = [];
