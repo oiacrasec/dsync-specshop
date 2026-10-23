@@ -7,18 +7,17 @@ from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from apps.audit.models import AccessLogAction
 from apps.audit.utils import mark_auth_access
 from apps.core.exceptions import ContractInactive
 from apps.core.openapi import temporary_password_response
 from apps.core.responses import build_exception_response, build_result_response
-from apps.core.views import BaseModelViewSet
+from apps.core.views import UPLOAD_PARSERS, BaseAPIView, BaseModelViewSet
 from apps.rbac import services as rbac_services
 from apps.rbac.permissions import AllowAuthenticated
 from apps.rbac.selectors import user_access
@@ -39,9 +38,8 @@ from apps.users.serializers import (
 from apps.users.throttles import LoginThrottle, PasswordChangeThrottle
 
 
-@method_decorator(never_cache, name='dispatch')
 @method_decorator(sensitive_post_parameters('username', 'password', 'refresh'), name='dispatch')
-class AuthView(APIView):
+class AuthView(BaseAPIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     parser_classes = [JSONParser]
@@ -97,12 +95,11 @@ class LogoutView(AuthView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@method_decorator(never_cache, name='dispatch')
 @method_decorator(
     sensitive_post_parameters('current_password', 'new_password', 'new_password_confirm'), name='dispatch'
 )
 @extend_schema(request=PasswordChangeSerializer, responses={200: USER_RESPONSE})
-class PasswordChangeView(APIView):
+class PasswordChangeView(BaseAPIView):
     permission_classes = [AllowAuthenticated]
     parser_classes = [JSONParser]
     renderer_classes = [JSONRenderer]
@@ -122,7 +119,7 @@ class PasswordChangeView(APIView):
 
 @method_decorator(never_cache, name='dispatch')
 @extend_schema(request=PreferencesSerializer, responses={200: PreferencesSerializer})
-class MyPreferencesView(APIView):
+class MyPreferencesView(BaseAPIView):
     """Aparência da interface do próprio usuário; sem X-Organization-Id (vale para o superadmin)."""
 
     permission_classes = [AllowAuthenticated]
@@ -146,12 +143,11 @@ class MyPreferencesView(APIView):
 
 
 @extend_schema(request={'multipart/form-data': MyProfileSerializer}, responses={200: MyProfileSerializer})
-@method_decorator(never_cache, name='dispatch')
-class MyProfileView(APIView):
+class MyProfileView(BaseAPIView):
     """Perfil do próprio usuário (9.2): nome, fuso e foto num envio só (multipart)."""
 
     permission_classes = [AllowAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    parser_classes = UPLOAD_PARSERS
 
     def get(self, request):
         return Response(MyProfileSerializer(request.user).data)

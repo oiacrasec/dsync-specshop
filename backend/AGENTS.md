@@ -74,6 +74,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   `manage.py spectacular --validate --fail-on-warn --file ../docs/api/openapi-v1.yaml`;
   o teste `test_versioned_schema_file_matches_the_code` acusa divergência. Views que exigem
   a organização ativa sem `RequiredPermission` declaram `organization_header = True`.
+- Views e serializers só pelas bases (ADR 0021): `BaseAPIView` (no-store por padrão; `UPLOAD_PARSERS`
+  para multipart), `BaseSerializer`, `BaseModelSerializer`, `BaseModelViewSet`. Nunca `APIView`
+  ou `serializers.Serializer` direto (teste-trava em `test_base_classes.py`); sem `never_cache` à mão.
 - Mídia só pela fachada `apps.core.media` (ADR 0039 §6): models com `MediaFileField`/
   `MediaImageField`; fora de models `media.save/url/open_file/delete`. Nunca `models.FileField`,
   `models.ImageField`, `default_storage` ou `storages` direto (teste-trava em `test_media_facade.py`).

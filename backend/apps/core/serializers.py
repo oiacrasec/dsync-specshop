@@ -149,7 +149,15 @@ class BaseAdminModelSerializer(BaseModelSerializer):
         return actor
 
 
-class PageQuerySerializer(serializers.Serializer):
+# Base de todo serializer sem model (nunca `serializers.Serializer` direto; um teste trava).
+# Ponto único para regras comuns de entrada e saída. Comentário, não docstring: seria herdada
+# no OpenAPI. O `ValidationError` do Django já vira erro de campo na validação (DRF) e 422 no
+# `save()` (handler RFC 9457): não converter à mão.
+class BaseSerializer(serializers.Serializer):
+    pass
+
+
+class PageQuerySerializer(BaseSerializer):
     first = serializers.IntegerField(default=0, min_value=0)
     rows = serializers.IntegerField(default=OPTIONS_DEFAULT_ROWS, min_value=1, max_value=OPTIONS_MAX_ROWS)
 

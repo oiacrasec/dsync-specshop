@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-23 — Bases de view e serializer (decisão 82)
+
+- `apps/core/views.BaseAPIView` (`no_store=True` via `finalize_response`, também em erro; parser JSON;
+  `UPLOAD_PARSERS`) e `apps/core/serializers.BaseSerializer`. 12 views e 13 serializers migrados;
+  decorators `never_cache` das APIViews removidos; `MediaFileView` com `no_store = False`;
+  `OpenApiSchemaView(BaseAPIView, SpectacularAPIView)`. Explicação em comentário: docstring das
+  bases era herdada como descrição no OpenAPI. Verificado: DRF já converte `ValidationError` do
+  Django em `validate*` e o handler RFC 9457 trata o do `save()`; try/except do avatar removido.
+  OpenAPI sem diferença. Teste-trava `test_base_classes.py`. Back 708.
+
 ## 2026-10-23 — Etapa 9.2: Perfil
 
 - Backend: `User.avatar` (`MediaImageField` avatars, 2 MB, 256 px) e `User.time_zone` (vazio =

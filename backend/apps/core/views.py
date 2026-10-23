@@ -5,13 +5,13 @@ import mimetypes
 from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
+from django.utils.cache import add_never_cache_headers
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -32,6 +32,26 @@ from .permissions import SuperadminPermission
 from .problems import problem_http_response
 from .storage import media_name_from_token
 from .throttles import MediaDownloadThrottle
+
+# Entrada com arquivo (multipart), para views de upload: `parser_classes = UPLOAD_PARSERS`.
+UPLOAD_PARSERS = [MultiPartParser, FormParser, JSONParser]
+
+
+# Base de toda APIView do projeto (nunca `APIView` direto; um teste trava). Comentário, não
+# docstring: a docstring seria herdada como descrição de cada rota no OpenAPI.
+# - `no-store` por padrão: a resposta é por usuário e não fica em cache (sucesso e erro).
+#   Quem puder ser cacheada declara `no_store = False` e define o próprio Cache-Control.
+# - Entrada JSON por padrão; upload declara `parser_classes = UPLOAD_PARSERS`.
+# - Permissão continua obrigatória e explícita na view (ADR 0009 §4): a base não libera nada.
+class BaseAPIView(APIView):
+    no_store = True
+    parser_classes = [JSONParser]
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        if self.no_store:
+            add_never_cache_headers(response)
+        return response
 
 
 @transaction.non_atomic_requests
@@ -78,8 +98,7 @@ class BaseReadOnlyModelViewSet(ResourcePermissionMixin, ListFilterMixin, LookupO
     filter_backends = [ValidatedDjangoFilterBackend]
 
 
-@method_decorator(never_cache, name='dispatch')
-class OpenApiSchemaView(SpectacularAPIView):
+class OpenApiSchemaView(BaseAPIView, SpectacularAPIView):
     """`/api/v1/schema/` só para autenticados; as rotas `/admin/` só para o superadmin (ADR 0004)."""
 
     def get_permissions(self):
@@ -92,7 +111,7 @@ class OpenApiSchemaView(SpectacularAPIView):
         return Response(api_schema(include_admin=request.user.is_superuser))
 
 
-class MediaFileView(APIView):
+class MediaFileView(BaseAPIView):
     """Download de mídia do modo `filesystem` (ADR 0039): o token assinado é a credencial.
 
     Sem JWT porque `<img>` não envia o header; o link só é gerado para quem está autenticado e
@@ -102,6 +121,7 @@ class MediaFileView(APIView):
 
     # Só leitura: nenhum envio de arquivo passa por aqui (envio é sempre autenticado, no recurso).
     http_method_names = ['get', 'head']
+    no_store = False  # Define o próprio Cache-Control (private, pela validade do link).
     authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [MediaDownloadThrottle]

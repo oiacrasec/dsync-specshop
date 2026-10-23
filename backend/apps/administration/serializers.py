@@ -4,12 +4,12 @@ from rest_framework import serializers
 
 from apps.audit.models import AuditEventType as Event
 from apps.contracts.models import Contract, Plan
-from apps.core.serializers import BaseAdminModelSerializer
+from apps.core.serializers import BaseAdminModelSerializer, BaseSerializer
 
 from .constants import CONTRACT_AUDIT_FIELDS, PLAN_AUDIT_FIELDS
 
 
-class ContractProvisionSerializer(serializers.Serializer):
+class ContractProvisionSerializer(BaseSerializer):
     """Entrada do provisionamento; dados mínimos do admin (username e nome)."""
 
     organization_name = serializers.CharField(max_length=255)

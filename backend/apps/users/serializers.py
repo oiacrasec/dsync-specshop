@@ -1,20 +1,19 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.audit.models import AuditEventType as Event
 from apps.core import media
-from apps.core.serializers import BaseModelSerializer
+from apps.core.serializers import BaseModelSerializer, BaseSerializer
 from apps.core.tenancy import get_context
 
 from .constants import MENU_MODES, THEME_PRESETS, THEME_PRIMARY_COLORS, TIME_ZONES
 from .utils import generate_temporary_password
 
 
-class LoginSerializer(serializers.Serializer):
+class LoginSerializer(BaseSerializer):
     username = serializers.CharField(max_length=150, write_only=True)
     password = serializers.CharField(write_only=True, trim_whitespace=False)
 
@@ -22,7 +21,7 @@ class LoginSerializer(serializers.Serializer):
         return get_user_model().normalize_username(value)
 
 
-class RefreshSerializer(serializers.Serializer):
+class RefreshSerializer(BaseSerializer):
     refresh = serializers.CharField(write_only=True, trim_whitespace=False)
 
 
@@ -39,7 +38,7 @@ class UserSummarySerializer(serializers.ModelSerializer):
         return user.must_change_password and not user.is_superuser
 
 
-class PasswordChangeSerializer(serializers.Serializer):
+class PasswordChangeSerializer(BaseSerializer):
     current_password = serializers.CharField(write_only=True, trim_whitespace=False)
     new_password = serializers.CharField(write_only=True, trim_whitespace=False)
     new_password_confirm = serializers.CharField(write_only=True, trim_whitespace=False)
@@ -103,7 +102,7 @@ class ContractUserSerializer(BaseModelSerializer):
         return data
 
 
-class PreferencesSerializer(serializers.Serializer):
+class PreferencesSerializer(BaseSerializer):
     """Aparência da interface do usuário (`/me/preferences/`); PUT envia o conjunto inteiro."""
 
     preset = serializers.ChoiceField(choices=THEME_PRESETS)
@@ -112,7 +111,7 @@ class PreferencesSerializer(serializers.Serializer):
     menu_mode = serializers.ChoiceField(choices=MENU_MODES)
 
 
-class MyProfileSerializer(serializers.Serializer):
+class MyProfileSerializer(BaseSerializer):
     """Perfil do próprio usuário (`/me/profile/`, 9.2): o formulário inteiro num envio só.
 
     A senha não entra aqui: fica no `POST /auth/change-password/` (decisão 80).
@@ -134,10 +133,7 @@ class MyProfileSerializer(serializers.Serializer):
     def validate_avatar(self, value):
         if value is not None:
             field = get_user_model()._meta.get_field('avatar')
-            try:
-                media.validate_upload(value, allowed=field.media_allowed, max_size=field.media_max_size)
-            except DjangoValidationError as exc:
-                raise serializers.ValidationError(exc.messages) from None
+            media.validate_upload(value, allowed=field.media_allowed, max_size=field.media_max_size)
         return value
 
     def get_avatar_url(self, user) -> str:

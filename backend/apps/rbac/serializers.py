@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from apps.contracts.models import Organization
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
+from apps.core.serializers import BaseSerializer
 from apps.core.tenancy import get_context
 
 from . import services
@@ -97,12 +98,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile.__dict__.pop('_prefetched_objects_cache', None)
 
 
-class ExcludedPermissionSerializer(serializers.Serializer):
+class ExcludedPermissionSerializer(BaseSerializer):
     organization = serializers.UUIDField(required=False, allow_null=True, default=None)
     permission = serializers.CharField(max_length=128)
 
 
-class AccessGrantSerializer(serializers.Serializer):
+class AccessGrantSerializer(BaseSerializer):
     scope = serializers.ChoiceField(choices=[scope.value for scope in PermissionScope])
     organization = serializers.UUIDField(required=False, allow_null=True, default=None)
     profile = serializers.UUIDField(required=False, allow_null=True, default=None)
@@ -122,7 +123,7 @@ class AccessGrantSerializer(serializers.Serializer):
         return attrs
 
 
-class UserAccessSerializer(serializers.Serializer):
+class UserAccessSerializer(BaseSerializer):
     """Concessões do usuário na aba Permissões (8.3); PUT substitui o conjunto inteiro."""
 
     grants = AccessGrantSerializer(many=True, max_length=500)
@@ -162,13 +163,13 @@ class UserAccessSerializer(serializers.Serializer):
         return attrs
 
 
-class AccessOrganizationSerializer(serializers.Serializer):
+class AccessOrganizationSerializer(BaseSerializer):
     public_id = serializers.UUIDField()
     name = serializers.CharField()
     is_active = serializers.BooleanField()
 
 
-class AccessProfileSerializer(serializers.Serializer):
+class AccessProfileSerializer(BaseSerializer):
     public_id = serializers.UUIDField()
     name = serializers.CharField()
     is_active = serializers.BooleanField()
@@ -181,7 +182,7 @@ class AccessGrantOutputSerializer(AccessGrantSerializer):
     is_active = serializers.BooleanField()
 
 
-class UserAccessOutputSerializer(serializers.Serializer):
+class UserAccessOutputSerializer(BaseSerializer):
     """Formato de `selectors.user_access` (GET/PUT …/access/), só para o OpenAPI."""
 
     organizations = AccessOrganizationSerializer(many=True)

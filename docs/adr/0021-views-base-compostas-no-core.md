@@ -3,6 +3,7 @@
 - **Status:** Aceito
 - **Data:** 2026-10-04
 - **Complementa:** ADRs 0002, 0004, 0011 e 0020
+- **Revisões:** 2026-10-23 — `BaseAPIView` e `BaseSerializer` obrigatórias, com teste-trava (decisão 82)
 
 ## Contexto
 
@@ -25,6 +26,13 @@ comportamentos separados em mixins, reutilizados pelos apps de domínio.
   executa COUNT e SELECT limitado. Preservar escopo e evitar consultas por item.
 - Apps de domínio declaram serializer/selector/services/schema e ações próprias.
   Regras, locks, autoria e auditoria continuam nos services.
+- **Bases obrigatórias (revisão de 2026-10-23):** toda `APIView` herda `BaseAPIView` e todo
+  serializer sem model herda `BaseSerializer` (`core/views.py`, `core/serializers.py`); nunca
+  `APIView` ou `serializers.Serializer` direto (teste `test_base_classes.py`). A `BaseAPIView`
+  responde `no-store` por padrão, inclusive em erro (`no_store = False` só para quem define o
+  próprio Cache-Control, como o download de mídia), aceita JSON por padrão (`UPLOAD_PARSERS` para
+  multipart) e não libera permissão. As bases explicam-se em comentário, não em docstring, para a
+  docstring não ser herdada como descrição das rotas no OpenAPI.
 
 ## Consequências
 

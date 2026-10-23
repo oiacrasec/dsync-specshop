@@ -91,6 +91,7 @@ e só começa após aprovação do usuário.
 | 79 | Fachada única de mídia `apps/core/media.py`: campos `MediaFileField`/`MediaImageField` (herdam os do Django) e funções; nunca o storage do Django direto (teste-trava); `mediaUrl` no frontend |
 | 80 | Perfil envia o formulário inteiro num `PUT /me/profile/` multipart (nome, fuso, foto, remover foto); só a senha fica separada, no `POST /auth/change-password/`. Rota de mídia só leitura e limitada por IP |
 | 81 | Mídia separada por contrato: `<public_id do contrato>/<pasta>/…`, e `system/…` para o que não é de cliente, para separar um cliente levando a pasta inteira |
+| 82 | Bases obrigatórias `BaseAPIView` (no-store por padrão) e `BaseSerializer`, com teste-trava; ADR 0021 revisado |
 
 ## Bloco 0 — Fundação
 

@@ -1,15 +1,12 @@
 from django.db.models import Prefetch
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from apps.core.context import resolve_organization
 from apps.core.exceptions import ContextForbidden
 from apps.core.permission_registry import PERMISSIONS
-from apps.core.views import BaseModelViewSet
+from apps.core.views import BaseAPIView, BaseModelViewSet
 
 from .constants import ACTION_LABELS, PERMISSION_LABELS, RESOURCE_LABELS
 from .filters import ProfileFilterSet
@@ -21,8 +18,7 @@ from .utils import access_evaluation
 
 
 @extend_schema(responses={200: OrganizationSummarySerializer(many=True)})
-@method_decorator(never_cache, name='dispatch')
-class MyOrganizationsView(APIView):
+class MyOrganizationsView(BaseAPIView):
     """Lista para troca de contexto; sem X-Organization-Id (ADR 0006 §3.1).
 
     Superadmin não tem contrato: recebe lista vazia e usa a busca contrato → organização.
@@ -42,8 +38,7 @@ class MyOrganizationsView(APIView):
         )
     }
 )
-@method_decorator(never_cache, name='dispatch')
-class MyPermissionsView(APIView):
+class MyPermissionsView(BaseAPIView):
     """Códigos efetivos na organização ativa, só para a interface (ADR 0037).
 
     Mesmo contexto e cálculo dos endpoints de negócio: header ausente/malformado → 400,
@@ -83,7 +78,7 @@ CATALOG_ITEM = inline_serializer(
         )
     }
 )
-class PermissionCatalogView(APIView):
+class PermissionCatalogView(BaseAPIView):
     """Catálogo do registry com rótulos, agrupado por recurso, para montar as telas de acesso."""
 
     permission_classes = [AllowAuthenticated]
