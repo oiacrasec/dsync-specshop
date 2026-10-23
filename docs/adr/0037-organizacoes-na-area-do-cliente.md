@@ -2,6 +2,7 @@
 
 - **Status:** Aceito
 - **Data:** 2026-10-18
+- **Revisões:** 2026-10-19 — `organization:create` em qualquer escopo (decisão 62, §2)
 - **Substitui:** ADR 0032; ADR 0009 §3.1 no trecho que reservava a gestão de organizações
 - **Complementa:** ADRs 0006, 0008 e 0009
 

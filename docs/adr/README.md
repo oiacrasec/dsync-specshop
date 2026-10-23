@@ -1,8 +1,9 @@
 # ADRs — Architecture Decision Records
 
 Registram decisões arquiteturais relevantes e, principalmente, **por que** foram
-tomadas. Um ADR aprovado não é editado para mudar a decisão: uma decisão nova gera
-um ADR novo que **substitui** o anterior.
+tomadas. **Um ADR por assunto:** quando o usuário revisa uma decisão aceita, o próprio
+ADR é corrigido e ganha uma linha em "Revisões" (data e decisão do plano). ADR novo só
+para assunto novo; o status "Substituído por" fica para os ADRs antigos já substituídos.
 
 ## Status
 

@@ -24,7 +24,7 @@ Preferências do usuário que valem **sempre**, para qualquer agente. Esta skill
 | Conflitos | mostrar as fontes lado a lado, com opções e recomendação, e **perguntar** |
 | Uma coisa por vez | ao revisar ou decidir, apresentar **um ponto por vez** e só avançar com a confirmação do usuário |
 | Recomendar | sempre dar uma recomendação justificada; quem decide é o usuário |
-| Registrar | decisão arquitetural vira ADR (`docs/adr/`); ADR aceito não é editado: um novo o complementa ou substitui |
+| Registrar | decisão arquitetural vira ADR (`docs/adr/`); **um ADR por assunto**: revisão decidida pelo usuário é corrigida no próprio ADR, com a revisão registrada nele (data e decisão do plano); ADR novo só para assunto novo |
 
 ## Execução
 

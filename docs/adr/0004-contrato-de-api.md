@@ -2,6 +2,8 @@
 
 - **Status:** Aceito
 - **Data:** 2026-10-03
+- **Revisões:** 2026-10-19 — OpenAPI: arquivo `docs/api/openapi-v1.yaml` com teste de divergência e
+  documentação navegável no frontend (decisões 67–68, etapa 5.5)
 
 ## Contexto
 
