@@ -31,6 +31,11 @@ campos e rodapé orientando a pedir a redefinição da senha ao administrador. I
 login atual (antes), o erro e versões 390/320 px. O campo de senha foi desvinculado do
 componente para receber o ícone. Aplicada em `pages/auth/login.html`/`.scss`.
 
+A página **Filtros avançados · proposta** traz a v2 aprovada (seção "Proposta v2"): barra
+única com busca, Filtros avançados (com quantidade) e Limpar só com filtro aplicado; os
+campos dinâmicos abrem presos à barra, em grade de colunas de pelo menos 240 px.
+Aplicada em `shared/ui/filter`. As versões anteriores ficam na página como histórico.
+
 ## Biblioteca
 
 | Página | Conteúdo |
