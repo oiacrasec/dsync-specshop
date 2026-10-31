@@ -37,8 +37,9 @@ import { UserContextService } from '@/app/core/services/user-context.service';
                 <div app-search></div>
                 <div app-rightmenu></div>
                 <div class="layout-mask"></div>
-            } @else {
-                <!-- Sem menu (seleção de organização e troca de senha após o login): card centralizado na vertical. -->
+            } @else if (hasSession()) {
+                <!-- Sem menu (seleção de organização e troca de senha após o login): card centralizado na vertical.
+                     Sem sessão não há outlet: ao sair, a página atual não é recriada antes de ir ao login. -->
                 <div class="layout-content-wrapper">
                     <div class="layout-content-wrapper-inside">
                         <div class="layout-content flex flex-col justify-center py-8">
@@ -81,6 +82,10 @@ export class AppLayout implements OnInit {
     ngOnInit() {
         this.preferences.load().subscribe({ error: () => undefined });
         this.profile.load().subscribe({ error: () => undefined });
+    }
+
+    hasSession() {
+        return !!this.authSession.getUser();
     }
 
     shouldShowAppShell() {
