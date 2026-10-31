@@ -26,6 +26,7 @@ from apps.rbac.serializers import UserAccessOutputSerializer, UserAccessSerializ
 from apps.users import services
 from apps.users.constants import DEFAULT_PREFERENCES, SESSION_CLAIM
 from apps.users.filters import UserFilterSet
+from apps.users.mfa import MfaChallengesRevoked
 from apps.users.models import User
 from apps.users.selectors import active_sessions, recent_logins
 from apps.users.serializers import (
@@ -300,6 +301,12 @@ class MfaLoginView(AuthView):
         serializer.is_valid(raise_exception=True)
         try:
             tokens = services.login_mfa(request=request, **serializer.validated_data)
+        except MfaChallengesRevoked as exc:
+            mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
+            throttle = LoginThrottle()
+            throttle.key = throttle.username_key(exc.username)
+            throttle.record_failure()
+            raise
         except AuthenticationFailed, ContractInactive, ValidationError:
             mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
             raise

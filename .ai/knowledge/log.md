@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Limite de falhas no 2º passo do login
+
+- Revisão de segurança: 2º passo sem limite final. Decisão do usuário (opção A, N = 10):
+  `MFA_MAX_LOGIN_FAILURES`; a falha que atinge o limite derruba as provas pendentes
+  (`MfaChallengesRevoked`, 401) e registra falha no `LoginThrottle`. Frontend volta à
+  senha em 401 do 2º passo. ADR 0041 revisado; docs/api/mfa.md atualizado.
+- Arquivos: users/constants.py, mfa.py, services.py, throttles.py, views.py,
+  tests/test_mfa.py, pages/auth/login.ts, mfa-login.spec.ts.
+
 ## 2026-10-31 — Nome do sistema configurável
 
 - Textos usam o nome por variável: frontend `environment.appName`/`companyName` via token

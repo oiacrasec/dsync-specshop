@@ -9,7 +9,7 @@ import { finalize } from 'rxjs/operators';
 
 import { AuthService } from '@/app/core/services/auth.service';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
-import { problemMessage } from '@/app/core/utils/api-problem';
+import { apiProblem, problemMessage } from '@/app/core/utils/api-problem';
 import { APP_BRAND } from '@/app/core/tokens/app-brand';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
@@ -128,7 +128,17 @@ export class Login {
                         this.finishLogin(response);
                     }
                 },
-                error: (error) => this.errorMessage.set(problemMessage(error, 'Não foi possível verificar. Tente novamente ou volte ao login.'))
+                error: (error) => {
+                    // Prova expirada ou derrubada após falhas seguidas: o login recomeça pela senha.
+                    if (apiProblem(error)?.type === 'urn:datasync:problem:authentication-required') {
+                        this.backToPassword();
+                        this.errorMessage.set('A verificação foi encerrada. Entre novamente com usuário e senha.');
+
+                        return;
+                    }
+
+                    this.errorMessage.set(problemMessage(error, 'Não foi possível verificar. Tente novamente ou volte ao login.'));
+                }
             });
     }
 

@@ -9,8 +9,8 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 9.4 MFA TOTP — concluída, alterações sem commit |
-| Próximo passo exato | Decidir o limite de tentativas do 2º passo (revisão de segurança, opções A/B/C); conferir login novo no navegador |
-| Aguardando o usuário? | sim — escolha da opção de limite do MFA |
+| Próximo passo exato | Ponto 2 da revisão de segurança: ativação do MFA sem senha; conferir login novo no navegador |
+| Aguardando o usuário? | sim — decisão do ponto 2 (ativação sem senha) |
 
 ## Feito nesta etapa
 
@@ -37,8 +37,8 @@
 
 - Login redesenhado conforme FigCraft "Login · proposta": erro inline (sem toasts), senha com
   ui-input-password. 401 no logout corrigido (outlet sem menu exige sessão).
-- Pendente: revisão de segurança apontou 2º passo sem limite final (espera até 60 s) e ativação
-  do MFA sem senha; aguardando decisão, ADR 0041 a revisar.
+- Revisão de segurança: ponto 1 resolvido (corte após 10 falhas seguidas, ADR 0041 revisado).
+  Ponto 2 pendente: setup/ativação do MFA não pedem a senha atual.
 - FigCraft salvo na página Login · Verificação em duas etapas; referência IM03.png
   e seleção de organização. Estados autenticador/reserva/erro e 390/320 px conferidos.
 - Aplicada em pages/auth/login.html/.scss (template extraído do login.ts). Prettier, lint,

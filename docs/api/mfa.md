@@ -26,7 +26,9 @@ Senha sozinha não cria sessão nem AccessLog de sucesso para contas com MFA con
 TOTP: seis dígitos, 30 s, janela de um intervalo e antirreuso pelo último intervalo,
 inclusive entre ativação e login (aguardar o próximo código após ativar).
 Reserva: HMAC-SHA256 e exclusão ao consumir. Falhas aguardam 1, 2, 4… até 60 s;
-429 preserva Retry-After. As falhas são persistidas antes de responder o erro, sem
+429 preserva Retry-After. Com 10 falhas seguidas, o login MFA responde 401, derruba as
+provas pendentes da conta e conta falha no bloqueio do login; o cliente volta à senha.
+As falhas são persistidas antes de responder o erro, sem
 rollback do limitador. Tudo usa no-store e os erros seguem RFC 9457: código/senha
 inválidos 422, prova inválida 401, estado incompatível/expirado 409.
 Chave ausente/inválida ou segredo indecifrável: configuração/TOTP retornam 503 genérico,

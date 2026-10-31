@@ -16,7 +16,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import Throttled, ValidationError
+from rest_framework.exceptions import AuthenticationFailed, Throttled, ValidationError
 
 from apps.core.exceptions import MfaUnavailable
 
@@ -27,6 +27,14 @@ from .constants import (
     MFA_TOTP_WINDOW,
 )
 from .models import UserRecoveryCode
+
+
+class MfaChallengesRevoked(AuthenticationFailed):
+    """Falhas seguidas demais no 2º passo: a view conta a falha no bloqueio do login."""
+
+    def __init__(self, username):
+        super().__init__()
+        self.username = username
 
 
 class Mfa:

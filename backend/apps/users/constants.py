@@ -50,4 +50,6 @@ MFA_CHALLENGE_SECONDS = 300
 MFA_MAX_LOGIN_CHALLENGES = 5
 # O teto acompanha o bloqueio temporário de 60 s do login; nunca dormir sob lock.
 MFA_MAX_RETRY_SECONDS = 60
+# Falhas seguidas no 2º passo que derrubam as provas pendentes e devolvem o login à senha.
+MFA_MAX_LOGIN_FAILURES = 10
 MFA_RECOVERY_CODE_COUNT = 10

@@ -10,7 +10,7 @@ from django.db import router, transaction
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, Throttled
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
@@ -499,7 +499,8 @@ def _lock_mfa_user(pk, *, include_mfa=False):
 
 @system_scope
 def login_mfa(*, request, mfa_token, code):
-    from .mfa import Mfa
+    from .constants import MFA_MAX_LOGIN_FAILURES
+    from .mfa import Mfa, MfaChallengesRevoked
     from .models import UserMfa, UserMfaChallenge
 
     digest = sha256(mfa_token.encode()).hexdigest()
@@ -533,6 +534,9 @@ def login_mfa(*, request, mfa_token, code):
         if error is None:
             challenge.delete()
             result = _issue_login_tokens(user, request)
+        elif not isinstance(error, Throttled) and device.failures >= MFA_MAX_LOGIN_FAILURES:
+            UserMfaChallenge.objects.filter(user=user).delete()
+            error = MfaChallengesRevoked(user.get_username())
     # A view é non_atomic_requests: o contador de falhas já está confirmado aqui.
     if error:
         raise error

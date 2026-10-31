@@ -21,6 +21,7 @@ from apps.contracts.models import Organization
 from apps.core.permission_registry import PermissionScope
 from apps.rbac.constants import ESSENTIAL_PROFILE_KEY
 from apps.rbac.models import Assignment, Profile
+from apps.users.constants import MFA_MAX_LOGIN_FAILURES
 from apps.users.mfa import Mfa
 from apps.users.models import UserMfa, UserMfaChallenge, UserRecoveryCode, UserSession
 
@@ -422,6 +423,28 @@ def test_failure_counter_persists_and_delay_grows(account, factor):
     assert device.failures == 2
     assert second_step(token, 'incorrect').status_code == 429
     assert AccessLog.objects.filter(action=AccessLogAction.LOGIN_FAILURE).count() == 2
+
+
+def test_consecutive_failures_drop_pending_proofs_and_count_in_the_login_block(account, factor, settings):
+    device, secret = factor
+    settings.AUTH_LOGIN_RATE = '1/min'
+    tokens = [first_step(account)['mfa_token'] for _ in range(2)]
+    UserMfa.objects.filter(pk=device.pk).update(
+        failures=MFA_MAX_LOGIN_FAILURES - 2, last_failure_at=timezone.now() - timedelta(minutes=5)
+    )
+    assert second_step(tokens[0], 'incorrect').status_code == 422
+    assert UserMfaChallenge.objects.filter(user=account).count() == 2
+    UserMfa.objects.filter(pk=device.pk).update(last_failure_at=timezone.now() - timedelta(minutes=5))
+    cut = second_step(tokens[0], 'incorrect')
+    assert cut.status_code == 401
+    assert cut.json()['type'] == 'urn:datasync:problem:authentication-required'
+    assert not UserMfaChallenge.objects.filter(user=account).exists()
+    assert second_step(tokens[1], pyotp.TOTP(secret).now()).status_code == 401
+    assert not UserSession.objects.filter(user=account).exists()
+    blocked = APIClient().post(
+        '/api/v1/auth/login/', {'username': account.username, 'password': PASSWORD}, format='json'
+    )
+    assert blocked.status_code == 429
 
 
 def test_recovery_codes_are_hashed_and_consumed_once(account, factor):

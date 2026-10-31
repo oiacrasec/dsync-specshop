@@ -20,7 +20,9 @@ class LoginThrottle(SimpleRateThrottle):
     def get_cache_key(self, request, view):
         # Contas inexistentes seguem a mesma política, sem revelar sua existência.
         data = request.data
-        username = data.get('username') if isinstance(data, dict) else None
+        return self.username_key(data.get('username') if isinstance(data, dict) else None)
+
+    def username_key(self, username):
         if not isinstance(username, str) or not username.strip():
             return None
         username = get_user_model().normalize_username(username.strip())

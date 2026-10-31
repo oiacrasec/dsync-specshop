@@ -64,6 +64,22 @@ describe('Login em duas etapas', () => {
         expect(navigate).toHaveBeenCalledWith('/contexto/selecao');
     });
 
+    it('volta à senha quando a prova é encerrada pelo servidor', () => {
+        const fixture = TestBed.createComponent(Login);
+        const page = fixture.componentInstance;
+
+        fixture.detectChanges();
+        page.mfaToken.set('temporary-proof');
+        page.mfaForm.controls.code.setValue('123456');
+        page.submitMfa();
+        http.expectOne('/api/v1/auth/login/mfa/').flush({ type: 'urn:datasync:problem:authentication-required', status: 401 }, { status: 401, statusText: 'Unauthorized' });
+        fixture.detectChanges();
+        expect(page.mfaToken()).toBeNull();
+        expect(session.isAuthenticated()).toBeFalse();
+        expect(fixture.nativeElement.querySelector('#username')).not.toBeNull();
+        expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Entre novamente com usuário e senha');
+    });
+
     it('permite reserva, mantém a prova após erro e a descarta ao voltar', () => {
         const fixture = TestBed.createComponent(Login);
         const page = fixture.componentInstance;
