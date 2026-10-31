@@ -9,7 +9,7 @@ export const parseDate = (dateStr: string | Date): Date => (typeof dateStr === '
 
 export const sampleDataReduction = (data: DataPoint[], option: TimeUnit, show: number): DataPoint[] => {
     let sampledData: DataPoint[] = [];
-    let tempData: DataPoint[] = [];
+    let tempData: DataPoint[];
     const dataLength: number = data.length;
 
     if (dataLength === 0) return sampledData;

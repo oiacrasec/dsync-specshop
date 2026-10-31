@@ -35,6 +35,7 @@ Preferências do usuário que valem **sempre**, para qualquer agente. Esta skill
 | Performance | premissa forte do projeto inteiro, não só logs: analisar consultas, escritas, locks, CPU, memória, tráfego e concorrência antes de entregar; medir conforme o risco e não aceitar gargalos graves conhecidos. Autenticação admite seu custo necessário, sem replicar esse custo na navegação/uso cotidiano |
 | Aprovação | não iniciar a próxima etapa sem a confirmação do usuário |
 | Commits | skill `git-commit`; push só quando o usuário pedir |
+| Limpeza no commit | identificar e apagar arquivos comprovadamente desnecessários, como artefatos gerados acidentalmente (`backend/package-lock.json` vazio), sem pedir nova confirmação; autorização permanente do usuário |
 | Ações difíceis de desfazer | confirmar antes (apagar, alterar banco, sobrescrever, publicar) |
 | Continuidade | manter o `.ai/handoff.md` atualizado: skill `handoff` |
 

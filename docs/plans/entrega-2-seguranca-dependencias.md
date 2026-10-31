@@ -18,8 +18,8 @@ nas decisões 94–95 da Entrega 1. A etapa 5.3 continua paralisada (decisão 93
 
 | # | Entrega | Estado |
 |---|---|---|
-| 2.1 | Frontend: Angular 21 LTS e ferramentas associadas; corrigir alertas npm em lotes e validar | 🔄 Primeiro lote validado e commit autorizado; Quill e ferramentas pendentes |
-| 2.2 | Backend: auditar dependências Python de produção/desenvolvimento, corrigir e validar | ✅ Pillow atualizado/auditado/validado; commit autorizado |
+| 2.1 | Frontend: Angular 21 LTS e ferramentas associadas; corrigir alertas npm em lotes e validar | 🔄 Segundo lote validado e aprovado para commit; 9 moderadas residuais do executor de testes |
+| 2.2 | Backend: auditar dependências Python de produção/desenvolvimento, corrigir e validar | ✅ Pillow atualizado/auditado/validado e commitado em 3898118 |
 
 ## Diagnóstico inicial — 2026-10-31
 
@@ -41,9 +41,9 @@ Relatórios iniciais temporários: `/tmp/datasync-npm-audit-public.json` e
   mínimos corrigidos no manifesto e lockfile sincronizado. Demais bibliotecas
   diretas mantidas nas versões instaladas. `primeclt` removida por não ter uso.
 - `npm audit`: 101 → 48 (zero críticas/altas, 47 moderadas, 1 baixa).
-  `--omit=dev`: 21 → 1 baixa, Quill. Dependência preservada aguardando resposta
-  à pergunta assíncrona: retirar e manter exemplo CMS desabilitado (recomendado),
-  manter com alerta pendente ou avaliar versão anterior. Não alterar antes da decisão.
+  `--omit=dev`: 21 → 1 baixa, Quill. Naquele lote, dependência preservada enquanto
+  aguardava decisão sobre retirar, manter ou avaliar versão anterior. A autorização
+  posterior de limpeza permitiu a remoção no segundo lote.
 - 47 moderadas são propagações de glob/minimatch/uuid em ferramentas. Correções
   de major ficam fora das faixas de dependentes. Sem override global/downgrade
   automático; próxima avaliação deve ser um lote compatível, não mascarar auditoria.
@@ -57,6 +57,26 @@ Relatórios iniciais temporários: `/tmp/datasync-npm-audit-public.json` e
   da aplicação e sem teste de carga. Licenças das dependências alteradas revisadas.
 - OWASP A01–A10 revisado no diff; pendências A03 explícitas, auditoria npm não está limpa.
 - Usuário autorizou o commit do lote validado, preservando as 48 pendências npm
-  documentadas; a decisão sobre Quill continua aberta. Não iniciar deploy neste lote.
+  documentadas (3898118); Quill e parte das ferramentas tratados no segundo lote.
+  Não iniciar deploy neste lote.
+
+## Segundo lote — autorizado para resolver o máximo preservando o produto
+
+- Usuário autorizou limpar arquivos desnecessários ao commitar; preferência registrada
+  em modo-de-trabalho. `backend/package-lock.json` vazio removido.
+- Removidos Quill (só CMS desabilitado) e três plugins ESLint não carregados pelo config.
+  Exemplo CMS preservado, com requisito de revisão/reinstalação antes de reativá-lo.
+- ESLint 10.14.0 (9 em EOL), @eslint/js 10.0.1 explícito, typescript-eslint 8.72.1.
+  Regra nova achou uma inicialização descartada: removido somente `= []` de tempData.
+- Overrides limitados, fixos e testados: glob 13 → 14.0.3; minimatch 10 → 11.0.3;
+  uuid do SockJS → 11.1.1. Minimatch 3 preservado por incompatibilidade de API com 11.
+- Auditoria npm: 48 → **9 moderadas**, nenhuma crítica/alta/baixa; produção: 1 → **0**.
+- 143 testes, lint, formato, npm ls, build e smoke de ng serve passaram. Os 77 arquivos
+  JS/CSS de produção permaneceram idênticos por SHA-256. Compatibilidade de padrões,
+  seleção de arquivos, cache e WebSocket testada antes de aplicar no projeto.
+- Licenças revisadas, sem alteração no backend; usuário revisou o resultado e solicitou
+  commit do segundo lote, com as nove pendências documentadas.
+- Resíduo do Karma/cobertura precisa de modernização do executor ou correção compatível
+  em lote próprio. Não mascarar nem aceitar o aviso como resolvido. Deploy segue por alinhar.
 
 Relatório e fontes oficiais: [docs/security/dependencies.md](../security/dependencies.md).

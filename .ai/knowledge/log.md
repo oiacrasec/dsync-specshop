@@ -1,5 +1,26 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Segundo lote frontend: produção sem avisos e 9 moderadas residuais
+
+- Autorização permanente para apagar arquivos comprovadamente desnecessários ao
+  commitar registrada em modo-de-trabalho; backend/package-lock.json vazio e não
+  versionado removido. Lockfile frontend preservado e atualizado.
+- Quill removido do manifesto (único consumidor no CMS desabilitado); exemplo
+  preservado com aviso de revisão/reinstalação antes de reativar. Autorização de
+  limpeza supera a pergunta pendente do primeiro lote.
+- Removidos três plugins ESLint não carregados; ESLint 10.14.0, @eslint/js 10.0.1
+  explícito, typescript-eslint 8.72.1. Uma inicialização descartada removida de utils.ts.
+- Overrides limitados: glob 13 → 14.0.3, minimatch 10 → 11.0.3 e uuid do SockJS →
+  11.1.1; comparações de padrões, arquivos, cache e HTTP/WebSocket passaram.
+- npm 48 → 9 moderadas, zero críticas/altas/baixas; produção 1 → zero. Resíduo
+  minimatch 3/Karma/cobertura: não forçar API incompatível nem mascarar auditoria.
+  Modernização do executor ainda sem decisão; alcance do aviso documentado.
+- 143 testes, lint/formato/npm ls/build e ng serve passaram. Os 77 arquivos JS/CSS
+  de produção ficaram idênticos por SHA-256; backend sem alteração neste lote.
+- Relatório docs/security/dependencies.md, README frontend, overview, plano e handoff
+  atualizados. Resultado revisado pelo usuário e commit do segundo lote solicitado,
+  preservando as nove pendências documentadas.
+
 ## 2026-10-31 — Primeiro lote de segurança das dependências validado
 
 - Escopo frontend + backend aprovado; plano ativo agora em

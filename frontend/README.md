@@ -23,8 +23,10 @@ npm test -- --watch=false --browsers=ChromeHeadless
 
 Revisão de segurança das dependências: [relatório de 2026-10-31](../docs/security/dependencies.md).
 Angular/CDK/PostCSS atualizados; ferramenta `primeclt` sem uso removida. Auditorias:
-`npm audit` e `npm audit --omit=dev`. Quill e ferramentas transitivas ainda possuem
-avisos documentados; o relatório distingue o alcance de desenvolvimento/produção.
+`npm audit` e `npm audit --omit=dev`. Segundo lote: ESLint 10, remoção de Quill/plugins
+sem uso e overrides de transitivas validados. Produção sem avisos conhecidos; nove
+moderados restantes no executor Karma/cobertura, documentados no relatório.
+Antes de reativar o CMS de exemplo, revisar a segurança e reinstalar o editor Quill.
 
 ## Ambientes
 
