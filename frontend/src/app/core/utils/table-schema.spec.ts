@@ -37,4 +37,25 @@ describe('toTableResponse', () => {
             { field: 'start_date', header: 'Início', sortable: false, type: 'date' }
         ]);
     });
+
+    it('usa no filtro o mesmo nome e valores da coluna', () => {
+        const response = toTableResponse(
+            {
+                columns: [],
+                filters: [
+                    { field: 'is_active', label: 'Ativo', type: 'boolean' },
+                    { field: 'is_system', label: 'Sistema', type: 'boolean' }
+                ],
+                general_search: null,
+                ordering_fields: []
+            },
+            { data: [], total_records: 0 },
+            '/api/v1'
+        );
+
+        expect(response.filters?.map(({ header, choices }) => ({ header, choices: choices?.map((choice) => choice.label) }))).toEqual([
+            { header: 'Situação', choices: ['Todos', 'Ativo', 'Inativo'] },
+            { header: 'Sistema', choices: ['Todos', 'Sim', 'Não'] }
+        ]);
+    });
 });

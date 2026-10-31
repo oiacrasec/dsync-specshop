@@ -102,7 +102,17 @@ describe('ContratoService (API do Core)', () => {
         ]);
         expect(results[0].filters).toEqual([
             { field: 'name', header: 'Nome', type: 'text', placement: 'general' },
-            { field: 'is_active', header: 'Ativo', type: 'boolean', placement: 'advanced' },
+            {
+                field: 'is_active',
+                header: 'Situação',
+                type: 'boolean',
+                placement: 'advanced',
+                choices: [
+                    { label: 'Todos', value: null },
+                    { label: 'Ativo', value: true },
+                    { label: 'Inativo', value: false }
+                ]
+            },
             { field: 'plan', header: 'Plano', type: 'relation', placement: 'advanced', lookup: { endpoint: '/api/v1/admin/plans/options/' } }
         ]);
 

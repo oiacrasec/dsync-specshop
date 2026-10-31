@@ -46,7 +46,7 @@
             <p-select
                 [inputId]="'ui-filter-' + filter.field"
                 styleClass="w-full h-10"
-                [options]="booleanOptions"
+                [options]="filter.choices ?? booleanOptions"
                 optionLabel="label"
                 optionValue="value"
                 appendTo="body"

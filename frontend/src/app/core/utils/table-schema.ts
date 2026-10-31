@@ -69,6 +69,19 @@ function toFilter(filter: SchemaFilter, baseUrl: string): UiFilterField {
         field.choices = filter.choices?.map((choice) => ({ label: choice.label, value: choice.value })) ?? [];
     }
 
+    // Mesmo nome e valores da coluna da grade (ex.: Situação: Ativo/Inativo).
+    if (filter.type === 'boolean') {
+        const active = filter.field === 'is_active';
+        const tag = (active ? ACTIVE_COLUMN : COLUMN_FORMATS.boolean)!.booleanTag!;
+
+        field.header = active ? ACTIVE_COLUMN.header! : filter.label;
+        field.choices = [
+            { label: 'Todos', value: null },
+            { label: tag.trueLabel, value: true },
+            { label: tag.falseLabel, value: false }
+        ];
+    }
+
     if (filter.type === 'relation' && filter.options_url) {
         // options_url é caminho do servidor (reverse do backend); resolvido na origem da API, sem prefixo fixo.
         field.lookup = { endpoint: serverUrl(filter.options_url, baseUrl) };
