@@ -95,17 +95,12 @@ describe('UiTable — paginação e Limpar', () => {
         expect(element.querySelector('.ui-table-count')?.textContent?.trim()).toBe('2 registros');
     });
 
-    it('a contagem usa o nome do que a lista mostra', async () => {
-        const fixture = TestBed.createComponent(UiTable);
+    it('a contagem é global e fica no lugar do relatório da paginação', async () => {
+        const { element } = await render(1);
+        const count = element.querySelector('.ui-table-count') as HTMLElement;
 
-        fixture.componentInstance.service = { list: () => of(page(1)) };
-        fixture.componentInstance.cacheEnabled = false;
-        fixture.componentInstance.countLabels = { one: 'organização', other: 'organizações' };
-        fixture.detectChanges();
-        await fixture.whenStable();
-        fixture.detectChanges();
-
-        expect((fixture.nativeElement as HTMLElement).querySelector('.ui-table-count')?.textContent?.trim()).toBe('1 organização');
+        expect(count.textContent?.trim()).toBe('1 registro');
+        expect(getComputedStyle(count).textAlign).toBe('right');
     });
 
     it('mostra 10 linhas por página por padrão', async () => {
@@ -121,6 +116,11 @@ describe('UiTable — paginação e Limpar', () => {
         expect(table.showPaginator).toBeTrue();
         expect(element.querySelector('.p-paginator')).not.toBeNull();
         expect(element.querySelector('.ui-table-count')).toBeNull();
+
+        const report = getComputedStyle(element.querySelector('.p-paginator-current') as HTMLElement);
+
+        expect(parseFloat(report.fontSize)).toBe(parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.875);
+        expect(report.fontWeight).toBe('400');
     });
 
     it('mostra o Limpar só com busca ou ordenação ativa', async () => {

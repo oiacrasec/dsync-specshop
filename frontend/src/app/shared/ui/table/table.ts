@@ -113,9 +113,11 @@ export interface UiTableDataService {
                 align-items: center;
             }
 
+            /* Mesmo lugar e texto do relatório da paginação, para a lista não mudar de aparência. */
             .ui-table-count {
                 margin: 0;
                 padding: 0.75rem 1rem 0;
+                text-align: right;
             }
 
             :host ::ng-deep .ui-table-paginator {
@@ -131,6 +133,14 @@ export interface UiTableDataService {
                 margin: 0;
                 text-align: right;
                 white-space: nowrap;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                font-weight: 400;
+                color: var(--p-surface-700);
+            }
+
+            :host-context(.app-dark) ::ng-deep .ui-table-paginator .p-paginator-current {
+                color: rgb(255 255 255 / 0.64);
             }
 
             @media (max-width: 768px) {
@@ -173,7 +183,6 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     @Input() paginator = true;
     @Input() emptyMessage = 'Nenhum registro encontrado.';
     /** Nome do que a lista mostra, para a contagem: { one: 'organização', other: 'organizações' }. */
-    @Input() countLabels: { one: string; other: string } = { one: 'registro', other: 'registros' };
     @Input() actions: UiTableAction<T>[] = [];
     @Input() actionsMode: 'buttons' | 'menu' = 'menu';
     @Input() reloadKey = 0;
@@ -242,7 +251,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     get recordCountLabel() {
         const total = this.tableTotalRecords;
 
-        return `${total} ${total === 1 ? this.countLabels.one : this.countLabels.other}`;
+        return `${total} ${total === 1 ? 'registro' : 'registros'}`;
     }
 
     get tableFilters() {
