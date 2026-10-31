@@ -1,68 +1,55 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-31
-- **Agente:** Claude (continuação do Codex)
+- **Atualizado em:** 2026-10-31 18:20
+- **Agente:** Claude → Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Último commit:** f37be68 feat(frontend): improve organization selection and switching
+- **Último commit:** da38906 feat(frontend): show the organization search from six organizations
+
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.4 MFA TOTP — concluída, alterações sem commit |
-| Próximo passo exato | Ponto 2 da revisão de segurança: ativação do MFA sem senha; conferir login novo no navegador |
-| Aguardando o usuário? | sim — decisão do ponto 2 (ativação sem senha) |
+| Etapa atual | 9.4 MFA TOTP — ✅ concluída e commitada; ajustes de UI/segurança da sessão também commitados |
+| Próximo passo exato | Nenhum em andamento. Perguntar ao usuário: conferência visual pendente ou iniciar 9.5 (Meu acesso) |
+| Aguardando o usuário? | sim — escolher o próximo trabalho; conferir no navegador as telas listadas abaixo |
 
-## Feito nesta etapa
+## Feito nesta sessão (todos commitados, sem push; af7f843..da38906)
 
-- Decisões 73–75/86–88, ADR 0041 aceito. MFA opcional para todos; só é pedido após
-  ativação confirmada pelo usuário. Configuração pendente não exige segundo fator.
-- Backend: segredo Fernet com chave independente, reservas HMAC de uso único,
-  prova opaca de login (digest/5 min/uso único/máx. 5/conta), antirreuso e espera
-  crescente persistida antes de responder erro. Sem JWT/sessão antes do segundo fator.
-- Status/setup/ativar/desativar/regenerar completos. Todas as sessões/refresh/provas
-  revogados ao mudar o fator; frontend limpa a sessão e pede novo login após guardar
-  reservas. Preservada decisão 83: access emitido dura até 15 min, sem query por navegação.
-- Recuperação auditada: comuns pelo admin do próprio contrato; admins, inclusive
-  inativos, pelo superadmin. Comando reset_mfa para superadmins até a etapa 5.3.
-- Perfil → Verificação em duas etapas integrado e sob demanda, QR local, reservas uma
-  vez/download explícito/guarda antes da saída. Login TOTP/reserva; resets nas ações
-  de Usuários e Admins do contrato, com confirmação. Abas roláveis no celular.
-- Dependências instaladas/verificadas: PyOTP 2.10.0, cryptography 50.0.2, qrcode 1.5.4
-  e tipos 1.5.6, licenças permissivas; QR em chunk sob demanda, sem serviço externo.
-- Migrations users.0008/audit.0011 aplicadas ao banco local com autorização.
-  Chave MFA gerada apenas em backend/.env ignorado, sem imprimir; nenhuma conta ativada.
-- ADR/API/OpenAPI/AGENTS/README/overview/plano e memória sincronizados.
+- MFA (9.4) commitado; 401 no logout corrigido (outlet "sem menu" exige sessão).
+- Segurança: 2º passo derruba provas após 10 falhas seguidas e conta no bloqueio do login;
+  ativar MFA exige senha atual (`MfaConfirmSerializer`). ADR 0041 revisado.
+- Layouts aprovados no FigCraft e aplicados: login, 2º passo, aba Perfil › Verificação em
+  duas etapas (4 estados), barra única de busca/filtros (`ui-filter`).
+- Nome configurável: `environment.appName/companyName` (token `APP_BRAND`) e
+  `DJANGO_APP_NAME`; padrão Dsync CORE / DsyncLabs. Nome do repositório não muda.
+- URN de erros agora `urn:dsync:problem:*` (revisão no ADR 0004; core sem consumidores).
+- Filtros booleanos com o mesmo rótulo da grade (is_active → Situação: Ativo/Inativo).
+- Listas: 10 por página (API segue padrão 20); contagem global "N registros" à direita,
+  mesmo estilo do relatório da paginação.
+- Seletor de organização: busca a partir de 6 (junto com a rolagem da lista de 350 px).
+- FigCraft limpo: propostas superadas e capturas "antes" removidas; páginas Login,
+  Filtros avançados e Perfil · Verificação em duas etapas; biblioteca com contagem nova.
 
-## Login e MFA (layout aplicado)
+## Falta / pendências
 
-- Login redesenhado conforme FigCraft "Login · proposta": erro inline (sem toasts), senha com
-  ui-input-password. 401 no logout corrigido (outlet sem menu exige sessão).
-- Revisão de segurança: ponto 1 resolvido (corte após 10 falhas seguidas, ADR 0041 revisado).
-  Ponto 2 pendente: setup/ativação do MFA não pedem a senha atual.
-- FigCraft salvo na página Login · Verificação em duas etapas; referência IM03.png
-  e seleção de organização. Estados autenticador/reserva/erro e 390/320 px conferidos.
-- Aplicada em pages/auth/login.html/.scss (template extraído do login.ts). Prettier, lint,
-  build e 128 testes ok; conferência visual pendente. Nenhuma conta alterada.
+- Conferência visual no navegador (extensão do Chrome estava desconectada): login, aba do
+  MFA no Perfil, barra de filtros, contagem/paginação, seletor de organização.
+- 20 perfis mock ZZ-01..ZZ-20 no contrato CLIENTE X (banco local, criados via
+  `save_profile`, auditados): apagar quando o usuário pedir.
 
-## Validação
+## Validação (último estado)
 
-- 756 testes backend (36,68 s), 128 frontend ChromeHeadless; ruff check/format,
-  lint/format:check/build frontend, schema validate/fail-on-warn, migration checks,
-  check e check --deploy sem falhas. Logs /tmp/datasync-mfa-*.log.
-- Isolamento, papéis, falhas persistidas, antirreuso, revogação e concorrência cobertos.
-  Consultas constantes com 30 contas adicionais em status e operações; login sem MFA
-  mantém as 10 queries anteriores. Sem consulta nova na navegação; sem teste de carga produtiva.
-- OWASP A01–A10 revisados, sem achados pendentes no diff; corrigido papel de admin inativo.
+- Backend 758 testes, ruff, OpenAPI validate/fail-on-warn. Frontend 136 testes, lint,
+  format:check, build.
 
 ## Avisos
 
-- Não imprimir/versionar .env, chave, segredos, provas ou reservas; preservar chave em backup.
-- SDK PyCharm: /home/cesar/Virtual/datasync-core-3.14/bin/python (pip).
-  Consultar get_python_environment antes de CADA comando Python; não alterar SDK/configuração.
-- Testes transacionais fazem flush das sementes no banco de testes. Após subconjuntos,
-  suíte completa com --reuse-db --create-db; isso recria só o banco de testes.
-- Sem commit/push nesta entrega. Push só quando pedido; nunca --amend na main.
-- FigCraft em design/, MCP porta 7710; não fechar/sobrescrever sem necessidade.
+- Não imprimir/versionar .env, chave MFA, segredos, provas ou reservas.
+- Python: /home/cesar/Virtual/datasync-core-3.14/bin/python. Após subconjuntos de testes,
+  suíte completa com `pytest --reuse-db --create-db`.
+- Push só quando pedido; nunca --amend na main; usuário revisa o diff antes de cada commit.
+- FigCraft: app aberto com `figcraft --control 7710` (MCP usa `--attach 7710`); se o MCP
+  não conectar, o app não está aberto. Arquivos em design/; salvar após editar.
 
 ## Próximas etapas (não iniciar sem aprovação)
 

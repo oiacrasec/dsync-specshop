@@ -255,9 +255,7 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 - Revisão OWASP A01–A10: sem achados pendentes neste diff; corrigido reset de admin
   inativo. Conformidade: credenciais cifradas/sem logs, reservas só HMAC, QR local,
   autoria auditada, licenças verificadas, controles acessíveis e recurso opcional.
-- Etapa concluída; alterações sem commit aguardando revisão. Não iniciar 9.5 sem aprovação.
-
-- Revisão visual solicitada após entrega: segundo passo do login redesenhado no
-  FigCraft, página Login · Verificação em duas etapas, tomando a seleção de organização
-  como referência. Autenticador/reserva/erro e 390/320 px conferidos; proposta ainda
-  aguardando aprovação, sem alteração da implementação ou regra opcional do MFA.
+- ✅ Etapa concluída e commitada (af7f843). Não iniciar 9.5 sem aprovação.
+- Revisão de segurança pós-commit: corte após 10 falhas seguidas no 2º passo (7c0edbe) e
+  senha atual obrigatória para ativar (00eec1c); ambas registradas no ADR 0041.
+- Layouts aprovados e aplicados: 2º passo do login, login, aba do Perfil (FigCraft).
