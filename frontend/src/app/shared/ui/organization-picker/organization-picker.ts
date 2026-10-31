@@ -44,7 +44,8 @@ export class UiOrganizationPicker implements OnInit {
     readonly selectedId = signal('');
     readonly activeId = computed(() => this.contexts.getActiveContext()?.organization_public_id);
     readonly selected = computed(() => this.organizations().find((item) => item.public_id === this.selectedId()));
-    readonly showSearch = computed(() => this.organizations().length > 7);
+    // Mesmo limite em que a lista de 350 px passa a rolar (5 itens de 62 px cabem).
+    readonly showSearch = computed(() => this.organizations().length > 5);
     private readonly searchable = computed(() => this.organizations().map((organization) => ({ organization, name: searchText(organization.name) })));
     readonly filtered = computed(() => {
         const query = searchText(this.query());

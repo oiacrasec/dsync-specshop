@@ -56,7 +56,7 @@ Confirmar uma organização diferente mantém `setActiveContext/openContext` e o
 recarregamento entre abas (ADR 0035); confirmar a já ativa apenas fecha o modal.
 
 `UiOrganizationPicker` compartilha cartões com rádios nativos nas duas apresentações.
-A organização ativa recebe a tag **Atual** no modal. Acima de 7 organizações, busca
+A organização ativa recebe a tag **Atual** no modal. A partir de 6 organizações (quando a lista passa a rolar), busca
 local por nome ignora maiúsculas/acentos; a seleção permanece ao filtrar e o botão
 usa o rótulo fixo **Entrar**. Lista com até 350 px e rolagem interna, mantendo busca/ações
 fora da rolagem; estado vazio permite limpar a busca. Cada abertura busca a lista

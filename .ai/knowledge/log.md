@@ -1,5 +1,10 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Busca do seletor de organização a partir de 6
+
+- Busca aparece junto com a rolagem: 6 ou mais organizações (antes, mais de 7).
+  Arquivos: organization-picker.ts, auth-pages.spec.ts, frontend/docs/architecture/authentication.md.
+
 ## 2026-10-31 — Senha na ativação do MFA e nova aba do Perfil
 
 - `POST /me/mfa/enable/` exige `password` (serializer `MfaConfirmSerializer`, comum a ativar

@@ -290,7 +290,7 @@ describe('Core auth pages and route guards', () => {
         controller.expectNone('/api/v1/me/organizations/');
     });
 
-    it('shows search only above seven organizations and escapes names', async () => {
+    it('shows search with the scroll, from six organizations, and escapes names', async () => {
         session.setSession(response());
         const fixture = TestBed.createComponent(UiOrganizationPicker);
 
@@ -298,12 +298,12 @@ describe('Core auth pages and route guards', () => {
         controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
         await fixture.whenStable();
         expect(fixture.nativeElement.querySelector('#organization-search')).toBeNull();
-        fixture.componentInstance.organizations.set(Array.from({ length: 7 }, (_, i) => ({ public_id: String(i), name: '<img src=x onerror=alert(1)>' })));
+        fixture.componentInstance.organizations.set(Array.from({ length: 5 }, (_, i) => ({ public_id: String(i), name: '<img src=x onerror=alert(1)>' })));
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('#organization-search')).toBeNull();
         expect(fixture.nativeElement.querySelector('img')).toBeNull();
         expect(fixture.nativeElement.textContent).toContain('<img src=x onerror=alert(1)>');
-        fixture.componentInstance.organizations.update((items) => [...items, { public_id: '8', name: 'Oitava' }]);
+        fixture.componentInstance.organizations.update((items) => [...items, { public_id: '6', name: 'Sexta' }]);
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('#organization-search')).not.toBeNull();
     });
