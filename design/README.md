@@ -25,6 +25,12 @@ largura total e alternativas no rodapé. Inclui autenticador, reserva, erro e ve
 Valores mostrados são fictícios. Aplicada ao frontend (`pages/auth/login.html`/`.scss`); falta conferência visual.
 MFA continua opcional e só aparece no login de quem o ativou.
 
+A página **Login · proposta** leva o primeiro passo ao mesmo cartão: logo e título
+compactos, campos de 44 px com mostrar senha, Entrar em largura total, erro junto aos
+campos e rodapé orientando a pedir a redefinição da senha ao administrador. Inclui o
+login atual (antes), o erro e versões 390/320 px. O campo de senha foi desvinculado do
+componente para receber o ícone. Aplicada em `pages/auth/login.html`/`.scss`.
+
 ## Biblioteca
 
 | Página | Conteúdo |
