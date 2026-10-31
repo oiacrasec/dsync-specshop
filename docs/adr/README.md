@@ -57,6 +57,7 @@ para assunto novo; o status "Substituído por" fica para os ADRs antigos já sub
 | [0037](0037-organizacoes-na-area-do-cliente.md) | Organizações na área do cliente, com gestão delegável | Aceito |
 | [0038](0038-excecao-de-permissao-na-atribuicao.md) | Exceção de permissão na atribuição de perfil | Aceito |
 | [0039](0039-armazenamento-de-midia.md) | Armazenamento de mídia configurável e privado | Aceito |
+| [0040](0040-design-system-no-figcraft.md) | Design system no FigCraft, versionado em `design/` | Aceito |
 
 ## Modelo
 

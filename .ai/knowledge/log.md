@@ -1,5 +1,21 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Design system em `design/`
+
+- `design/`: biblioteca `datasync-ds.figcraft` (v1: tokens Tema/Primitivos, 8 estilos, 7 componentes
+  com propriedades do PrimeNG), `datasync-core-telas.figcraft` (Usuários; Organizações antes × depois
+  com 8 melhorias) e `tokens.json`. README com como abrir, publicar e refazer o vínculo da
+  biblioteca (o FigCraft grava caminho absoluto). ADR 0040 (Aceito). `.gitattributes`:
+  `*.figcraft binary`. `AGENTS.md`: `design/` em "Onde está cada coisa".
+- Primária azul 600 (5,2:1) no lugar do 500 do template (3,7:1): biblioteca v2, ADR 0040 §7.
+- Biblioteca v3: 31 ícones PrimeIcons + logo; página Layout (estrutura do Poseidon medida no código);
+  padrão Página · estrutura (claro/escuro). ADR 0040 §8.
+- Biblioteca v4: Select, MultiSelect, Data (+ calendário pt-BR), Menu de ações, Diálogo de confirmação;
+  Botão com secondary text e danger outlined (vermelho 700). App: `'marco'` sem cedilha no datepicker.
+- Biblioteca v5: padrões de tela adaptados de `usermanagement`/`crud` do Poseidon (lista com ações,
+  lista vazia, formulário com abas e 2 colunas, confirmação de exclusão), só com campos reais do app.
+- Biblioteca v6: Campo de texto com variante `filled` (placeholder × valor em `campo-texto`).
+
 ## 2026-10-30 — Skill leis-do-ux
 
 - `.ai/skills/leis-do-ux/SKILL.md`: as 30 leis de UX em 5 grupos (percepção, decisão e memória,

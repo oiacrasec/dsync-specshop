@@ -47,6 +47,7 @@ Princípio central: **código isolado, conhecimento conectado.**
 | `docs/domain/`, `docs/api/` | domínio e contratos de API |
 | `docs/adr/` | decisões arquiteturais |
 | `docs/plans/` | planos de entrega, com a situação de cada etapa (`entrega-N-<resumo>.md`) |
+| `design/` | design system no FigCraft: biblioteca, telas de referência e `tokens.json` (ADR 0040) |
 | `.ai/knowledge/` | memória compilada do projeto para IA |
 | `.ai/skills/<nome>/SKILL.md` | procedimentos que agentes devem seguir |
 | `.ai/queries/` | consultas reutilizáveis de investigação |
