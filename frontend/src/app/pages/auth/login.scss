@@ -1,14 +1,14 @@
 :host {
     display: block;
 }
-.mfa-screen {
+.auth-screen {
     min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px 16px;
 }
-.mfa-card {
+.auth-card {
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -20,7 +20,7 @@
     border-radius: 20px;
     font-size: 14px;
 }
-.mfa-header {
+.auth-header {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -36,7 +36,7 @@
         line-height: 1.45;
     }
 }
-.mfa-icon {
+.auth-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,6 +45,17 @@
     flex-shrink: 0;
     border-radius: 50%;
     font-size: 18px;
+}
+.auth-logo {
+    display: block;
+    width: 48px;
+    height: 52px;
+    flex-shrink: 0;
+}
+.auth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 .mfa-field {
     display: flex;
@@ -75,12 +86,12 @@
         border-color: var(--p-inputtext-invalid-border-color);
     }
 }
-.mfa-help {
+.auth-help {
     margin: 0;
     font-size: 13px;
     line-height: 1.5;
 }
-.mfa-footer {
+.auth-footer {
     display: flex;
     justify-content: space-between;
     gap: 16px;
@@ -107,16 +118,25 @@
         }
     }
 }
+.auth-footer-note {
+    justify-content: center;
+    p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+        text-align: center;
+    }
+}
 @media (max-width: 480px) {
-    .mfa-card {
+    .auth-card {
         padding: 24px;
     }
 }
 @media (max-width: 360px) {
-    .mfa-card {
+    .auth-card {
         padding: 20px;
     }
-    .mfa-footer {
+    .auth-footer {
         flex-direction: column;
         gap: 0;
     }

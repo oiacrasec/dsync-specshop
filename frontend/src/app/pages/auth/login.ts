@@ -2,24 +2,22 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, ElementRef, afterRenderEffect, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { ButtonModule } from 'primeng/button';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
 
 import { AuthService } from '@/app/core/services/auth.service';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
 import { UiButton } from '@/app/shared/ui/button/button';
+import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
 import { LoginResponse } from '@/app/types/auth';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, AuthLogoWidget, RouterModule, InputTextModule, CheckboxModule, ButtonModule, ReactiveFormsModule, UiButton],
+    imports: [CommonModule, AuthLogoWidget, InputTextModule, ReactiveFormsModule, UiButton, UiInputPassword],
     templateUrl: './login.html',
     styleUrl: './login.scss'
 })
@@ -28,7 +26,6 @@ export class Login {
     private authService = inject(AuthService);
     private authSession = inject(AuthSessionService);
     private router = inject(Router);
-    private messageService = inject(MessageService);
     private readonly destroyRef = inject(DestroyRef);
     private readonly mfaCode = viewChild<ElementRef<HTMLInputElement>>('mfaCode');
     private readonly usernameInput = viewChild<ElementRef<HTMLInputElement>>('usernameInput');
@@ -62,11 +59,7 @@ export class Login {
 
         if (this.form.invalid) {
             this.form.markAllAsTouched();
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Campos obrigatorios',
-                detail: 'Informe usuario e senha para continuar.'
-            });
+            this.errorMessage.set('Informe usuário e senha para continuar.');
 
             return;
         }
@@ -99,14 +92,7 @@ export class Login {
 
                     this.finishLogin(response as LoginResponse);
                 },
-                error: (error) => {
-                    this.errorMessage.set(problemMessage(error, 'Não foi possível entrar. Tente novamente.'));
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Login invalido',
-                        detail: this.errorMessage()
-                    });
-                }
+                error: (error) => this.errorMessage.set(problemMessage(error, 'Não foi possível entrar. Tente novamente.'))
             });
     }
 
