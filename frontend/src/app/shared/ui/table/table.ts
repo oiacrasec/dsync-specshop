@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ContentChild, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ContentChild, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -78,12 +78,44 @@ export interface UiTableDataService {
 
             :host ::ng-deep th.ui-table-actions-col--compact,
             :host ::ng-deep td.ui-table-actions-col--compact {
-                width: 50px;
-                min-width: 50px;
-                max-width: 50px;
+                width: 4.5rem;
+                min-width: 4.5rem;
+                max-width: 4.5rem;
                 text-align: center;
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
+            }
+
+            :host ::ng-deep th.ui-table-tag-col,
+            :host ::ng-deep td.ui-table-tag-col {
+                width: 11rem;
+                white-space: nowrap;
+            }
+
+            /* O ⋯ de 40 px define a altura da linha: sem o respiro vertical da célula, a linha fica compacta. */
+            :host ::ng-deep td.ui-table-actions-col--compact {
+                padding-top: 0;
+                padding-bottom: 0;
+                vertical-align: middle;
+            }
+
+            :host ::ng-deep .ui-table-menu-button {
+                display: inline-flex;
+                width: 40px;
+                height: 40px;
+            }
+
+            :host ::ng-deep .ui-table-menu-button .p-button {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .ui-table-count {
+                margin: 0;
+                padding: 0.75rem 1rem 0;
             }
 
             :host ::ng-deep .ui-table-paginator {
@@ -140,6 +172,8 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     @Input() lazyLoadOnInit = false;
     @Input() paginator = true;
     @Input() emptyMessage = 'Nenhum registro encontrado.';
+    /** Nome do que a lista mostra, para a contagem: { one: 'organização', other: 'organizações' }. */
+    @Input() countLabels: { one: string; other: string } = { one: 'registro', other: 'registros' };
     @Input() actions: UiTableAction<T>[] = [];
     @Input() actionsMode: 'buttons' | 'menu' = 'menu';
     @Input() reloadKey = 0;
@@ -163,6 +197,9 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     private columnsSchemaKey = '';
     private filtersSchemaKey = '';
     menuItems: MenuItem[] = [];
+
+    /** Ordenação ativa: o "Limpar" do filtro também a desfaz. */
+    readonly isSorted = signal(false);
 
     ngOnInit() {
         if (this.service) {
@@ -197,6 +234,17 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         return this.service ? this.internalTotalRecords : this.totalRecords;
     }
 
+    /** Com tudo numa página, a paginação vira só a contagem; volta se a página atual não for a primeira. */
+    get showPaginator() {
+        return this.paginator && (this.tableTotalRecords > this.rows || this.first > 0);
+    }
+
+    get recordCountLabel() {
+        const total = this.tableTotalRecords;
+
+        return `${total} ${total === 1 ? this.countLabels.one : this.countLabels.other}`;
+    }
+
     get tableFilters() {
         return this.service ? this.internalFilters : [];
     }
@@ -213,6 +261,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
 
         if (typeof event.sortField === 'string') {
             this.sortField = event.sortField;
+            this.isSorted.set(true);
         }
 
         if (event.sortOrder === 1 || event.sortOrder === 0 || event.sortOrder === -1) {
@@ -225,6 +274,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
     /** "Limpar" também volta à ordenação padrão da API; o filtersChange seguinte refaz a busca. */
     handleFiltersCleared() {
         this.sortField = undefined;
+        this.isSorted.set(false);
         this.sortOrder = undefined;
 
         if (this.table) {

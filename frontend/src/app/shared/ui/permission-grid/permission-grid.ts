@@ -43,7 +43,7 @@ import { PermissionCatalogGroup, PermissionScope } from '@/app/types/permission'
                     </div>
                 </div>
             } @empty {
-                <small class="text-surface-500 dark:text-white/64">Nenhuma permissão disponível.</small>
+                <small class="text-surface-700 dark:text-white/64">Nenhuma permissão disponível.</small>
             }
         </div>
     `

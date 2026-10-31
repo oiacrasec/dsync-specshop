@@ -2,7 +2,7 @@
     <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Perfil</h2>
-            <p class="text-sm text-surface-500 dark:text-white/64">Seus dados, sua foto e sua senha.</p>
+            <p class="text-sm text-surface-700 dark:text-white/64">Seus dados, sua foto e sua senha.</p>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
                                     <ui-button label="Remover foto" severity="secondary" text (onClick)="clearAvatar()"></ui-button>
                                     }
                                 </div>
-                                <small class="text-surface-500 dark:text-white/64">JPG, PNG ou WebP, até 2 MB. A foto é recortada em quadrado.</small>
+                                <small class="text-surface-700 dark:text-white/64">JPG, PNG ou WebP, até 2 MB. A foto é recortada em quadrado.</small>
                             </div>
                         </div>
 
@@ -58,7 +58,7 @@
                             <div class="flex flex-col gap-2">
                                 <label for="time_zone" class="text-sm font-medium text-surface-600 dark:text-white/70">Fuso horário</label>
                                 <p-select inputId="time_zone" formControlName="time_zone" [options]="timeZoneOptions()" [filter]="true" filterPlaceholder="Buscar fuso" appendTo="body" class="w-full" />
-                                <small class="text-surface-500 dark:text-white/64">Datas e horários aparecem neste fuso.</small>
+                                <small class="text-surface-700 dark:text-white/64">Datas e horários aparecem neste fuso.</small>
                             </div>
                         </form>
                     </div>
@@ -86,20 +86,20 @@
                                 @for (session of active; track session.public_id) {
                                 <li class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-surface-200 dark:border-surface-700 px-4 py-3">
                                     <div class="flex items-center gap-3">
-                                        <i [class]="deviceIcon(session.device)" class="text-surface-500" aria-hidden="true"></i>
+                                        <i [class]="deviceIcon(session.device)" class="text-surface-700" aria-hidden="true"></i>
                                         <div class="flex flex-col">
                                             <span class="font-medium text-surface-900 dark:text-surface-0">
                                                 {{ session.device }} @if (session.current) {
                                                 <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-200">Este navegador</span>
                                                 }
                                             </span>
-                                            <span class="text-sm text-surface-500 dark:text-white/64">IP {{ session.ip }} · desde {{ session.created_at | zonedDate: 'short' : timeZone() }}</span>
+                                            <span class="text-sm text-surface-700 dark:text-white/64">IP {{ session.ip }} · desde {{ session.created_at | zonedDate: 'short' : timeZone() }}</span>
                                         </div>
                                     </div>
-                                    <span class="text-sm text-surface-500 dark:text-white/64">Último uso {{ session.last_seen_at | zonedDate: 'short' : timeZone() }}</span>
+                                    <span class="text-sm text-surface-700 dark:text-white/64">Último uso {{ session.last_seen_at | zonedDate: 'short' : timeZone() }}</span>
                                 </li>
                                 } @empty {
-                                <li class="text-sm text-surface-500 dark:text-white/64">Nenhuma sessão ativa.</li>
+                                <li class="text-sm text-surface-700 dark:text-white/64">Nenhuma sessão ativa.</li>
                                 }
                             </ul>
                         </section>
@@ -110,17 +110,17 @@
                                 @for (item of logins(); track $index) {
                                 <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-2 text-sm">
                                     <span class="text-surface-700 dark:text-surface-100">{{ item.occurred_at | zonedDate: 'short' : timeZone() }}</span>
-                                    <span class="text-surface-500 dark:text-white/64">IP {{ item.ip }}</span>
+                                    <span class="text-surface-700 dark:text-white/64">IP {{ item.ip }}</span>
                                 </li>
                                 } @empty {
-                                <li class="px-4 py-2 text-sm text-surface-500 dark:text-white/64">Nenhum acesso registrado.</li>
+                                <li class="px-4 py-2 text-sm text-surface-700 dark:text-white/64">Nenhum acesso registrado.</li>
                                 }
                             </ul>
-                            <small class="text-surface-500 dark:text-white/64">Os 20 logins mais recentes desta conta.</small>
+                            <small class="text-surface-700 dark:text-white/64">Os 20 logins mais recentes desta conta.</small>
                         </section>
                     </div>
                     } @else {
-                    <small class="text-surface-500 dark:text-white/64">Carregando…</small>
+                    <small class="text-surface-700 dark:text-white/64">Carregando…</small>
                     }
                 </p-tabpanel>
             </p-tabpanels>

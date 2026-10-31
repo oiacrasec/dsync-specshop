@@ -29,7 +29,7 @@ import { RouterModule } from '@angular/router';
                                 <app-auth-logo-widget />
                             </div>
                             <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Register</h1>
-                            <p class="text-center lg:text-xl text-surface-500 mt-6">Enter your details to create a new account.</p>
+                            <p class="text-center lg:text-xl text-surface-700 mt-6">Enter your details to create a new account.</p>
                         </div>
                         <div class="flex md:flex-row flex-col items-center gap-4">
                             <a
@@ -53,24 +53,24 @@ import { RouterModule } from '@angular/router';
                             <span class="h-px w-full bg-primary-500/10"></span>
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="username" class="font-medium text-surface-500 dark:text-white/64">User Name</label>
+                            <label for="username" class="font-medium text-surface-700 dark:text-white/64">User Name</label>
                             <input name="username" pInputText id="username" class="w-full" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="email" class="font-medium text-surface-500 dark:text-white/64">Email Address</label>
+                            <label for="email" class="font-medium text-surface-700 dark:text-white/64">Email Address</label>
                             <input name="email" pInputText id="email" class="w-full" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="password" class="font-medium text-surface-500 dark:text-white/64">Password</label>
+                            <label for="password" class="font-medium text-surface-700 dark:text-white/64">Password</label>
                             <input name="password" pInputText id="password" type="password" class="w-full" />
                         </div>
                         <div class="flex items-center gap-2">
                             <p-checkbox name="remember" id="remember" binary />
-                            <label for="remember" class="text-surface-500 dark:text-white/64"><span class="text-surface-950 dark:text-surface-0 font-medium">I have read the </span>Terms and Conditions</label>
+                            <label for="remember" class="text-surface-700 dark:text-white/64"><span class="text-surface-950 dark:text-surface-0 font-medium">I have read the </span>Terms and Conditions</label>
                         </div>
                         <button pButton class="w-full" rounded>Register</button>
                         <div class="flex items-center justify-center gap-2">
-                            <span class="text-surface-500 dark:text-white/64">Already have an account?</span>
+                            <span class="text-surface-700 dark:text-white/64">Already have an account?</span>
                             <a routerLink="/landing/login" class="text-primary">Login</a>
                         </div>
                     </form>

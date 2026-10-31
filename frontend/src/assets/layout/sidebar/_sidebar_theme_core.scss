@@ -43,6 +43,7 @@
                 &.active-route {
                     background: var(--d-menuitem-active-bg);
                     color: var(--d-menuitem-active-text-color);
+                    font-weight: 600 !important;
                 }
 
                 &:hover {

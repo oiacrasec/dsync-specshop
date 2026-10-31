@@ -18,7 +18,7 @@
             <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-700 flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
                 <div>
                     <div class="text-base font-semibold text-surface-900 dark:text-surface-0">{{ targetName() }}</div>
-                    <div class="text-sm text-surface-500 dark:text-surface-400">
+                    <div class="text-sm text-surface-700 dark:text-surface-400">
                         {{ target() === allOrganizations ? 'Vale para todas as organizações do contrato, inclusive as criadas depois.' : 'Vale só para esta organização, somado ao que vem de todas as organizações.' }}
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                         @for (profile of appliedProfiles(); track profile.public_id) {
                         <p-chip [label]="profile.is_active ? profile.name : profile.name + ' (inativo)'" [removable]="!disabled()" (onRemove)="removeProfile(profile)" />
                         } @empty {
-                        <small class="text-surface-500 dark:text-white/64">Nenhum perfil aplicado aqui.</small>
+                        <small class="text-surface-700 dark:text-white/64">Nenhum perfil aplicado aqui.</small>
                         }
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                 <div class="h-0 border-t border-dashed border-surface-200 dark:border-surface-700"></div>
 
                 <app-permission-grid [groups]="catalog()" [scope]="scope()" [selected]="checkedCodes()" [locked]="contractAdmin() ? allCodes() : []" [disabled]="disabled()" [idPrefix]="'perm_' + target() + '_'" (selectedChange)="setCodes($event)" />
-                <small class="text-surface-500 dark:text-white/64">Os perfis marcam as caixas e continuam vinculados: o que você acrescentar a um perfil chega a quem o tem. Desmarque ou marque livremente para ajustar só este usuário.</small>
+                <small class="text-surface-700 dark:text-white/64">Os perfis marcam as caixas e continuam vinculados: o que você acrescentar a um perfil chega a quem o tem. Desmarque ou marque livremente para ajustar só este usuário.</small>
             </div>
         </section>
     </div>

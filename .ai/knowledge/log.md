@@ -1,5 +1,27 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Melhorias de layout (proposta de Organizações aplicada)
+
+- Listas (`shared/ui/table`, `filter`, `core/utils/table-schema.ts`): "Novo …" primário nas 11 listas;
+  coluna booleana como tag Sim/Não e `is_active` como **Situação** Ativo/Inativo; paginação só com mais de
+  uma página (senão contagem com `countLabels` da lista, ex.: "2 organizações"); "Limpar" só com busca,
+  filtro ou ordenação; "Buscar por nome"; realce da linha; tag 11rem; ⋯ 40 × 40 centralizado e linha
+  compacta; "Filtros avançados" primário sem ícone. Testes novos em `table.spec.ts`.
+- Estrutura: ☰ (40 px, fundo de cartão) antes da trilha, sem separador; trilha legível (`p-disabled`
+  no `<li>` tinha opacidade 0,6) e último item em destaque; organização ativa inteira em até 2 linhas
+  (sem corte em 20 caracteres), à esquerda; item ativo do menu em highlight 600; itens com 40 px; títulos
+  de seção 700 em surface-900; rodapé legível sobre o fundo azulado.
+- Contraste no tema (`theme.service.ts`): botão secundário em texto surface-700, tag cinza surface-800,
+  placeholder surface-600 (3,5:1, distinto do valor), além da etapa 1 abaixo.
+- Biblioteca `design/` v0.8 sincronizada com o app (tokens, item de menu ativo, título de seção, Topo).
+
+## 2026-10-31 — Melhorias de layout, etapa 1 (tema)
+
+- Primária no claro: `{primary.600}` (hover 700, ativo 800) e `text.mutedColor` `{surface.700}` em
+  `layout/service/theme.service.ts` (ADR 0040 §7). `text-surface-500` → `text-surface-700` nas telas,
+  layout e `shared/ui` (99 usos em 46 arquivos; `pages/examples` fora). Tradução pt-BR do PrimeNG com
+  acentos (`março`, `terça`, `sábado`, `Não`, `Contém`…) em `src/app.component.ts`.
+
 ## 2026-10-31 — Design system em `design/`
 
 - `design/`: biblioteca `datasync-ds.figcraft` (v1: tokens Tema/Primitivos, 8 estilos, 7 componentes

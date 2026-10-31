@@ -166,15 +166,43 @@ export class ThemeService {
             };
         } else {
             return {
+                // Tag cinza ("Não", "Inativo"): surface-600 sobre surface-100 não chega a 4,5:1.
+                components: {
+                    // Botão secundário em texto ("Filtros avançados", "⋯"): surface-500 não chega a 4,5:1.
+                    button: {
+                        colorScheme: {
+                            light: {
+                                text: {
+                                    secondary: { color: '{surface.700}' }
+                                }
+                            }
+                        }
+                    },
+                    tag: {
+                        colorScheme: {
+                            light: {
+                                secondary: { color: '{surface.800}' }
+                            }
+                        }
+                    }
+                },
                 semantic: {
                     primary: color.palette,
                     colorScheme: {
                         light: {
                             primary: {
-                                color: '{primary.500}',
+                                color: '{primary.600}',
                                 contrastColor: '#ffffff',
-                                hoverColor: '{primary.600}',
-                                activeColor: '{primary.700}'
+                                hoverColor: '{primary.700}',
+                                activeColor: '{primary.800}'
+                            },
+                            text: {
+                                mutedColor: '{surface.700}',
+                                hoverMutedColor: '{surface.800}'
+                            },
+                            // Placeholder legível (3,5:1) e ainda distinto do valor digitado (surface-700).
+                            formField: {
+                                placeholderColor: '{surface.600}'
                             },
                             highlight: {
                                 background: '{primary.50}',

@@ -154,7 +154,7 @@ import { ActivatedRoute, Router } from '@angular/router';
                             </defs>
                         </svg>
                         <h2 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 mt-8 text-center">Acesso negado</h2>
-                        <p class="lg:text-xl text-surface-500 dark:text-white/64 mt-4 text-center">Voce nao tem permissao para acessar esta pagina.</p>
+                        <p class="lg:text-xl text-surface-700 dark:text-white/64 mt-4 text-center">Voce nao tem permissao para acessar esta pagina.</p>
                         <button type="button" class="button-primary mt-8" (click)="goBack()">Voltar</button>
                     </div>
                 </div>

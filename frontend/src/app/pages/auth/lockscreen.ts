@@ -25,15 +25,15 @@ import { RouterModule } from '@angular/router';
                             <app-auth-logo-widget />
                         </div>
                         <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Screen Locked</h1>
-                        <p class="text-center lg:text-xl text-surface-500 dark:text-white/64 mt-6 max-w-sm mx-auto">Please enter your password</p>
+                        <p class="text-center lg:text-xl text-surface-700 dark:text-white/64 mt-6 max-w-sm mx-auto">Please enter your password</p>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <label for="password" class="font-medium text-surface-500 dark:text-white/64">Password</label>
+                        <label for="password" class="font-medium text-surface-700 dark:text-white/64">Password</label>
                         <input pInputText id="password" class="w-full" type="password" />
                     </div>
                     <p-button class="w-full" rounded>Unlock</p-button>
                     <div class="flex items-center justify-center gap-2 mt-8">
-                        <span class="text-surface-500 dark:text-white/64">A problem? <a routerLink="/landing/contact" class="text-primary">Click here</a> and let us help you.</span>
+                        <span class="text-surface-700 dark:text-white/64">A problem? <a routerLink="/landing/contact" class="text-primary">Click here</a> and let us help you.</span>
                     </div>
                 </form>
             </div>

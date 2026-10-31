@@ -10,9 +10,10 @@
         } @if (hasAnyFilters) {
         <div class="flex items-center gap-2 md:justify-end">
             @if (hasAdvancedFilters) {
-            <ui-button label="Filtros avançados" icon="pi pi-sliders-h" severity="secondary" text (onClick)="toggleAdvanced()"></ui-button>
-            }
+            <ui-button label="Filtros avançados" text (onClick)="toggleAdvanced()"></ui-button>
+            } @if (hasActiveFilters || clearable) {
             <ui-button label="Limpar" icon="pi pi-filter-slash" severity="secondary" text (onClick)="clear()"></ui-button>
+            }
         </div>
         }
     </div>

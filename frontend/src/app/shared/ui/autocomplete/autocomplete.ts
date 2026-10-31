@@ -112,7 +112,7 @@ export class UiAutocomplete implements ControlValueAccessor, OnDestroy {
     @Input() helpText?: string;
     @Input() labelClass = 'text-sm font-medium text-surface-600 dark:text-white/70';
     @Input() errorClass = 'text-red-500';
-    @Input() helpTextClass = 'text-xs text-surface-500 dark:text-white/64';
+    @Input() helpTextClass = 'text-xs text-surface-700 dark:text-white/64';
 
     @Input() optionLabel: string = 'label';
     @Input() optionValue: string = 'value';

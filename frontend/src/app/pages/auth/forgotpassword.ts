@@ -25,10 +25,10 @@ import { RouterModule } from '@angular/router';
                             <app-auth-logo-widget />
                         </div>
                         <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Forgot Password</h1>
-                        <p class="text-center lg:text-xl text-surface-500 dark:text-white/64 mt-6 max-w-sm mx-auto">Enter your email to reset your password</p>
+                        <p class="text-center lg:text-xl text-surface-700 dark:text-white/64 mt-6 max-w-sm mx-auto">Enter your email to reset your password</p>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <label for="email" class="font-medium text-surface-500 dark:text-white/64">Email Address</label>
+                        <label for="email" class="font-medium text-surface-700 dark:text-white/64">Email Address</label>
                         <input name="email" pInputText id="email" class="w-full" />
                     </div>
                     <div class="flex items-center gap-4">
@@ -36,7 +36,7 @@ import { RouterModule } from '@angular/router';
                         <button pButton class="flex-1" rounded>Submit</button>
                     </div>
                     <div class="flex items-center justify-center gap-2">
-                        <span class="text-surface-500 dark:text-white/64">A problem? <a routerLink="/landing/contact" class="text-primary">Click here</a> and let us help you.</span>
+                        <span class="text-surface-700 dark:text-white/64">A problem? <a routerLink="/landing/contact" class="text-primary">Click here</a> and let us help you.</span>
                     </div>
                 </form>
             </div>

@@ -13,7 +13,9 @@
             height: 1.5rem;
         }
 
+        // Sobre o fundo azulado da página, surface-700 não chega a 4,5:1: usa surface-900.
         .footer-app-name {
+            color: var(--p-surface-900);
             font-size: 1rem;
             font-weight: 600;
             letter-spacing: 0.2px;
@@ -23,6 +25,16 @@
 
     .footer-copyright {
         font-size: 0.875rem;
-        color: var(--text-muted-color);
+        color: var(--p-surface-800);
+    }
+
+    .app-dark & {
+        .footer-app-name {
+            color: var(--p-surface-0);
+        }
+
+        .footer-copyright {
+            color: var(--text-muted-color);
+        }
     }
 }

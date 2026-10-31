@@ -70,7 +70,7 @@ export class UiMultiSelect implements ControlValueAccessor {
     @Input() labelClass = 'text-sm font-medium text-surface-600 dark:text-white/70';
     @Input() errorMessage?: string;
     @Input() errorClass = 'text-red-500';
-    @Input() helpTextClass = 'text-xs text-surface-500 dark:text-white/64';
+    @Input() helpTextClass = 'text-xs text-surface-700 dark:text-white/64';
     @Input() styleClass?: string;
     @Input() panelStyleClass?: string;
 

@@ -1,12 +1,13 @@
 @if (tableFilters.length) {
-<ui-filter [filters]="tableFilters" (cleared)="handleFiltersCleared()" (filtersChange)="handleFiltersChange($event)"></ui-filter>
+<ui-filter [filters]="tableFilters" [clearable]="isSorted()" (cleared)="handleFiltersCleared()" (filtersChange)="handleFiltersChange($event)"></ui-filter>
 }
 
 <p-table
     [value]="tableValue"
     [lazy]="lazy"
     [lazyLoadOnInit]="lazyLoadOnInit"
-    [paginator]="paginator"
+    [paginator]="showPaginator"
+    [rowHover]="true"
     [rows]="rows"
     [first]="first"
     [totalRecords]="tableTotalRecords"
@@ -23,14 +24,14 @@
     <ng-template #header>
         <tr>
             @for (col of tableColumns; track col.field) { @if (col.sortable) {
-            <th [pSortableColumn]="col.field">
+            <th [pSortableColumn]="col.field" [class.ui-table-tag-col]="col.type === 'boolean-tag'">
                 <span class="flex items-center gap-2">
                     {{ col.header }}
                     <p-sortIcon [field]="col.field" />
                 </span>
             </th>
             } @else {
-            <th>
+            <th [class.ui-table-tag-col]="col.type === 'boolean-tag'">
                 <span class="flex items-center gap-2">{{ col.header }}</span>
             </th>
             } } @if (actionsTemplate || actions.length) {
@@ -44,7 +45,7 @@
     <ng-template #body let-row>
         <tr>
             @for (col of tableColumns; track col.field) {
-            <td>
+            <td [class.ui-table-tag-col]="col.type === 'boolean-tag'">
                 @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { @if (col.zoned) { {{ getCellValue(row, col) | zonedDate: (col.format || 'short') : timeZone() }} } @else { {{ getCellValue(row, col) | date: (col.format ||
                 'shortDate') }} } } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean') {
                 <i class="fa-solid" [ngClass]="getCellValue(row, col) ? 'fa-square-check text-green-500' : 'fa-square-xmark text-red-500'" aria-hidden="true"></i>
@@ -60,7 +61,7 @@
                 } @else { @if (actionsMode === 'menu') {
                 <div class="ui-table-actions-wrapper ui-table-actions-wrapper--compact">
                     <p-menu #rowMenu [popup]="true" [appendTo]="'body'" [model]="menuItems"></p-menu>
-                    <ui-button icon="pi pi-ellipsis-h" severity="secondary" text (onClick)="openMenu($event, rowMenu, row)"></ui-button>
+                    <ui-button icon="pi pi-ellipsis-h" severity="secondary" text styleClass="ui-table-menu-button" ariaLabel="Ações" (onClick)="openMenu($event, rowMenu, row)"></ui-button>
                 </div>
                 } @else {
                 <div class="ui-table-actions-wrapper gap-1">
@@ -76,7 +77,11 @@
 
     <ng-template #emptymessage>
         <tr>
-            <td [attr.colspan]="tableColumns.length + (actionsTemplate || actions.length ? 1 : 0)" class="text-center text-surface-500 dark:text-white/64">{{ emptyMessage }}</td>
+            <td [attr.colspan]="tableColumns.length + (actionsTemplate || actions.length ? 1 : 0)" class="text-center text-surface-700 dark:text-white/64">{{ emptyMessage }}</td>
         </tr>
     </ng-template>
 </p-table>
+
+@if (!showPaginator && tableTotalRecords > 0) {
+<p class="ui-table-count text-sm font-medium text-surface-700 dark:text-white/64">{{ recordCountLabel }}</p>
+}

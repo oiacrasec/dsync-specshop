@@ -2,6 +2,10 @@
 
 - **Status:** Aceito
 - **Data:** 2026-10-31
+- **Revisões:** 2026-10-31 — primária azul 600 e texto suave em surface-700 aplicados no frontend
+  (`theme.service.ts`, classes `text-surface-500` → `text-surface-700`); proposta de Organizações aplicada às
+  listas e à estrutura; placeholder em surface-600 (3,5:1, aprovado para manter a distinção do valor);
+  biblioteca v0.8 sincronizada
 
 ## Contexto
 
@@ -52,8 +56,6 @@ permite desenhar com tokens e componentes que espelham o PrimeNG e publicá-los 
 
 ## Pendências
 
-- Aplicar a primária azul 600 no frontend (`theme.service.ts`), junto com as melhorias das listas.
 - Ligação componente → código (`codeConnect`) e `figcraft.connect.json`.
 - Telas Login e Perfil; slot na célula da Tabela.
 - Logo para o modo escuro (o app referencia `logo-white.svg`, ausente em `public/`); ponto vermelho do sino.
-- Tradução do datepicker no app: `monthNames` com `'marco'` (sem cedilha) em `src/app.component.ts`.

@@ -11,9 +11,15 @@ import { PageResponse, SchemaFieldType, SchemaFilter, TableSchema } from '@/app/
 // O backend informa só o tipo; o formato vem do LOCALE_ID (pt-BR: shortDate 01/10/2026, short com hora).
 // Data e hora (instante) seguem o fuso do Perfil (`zoned`); data pura não muda de dia.
 const COLUMN_FORMATS: Partial<Record<SchemaFieldType, Partial<UiTableColumn>>> = {
-    boolean: { type: 'boolean' },
+    boolean: { type: 'boolean-tag', booleanTag: { trueLabel: 'Sim', trueSeverity: 'success', falseLabel: 'Não', falseSeverity: 'secondary' } },
     date: { type: 'date' },
     datetime: { type: 'date', format: 'short', zoned: true }
+};
+
+// Situação do registro em texto + cor (nunca só cor), igual em todas as listas.
+const ACTIVE_COLUMN: Partial<UiTableColumn> = {
+    header: 'Situação',
+    booleanTag: { trueLabel: 'Ativo', trueSeverity: 'success', falseLabel: 'Inativo', falseSeverity: 'secondary' }
 };
 
 export function toTableResponse<T>(schema: TableSchema, page: PageResponse<T>, baseUrl: string): UiTableListResponse<T> {
@@ -34,7 +40,8 @@ function toColumns(schema: TableSchema): UiTableColumn[] {
         field: column.field,
         header: column.label,
         sortable: schema.ordering_fields.includes(column.field),
-        ...COLUMN_FORMATS[column.type]
+        ...COLUMN_FORMATS[column.type],
+        ...(column.field === 'is_active' && column.type === 'boolean' ? ACTIVE_COLUMN : {})
     }));
 }
 

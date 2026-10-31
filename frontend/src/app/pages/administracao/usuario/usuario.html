@@ -4,11 +4,11 @@
     <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Usuários</h2>
-            <p class="text-sm text-surface-500 dark:text-white/64">Pessoas com acesso ao contrato.</p>
+            <p class="text-sm text-surface-700 dark:text-white/64">Pessoas com acesso ao contrato.</p>
         </div>
         @if (canCreate) {
         <div class="flex items-center gap-2">
-            <ui-button label="Novo usuário" icon="pi pi-plus" severity="secondary" (onClick)="create()"></ui-button>
+            <ui-button label="Novo usuário" icon="pi pi-plus" (onClick)="create()"></ui-button>
         </div>
         }
     </div>
@@ -17,5 +17,5 @@
     <app-temporary-password [username]="result.user.username" [password]="result.temporary_password" title="Senha temporária redefinida (exibida uma única vez)" />
     }
 
-    <ui-table [service]="usuarioService" [actions]="tableActions" [reloadKey]="reloadKey"></ui-table>
+    <ui-table [service]="usuarioService" [countLabels]="{ one: 'usuário', other: 'usuários' }" [actions]="tableActions" [reloadKey]="reloadKey"></ui-table>
 </div>

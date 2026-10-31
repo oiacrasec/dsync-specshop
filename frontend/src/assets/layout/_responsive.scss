@@ -18,23 +18,9 @@
             padding-left: 1rem;
         }
 
-        .layout-topbar {
-            .menu-button {
-                i:before {
-                    content: '\e901';
-                }
-            }
-        }
     }
 
     .layout-overlay {
-        .layout-topbar {
-            .menu-button {
-                i:before {
-                    content: '\e901';
-                }
-            }
-        }
         .layout-sidebar {
             position: absolute;
             left: 0;

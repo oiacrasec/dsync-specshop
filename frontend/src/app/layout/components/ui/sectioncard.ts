@@ -16,7 +16,7 @@ import { Component, ContentChild, TemplateRef, AfterContentInit } from '@angular
                     }
 
                     @if (descriptionTemplate) {
-                        <p class="mt-1 text-sm text-surface-500">
+                        <p class="mt-1 text-sm text-surface-700">
                             <ng-container *ngTemplateOutlet="descriptionTemplate"></ng-container>
                         </p>
                     }

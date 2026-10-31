@@ -10,7 +10,6 @@ import { UserContextService } from '@/app/core/services/user-context.service';
 const BREAKPOINT = 992;
 // Worst case (drawer expanded): ~146px available for organization text at 0.9rem semibold.
 // 20 chars keeps the label readable without breaking layout, counting "..." in the limit.
-const MAX_ORGANIZATION_LABEL_LENGTH = 20;
 
 @Component({
     selector: '[app-sidebar]',
@@ -20,8 +19,8 @@ const MAX_ORGANIZATION_LABEL_LENGTH = 20;
             <a class="logo" [routerLink]="['/']">
                 <img class="logo-image" src="/layout/images/logo-{{ layoutService.isDarkTheme() ? 'white' : 'dark' }}.svg" alt="logo" />
                 <div class="brand-block">
-                    @if (getOrganizationLabel(); as organizationName) {
-                        <span class="organization-name" [attr.title]="getOrganizationTooltip()">
+                    @if (getOrganizationName(); as organizationName) {
+                        <span class="organization-name" [attr.title]="organizationName">
                             {{ organizationName }}
                         </span>
                     }
@@ -284,39 +283,8 @@ export class AppSidebar implements OnInit, OnDestroy {
         return this.layoutService.isStatic() || this.layoutService.isOverlay();
     }
 
-    private truncateLabel(label: string | null, maxLength: number): string | null {
-        if (!label) {
-            return null;
-        }
-
-        if (label.length <= maxLength) {
-            return label;
-        }
-
-        if (maxLength <= 3) {
-            return '.'.repeat(maxLength);
-        }
-
-        return `${label.slice(0, maxLength - 3)}...`;
-    }
-
     getOrganizationName(): string | null {
         return this.userContextService.getActiveContext()?.organization_name?.trim() ?? null;
-    }
-
-    getOrganizationLabel(): string | null {
-        return this.truncateLabel(this.getOrganizationName(), MAX_ORGANIZATION_LABEL_LENGTH);
-    }
-
-    getOrganizationTooltip(): string | null {
-        const fullName = this.getOrganizationName();
-        const shortName = this.getOrganizationLabel();
-
-        if (!fullName || !shortName || fullName === shortName) {
-            return null;
-        }
-
-        return fullName;
     }
 
     onMenuScroll() {

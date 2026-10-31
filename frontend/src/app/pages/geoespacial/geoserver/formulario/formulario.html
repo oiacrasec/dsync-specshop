@@ -4,7 +4,7 @@
     <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar GeoServer' : 'Novo GeoServer' }}</h2>
-            <p class="text-sm text-surface-500 dark:text-white/64">Preencha os dados obrigatórios antes de salvar.</p>
+            <p class="text-sm text-surface-700 dark:text-white/64">Preencha os dados obrigatórios antes de salvar.</p>
         </div>
         <div class="flex items-center gap-2">
             <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
@@ -63,7 +63,7 @@
                 @if (isEditing) {
                 <p-tabpanel value="bancos">
                     <div class="flex flex-col gap-6">
-                        <p class="text-sm text-surface-500 dark:text-white/64">Defina quais bancos geoespaciais podem ser usados por este GeoServer.</p>
+                        <p class="text-sm text-surface-700 dark:text-white/64">Defina quais bancos geoespaciais podem ser usados por este GeoServer.</p>
 
                         <div [formGroup]="vinculoForm" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="flex flex-col gap-2">
@@ -86,9 +86,9 @@
                             <ui-button label="Vincular banco" icon="pi pi-link" [loading]="vinculoSaving" [disabled]="vinculosLoading" (onClick)="createVinculo()"></ui-button>
                         </div>
                         } @if (vinculosLoading) {
-                        <div class="text-sm text-surface-500 dark:text-white/64">Carregando vínculos...</div>
+                        <div class="text-sm text-surface-700 dark:text-white/64">Carregando vínculos...</div>
                         } @else if (!vinculos.length) {
-                        <div class="text-sm text-surface-500 dark:text-white/64">Nenhum banco vinculado a este GeoServer.</div>
+                        <div class="text-sm text-surface-700 dark:text-white/64">Nenhum banco vinculado a este GeoServer.</div>
                         } @else {
                         <div class="rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden">
                             <table class="w-full table-fixed border-collapse">
@@ -109,7 +109,7 @@
                                     <tr class="border-t border-surface-200 dark:border-surface-700">
                                         <td class="px-4 py-3 align-middle text-sm text-surface-700 dark:text-surface-100">{{ vinculo.banco_label ?? vinculo.banco }}</td>
                                         <td class="px-4 py-3 align-middle text-center">
-                                            <span class="text-xs font-semibold" [class.text-green-600]="vinculo.ativo" [class.text-surface-500]="!vinculo.ativo"> {{ vinculo.ativo ? 'ATIVO' : 'INATIVO' }} </span>
+                                            <span class="text-xs font-semibold" [class.text-green-600]="vinculo.ativo" [class.text-surface-700]="!vinculo.ativo"> {{ vinculo.ativo ? 'ATIVO' : 'INATIVO' }} </span>
                                         </td>
                                         <td class="px-4 py-3 align-middle">
                                             <div class="flex justify-end gap-2 whitespace-nowrap">

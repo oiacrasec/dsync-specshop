@@ -13,21 +13,24 @@
     .topbar-left {
         display: flex;
         align-items: center;
+        gap: 1rem;
 
         .horizontal-logo {
             display: none;
         }
     }
 
+    // ☰ num quadrado de 40 px com fundo de cartão, antes da trilha (design/ · Layout/Topo).
     .menu-button {
-        width: 2.5rem;
-        height: 2.5rem;
-        line-height: 2.5rem;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        flex-shrink: 0;
         text-align: center;
-        color: var(--text-color);
+        color: var(--p-text-hover-color);
         overflow: hidden;
-        border-radius: 99px;
-        background: transparent;
+        border-radius: 8px;
+        background: var(--p-content-background);
         transition:
             background-color var(--transition-duration),
             box-shadow var(--transition-duration);

@@ -39,11 +39,11 @@ import { problemMessage } from '@/app/core/utils/api-problem';
                             <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync</h1>
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="username" class="font-medium text-surface-500 dark:text-white/64">Usuário</label>
+                            <label for="username" class="font-medium text-surface-700 dark:text-white/64">Usuário</label>
                             <input name="username" pInputText id="username" formControlName="username" autocomplete="username" class="w-full" />
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label for="password" class="font-medium text-surface-500 dark:text-white/64">Senha</label>
+                            <label for="password" class="font-medium text-surface-700 dark:text-white/64">Senha</label>
                             <input name="password" pInputText id="password" formControlName="password" type="password" autocomplete="current-password" class="w-full" />
                         </div>
                         <p class="text-red-500" role="alert">{{ errorMessage() }}</p>

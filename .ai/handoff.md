@@ -10,7 +10,7 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 9.4 2FA desenhada, não iniciada · em paralelo: design system em `design/` (ver abaixo) |
-| Próximo passo exato | Usuário escolhe: implementar no frontend as melhorias das listas + primária azul 600, ou a 9.4 |
+| Próximo passo exato | Melhorias de layout aplicadas e commitadas; próximo bloco a escolher (ex.: 9.4) |
 | Aguardando o usuário? | sim — escolha do próximo bloco |
 
 ## Design system (`design/`, ADR 0040 Aceito)
@@ -27,8 +27,9 @@
   4. Paginação só com mais de uma página (senão a contagem); "Limpar" só com filtro ativo.
   5. Situação 160 px e Ações 96 px fixas; realce da linha no hover. 6. Ações 40 × 40 px.
   7. Organização ativa em 2 linhas no topo. 8. ☰ para recolher o menu; trilha legível.
-- Decidido (2026-10-31): primária azul 600 no modo claro (hover 700, ativo 800); biblioteca v2 publicada. Falta
-  aplicar no frontend (`theme.service.ts`: `{primary.600}`/`700`/`800`), junto com as melhorias das listas.
+- Decidido e aplicado no frontend (2026-10-31): primária azul 600; as 8 melhorias de Organizações em todas
+  as listas e na estrutura; placeholder surface-600. Mantidos por decisão: trilha em cartão com ícone,
+  nome da organização inteiro (API não separa o contrato), busca e avisos no topo.
 - Poseidon offline (caminho A, aprovado): recriar do código em `frontend/`, nunca copiar o site.
   Parte 1 ✅ (biblioteca v3): ícones, página Layout, padrão Página · estrutura. Parte 2 ✅ (v4): select,
   multiselect, data + calendário, menu de ações, diálogo de confirmação, variantes do Botão. Parte 3 ✅ (v5): Lista com
@@ -36,7 +37,7 @@
   `--automation-read-root design/ e a pasta do script` (MCP desconectado nesta sessão).
 - Planejado: `codeConnect` + `figcraft.connect.json`; telas Login e Perfil; slot na célula da Tabela;
   logo para o modo escuro (`logo-white.svg` ausente); ponto vermelho do sino; corrigir
-  `'marco'` → `'março'` em `frontend/src/app.component.ts` (datepicker).
+  (`'março'` já corrigido no app).
 
 ## Concluído
 

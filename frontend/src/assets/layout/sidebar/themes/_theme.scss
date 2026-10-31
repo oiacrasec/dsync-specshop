@@ -4,12 +4,12 @@
     --d-sidebar-border: 1px solid var(--surface-border);
     --d-app-name-color: var(--p-surface-950);
     --d-menu-separator-border: 1px solid var(--p-surface-300);
-    --d-menuitem-root-text-color: var(--p-surface-700);
+    --d-menuitem-root-text-color: var(--p-surface-900);
     --d-menuitem-text-color: var(--p-surface-700);
     --d-menuitem-text-hover-color: var(--p-surface-950);
     --d-menuitem-hover-bg: rgba(255, 255, 255, 0.64);
-    --d-menuitem-active-bg: color-mix(in srgb, var(--p-button-secondary-background, #e5e7eb) 72%, white 28%);
-    --d-menuitem-active-text-color: var(--p-surface-950);
+    --d-menuitem-active-bg: var(--p-highlight-background);
+    --d-menuitem-active-text-color: var(--p-highlight-color);
     --d-menuitem-focus-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
 }
 

@@ -48,6 +48,8 @@
         box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-color) 22%, transparent);
     }
 
+    // Itens sem link vêm como p-disabled no <li> (opacidade 0,6): a trilha precisa continuar legível.
+    .p-breadcrumb-item.p-disabled,
     .p-breadcrumb-item-link.p-disabled,
     .p-breadcrumb-home .p-menuitem-link.p-disabled {
         opacity: 1;
@@ -58,6 +60,7 @@
 
     .p-breadcrumb-item:last-child .p-menuitem-text {
         font-weight: 600;
+        color: var(--p-text-hover-color);
     }
 
     .p-menuitem-text {

@@ -32,13 +32,12 @@ interface NotificationsBars {
     template: ` <div class="layout-topbar">
         <div class="topbar-left">
             <img class="horizontal-logo" src="/layout/images/logo-white.svg" alt="logo" />
+            <a tabindex="0" #menubutton type="button" class="menu-button" aria-label="Recolher ou abrir o menu" (click)="onMenuButtonClick()">
+                <i class="pi pi-bars" aria-hidden="true"></i>
+            </a>
             @if (shouldShowBreadcrumb()) {
                 <div app-breadcrumb></div>
             }
-            <span class="topbar-separator"></span>
-            <a tabindex="0" #menubutton type="button" class="menu-button" (click)="onMenuButtonClick()">
-                <i class="pi pi-chevron-left"></i>
-            </a>
             <a routerLink="/">
                 <img class="mobile-logo" src="/layout/images/logo-{{ isDarkTheme() ? 'white' : 'dark' }}.svg" alt="logo" />
             </a>

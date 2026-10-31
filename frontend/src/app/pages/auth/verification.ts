@@ -26,7 +26,7 @@ import { InputTextModule } from 'primeng/inputtext';
                             <app-auth-logo-widget />
                         </div>
                         <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Verification</h1>
-                        <p class="text-center lg:text-xl text-surface-500 mt-6">Please verify your account.</p>
+                        <p class="text-center lg:text-xl text-surface-700 mt-6">Please verify your account.</p>
                     </div>
                     <div class="flex flex-col items-center">
                         <p-inputotp name="otp" [length]="6">

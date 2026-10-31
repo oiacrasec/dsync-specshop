@@ -20,12 +20,12 @@ const STYLESHEET_ID = 'swagger-ui-styles';
         <div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
             <div class="dss-page-header border-b border-surface-200 dark:border-surface-700">
                 <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">API</h2>
-                <p class="text-sm text-surface-500 dark:text-white/64">Rotas que você pode usar, geradas do código. "Try it out" executa de verdade, com a sua sessão.</p>
+                <p class="text-sm text-surface-700 dark:text-white/64">Rotas que você pode usar, geradas do código. "Try it out" executa de verdade, com a sua sessão.</p>
             </div>
             @if (error()) {
                 <p class="text-sm text-red-600 dark:text-red-400">{{ error() }}</p>
             } @else if (loading()) {
-                <p class="text-sm text-surface-500 dark:text-white/64">Carregando a documentação…</p>
+                <p class="text-sm text-surface-700 dark:text-white/64">Carregando a documentação…</p>
             }
             <div #swagger class="swagger-host bg-white rounded-lg"></div>
         </div>

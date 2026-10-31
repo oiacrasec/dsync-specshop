@@ -53,6 +53,9 @@ export class UiFilter implements OnChanges, OnDestroy {
 
     @Input() filters: UiFilterField[] = [];
     @Output() filtersChange = new EventEmitter<Record<string, any>>();
+    /** Mostra o "Limpar" mesmo sem filtro (ex.: tabela ordenada, que o Limpar também desfaz). */
+    @Input() clearable = false;
+
     /** Emitido pelo botão "Limpar", antes do filtersChange vazio (a tabela também zera a ordenação). */
     @Output() cleared = new EventEmitter<void>();
 
@@ -116,6 +119,10 @@ export class UiFilter implements OnChanges, OnDestroy {
         return this.advancedFilters.length > 0;
     }
 
+    get hasActiveFilters() {
+        return !!this.generalTerm.trim() || Object.values(this.advancedValues).some((value) => value !== undefined && value !== null && value !== '');
+    }
+
     get hasAnyFilters() {
         return this.hasGeneralFilters || this.hasAdvancedFilters;
     }
@@ -127,7 +134,7 @@ export class UiFilter implements OnChanges, OnDestroy {
             return 'Buscar';
         }
 
-        return `Buscar por ${names.join(', ')}`;
+        return `Buscar por ${names.map(toSentenceCase).join(', ')}`;
     }
 
     onGeneralInput(value: string) {
@@ -216,4 +223,9 @@ export class UiFilter implements OnChanges, OnDestroy {
             }))
         );
     }
+}
+
+// "Nome" → "nome" no meio da frase; siglas (CNPJ, UF) ficam como estão.
+function toSentenceCase(label: string) {
+    return label.length > 1 && label[1] === label[1].toLowerCase() ? label[0].toLowerCase() + label.slice(1) : label;
 }
