@@ -12,6 +12,8 @@ import { CONTEXT_KEY, SESSION_KEY } from '@/app/core/utils/session-data';
 import { accessGuard } from '@/app/core/guards/access.guard';
 import { LoginResponse } from '@/app/types/auth';
 import { Login } from './login';
+import { APP_BRAND } from '@/app/core/tokens/app-brand';
+import { environment } from '@/environments/environment';
 import { PrimeiroAcessoTrocarSenhaPage } from './primeiro-acesso-trocar-senha';
 import { ContextoSelecaoPage } from './contexto-selecao';
 import { AppTopbar } from '@/app/layout/components/app.topbar';
@@ -117,6 +119,14 @@ describe('Core auth pages and route guards', () => {
         await fixture.whenStable();
         expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Usuário ou senha inválidos.');
         expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBeFalse();
+    });
+
+    it('shows the configurable system name in the login title', () => {
+        const fixture = TestBed.createComponent(Login);
+
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('h1').textContent).toBe(`Entrar no ${TestBed.inject(APP_BRAND).name}`);
+        expect(TestBed.inject(APP_BRAND).name).toBe(environment.appName);
     });
 
     it('renders labeled radio cards and confirms the selected UUID', async () => {

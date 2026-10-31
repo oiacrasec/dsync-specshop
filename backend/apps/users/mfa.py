@@ -58,7 +58,7 @@ class Mfa:
 
     def provisioning(self, username):
         secret = self.decrypt(self.device.secret)
-        uri = pyotp.TOTP(secret, interval=MFA_TOTP_INTERVAL).provisioning_uri(username, issuer_name='Datasync')
+        uri = pyotp.TOTP(secret, interval=MFA_TOTP_INTERVAL).provisioning_uri(username, issuer_name=settings.APP_NAME)
         return {'secret': secret, 'otpauth_url': uri}
 
     def retry_after(self):

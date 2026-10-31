@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Nome do sistema configurável
+
+- Textos usam o nome por variável: frontend `environment.appName`/`companyName` via token
+  `APP_BRAND` (login, rodapé, título da aba, arquivo de códigos reserva); backend
+  `DJANGO_APP_NAME` (emissor TOTP, título do OpenAPI). Padrão Dsync CORE / DsyncLabs.
+- Rodapé sem "GIS"; título da aba deixa de ser "Poseidon - PrimeNG".
+- Arquivos: core/tokens/app-brand.ts, environments, app.component.ts, app.footer.ts,
+  pages/auth/login.*, perfil/mfa-settings.ts, settings/base.py, users/mfa.py,
+  .env.example, docs/api/openapi-v1.yaml, docs/architecture/overview.md.
+
 ## 2026-10-31 — Proposta visual do segundo passo do login
 
 - Por solicitação do usuário e com referência em IM03.png, desenhada a página

@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { PrimeNG } from 'primeng/config';
 
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
+import { APP_BRAND } from '@/app/core/tokens/app-brand';
 
 @Component({
     selector: 'app-root',
@@ -20,6 +22,7 @@ export class AppComponent {
     constructor() {
         // Inicializa a sessão e a sincronização entre abas; sem polling de auth/permissões.
         inject(AuthSessionService);
+        inject(Title).setTitle(inject(APP_BRAND).name);
         this.configureLocale();
     }
 

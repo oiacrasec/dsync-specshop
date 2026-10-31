@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { MfaService, MfaSetup, MfaStatus } from '@/app/core/services/mfa.service';
+import { APP_BRAND } from '@/app/core/tokens/app-brand';
 import { problemMessage } from '@/app/core/utils/api-problem';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
@@ -18,6 +19,7 @@ export class MfaSettings implements OnInit {
     private readonly api = inject(MfaService);
     private readonly destroyRef = inject(DestroyRef);
     private readonly fb = inject(FormBuilder);
+    private readonly brand = inject(APP_BRAND);
     readonly changed = output<void>();
     readonly status = signal<MfaStatus | null>(null);
     readonly setup = signal<MfaSetup | null>(null);
@@ -187,12 +189,12 @@ export class MfaSettings implements OnInit {
     }
 
     downloadCodes() {
-        const content = 'Datasync — códigos reserva de uso único\n\n' + this.recoveryCodes().join('\n') + '\n\nGuarde em local seguro. Não compartilhe estes códigos.';
+        const content = `${this.brand.name} — códigos reserva de uso único\n\n` + this.recoveryCodes().join('\n') + '\n\nGuarde em local seguro. Não compartilhe estes códigos.';
         const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
         const link = document.createElement('a');
 
         link.href = url;
-        link.download = 'datasync-codigos-reserva.txt';
+        link.download = 'codigos-reserva.txt';
         link.click();
         URL.revokeObjectURL(url);
     }

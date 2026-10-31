@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: datasync-core API
+  title: Dsync CORE API
   version: '1'
   description: API v1. Erros em RFC 9457 (application/problem+json); contexto pelo
     header X-Organization-Id.

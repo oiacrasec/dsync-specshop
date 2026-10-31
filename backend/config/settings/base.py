@@ -23,6 +23,9 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
+# Nome do sistema nos textos (autenticador do 2FA, título da API); projetos derivados trocam no .env.
+APP_NAME = env('DJANGO_APP_NAME', default='Dsync CORE')
+
 DEBUG = False
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
@@ -178,7 +181,7 @@ REST_FRAMEWORK = {
 
 # OpenAPI gerado do código (ADR 0004); arquivo em docs/api/openapi-v1.yaml.
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'datasync-core API',
+    'TITLE': f'{APP_NAME} API',
     'DESCRIPTION': 'API v1. Erros em RFC 9457 (application/problem+json); contexto pelo header X-Organization-Id.',
     'VERSION': '1',
     'SERVE_INCLUDE_SCHEMA': False,

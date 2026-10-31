@@ -10,6 +10,7 @@ import { finalize } from 'rxjs/operators';
 import { AuthService } from '@/app/core/services/auth.service';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
+import { APP_BRAND } from '@/app/core/tokens/app-brand';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
 import { LoginResponse } from '@/app/types/auth';
@@ -27,6 +28,7 @@ export class Login {
     private authSession = inject(AuthSessionService);
     private router = inject(Router);
     private readonly destroyRef = inject(DestroyRef);
+    readonly brand = inject(APP_BRAND);
     private readonly mfaCode = viewChild<ElementRef<HTMLInputElement>>('mfaCode');
     private readonly usernameInput = viewChild<ElementRef<HTMLInputElement>>('usernameInput');
 

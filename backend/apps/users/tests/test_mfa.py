@@ -6,6 +6,7 @@ from uuid import uuid4
 import pyotp
 import pytest
 from cryptography.fernet import Fernet
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import close_old_connections, connection, transaction
@@ -348,7 +349,8 @@ def test_status_and_setup_belong_to_the_owner_and_secret_is_ciphertext(account, 
     device = UserMfa.objects.get(user=account)
     assert device.secret != setup['secret'] and setup['secret'] not in device.secret
     assert Mfa.decrypt(device.secret) == setup['secret']
-    assert pyotp.parse_uri(setup['otpauth_url']).secret == setup['secret']
+    uri = pyotp.parse_uri(setup['otpauth_url'])
+    assert uri.secret == setup['secret'] and uri.issuer == settings.APP_NAME
     assert not device.confirmed and device.setup_expires_at > timezone.now()
     assert api.get('/api/v1/me/mfa/').json()['setup_pending']
     other = get_user_model().objects.create_user(username='other', contract=user_contract)

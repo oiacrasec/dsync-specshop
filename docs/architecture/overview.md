@@ -150,6 +150,11 @@ um remote `core`, evolui no próprio ritmo e recebe as evoluções de arquitetur
 por merge manual. O fluxo é só do core para os projetos, e o projeto apenas acrescenta
 código novo, sem editar arquivos que vêm do core (ADR 0036).
 
+O nome exibido nos textos é configuração, não código: `appName`/`companyName` nos
+`environments` do frontend (token `APP_BRAND`) e `DJANGO_APP_NAME` no `.env` do backend
+(emissor no app autenticador e título da API). Padrão do core: **Dsync CORE**, empresa
+**DsyncLabs**. Os `environments` já são ajustados por projeto (URL da API).
+
 ---
 
 # 3. Estrutura oficial do repositório
