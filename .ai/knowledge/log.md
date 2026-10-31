@@ -1,5 +1,26 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Prioridades e requisitos de deploy definidos pelo usuário
+
+- Ordem: 1) segurança das dependências; 2) deploy em VPS / servidor local.
+- Uma VPS poderá hospedar 1 ou N projetos derivados do core; banco de dados sempre
+  separado em outra VPS. Estrutura Docker será alinhada antes da implementação.
+- Decisões 94–95 registradas no plano ativo e no handoff; 5.3 permanece paralisada.
+
+## 2026-10-31 — Alinhamento de produção e auditoria npm retomada
+
+- Usuário destacou Dockerização para VPS nas clouds e pediu alinhamento antes da implementação.
+- `npm audit` executado sem mudar dependências: 101 pacotes sinalizados, incluindo
+  transitivas/desenvolvimento (5 critical, 48 high, 46 moderate, 2 low). Ainda avaliar
+  alcance em produção e correções compatíveis; não equivale a 101 falhas exploráveis no app.
+- Relatório temporário: /tmp/datasync-npm-audit-public.json; handoff atualizado.
+
+## 2026-10-31 — Etapa 5.3 paralisada pelo usuário
+
+- Etapa 5.3 e revisão do acesso total do superadmin ficam paralisadas até solicitação
+  explícita do usuário; não propor sua retomada como próxima atividade.
+- Decisão 93 registrada no plano ativo e no `.ai/handoff.md`.
+
 ## 2026-10-31 — Minhas permissões (9.5 concluída)
 
 - Novo `GET /me/access/` em rbac: organizações acessíveis, perfis atribuídos e códigos

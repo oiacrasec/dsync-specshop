@@ -102,6 +102,9 @@ e só começa após aprovação do usuário.
 | 90 | Superadmin não vê a aba Minhas permissões por ora; o acesso total do superadmin está em reavaliação pelo usuário (sem mudança até decidir) |
 | 91 | 9.5 (proposta visual aprovada): administrador do contrato mantém organizações em acordeão e perfil identificado; aviso de todas as permissões, inclusive futuras, sem repetir a grade de ações. Usuário autorizou backend + frontend |
 | 92 | 9.5: acesso direto do superadmin a `/me/access/` retorna 403 `permission-denied`, antes de consultar concessões; aba continua oculta, sem alterar suas demais permissões |
+| 93 | Etapa 5.3 e revisão do acesso total do superadmin paralisadas por determinação do usuário; retomar somente quando ele solicitar explicitamente |
+| 94 | Próximas prioridades definidas pelo usuário, nesta ordem: 1) segurança das dependências; 2) deploy em VPS / servidor local |
+| 95 | Requisitos do deploy: uma VPS poderá hospedar um ou N projetos derivados desta base; banco de dados sempre separado em outra VPS. Alinhar a estrutura Docker antes de implementar |
 
 ## Bloco 0 — Fundação
 
@@ -151,7 +154,7 @@ e só começa após aprovação do usuário.
 |---|---|---|---|
 | 5.1 | Mixin `options` | 0011 | ✅ |
 | 5.2 | Admin: planos e contratos (`/api/v1/admin/…`) | 0008, 0020 | ✅ |
-| 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⬜ |
+| 5.3 | Admin: usuários, superadmins e admins de contrato | 0010 | ⏸ Paralisada até solicitação explícita do usuário (decisão 93) |
 | 5.4 | Área comum (admin do contrato): organizações, usuários, perfis e atribuições | 0009 §3.1 | ✅ (Blocos 7 e 8) |
 | 5.5 | OpenAPI (`drf-spectacular`), navegável só para autenticados | 0004 | ✅ |
 

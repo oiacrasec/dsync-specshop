@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-31 18:41
+- **Atualizado em:** 2026-10-31 18:52
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Commit da etapa:** feat(users): add read-only personal permissions tab (este handoff integra o commit; hash em `git log -1`)
+- **Commit da etapa 9.5:** b54a38b feat(users): add read-only personal permissions tab
 
 ## Situação
 
 | Item | Estado |
 |---|---|
 | Etapa atual | 9.5 Minhas permissões — ✅ concluída; resultado e commit autorizados pelo usuário |
-| Próximo passo exato | Aguardar usuário definir próxima prioridade; 5.3 depende da decisão sobre acesso total do superadmin |
-| Aguardando o usuário? | sim — próxima etapa, sem pendência na 9.5 |
+| Próximo passo exato | Prioridade 1: analisar e corrigir segurança das dependências. Depois, prioridade 2: alinhar e estruturar deploy em VPS / servidor local (decisões 94–95) |
+| Aguardando o usuário? | Sem pergunta pendente sobre quantidade de projetos: VPS comportará 1 ou N; banco sempre em outra VPS. Dependências ainda sem alteração; deploy por alinhar antes de implementar |
 
 ## Entregue na 9.5
 
@@ -44,6 +44,13 @@
 - FigCraft: --control 7710; MCP --attach 7710. Salvar após editar.
 - 20 perfis mock ZZ-01..ZZ-20 no CLIENTE X local: apagar só quando pedido.
 - Conferência visual anterior (login/MFA/filtros/contagem/seletor com API real) pendente.
-- 9.1–9.5 concluídas. Não iniciar 5.3 sem decisão sobre acesso total do superadmin.
+- 9.1–9.5 concluídas. 5.3 e revisão do acesso total do superadmin paralisadas:
+  não retomar nem propor sua retomada até solicitação explícita do usuário (decisão 93).
 - Produção: HTTPS/CSP, cache compartilhado/borda, recuperação, expurgo/LegalHold e infra.
-- npm audit adiado; não reativar telas DESABILITADO sem aprovação.
+- npm audit retomado a pedido: 101 pacotes sinalizados (5 critical, 48 high,
+  46 moderate, 2 low), incluindo desenvolvimento/transitivas; impacto real ainda a avaliar.
+  Relatório: /tmp/datasync-npm-audit-public.json. Nenhuma dependência alterada.
+- Docker: frontend tem Dockerfile/Nginx; backend e composição da implantação faltam.
+  VPS/servidor local deve comportar 1 ou N projetos derivados; banco sempre em outra
+  VPS. Alinhar estrutura antes de implementar (95). Retenção segue ADR 0007.
+- Não reativar telas DESABILITADO sem aprovação.
