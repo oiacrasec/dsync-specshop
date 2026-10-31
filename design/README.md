@@ -9,11 +9,21 @@ código e nenhum projeto depende destes arquivos para rodar (ADR 0040).
 | Arquivo | Conteúdo |
 |---|---|
 | `datasync-ds.figcraft` | **biblioteca** publicada: tokens, estilos de texto, componentes e padrões |
-| `datasync-core-telas.figcraft` | telas do core montadas só com a biblioteca (Usuários, Organizações antes × depois) |
+| `datasync-core-telas.figcraft` | telas do core com a biblioteca: Usuários, Organizações, seleção/troca de organização e proposta de login MFA |
 | `tokens.json` | exportação das variáveis (`variable.export`), para ver as mudanças de tokens no diff |
 
 O `.figcraft` é um zip: o git guarda como binário. Toda mudança de token exige reexportar o
 `tokens.json` no mesmo commit.
+
+## Proposta em revisão
+
+A página **Login · Verificação em duas etapas** aproxima o segundo passo do login
+à seleção de organização aprovada: mesmo fundo, cartão branco de 560 px, Figtree,
+cores e componentes da biblioteca. Campo de código em destaque, ação Verificar em
+largura total e alternativas no rodapé. Inclui autenticador, reserva, erro e versões
+390/320 px; os links entre autenticador e reserva têm navegação no protótipo desktop.
+Valores mostrados são fictícios. Aplicada ao frontend (`pages/auth/login.html`/`.scss`); falta conferência visual.
+MFA continua opcional e só aparece no login de quem o ativou.
 
 ## Biblioteca
 
