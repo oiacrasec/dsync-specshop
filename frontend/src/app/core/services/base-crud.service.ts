@@ -29,7 +29,7 @@ export abstract class BaseCrudService {
     /** Opções do Core (ADR 0011): busca por `q` ou resolve rótulos por `public_id`. */
     protected lookupOptions(resource: string, query: UiLookupQuery): Observable<UiLookupOptionsResponse> {
         const first = query.first ?? 0;
-        const rows = query.rows ?? 20;
+        const rows = query.rows ?? 10;
         const params = this.buildParams(query.pk ? { public_id: query.pk, first, rows } : { q: query.q, first, rows });
 
         return this.http.get<OptionsResponse>(`${this.baseUrl}/${resource}/options/`, { params }).pipe(map((page) => toLookupResponse(page, first, rows)));

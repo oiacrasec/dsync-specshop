@@ -108,6 +108,13 @@ describe('UiTable — paginação e Limpar', () => {
         expect((fixture.nativeElement as HTMLElement).querySelector('.ui-table-count')?.textContent?.trim()).toBe('1 organização');
     });
 
+    it('mostra 10 linhas por página por padrão', async () => {
+        const { table, element } = await render(15);
+
+        expect(table.rows).toBe(10);
+        expect(element.querySelector('.p-paginator')).not.toBeNull();
+    });
+
     it('com mais de uma página, mostra a paginação', async () => {
         const { table, element } = await render(45);
 
