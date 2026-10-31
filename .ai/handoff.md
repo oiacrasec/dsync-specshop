@@ -3,20 +3,40 @@
 - **Atualizado em:** 2026-10-23
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Blocos 7 e 8 concluídos)
-- **Último commit:** a0e8dce feat(core): configure private media storage on filesystem or S3
+- **Último commit:** c3315cb fix(users): revoke sessionless refresh tokens when ending other sessions
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.3 Sessões ✅ commitada; users.0007 aplicada ao banco local |
-| Próximo passo exato | 9.4 2FA TOTP (opcional, QR, 10 códigos reserva, 2º passo no login, reset por admin) — aguardar confirmação |
-| Aguardando o usuário? | sim — confirmar início da 9.4 |
+| Etapa atual | 9.3 ✅ (com a correção c3315cb); 9.4 2FA desenhada, não iniciada |
+| Próximo passo exato | Implementar a 9.4 inteira conforme o desenho abaixo (decisões 86–87) |
+| Aguardando o usuário? | não — 9.4 autorizada (caminho C); confirmar início na sessão |
 
 ## Concluído
 
 0.1–0.3 · 1.1–1.2 · 2.1–2.5 · 3.1–3.6 · 4.1 · 5.1–5.2 · 5.4 (via Blocos 7–8) · 6.1–6.8 · 7.1–7.4 ·
 8.1–8.5.
+
+## Desenho da 9.4 (2FA TOTP, decisões 73–75, 86–87)
+
+Dependências: `pyotp` 2.10.0 (MIT) e `cryptography` (Apache/BSD); frontend `qrcode` 1.5.4 (MIT).
+Conferir versões ≥ 2 semanas na hora de instalar.
+
+| Peça | Desenho |
+|---|---|
+| `UserMfa` (1:1 usuário) | segredo cifrado (Fernet, `DJANGO_MFA_ENCRYPTION_KEY`), `confirmed`, `last_t`, falhas + horário da última |
+| `UserRecoveryCode` | hash HMAC-SHA256 de cada um dos 10 códigos; apagado ao usar |
+| `apps/users/mfa.py` | classe: gera segredo, link `otpauth://`, verifica com `select_for_update`, espera crescente 1, 2, 4, 8 s… com teto, antirreuso por `last_t`, consome código reserva; crédito ao django-otp |
+| Ativar | `POST /me/mfa/setup/` (segredo pendente + QR) → `POST /me/mfa/enable/` (código) → 10 códigos uma vez |
+| Login | `POST /auth/login/` com 2FA → `mfa_required` + token temporário de 5 min; `POST /auth/login/mfa/` (código ou reserva) → tokens + sessão 9.3 |
+| Desativar | senha + código; regenerar códigos com código |
+| Reset por admin | admin do contrato → usuários comuns do contrato; superadmin → admins do contrato; superadmin ↔ superadmin por comando até a 5.3; auditado |
+| Frontend | aba "Verificação em duas etapas" no Perfil (QR, confirmar, códigos); 2º passo na tela de login; ação "Redefinir 2FA" em Usuários e em Admins do contrato |
+
+Fonte da análise: django-otp 1.7.5 (`TOTPDevice.verify_token`, `ThrottlingMixin`, `StaticToken`):
+segredo em hex legível, códigos reserva legíveis e verificação sem lock de linha (os três
+corrigidos aqui); login por sessão (não serve, usamos JWT).
 
 ## Pendências (para escolher o próximo bloco)
 

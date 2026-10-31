@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-23 — 9.4 desenhada (2FA)
+
+- Decisões 86–87: implementação própria adaptada do django-otp (caminho C), segredo cifrado com
+  `DJANGO_MFA_ENCRYPTION_KEY`, entrega única. Comparados django-otp 1.7.5, django-two-factor-auth
+  1.18.1 e django-allauth 65.20.1 (código conferido). Desenho completo no handoff.
+
 ## 2026-10-23 — Etapa 9.3: sessões
 
 - Decisões 83–85. `users.UserSession` (registro técnico em `UNSCOPED_RECORDS`; `users.0007`):

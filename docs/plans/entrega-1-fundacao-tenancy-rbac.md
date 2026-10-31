@@ -95,6 +95,8 @@ e só começa após aprovação do usuário.
 | 83 | Sessões: encerrar revoga o refresh (corte na próxima renovação, até 15 min, sem consulta por requisição); encerradas e expiradas são apagadas (LGPD) |
 | 84 | Dispositivo pelo User-Agent com classe própria `users.devices.UserAgent` (sem dependência); guarda só o rótulo |
 | 85 | Aba Sessões do Perfil só de visualização: sessões ativas + últimos 20 logins do registro de acesso; rotas de encerrar mantidas na API |
+| 86 | 2FA (9.4) por implementação própria adaptada do django-otp (Unlicense): espera crescente após falhas, antirreuso pelo último intervalo (`last_t`) e código reserva apagado ao usar; `pyotp` só para o cálculo. Corrigido em relação a ele: segredo cifrado, códigos reserva com hash, linha travada na verificação, login em dois passos no JWT |
+| 87 | Segredo do 2FA cifrado (Fernet, `cryptography`) com chave própria `DJANGO_MFA_ENCRYPTION_KEY`; a 9.4 é entregue de uma vez (backend, Perfil, login e reset por admin) |
 
 ## Bloco 0 — Fundação
 
