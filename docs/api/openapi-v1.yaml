@@ -1437,7 +1437,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MfaDisableRequest'
+              $ref: '#/components/schemas/MfaConfirmRequest'
         required: true
       security:
       - jwt: []
@@ -1483,7 +1483,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MfaCodeRequest'
+              $ref: '#/components/schemas/MfaConfirmRequest'
         required: true
       security:
       - jwt: []
@@ -4480,7 +4480,7 @@ components:
           maxLength: 64
       required:
       - code
-    MfaDisableRequest:
+    MfaConfirmRequest:
       type: object
       properties:
         code:

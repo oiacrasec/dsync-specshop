@@ -93,7 +93,9 @@ def test_enable_returns_reserves_once_and_revokes_all_existing_sessions(account)
     tokens = [first_step(account), first_step(account)]
     api = authenticated(account)
     setup = api.post('/api/v1/me/mfa/setup/').json()
-    response = api.post('/api/v1/me/mfa/enable/', {'code': pyotp.TOTP(setup['secret']).now()}, format='json')
+    response = api.post(
+        '/api/v1/me/mfa/enable/', {'code': pyotp.TOTP(setup['secret']).now(), 'password': PASSWORD}, format='json'
+    )
     assert response.status_code == 200, response.content
     codes = response.json()['recovery_codes']
     assert len(codes) == len(set(codes)) == 10
@@ -110,16 +112,32 @@ def test_enable_returns_reserves_once_and_revokes_all_existing_sessions(account)
     assert codes[0] not in str(event.__dict__) and setup['secret'] not in str(event.__dict__)
 
 
+def enable(api, code):
+    return api.post('/api/v1/me/mfa/enable/', {'code': code, 'password': PASSWORD}, format='json')
+
+
 def test_enable_requires_unexpired_setup_and_valid_code_and_persists_failures(account):
     api = authenticated(account)
-    assert api.post('/api/v1/me/mfa/enable/', {'code': '123456'}, format='json').status_code == 409
+    assert enable(api, '123456').status_code == 409
     api.post('/api/v1/me/mfa/setup/')
-    assert api.post('/api/v1/me/mfa/enable/', {'code': 'wrong'}, format='json').status_code == 422
+    assert enable(api, 'wrong').status_code == 422
     device = UserMfa.objects.get(user=account)
     assert device.failures == 1 and not device.confirmed
-    assert api.post('/api/v1/me/mfa/enable/', {'code': 'wrong'}, format='json').status_code == 429
+    assert enable(api, 'wrong').status_code == 429
     UserMfa.objects.filter(pk=device.pk).update(setup_expires_at=timezone.now() - timedelta(seconds=1))
-    assert api.post('/api/v1/me/mfa/enable/', {'code': '123456'}, format='json').status_code == 409
+    assert enable(api, '123456').status_code == 409
+
+
+def test_enable_requires_the_current_password(account):
+    api = authenticated(account)
+    setup = api.post('/api/v1/me/mfa/setup/').json()
+    code = pyotp.TOTP(setup['secret']).now()
+    assert api.post('/api/v1/me/mfa/enable/', {'code': code}, format='json').status_code == 422
+    wrong = api.post('/api/v1/me/mfa/enable/', {'code': code, 'password': 'wrong-password'}, format='json')
+    assert wrong.status_code == 422 and 'password' in wrong.json()['errors']
+    device = UserMfa.objects.get(user=account)
+    assert device.failures == 1 and not device.confirmed
+    assert api.post('/api/v1/me/mfa/enable/', {'code': code, 'password': PASSWORD}, format='json').status_code == 429
 
 
 def test_disable_requires_password_and_factor_and_then_login_skips_mfa(account, factor):
@@ -311,7 +329,7 @@ def test_mfa_operation_query_cost_is_independent_of_other_accounts(operation, us
         payload = {'code': reserves[0]}
         url = f'/api/v1/me/mfa/{operation}/'
         if operation == 'enable':
-            payload = {'code': pyotp.TOTP(secret).now()}
+            payload = {'code': pyotp.TOTP(secret).now(), 'password': PASSWORD}
         elif operation == 'disable':
             payload['password'] = PASSWORD
         elif operation == 'login':

@@ -8,11 +8,12 @@ import { problemMessage } from '@/app/core/utils/api-problem';
 import { UiButton } from '@/app/shared/ui/button/button';
 import { UiInputPassword } from '@/app/shared/ui/input-password/input-password';
 import { InputTextModule } from 'primeng/inputtext';
+import { TagModule } from 'primeng/tag';
 
 @Component({
     selector: 'app-mfa-settings',
     standalone: true,
-    imports: [ReactiveFormsModule, UiButton, UiInputPassword, InputTextModule],
+    imports: [ReactiveFormsModule, UiButton, UiInputPassword, InputTextModule, TagModule],
     templateUrl: './mfa-settings.html'
 })
 export class MfaSettings implements OnInit {
@@ -29,7 +30,9 @@ export class MfaSettings implements OnInit {
     readonly loading = signal(false);
     readonly error = signal('');
     readonly action = signal<'disable' | 'regenerate' | null>(null);
+    readonly copied = signal<'key' | 'codes' | null>(null);
     readonly codeForm = this.fb.nonNullable.group({ code: ['', Validators.required] });
+    readonly enableForm = this.fb.nonNullable.group({ code: ['', Validators.required], password: ['', Validators.required] });
     readonly disableForm = this.fb.nonNullable.group({ password: ['', Validators.required], code: ['', Validators.required] });
 
     constructor() {
@@ -38,6 +41,7 @@ export class MfaSettings implements OnInit {
             this.qr.set('');
             this.recoveryCodes.set([]);
             this.codeForm.reset();
+            this.enableForm.reset();
             this.disableForm.reset();
         });
     }
@@ -81,7 +85,7 @@ export class MfaSettings implements OnInit {
             .subscribe({
                 next: (setup) => {
                     this.setup.set(setup);
-                    this.codeForm.reset();
+                    this.enableForm.reset();
                     void this.renderQr(setup.otpauth_url);
                 },
                 error: (error) => this.error.set(problemMessage(error, 'Não foi possível iniciar a configuração.'))
@@ -106,24 +110,42 @@ export class MfaSettings implements OnInit {
     }
 
     enable() {
-        if (this.loading() || this.codeForm.invalid) {
-            this.codeForm.markAllAsTouched();
+        if (this.loading() || this.enableForm.invalid) {
+            this.enableForm.markAllAsTouched();
 
             return;
         }
 
+        const { password, code } = this.enableForm.getRawValue();
+
         this.loading.set(true);
         this.error.set('');
         this.api
-            .enable(this.codeForm.controls.code.value.trim())
+            .enable(password, code.trim())
             .pipe(
                 takeUntilDestroyed(this.destroyRef),
                 finalize(() => this.loading.set(false))
             )
             .subscribe({
                 next: (data) => this.showCodes(data.recovery_codes),
-                error: (error) => this.error.set(problemMessage(error, 'Não foi possível confirmar o código.'))
+                error: (error) => this.error.set(problemMessage(error, 'Não foi possível confirmar a ativação.'))
             });
+    }
+
+    cancelSetup() {
+        this.setup.set(null);
+        this.qr.set('');
+        this.enableForm.reset();
+        this.error.set('');
+    }
+
+    copy(target: 'key' | 'codes') {
+        const text = target === 'key' ? (this.setup()?.secret ?? '') : this.recoveryCodes().join('\n');
+
+        navigator.clipboard?.writeText(text).then(
+            () => this.copied.set(target),
+            () => this.error.set('Não foi possível copiar. Selecione o texto e copie manualmente.')
+        );
     }
 
     chooseAction(action: 'disable' | 'regenerate' | null) {
@@ -184,6 +206,8 @@ export class MfaSettings implements OnInit {
         this.setup.set(null);
         this.qr.set('');
         this.codeForm.reset();
+        this.enableForm.reset();
+        this.copied.set(null);
         this.action.set(null);
         this.status.set({ enabled: true, setup_pending: false, recovery_codes_remaining: codes.length });
     }

@@ -33,11 +33,14 @@ describe('Configuração de duas etapas', () => {
         expect(component.status()?.enabled).toBeFalse();
         expect(fixture.nativeElement.textContent).toContain('JBSWY3DPEHPK3PXP');
         expect(changed).not.toHaveBeenCalled();
-        component.codeForm.controls.code.setValue('123456');
+        component.enableForm.controls.code.setValue('123456');
+        component.enable();
+        http.expectNone('/api/v1/me/mfa/enable/');
+        component.enableForm.controls.password.setValue('senha atual');
         component.enable();
         const confirm = http.expectOne('/api/v1/me/mfa/enable/');
 
-        expect(confirm.request.body).toEqual({ code: '123456' });
+        expect(confirm.request.body).toEqual({ password: 'senha atual', code: '123456' });
         confirm.flush({ recovery_codes: CODES });
         fixture.detectChanges();
         expect(component.setup()).toBeNull();
@@ -49,6 +52,24 @@ describe('Configuração de duas etapas', () => {
         component.finish();
         expect(changed).toHaveBeenCalledTimes(1);
         expect(component.recoveryCodes()).toEqual([]);
+    });
+
+    it('cancela a configuração e descarta chave, QR e senha digitada', () => {
+        const fixture = TestBed.createComponent(MfaSettings);
+        const component = fixture.componentInstance;
+
+        fixture.detectChanges();
+        http.expectOne('/api/v1/me/mfa/').flush({ enabled: false, setup_pending: false, recovery_codes_remaining: 0 });
+        component.start();
+        http.expectOne('/api/v1/me/mfa/setup/').flush({ secret: 'JBSWY3DPEHPK3PXP', otpauth_url: 'otpauth://totp/Dsync:teste?secret=JBSWY3DPEHPK3PXP&issuer=Dsync' });
+        component.enableForm.setValue({ code: '123456', password: 'senha atual' });
+        component.cancelSetup();
+        fixture.detectChanges();
+
+        expect(component.setup()).toBeNull();
+        expect(component.enableForm.getRawValue()).toEqual({ code: '', password: '' });
+        expect(fixture.nativeElement.textContent).not.toContain('JBSWY3DPEHPK3PXP');
+        expect(fixture.nativeElement.textContent).toContain('Desativada');
     });
 
     it('pede senha e código para desativar e preserva o estado quando o servidor rejeita', () => {

@@ -96,7 +96,7 @@ describe('Perfil', () => {
         fixture.detectChanges();
         controller.expectOne('/api/v1/me/mfa/').flush({ enabled: false, setup_pending: false, recovery_codes_remaining: 0 });
         fixture.detectChanges();
-        expect(fixture.nativeElement.textContent).toContain('Este recurso é opcional');
+        expect(fixture.nativeElement.textContent).toContain('Opcional, recomendado');
         const clear = spyOn(TestBed.inject(AuthSessionService), 'clearSession');
         const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
 

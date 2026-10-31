@@ -24,7 +24,8 @@
   entre ações. Falhas aguardam 1, 2, 4, 8… até 60 s (mesmo teto do bloqueio do login).
   Com 10 falhas seguidas, cada falha no 2º passo derruba todas as provas pendentes da conta
   (401) e conta uma falha no bloqueio do login; o acesso recomeça pela senha.
-  Recuperação e senha inválida de desativação compartilham a proteção da credencial.
+  Ativar e desativar exigem a senha atual; senha inválida e recuperação compartilham
+  a proteção da credencial.
 - `UserMfa`, `UserRecoveryCode` e `UserMfaChallenge` são credenciais técnicas da conta,
   sem BaseModel/soft delete/contrato: a autenticação precede o tenant e superadmin não
   tem contrato. Entram explicitamente em UNSCOPED_RECORDS e OWNER_ONLY, com testes
@@ -70,6 +71,8 @@
 - 2026-10-31 — revisão de segurança: o 2º passo não tinha limite final (só espera de até
   60 s). Usuário escolheu cortar após 10 falhas seguidas: provas pendentes derrubadas,
   falha contada no bloqueio do login e retorno à senha. O contador zera no sucesso.
+- 2026-10-31 — revisão de segurança: ativar passa a exigir a senha atual, como desativar.
+  Uma sessão roubada não consegue cadastrar outro autenticador e trancar o dono.
 
 ## Fontes
 

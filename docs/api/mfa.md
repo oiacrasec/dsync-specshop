@@ -12,7 +12,7 @@ Sem configuração, ou com configuração ainda pendente, o login segue sem segu
 | `POST /api/v1/auth/login/mfa/` | mfa_token/code | 200 access/refresh/user, após TOTP ou reserva |
 | `GET /api/v1/me/mfa/` | JWT, sem organização | 200 enabled, setup_pending, recovery_codes_remaining |
 | `POST /api/v1/me/mfa/setup/` | JWT, sem organização | 200 secret e otpauth_url para QR local; não ativa o fator; configuração válida por 5 min |
-| `POST /api/v1/me/mfa/enable/` | JWT + code TOTP | 200 recovery_codes (10, exibidos uma vez) |
+| `POST /api/v1/me/mfa/enable/` | JWT + password/code TOTP | 200 recovery_codes (10, exibidos uma vez); exige senha atual |
 | `POST /api/v1/me/mfa/disable/` | JWT + password/code | 204; exige senha atual e TOTP ou reserva |
 | `POST /api/v1/me/mfa/recovery-codes/` | JWT + code TOTP/reserva | 200 recovery_codes (10 novos); invalida anteriores |
 | `POST /api/v1/users/{public_id}/reset-mfa/` | JWT + organização; admin do contrato, user:manage | 204; somente usuário comum do mesmo contrato |

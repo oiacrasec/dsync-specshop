@@ -31,8 +31,8 @@ export class MfaService {
         return this.http.post<MfaSetup>(apiEndpoint(this.baseUrl, '/me/mfa/setup/'), {});
     }
 
-    enable(code: string) {
-        return this.http.post<MfaRecoveryCodes>(apiEndpoint(this.baseUrl, '/me/mfa/enable/'), { code });
+    enable(password: string, code: string) {
+        return this.http.post<MfaRecoveryCodes>(apiEndpoint(this.baseUrl, '/me/mfa/enable/'), { password, code });
     }
 
     disable(password: string, code: string) {

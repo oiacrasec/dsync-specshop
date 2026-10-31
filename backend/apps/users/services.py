@@ -601,13 +601,14 @@ def change_mfa(*, user, operation, code, password=None):
         ):
             raise MfaStateConflict()
         factor = Mfa(device)
-        # A espera também limita tentativas de senha ao desativar, antes do hash caro.
+        # Ativar e desativar pedem a senha (sessão roubada não troca o fator); a espera
+        # também limita essas tentativas, antes do hash caro.
         from rest_framework.exceptions import Throttled
 
         wait = factor.retry_after()
         if wait:
             error = Throttled(wait=wait)
-        elif operation == 'disable' and not current.check_password(password):
+        elif operation in ('enable', 'disable') and not current.check_password(password or ''):
             error = factor.failure(field='password')
         else:
             error = factor.verify(code, allow_recovery=operation != 'enable')

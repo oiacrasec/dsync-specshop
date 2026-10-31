@@ -183,7 +183,7 @@ class MfaLoginSerializer(MfaCodeSerializer):
     mfa_token = serializers.CharField(max_length=128, trim_whitespace=False, write_only=True)
 
 
-class MfaDisableSerializer(MfaCodeSerializer):
+class MfaConfirmSerializer(MfaCodeSerializer):
     password = serializers.CharField(trim_whitespace=False, write_only=True)
 
 

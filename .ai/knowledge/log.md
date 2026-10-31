@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Senha na ativação do MFA e nova aba do Perfil
+
+- `POST /me/mfa/enable/` exige `password` (serializer `MfaConfirmSerializer`, comum a ativar
+  e desativar); senha errada conta falha e respeita a espera. ADR 0041 revisado.
+- Aba Perfil › Verificação em duas etapas redesenhada (FigCraft): situação, como funciona,
+  configuração com QR/chave/código/senha, códigos reserva e ações de ativada.
+
 ## 2026-10-31 — Identificadores datasync → dsync
 
 - Tipos de erro RFC 9457 agora `urn:dsync:problem:<slug>` (backend, frontend, testes,

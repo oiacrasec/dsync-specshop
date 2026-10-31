@@ -35,7 +35,7 @@ from apps.users.serializers import (
     LoginSerializer,
     MfaChallengeSerializer,
     MfaCodeSerializer,
-    MfaDisableSerializer,
+    MfaConfirmSerializer,
     MfaLoginSerializer,
     MfaRecoveryCodesSerializer,
     MfaSetupSerializer,
@@ -349,14 +349,15 @@ class MfaChangeView(BaseAPIView):
         return Response(result, status=response_status)
 
 
-@extend_schema(request=MfaCodeSerializer, responses={200: MfaRecoveryCodesSerializer})
+@extend_schema(request=MfaConfirmSerializer, responses={200: MfaRecoveryCodesSerializer})
 class MfaEnableView(MfaChangeView):
+    serializer_class = MfaConfirmSerializer
     operation = 'enable'
 
 
-@extend_schema(request=MfaDisableSerializer, responses={204: None})
+@extend_schema(request=MfaConfirmSerializer, responses={204: None})
 class MfaDisableView(MfaChangeView):
-    serializer_class = MfaDisableSerializer
+    serializer_class = MfaConfirmSerializer
     operation = 'disable'
 
 
