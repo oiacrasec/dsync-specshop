@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Identificadores datasync → dsync
+
+- Tipos de erro RFC 9457 agora `urn:dsync:problem:<slug>` (backend, frontend, testes,
+  docs/api, OpenAPI, skill erros-api-rfc9457); revisão registrada no ADR 0004.
+- Sal de assinatura de mídia `dsync.media` (invalida só URLs temporárias já emitidas);
+  exemplos `dsync-media` e `/srv/dsync/media`. Nome do repositório/projeto não muda.
+
 ## 2026-10-31 — Limite de falhas no 2º passo do login
 
 - Revisão de segurança: 2º passo sem limite final. Decisão do usuário (opção A, N = 10):

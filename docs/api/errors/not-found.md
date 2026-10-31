@@ -1,6 +1,6 @@
 # not-found
 
-- **Type:** `urn:datasync:problem:not-found`
+- **Type:** `urn:dsync:problem:not-found`
 - **HTTP:** 404
 - **Title:** Recurso não encontrado
 - **Detail padrão:** O recurso solicitado não foi encontrado.

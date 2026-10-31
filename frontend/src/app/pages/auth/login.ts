@@ -130,7 +130,7 @@ export class Login {
                 },
                 error: (error) => {
                     // Prova expirada ou derrubada após falhas seguidas: o login recomeça pela senha.
-                    if (apiProblem(error)?.type === 'urn:datasync:problem:authentication-required') {
+                    if (apiProblem(error)?.type === 'urn:dsync:problem:authentication-required') {
                         this.backToPassword();
                         this.errorMessage.set('A verificação foi encerrada. Entre novamente com usuário e senha.');
 

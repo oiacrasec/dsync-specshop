@@ -58,7 +58,7 @@ def page_of(name, item_serializer):
 
 PROBLEM_SCHEMA = {
     'type': 'object',
-    'description': 'Problem Details (RFC 9457); `type` é urn:datasync:problem:<slug>.',
+    'description': 'Problem Details (RFC 9457); `type` é urn:dsync:problem:<slug>.',
     'properties': {
         'type': {'type': 'string'},
         'title': {'type': 'string'},

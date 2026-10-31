@@ -1,6 +1,6 @@
 # last-contract-admin
 
-- **Type:** `urn:datasync:problem:last-contract-admin`
+- **Type:** `urn:dsync:problem:last-contract-admin`
 - **HTTP:** 409
 - **Title:** Último administrador do contrato
 - **Detail padrão:** O contrato precisa manter pelo menos um administrador.

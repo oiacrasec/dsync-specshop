@@ -1,6 +1,6 @@
 # organization-in-use
 
-- **Type:** `urn:datasync:problem:organization-in-use`
+- **Type:** `urn:dsync:problem:organization-in-use`
 - **HTTP:** 409
 - **Title:** Organização em uso
 - **Detail padrão:** Remova as atribuições e exceções de acesso desta organização antes de excluí-la.

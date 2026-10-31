@@ -23,7 +23,7 @@ PASSWORD = 'temporary-strong-password-123'
 NEW_PASSWORD = 'replacement-strong-password-456'
 LOGIN = '/api/v1/auth/login/'
 CHANGE = '/api/v1/auth/change-password/'
-REQUIRED = 'urn:datasync:problem:password-change-required'
+REQUIRED = 'urn:dsync:problem:password-change-required'
 
 
 class AuthenticatedProbe(APIView):
@@ -78,7 +78,7 @@ def change(client, **overrides):
 def assert_problem(response, status, slug):
     assert response.status_code == status, response.content
     assert response['Content-Type'] == 'application/problem+json'
-    assert response.json()['type'] == f'urn:datasync:problem:{slug}'
+    assert response.json()['type'] == f'urn:dsync:problem:{slug}'
     assert response.json()['request_id'] == response['X-Request-Id']
 
 

@@ -1,6 +1,6 @@
 # profile-in-use
 
-- **Type:** `urn:datasync:problem:profile-in-use`
+- **Type:** `urn:dsync:problem:profile-in-use`
 - **HTTP:** 409
 - **Title:** Perfil em uso
 - **Detail padrão:** Remova as atribuições do perfil antes de excluí-lo.

@@ -97,7 +97,7 @@ def test_contract_with_users_or_organizations_is_not_provisionable(world, blocke
         Organization.objects.create(contract=contract, name='Existente', is_active=blocker == 'organization')
     response = world['api'].post(url(contract), PAYLOAD, format='json')
     assert response.status_code == 409, response.content
-    assert response.json()['type'] == 'urn:datasync:problem:contract-not-provisionable'
+    assert response.json()['type'] == 'urn:dsync:problem:contract-not-provisionable'
     assert not get_user_model().objects.filter(username='admin.cliente').exists()
 
 
@@ -121,7 +121,7 @@ def test_unavailable_contract_is_not_provisionable(world, change):
     Contract.objects.filter(pk=contract.pk).update(**change)
     response = world['api'].post(url(contract), PAYLOAD, format='json')
     assert response.status_code == 409, response.content
-    assert response.json()['type'] == 'urn:datasync:problem:contract-not-provisionable'
+    assert response.json()['type'] == 'urn:dsync:problem:contract-not-provisionable'
     assert not Organization.objects.filter(contract=contract).exists()
 
 
@@ -149,7 +149,7 @@ def test_username_in_use_returns_validation_error(world, deleted):
 def test_invalid_payload_returns_validation_error(world, payload):
     response = world['api'].post(url(world['contract']), payload, format='json')
     assert response.status_code == 422, response.content
-    assert response.json()['type'] == 'urn:datasync:problem:validation-error'
+    assert response.json()['type'] == 'urn:dsync:problem:validation-error'
     assert 'temporary_password' not in response.content.decode()
 
 

@@ -14,7 +14,7 @@ from apps.rbac.models import Assignment, AssignmentExclusion, ProfilePermission
 from apps.rbac.tests.test_permissions import assign, profile_with
 
 pytestmark = pytest.mark.django_db
-PROBLEM = 'urn:datasync:problem:'
+PROBLEM = 'urn:dsync:problem:'
 
 
 @pytest.fixture

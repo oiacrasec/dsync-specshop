@@ -80,6 +80,6 @@ def test_command_reports_and_fails_when_something_was_not_copied(storages):
 def test_s3_target_is_built_from_the_same_env_variables(tmp_path):
     from apps.core.media import build_storage
 
-    with mock.patch.dict('os.environ', {'DJANGO_MEDIA_S3_BUCKET': 'datasync-media'}):
+    with mock.patch.dict('os.environ', {'DJANGO_MEDIA_S3_BUCKET': 'dsync-media'}):
         storage = build_storage('s3')
-    assert storage.bucket_name == 'datasync-media' and storage.default_acl is None and storage.querystring_auth
+    assert storage.bucket_name == 'dsync-media' and storage.default_acl is None and storage.querystring_auth

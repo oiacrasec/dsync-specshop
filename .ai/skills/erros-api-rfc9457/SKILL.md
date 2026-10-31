@@ -18,7 +18,7 @@ HTTP/1.1 403 Forbidden
 Content-Type: application/problem+json
 
 {
-  "type": "urn:datasync:problem:context-forbidden",
+  "type": "urn:dsync:problem:context-forbidden",
   "status": 403,
   "title": "Sem acesso à organização",
   "detail": "Você não tem acesso à organização selecionada.",
@@ -31,7 +31,7 @@ Content-Type: application/problem+json
 
 | Campo | Regra (RFC 9457) | No projeto |
 |---|---|---|
-| `type` | URI que **identifica o tipo** de problema. Consumidores **devem** usá-lo para decidir. Ausente = `about:blank` | **URN informal** `urn:datasync:problem:<slug-em-inglês>`; cada slug documentado em `docs/api/errors/<slug>.md` |
+| `type` | URI que **identifica o tipo** de problema. Consumidores **devem** usá-lo para decidir. Ausente = `about:blank` | **URN informal** `urn:dsync:problem:<slug-em-inglês>`; cada slug documentado em `docs/api/errors/<slug>.md` |
 | `status` | número igual ao código HTTP; **deve** ser o mesmo da resposta | sempre presente e igual ao HTTP |
 | `title` | resumo curto do **tipo**; **não muda** entre ocorrências (só por tradução) | português, via `gettext_lazy` |
 | `detail` | explicação **desta ocorrência**, para ajudar o cliente a **corrigir**; não é informação de debug. Consumidores **não devem** extrair dados dele | português, via `gettext_lazy` |
@@ -87,8 +87,8 @@ traduzível).
 - Handler global em `REST_FRAMEWORK['EXCEPTION_HANDLER']` convertendo **todas** as
   exceções (DRF, Django e as nossas) para Problem Details.
 - Exceções do domínio herdam de uma base comum com `type`, `status` e `title` declarados.
-- O `type` é sempre `urn:datasync:problem:<slug>`. É um URN **informal**: o namespace
-  `datasync` não é registrado na IANA (RFC 8141); aceito conscientemente, sem impacto
+- O `type` é sempre `urn:dsync:problem:<slug>`. É um URN **informal**: o namespace
+  `dsync` não é registrado na IANA (RFC 8141); aceito conscientemente, sem impacto
   no funcionamento. Por não ser uma URL, a documentação de cada tipo fica em
   `docs/api/errors/<slug>.md`.
 - Resposta com `Content-Type: application/problem+json`.

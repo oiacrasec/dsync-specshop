@@ -11,7 +11,7 @@ from apps.rbac.tests.test_permissions import assign, profile_with
 
 pytestmark = pytest.mark.django_db
 URL = '/api/v1/me/permissions/'
-PROBLEM = 'urn:datasync:problem:'
+PROBLEM = 'urn:dsync:problem:'
 ALL_CODES = sorted(definition.code for definition in PERMISSIONS)
 
 

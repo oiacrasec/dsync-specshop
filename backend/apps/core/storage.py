@@ -13,7 +13,7 @@ from django.core import signing
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 
-MEDIA_SIGNING_SALT = 'datasync.media'
+MEDIA_SIGNING_SALT = 'dsync.media'
 
 
 class SignedFileSystemStorage(FileSystemStorage):

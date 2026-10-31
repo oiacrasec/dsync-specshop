@@ -33,20 +33,20 @@ export const contextErrorInterceptor: HttpInterceptorFn = (req, next) => {
                 return throwError(() => error);
             }
 
-            if (problem.type === 'urn:datasync:problem:authentication-required' || problem.type === 'urn:datasync:problem:contract-inactive') {
+            if (problem.type === 'urn:dsync:problem:authentication-required' || problem.type === 'urn:dsync:problem:contract-inactive') {
                 session.clearSession();
 
                 if (!router.url.startsWith('/landing/login')) {
                     void router.navigateByUrl('/landing/login');
                 }
-            } else if (problem.type === 'urn:datasync:problem:password-change-required' && !session.getUser()?.is_superuser) {
+            } else if (problem.type === 'urn:dsync:problem:password-change-required' && !session.getUser()?.is_superuser) {
                 session.updateUser({ must_change_password: true });
                 contexts.clearActiveContext();
 
                 if (!router.url.startsWith('/primeiro-acesso/trocar-senha')) {
                     void router.navigateByUrl('/primeiro-acesso/trocar-senha');
                 }
-            } else if (['urn:datasync:problem:context-invalid-request', 'urn:datasync:problem:context-forbidden'].includes(problem.type) && !session.getUser()?.is_superuser) {
+            } else if (['urn:dsync:problem:context-invalid-request', 'urn:dsync:problem:context-forbidden'].includes(problem.type) && !session.getUser()?.is_superuser) {
                 contexts.clearActiveContext();
 
                 if (!router.url.startsWith('/contexto/selecao')) {

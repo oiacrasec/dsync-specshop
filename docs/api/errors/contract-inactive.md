@@ -1,6 +1,6 @@
 # contract-inactive
 
-- **Type:** `urn:datasync:problem:contract-inactive`
+- **Type:** `urn:dsync:problem:contract-inactive`
 - **HTTP:** 403
 - **Title:** Contrato indisponível
 - **Detail padrão:** O contrato está vencido ou desativado.

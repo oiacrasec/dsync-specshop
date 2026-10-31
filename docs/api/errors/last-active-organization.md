@@ -1,6 +1,6 @@
 # last-active-organization
 
-- **Type:** `urn:datasync:problem:last-active-organization`
+- **Type:** `urn:dsync:problem:last-active-organization`
 - **HTTP:** 409
 - **Title:** Última organização ativa
 - **Detail padrão:** O contrato precisa manter pelo menos uma organização ativa.

@@ -1,6 +1,6 @@
 # context-forbidden
 
-- **Type:** `urn:datasync:problem:context-forbidden`
+- **Type:** `urn:dsync:problem:context-forbidden`
 - **HTTP:** 403
 - **Title:** Sem acesso à organização
 - **Detail padrão:** Você não tem acesso à organização selecionada.

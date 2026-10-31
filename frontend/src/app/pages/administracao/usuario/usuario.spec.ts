@@ -121,7 +121,7 @@ describe('Usuários na área do cliente', () => {
         page.save();
         const detail = 'O contrato não possui licenças disponíveis para cadastrar outro usuário.';
 
-        controller.expectOne('/api/v1/users/').flush({ type: 'urn:datasync:problem:license-limit-reached', status: 409, title: 'Limite de licenças atingido', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
+        controller.expectOne('/api/v1/users/').flush({ type: 'urn:dsync:problem:license-limit-reached', status: 409, title: 'Limite de licenças atingido', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
         expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail }));
         expect(page.created).toBeNull();
     });

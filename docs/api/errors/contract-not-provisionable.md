@@ -1,6 +1,6 @@
 # contract-not-provisionable
 
-- **Type:** `urn:datasync:problem:contract-not-provisionable`
+- **Type:** `urn:dsync:problem:contract-not-provisionable`
 - **HTTP:** 409
 - **Title:** Contrato não pode ser provisionado
 - **Detail padrão:** O provisionamento exige contrato disponível, sem usuários e sem organizações.

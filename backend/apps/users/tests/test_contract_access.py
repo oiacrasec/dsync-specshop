@@ -10,7 +10,7 @@ from apps.contracts.models import Contract
 
 pytestmark = pytest.mark.django_db
 PASSWORD = 'test-strong-password-123'
-INACTIVE = 'urn:datasync:problem:contract-inactive'
+INACTIVE = 'urn:dsync:problem:contract-inactive'
 LOGIN, REFRESH, LOGOUT = '/api/v1/auth/login/', '/api/v1/auth/refresh/', '/api/v1/auth/logout/'
 ORGANIZATIONS = '/api/v1/me/organizations/'
 

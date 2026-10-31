@@ -1,6 +1,6 @@
 # validation-error
 
-- **Type:** `urn:datasync:problem:validation-error`
+- **Type:** `urn:dsync:problem:validation-error`
 - **HTTP:** 422
 - **Title:** Dados inválidos
 - **Detail padrão:** Corrija os campos indicados em errors.

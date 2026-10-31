@@ -1,6 +1,6 @@
 # context-invalid-request
 
-- **Type:** `urn:datasync:problem:context-invalid-request`
+- **Type:** `urn:dsync:problem:context-invalid-request`
 - **HTTP:** 400
 - **Title:** Contexto de organização inválido
 - **Detail padrão:** Informe uma organização válida no header X-Organization-Id.

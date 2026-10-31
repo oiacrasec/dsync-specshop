@@ -72,7 +72,7 @@ describe('Login em duas etapas', () => {
         page.mfaToken.set('temporary-proof');
         page.mfaForm.controls.code.setValue('123456');
         page.submitMfa();
-        http.expectOne('/api/v1/auth/login/mfa/').flush({ type: 'urn:datasync:problem:authentication-required', status: 401 }, { status: 401, statusText: 'Unauthorized' });
+        http.expectOne('/api/v1/auth/login/mfa/').flush({ type: 'urn:dsync:problem:authentication-required', status: 401 }, { status: 401, statusText: 'Unauthorized' });
         fixture.detectChanges();
         expect(page.mfaToken()).toBeNull();
         expect(session.isAuthenticated()).toBeFalse();
@@ -89,7 +89,7 @@ describe('Login em duas etapas', () => {
         page.toggleRecovery();
         page.mfaForm.controls.code.setValue('ABCD-EF01-2345-6789');
         page.submitMfa();
-        http.expectOne('/api/v1/auth/login/mfa/').flush({ type: 'urn:datasync:problem:validation-error', status: 422, errors: { code: ['Código inválido.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
+        http.expectOne('/api/v1/auth/login/mfa/').flush({ type: 'urn:dsync:problem:validation-error', status: 422, errors: { code: ['Código inválido.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
         expect(page.errorMessage()).toContain('Código inválido');
         expect(session.isAuthenticated()).toBeFalse();
         expect(page.mfaToken()).toBe('temporary-proof');

@@ -103,7 +103,7 @@ describe('Core auth pages and route guards', () => {
 
         page.form.setValue({ username: 'tester', password: 'temporary' });
         page.submit();
-        controller.expectOne('/api/v1/auth/login/').flush({ type: 'urn:datasync:problem:throttled', status: 429, detail: 'Tente novamente em 60 segundos.' }, { status: 429, statusText: 'Too Many Requests' });
+        controller.expectOne('/api/v1/auth/login/').flush({ type: 'urn:dsync:problem:throttled', status: 429, detail: 'Tente novamente em 60 segundos.' }, { status: 429, statusText: 'Too Many Requests' });
         expect(page.errorMessage()).toBe('Tente novamente em 60 segundos.');
         expect(page.loading()).toBeFalse();
         expect(session.isAuthenticated()).toBeFalse();
@@ -115,7 +115,7 @@ describe('Core auth pages and route guards', () => {
         fixture.detectChanges();
         fixture.componentInstance.form.setValue({ username: 'tester', password: 'temporary' });
         fixture.componentInstance.submit();
-        controller.expectOne('/api/v1/auth/login/').flush({ type: 'urn:datasync:problem:authentication-required', status: 401, detail: 'Usuário ou senha inválidos.' }, { status: 401, statusText: 'Unauthorized' });
+        controller.expectOne('/api/v1/auth/login/').flush({ type: 'urn:dsync:problem:authentication-required', status: 401, detail: 'Usuário ou senha inválidos.' }, { status: 401, statusText: 'Unauthorized' });
         await fixture.whenStable();
         expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Usuário ou senha inválidos.');
         expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBeFalse();
@@ -185,7 +185,7 @@ describe('Core auth pages and route guards', () => {
 
         page.form.setValue({ current_password: 'wrong', new_password: 'long-password-one', new_password_confirm: 'long-password-one' });
         page.submit();
-        controller.expectOne('/api/v1/auth/change-password/').flush({ type: 'urn:datasync:problem:validation-error', status: 422, errors: { current_password: ['Senha atual incorreta.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
+        controller.expectOne('/api/v1/auth/change-password/').flush({ type: 'urn:dsync:problem:validation-error', status: 422, errors: { current_password: ['Senha atual incorreta.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
         expect(page.errorMessage()).toBe('Senha atual incorreta.');
         expect(session.getUser()?.must_change_password).toBeTrue();
         expect(page.saving()).toBeFalse();

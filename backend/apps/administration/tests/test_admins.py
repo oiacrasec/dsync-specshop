@@ -166,7 +166,7 @@ def test_reset_password_revokes_existing_refresh_tokens(world):
     blocked.credentials(HTTP_AUTHORIZATION=f'Bearer {sessions[0]["access"]}')
     response = blocked.get('/api/v1/me/organizations/')
     assert response.status_code == 403
-    assert response.json()['type'] == 'urn:datasync:problem:password-change-required'
+    assert response.json()['type'] == 'urn:dsync:problem:password-change-required'
 
 
 def test_reset_inactive_admin_is_allowed(world):

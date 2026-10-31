@@ -1,6 +1,6 @@
 # malformed-request
 
-- **Type:** `urn:datasync:problem:malformed-request`
+- **Type:** `urn:dsync:problem:malformed-request`
 - **HTTP:** 400
 - **Title:** Requisição malformada
 - **Detail padrão:** Verifique a sintaxe da requisição.

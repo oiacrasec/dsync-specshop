@@ -63,7 +63,7 @@ def assert_auth_error(response):
     assert response.status_code == 401
     assert response['Content-Type'] == 'application/problem+json'
     assert response['WWW-Authenticate'].startswith('Bearer')
-    assert response.json()['type'] == 'urn:datasync:problem:authentication-required'
+    assert response.json()['type'] == 'urn:dsync:problem:authentication-required'
     assert response.json()['request_id'] == response['X-Request-Id']
 
 
@@ -107,11 +107,11 @@ def test_invalid_credentials_have_same_generic_error(user, api_client, kind):
 def test_missing_fields_and_malformed_json_follow_error_contract(api_client, url):
     response = api_client.post(url, {}, format='json')
     assert response.status_code == 422
-    assert response.json()['type'] == 'urn:datasync:problem:validation-error'
+    assert response.json()['type'] == 'urn:dsync:problem:validation-error'
     assert response.json()['errors']
     response = api_client.post(url, data='{', content_type='application/json')
     assert response.status_code == 400
-    assert response.json()['type'] == 'urn:datasync:problem:malformed-request'
+    assert response.json()['type'] == 'urn:dsync:problem:malformed-request'
 
 
 def test_rotation_blacklists_old_token_and_new_token_works(user, api_client):

@@ -1,6 +1,6 @@
 # password-change-required
 
-- **Type:** `urn:datasync:problem:password-change-required`
+- **Type:** `urn:dsync:problem:password-change-required`
 - **HTTP:** 403
 - **Title:** Troca de senha obrigatória
 - **Detail padrão:** Troque a senha temporária antes de usar o sistema.

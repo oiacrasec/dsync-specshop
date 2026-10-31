@@ -13,7 +13,7 @@ from apps.rbac.tests.test_permissions import assign, profile_with
 
 pytestmark = pytest.mark.django_db
 URL = '/api/v1/users/'
-PROBLEM = 'urn:datasync:problem:'
+PROBLEM = 'urn:dsync:problem:'
 PASSWORD = 'senha-original-segura-123'
 
 

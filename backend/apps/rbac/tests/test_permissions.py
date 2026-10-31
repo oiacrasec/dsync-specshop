@@ -15,7 +15,7 @@ from apps.rbac.models import Assignment, AssignmentExclusion, Profile, ProfilePe
 from apps.rbac.permissions import AllowAuthenticated
 
 pytestmark = [pytest.mark.django_db, pytest.mark.urls(__name__)]
-PROBLEM = 'urn:datasync:problem:'
+PROBLEM = 'urn:dsync:problem:'
 
 
 class DeclaredView(APIView):

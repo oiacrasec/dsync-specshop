@@ -28,7 +28,7 @@ describe('Configuração de duas etapas', () => {
         fixture.detectChanges();
         http.expectOne('/api/v1/me/mfa/').flush({ enabled: false, setup_pending: false, recovery_codes_remaining: 0 });
         component.start();
-        http.expectOne('/api/v1/me/mfa/setup/').flush({ secret: 'JBSWY3DPEHPK3PXP', otpauth_url: 'otpauth://totp/Datasync:teste?secret=JBSWY3DPEHPK3PXP&issuer=Datasync' });
+        http.expectOne('/api/v1/me/mfa/setup/').flush({ secret: 'JBSWY3DPEHPK3PXP', otpauth_url: 'otpauth://totp/Dsync:teste?secret=JBSWY3DPEHPK3PXP&issuer=Dsync' });
         await fixture.whenStable();
         expect(component.status()?.enabled).toBeFalse();
         expect(fixture.nativeElement.textContent).toContain('JBSWY3DPEHPK3PXP');
@@ -65,7 +65,7 @@ describe('Configuração de duas etapas', () => {
         const request = http.expectOne('/api/v1/me/mfa/disable/');
 
         expect(request.request.body).toEqual({ password: 'senha atual', code: '123456' });
-        request.flush({ type: 'urn:datasync:problem:validation-error', status: 422, errors: { code: ['Código inválido.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
+        request.flush({ type: 'urn:dsync:problem:validation-error', status: 422, errors: { code: ['Código inválido.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
         expect(component.status()?.enabled).toBeTrue();
         expect(component.error()).toContain('Código inválido');
         component.chooseAction(null);

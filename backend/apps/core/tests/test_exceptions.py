@@ -140,7 +140,7 @@ def test_exception_contract(rf, error, status, slug):
     assert response['Content-Type'] == 'application/problem+json'
     data = response.data
     assert data['status'] == status
-    assert data['type'] == (f'urn:datasync:problem:{slug}' if slug else 'about:blank')
+    assert data['type'] == (f'urn:dsync:problem:{slug}' if slug else 'about:blank')
     assert data['instance'] == '/api/v1/example/'
     assert data['request_id'] == request.request_id
     assert PRIVATE_DETAIL not in response.content.decode()
@@ -191,7 +191,7 @@ def test_authentication_required_does_not_query_database(client, test_routes, dj
         response = client.get('/api/v1/protected/')
 
     assert response.status_code == 401
-    assert response.json()['type'] == 'urn:datasync:problem:authentication-required'
+    assert response.json()['type'] == 'urn:dsync:problem:authentication-required'
     assert response['WWW-Authenticate'].startswith('Basic ')
 
 
@@ -206,7 +206,7 @@ def test_json_syntax_and_validation_have_distinct_statuses(client, test_routes, 
     response = client.post('/api/v1/input/', data=body, content_type='application/json')
 
     assert response.status_code == status
-    assert response.json()['type'] == f'urn:datasync:problem:{slug}'
+    assert response.json()['type'] == f'urn:dsync:problem:{slug}'
 
 
 def test_request_id_correlates_response_and_logs(client, test_routes, caplog):
@@ -248,7 +248,7 @@ def test_unknown_api_route_is_problem_even_in_debug(client, settings, debug):
 
     assert response.status_code == 404
     assert response['Content-Type'] == 'application/problem+json'
-    assert response.json()['type'] == 'urn:datasync:problem:not-found'
+    assert response.json()['type'] == 'urn:dsync:problem:not-found'
     assert response.json()['instance'] == '/api/v1/missing/'
     assert 'private' not in response.content.decode()
 
@@ -283,7 +283,7 @@ def test_django_errors_use_same_handler_as_drf(client, test_routes, kind, status
 
     assert response.status_code == status
     assert response['Content-Type'] == 'application/problem+json'
-    assert response.json()['type'] == f'urn:datasync:problem:{slug}'
+    assert response.json()['type'] == f'urn:dsync:problem:{slug}'
     assert PRIVATE_DETAIL not in response.content.decode()
     assert response.json()['request_id'] == response['X-Request-Id']
 

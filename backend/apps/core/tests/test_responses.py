@@ -73,7 +73,7 @@ def test_caught_exceptions_keep_problem_details_headers_and_safe_logging(kind, s
     body = response.json()
     assert response.status_code == body['status'] == status_code
     assert response['Content-Type'] == 'application/problem+json'
-    assert body['type'] == (f'urn:datasync:problem:{slug}' if slug else 'about:blank')
+    assert body['type'] == (f'urn:dsync:problem:{slug}' if slug else 'about:blank')
     assert body['instance'] == URL
     assert body['request_id'] == response['X-Request-Id']
     assert PRIVATE_DETAIL not in response.content.decode()

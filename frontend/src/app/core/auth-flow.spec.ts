@@ -29,7 +29,7 @@ function login(overrides: Partial<LoginResponse['user']> = {}, seconds = 300): L
 }
 
 function problem(status: number, code: string) {
-    return { type: `urn:datasync:problem:${code}`, status, title: 'Erro', detail: 'Mensagem segura.' };
+    return { type: `urn:dsync:problem:${code}`, status, title: 'Erro', detail: 'Mensagem segura.' };
 }
 
 describe('Core authentication and shared organization', () => {

@@ -1,6 +1,6 @@
 # license-limit-reached
 
-- **Type:** `urn:datasync:problem:license-limit-reached`
+- **Type:** `urn:dsync:problem:license-limit-reached`
 - **HTTP:** 409
 - **Title:** Limite de licenças atingido
 - **Detail padrão:** O contrato não possui licenças disponíveis para cadastrar outro usuário.

@@ -156,7 +156,7 @@ describe('Organizações na área do cliente', () => {
 
         controller
             .expectOne(`/api/v1/organizations/${ORG_ID}/`)
-            .flush({ type: 'urn:datasync:problem:last-active-organization', status: 409, title: 'Última organização ativa', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
+            .flush({ type: 'urn:dsync:problem:last-active-organization', status: 409, title: 'Última organização ativa', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
         expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail }));
     });
 

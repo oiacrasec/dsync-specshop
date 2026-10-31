@@ -1,6 +1,6 @@
 # authentication-required
 
-- **Type:** `urn:datasync:problem:authentication-required`
+- **Type:** `urn:dsync:problem:authentication-required`
 - **HTTP:** 401
 - **Title:** Autenticação necessária
 - **Detail padrão:** Informe credenciais válidas para acessar este recurso.

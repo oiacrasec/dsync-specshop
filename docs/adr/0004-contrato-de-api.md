@@ -21,7 +21,7 @@ precisa ser estável, documentado em `docs/api/` e igual para qualquer cliente
 | Autenticação | **JWT** | ADR 0006 |
 | Contexto | header único `X-Organization-Id` com o `public_id` (o contrato vem do usuário) | ADR 0006 |
 | Identificadores | só `public_id` (UUID v7) na API; o `id` interno nunca é exposto | ADR 0007 |
-| Formato de erro | **RFC 9457** (Problem Details, `application/problem+json`), `type` como URN informal `urn:datasync:problem:<slug>`, com `request_id` e `errors`; regras na skill `erros-api-rfc9457` | este ADR |
+| Formato de erro | **RFC 9457** (Problem Details, `application/problem+json`), `type` como URN informal `urn:dsync:problem:<slug>`, com `request_id` e `errors`; regras na skill `erros-api-rfc9457` | este ADR |
 | Erros de contexto | **400** `context-invalid-request` e **403** `context-forbidden` | ADR 0006 |
 | Códigos HTTP | **400** sintaxe malformada · **422** validação · **409** conflito de estado (RFC 9110) | este ADR |
 | Autorização | negada por padrão; o backend é a fonte da verdade | ADR 0002 |
@@ -103,3 +103,9 @@ Rotas organizadas por versão em `config/api/v1.py` (como no `datasync-spatial`)
 
 - Mudança incompatível no contrato exige nova versão da API e registro em `docs/api/`.
 - O frontend consome apenas o que está documentado.
+
+## Revisões
+
+- 2026-10-31 — namespace dos erros passa de `urn:datasync:problem:` para
+  `urn:dsync:problem:` (empresa DsyncLabs). Feito na `v1` sem nova versão: o core ainda
+  não tem consumidores; os projetos derivados nascem dele já com o prefixo novo.

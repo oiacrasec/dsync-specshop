@@ -121,7 +121,7 @@ Todos seguem [RFC 9457](errors.md), com `application/problem+json`.
 
 401 devolve mensagem genérica sem revelar se a conta existe e inclui desafio
 `WWW-Authenticate: Bearer`. 429 utiliza o título HTTP padrão, sem novo slug.
-Os tipos com slug usam o prefixo `urn:datasync:problem:`.
+Os tipos com slug usam o prefixo `urn:dsync:problem:`.
 
 ## Primeiro acesso e troca de senha (6.4)
 

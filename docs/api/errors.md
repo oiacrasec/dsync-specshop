@@ -11,7 +11,7 @@ nas views: levante exceções; use `serializer.is_valid(raise_exception=True)`.
 
 ```json
 {
-  "type": "urn:datasync:problem:validation-error",
+  "type": "urn:dsync:problem:validation-error",
   "status": 422,
   "title": "Dados inválidos",
   "detail": "Corrija os campos indicados em errors.",
@@ -43,7 +43,7 @@ nas views: levante exceções; use `serializer.is_valid(raise_exception=True)`.
   das transações de requisição (`ATOMIC_REQUESTS`).
 
 Clientes decidem pelo `type`, nunca pelo texto de `detail`, e ignoram campos extras
-desconhecidos. O namespace URN `datasync` é informal (ADR 0004).
+desconhecidos. O namespace URN `dsync` é informal (ADR 0004).
 
 ## Catálogo
 

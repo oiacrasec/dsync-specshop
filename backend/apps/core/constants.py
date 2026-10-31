@@ -20,7 +20,7 @@ ORGANIZATION_HEADER = 'X-Organization-Id'
 
 # Erros RFC 9457 (ADR 0004).
 PROBLEM_CONTENT_TYPE = 'application/problem+json'
-PROBLEM_TYPE_PREFIX = 'urn:datasync:problem:'
+PROBLEM_TYPE_PREFIX = 'urn:dsync:problem:'
 # Mensagens estáveis; não repassar texto de exceções de infraestrutura ao cliente.
 HTTP_PROBLEMS = {
     400: ('malformed-request', _('Requisição malformada'), _('Verifique a sintaxe da requisição.')),

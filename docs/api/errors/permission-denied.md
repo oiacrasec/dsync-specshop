@@ -1,6 +1,6 @@
 # permission-denied
 
-- **Type:** `urn:datasync:problem:permission-denied`
+- **Type:** `urn:dsync:problem:permission-denied`
 - **HTTP:** 403
 - **Title:** Acesso negado
 - **Detail padrão:** Você não tem permissão para acessar este recurso.

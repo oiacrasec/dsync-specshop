@@ -272,7 +272,7 @@ describe('ContratoFormPage', () => {
 
         controller
             .expectOne(`/api/v1/admin/contracts/${CONTRACT_ID}/provision/`)
-            .flush({ type: 'urn:datasync:problem:contract-not-provisionable', status: 409, title: 'Contrato não pode ser provisionado', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
+            .flush({ type: 'urn:dsync:problem:contract-not-provisionable', status: 409, title: 'Contrato não pode ser provisionado', detail, instance: '/x', request_id: 'r' }, { status: 409, statusText: 'Conflict' });
         expect(page.provisionResult).toBeNull();
         expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail }));
     });

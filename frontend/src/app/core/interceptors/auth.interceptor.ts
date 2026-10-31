@@ -46,7 +46,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         concatMap((token) =>
             next(withCredentials(token)).pipe(
                 catchError((error) => {
-                    if (!(error instanceof HttpErrorResponse) || apiProblem(error)?.type !== 'urn:datasync:problem:authentication-required' || !token || revision !== session.getRevision()) {
+                    if (!(error instanceof HttpErrorResponse) || apiProblem(error)?.type !== 'urn:dsync:problem:authentication-required' || !token || revision !== session.getRevision()) {
                         return throwError(() => error);
                     }
 

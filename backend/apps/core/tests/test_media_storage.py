@@ -27,11 +27,11 @@ def test_filesystem_is_the_signed_local_storage():
 def test_s3_is_private_with_presigned_urls_and_accepts_compatible_endpoints():
     options = build(
         's3',
-        DJANGO_MEDIA_S3_BUCKET='datasync-media',
+        DJANGO_MEDIA_S3_BUCKET='dsync-media',
         DJANGO_MEDIA_S3_ENDPOINT_URL='http://minio:9000',
         DJANGO_MEDIA_S3_ADDRESSING_STYLE='path',
     )['OPTIONS']
-    assert options['bucket_name'] == 'datasync-media' and options['endpoint_url'] == 'http://minio:9000'
+    assert options['bucket_name'] == 'dsync-media' and options['endpoint_url'] == 'http://minio:9000'
     assert options['default_acl'] is None and options['querystring_auth'] is True
     assert options['querystring_expire'] == 120 and options['file_overwrite'] is False
     assert options['location'] == 'media' and options['access_key'] is None

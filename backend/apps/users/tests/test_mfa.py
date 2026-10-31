@@ -437,7 +437,7 @@ def test_consecutive_failures_drop_pending_proofs_and_count_in_the_login_block(a
     UserMfa.objects.filter(pk=device.pk).update(last_failure_at=timezone.now() - timedelta(minutes=5))
     cut = second_step(tokens[0], 'incorrect')
     assert cut.status_code == 401
-    assert cut.json()['type'] == 'urn:datasync:problem:authentication-required'
+    assert cut.json()['type'] == 'urn:dsync:problem:authentication-required'
     assert not UserMfaChallenge.objects.filter(user=account).exists()
     assert second_step(tokens[1], pyotp.TOTP(secret).now()).status_code == 401
     assert not UserSession.objects.filter(user=account).exists()
@@ -515,7 +515,7 @@ def test_setup_cannot_replace_an_active_factor(account, factor):
     original = device.secret
     response = authenticated(account).post('/api/v1/me/mfa/setup/')
     assert response.status_code == 409
-    assert response.json()['type'] == 'urn:datasync:problem:mfa-state-conflict'
+    assert response.json()['type'] == 'urn:dsync:problem:mfa-state-conflict'
     device.refresh_from_db()
     assert device.confirmed and device.secret == original
 
