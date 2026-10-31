@@ -98,6 +98,8 @@ e só começa após aprovação do usuário.
 | 86 | 2FA (9.4) por implementação própria adaptada do django-otp (Unlicense): espera crescente após falhas, antirreuso pelo último intervalo (`last_t`) e código reserva apagado ao usar; `pyotp` só para o cálculo. Corrigido em relação a ele: segredo cifrado, códigos reserva com hash, linha travada na verificação, login em dois passos no JWT |
 | 87 | Segredo do 2FA cifrado (Fernet, `cryptography`) com chave própria `DJANGO_MFA_ENCRYPTION_KEY`; a 9.4 é entregue de uma vez (backend, Perfil, login e reset por admin) |
 | 88 | MFA permanece opcional e só é pedido após ativação confirmada pelo usuário. Ativar, desativar, regenerar reservas ou resetar encerra todas as sessões e pede novo login; mostrar as reservas antes da saída. Preservada a decisão 83 para access já emitido |
+| 89 | 9.5 vira a aba **Minhas permissões** do Perfil, antes de Sessões: só leitura, todas as organizações do usuário (a ativa em destaque), com perfis e permissões efetivas de cada uma |
+| 90 | Superadmin não vê a aba Minhas permissões por ora; o acesso total do superadmin está em reavaliação pelo usuário (sem mudança até decidir) |
 
 ## Bloco 0 — Fundação
 
@@ -221,13 +223,13 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 | 9.2 | Perfil `/perfil` (formulário no padrão, abas): Principal com foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas; aba Senha (troca pelo próprio usuário) | backend + frontend | 0039 | ✅ |
 | 9.3 | Sessões: navegador/IP de cada sessão (claim `sid`), aba Sessões só leitura com ativas + últimos logins; rotas de encerrar uma e as outras prontas na API | backend + frontend | 0004 | ✅ |
 | 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | 0041 | ✅ |
-| 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |
+| 9.5 | Minhas permissões (aba do Perfil, só leitura): organizações, perfis e permissões efetivas (decisões 89–90) | backend + frontend | — | 🔄 |
 
 ## Melhoria aprovada — escolha e troca de organização (2026-10-31)
 
 - ✅ FigCraft: escolha no login, troca em modal e cenários com 100 organizações/busca/vazio.
 - ✅ Frontend: `UiOrganizationPicker` compartilhado, rota em AuthLayout, diálogo pelo
-  avatar; busca local acima de 7, seleção preservada e lista limitada a 350 px.
+  avatar; busca local a partir de 6 (junto com a rolagem), seleção preservada e lista limitada a 350 px.
 - ✅ Entrada direta com organização única, guards e sincronização/recarregamento
   mantidos (ADR 0035); Cancelar/X/Esc preservam contexto/URL e retornam foco ao avatar.
 - Validação: 120 testes ChromeHeadless; lint/formato/build; revisão OWASP A01–A10 e
