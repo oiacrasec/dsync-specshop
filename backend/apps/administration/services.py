@@ -14,7 +14,7 @@ from apps.rbac.constants import ESSENTIAL_PROFILE_KEY
 from apps.rbac.models import Assignment, Profile
 from apps.rbac.selectors import contract_admin_users
 from apps.rbac.services import begin_write, save_assignment
-from apps.users.services import reset_password, save_user
+from apps.users.services import reset_mfa, reset_password, save_user
 from apps.users.utils import generate_temporary_password
 
 
@@ -83,3 +83,16 @@ def reset_admin_password(*, contract, user_public_id, actor):
     except get_user_model().DoesNotExist:
         raise NotFound() from None
     return reset_password(user=user, actor=actor)
+
+
+@system_scope
+@transaction.atomic
+def reset_admin_mfa(*, contract, user_public_id, actor):
+    begin_write(actor)
+    if not get_user_model().objects.filter(pk=actor.pk, is_active=True, is_superuser=True).exists():
+        raise PermissionDenied(_('A operação exige autorização administrativa.'))
+    try:
+        user = contract_admin_users(contract.pk).get(public_id=user_public_id)
+    except get_user_model().DoesNotExist:
+        raise NotFound() from None
+    reset_mfa(user=user, actor=actor)

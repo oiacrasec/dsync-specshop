@@ -22,7 +22,7 @@
                         "browser": "src/main.ts",
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
-                        "allowedCommonJsDependencies": ["swagger-ui-dist"],
+                        "allowedCommonJsDependencies": ["swagger-ui-dist", "qrcode", "dijkstrajs"],
                         "assets": [
                             {
                                 "glob": "**/*",

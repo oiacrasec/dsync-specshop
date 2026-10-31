@@ -314,3 +314,17 @@ python manage.py check --deploy --settings=config.settings.production
 ```
 
 Regras para agentes de IA: [`AGENTS.md`](AGENTS.md).
+
+## 2FA opcional — etapa 9.4
+
+Configuração em Perfil → Verificação em duas etapas. Só contas com fator confirmado
+usam o segundo passo do login. PyOTP calcula TOTP; cryptography/Fernet cifra o segredo
+com `DJANGO_MFA_ENCRYPTION_KEY`, independente de SECRET_KEY/JWT. Configuração e TOTP
+sem chave válida respondem 503 seguro; reservas permitem recuperação por HMAC.
+Mudanças revogam todos os refresh/sessões e pedem novo login; access já emitido dura
+até 15 min (decisão 83). Dez reservas de uso único, exibidas uma vez; reset administrativo
+auditado e comando `manage.py reset_mfa <username> --actor <superadmin>` para superadmins.
+
+Migrations users.0008/audit.0011 aplicadas localmente em 2026-10-31. Chave MFA local
+configurada apenas em .env, ignorado pelo Git; preservar em backup seguro. Nenhum
+usuário é ativado automaticamente. Ver [contratos e implantação](../docs/api/mfa.md).

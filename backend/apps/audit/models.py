@@ -10,6 +10,10 @@ from .managers import AccessLogManager, AccessLogQuerySet, AllAuditManager, Appe
 
 
 class AuditEventType(models.TextChoices):
+    USER_MFA_ENABLED = 'user.mfa_enabled', _('verificação em duas etapas ativada')
+    USER_MFA_DISABLED = 'user.mfa_disabled', _('verificação em duas etapas desativada')
+    USER_MFA_RECOVERY_REGENERATED = 'user.mfa_recovery_regenerated', _('códigos reserva regenerados')
+    USER_MFA_RESET = 'user.mfa_reset', _('verificação em duas etapas redefinida')
     USER_PASSWORD_CHANGED = 'user.password_changed', _('senha do usuário alterada')
     USER_PASSWORD_RESET = 'user.password_reset', _('senha do usuário redefinida')
     USER_CREATED = 'user.created', _('usuário criado')

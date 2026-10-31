@@ -24,6 +24,17 @@ export interface LoginResponse extends TokenRefreshResponse {
     user: LoginUser;
 }
 
+export interface MfaLoginChallenge {
+    mfa_required: true;
+    mfa_token: string;
+    expires_in: number;
+}
+
+export interface MfaLoginRequest {
+    mfa_token: string;
+    code: string;
+}
+
 export interface FirstAccessPasswordChangeRequest {
     current_password: string;
     new_password: string;

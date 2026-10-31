@@ -5,7 +5,13 @@ from apps.users.views import (
     EndOtherSessionsView,
     LoginView,
     LogoutView,
+    MfaDisableView,
+    MfaEnableView,
+    MfaLoginView,
+    MfaRecoveryCodesView,
+    MfaSetupView,
     MyLoginHistoryView,
+    MyMfaView,
     MyPreferencesView,
     MyProfileView,
     MySessionsView,
@@ -21,6 +27,12 @@ router = SchemaRouter(use_regex_path=False)
 router.register('users', UserViewSet, basename='user')
 
 urlpatterns = [
+    path('auth/login/mfa/', MfaLoginView.as_view(), name='login-mfa'),
+    path('me/mfa/', MyMfaView.as_view(), name='my-mfa'),
+    path('me/mfa/setup/', MfaSetupView.as_view(), name='mfa-setup'),
+    path('me/mfa/enable/', MfaEnableView.as_view(), name='mfa-enable'),
+    path('me/mfa/disable/', MfaDisableView.as_view(), name='mfa-disable'),
+    path('me/mfa/recovery-codes/', MfaRecoveryCodesView.as_view(), name='mfa-recovery-codes'),
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/refresh/', RefreshView.as_view(), name='refresh'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),

@@ -215,6 +215,7 @@ if len(SIMPLE_JWT['SIGNING_KEY'].encode('utf-8')) < 32 or constant_time_compare(
     )
 
 AUTH_LOGIN_RATE = env('DJANGO_AUTH_LOGIN_RATE', default='5/min')
+MFA_ENCRYPTION_KEY = env('DJANGO_MFA_ENCRYPTION_KEY', default='')
 
 
 # Security (comum a todos os ambientes)

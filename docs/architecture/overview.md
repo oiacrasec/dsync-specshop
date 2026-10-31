@@ -65,6 +65,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `frontend/` (etapa 7.4: organizações na área do cliente, `PermissionContextService` com `/me/permissions/`, menu e botões por permissão) | concluído |
 | `frontend/` (etapa 6.5: auth Core, primeiro acesso, seleção UUID, RFC 9457; JWT/contexto localStorage e recarregamento entre abas, ADR 0035) | concluído |
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
+| `backend/` + `frontend/` (9.4: MFA TOTP opcional, Perfil/login, reservas e reset administrativo auditado, ADR 0041) | implementado |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | criado; auth/contexto (6.5) e administração de contratos (6.8) adaptados ao Core |
 | `AGENTS.md` (frontend) | criado |

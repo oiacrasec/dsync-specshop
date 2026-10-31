@@ -213,6 +213,37 @@ export class ContratoFormPage implements OnInit {
         return this.resettingAdminIds.has(adminPublicId);
     }
 
+    confirmResetMfa(admin: ContractAdmin) {
+        const contractId = this.contractId;
+
+        if (!contractId || this.isResetting(admin.public_id)) {
+            return;
+        }
+
+        this.confirmationService.confirm({
+            header: 'Redefinir verificação em duas etapas',
+            message: `Remover a verificação em duas etapas de "${admin.username}"? As sessões serão encerradas e os códigos reserva serão invalidados. O administrador poderá configurar novamente no Perfil.`,
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                if (this.isResetting(admin.public_id)) {
+                    return;
+                }
+
+                this.resettingAdminIds.add(admin.public_id);
+                this.contratoService.resetAdminMfa(contractId, admin.public_id).subscribe({
+                    next: () => {
+                        this.resettingAdminIds.delete(admin.public_id);
+                        this.messageService.add({ severity: 'success', summary: 'Verificação redefinida', detail: 'Proteção removida e sessões encerradas. O administrador pode configurar novamente.' });
+                    },
+                    error: (error: unknown) => {
+                        this.resettingAdminIds.delete(admin.public_id);
+                        this.messageService.add({ severity: 'error', summary: 'Falha ao redefinir', detail: problemMessage(error, 'Não foi possível redefinir a verificação em duas etapas.') });
+                    }
+                });
+            }
+        });
+    }
+
     private resetPassword(admin: ContractAdmin) {
         if (!this.contractId) {
             return;

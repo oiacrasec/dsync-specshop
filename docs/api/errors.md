@@ -62,6 +62,7 @@ desconhecidos. O namespace URN `datasync` é informal (ADR 0004).
 | [organization-in-use](errors/organization-in-use.md) | 409 |
 | [last-active-organization](errors/last-active-organization.md) | 409 |
 | [last-contract-admin](errors/last-contract-admin.md) | 409 |
+| [mfa-state-conflict](errors/mfa-state-conflict.md) | 409 |
 | [not-found](errors/not-found.md) | 404 |
 | [authentication-required](errors/authentication-required.md) | 401 |
 

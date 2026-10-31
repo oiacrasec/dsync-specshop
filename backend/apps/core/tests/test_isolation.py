@@ -19,7 +19,7 @@ from apps.core.models import HybridScopedModel, OrganizationScopedModel, SharedM
 from apps.core.tenancy import TenantContext, TenantContextMissing, use_context
 from apps.core.tests.scoping.models import ScopingCategory, ScopingCountry, ScopingMovement, ScopingProduct
 from apps.rbac.models import Assignment, AssignmentExclusion, Profile, ProfilePermission
-from apps.users.models import UserSession
+from apps.users.models import UserMfa, UserMfaChallenge, UserRecoveryCode, UserSession
 
 pytestmark = pytest.mark.django_db
 _sequence = count()
@@ -84,7 +84,7 @@ SHARED = {Plan, ScopingCountry}
 GLOBAL_ONLY = {AccessLog}
 # Registros do próprio usuário (sessões, 9.3): sem contrato; toda leitura filtra pelo dono
 # (`users.selectors.active_sessions`, `users.services.end_sessions`), coberto em test_sessions.py.
-OWNER_ONLY = {UserSession}
+OWNER_ONLY = {UserSession, UserMfa, UserRecoveryCode, UserMfaChallenge}
 
 
 def own_models():

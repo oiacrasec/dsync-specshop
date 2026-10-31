@@ -155,3 +155,15 @@ e plano da Entrega 1.
   `backend/docs/examples/model.md`. AGENTS e README apontam para essas fontes.
   `models.py` mantém formatação manual, mas respeita o limite de 120 caracteres
   confirmado pelo usuário, com E501 e demais regras de lint ativas.
+
+- 9.4 (2026-10-31, ADR 0041): MFA opcional, só exigido após UserMfa.confirmed.
+  UserMfa/UserRecoveryCode/UserMfaChallenge em UNSCOPED_RECORDS/OWNER_ONLY.
+  Segredo Fernet com chave própria; reservas somente HMAC. Prova opaca, 5 min,
+  uso único, máx. 5/conta, vinculada a senha/geração; sem JWT/sessão antes do fator.
+  Verificação sob lock, antirreuso e espera crescente persistida antes de responder
+  erro (views non_atomic_requests + atomic no service). Ativar/desativar/regenerar/
+  reset revogam todos os refresh/sessões/provas; access até 15 min (decisões 83/88).
+  Reset: comuns pelo admin do contrato; admins, inclusive inativos, pelo superadmin.
+  Comando reset_mfa para superadmins até 5.3; tudo auditado sem segredos.
+  Migrations users.0008/audit.0011 aplicadas localmente; chave configurada apenas
+  em .env ignorado. Nenhuma ativação automática. Ver docs/api/mfa.md.

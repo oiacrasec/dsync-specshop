@@ -34,6 +34,10 @@ export class UsuarioService extends BaseCrudService {
         return this.http.post<ContractUserPasswordReset>(`${this.userUrl(publicId)}reset-password/`, {}).pipe(tap(() => this.invalidateTableCache()));
     }
 
+    resetMfa(publicId: string) {
+        return this.http.post<void>(`${this.userUrl(publicId)}reset-mfa/`, {});
+    }
+
     getAccess(publicId: string) {
         return this.http.get<UserAccess>(`${this.userUrl(publicId)}access/`);
     }

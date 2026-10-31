@@ -106,3 +106,18 @@ O diálogo do topo deve ser irmão de `.layout-topbar`, fora do seu flex. Dentro
 o host do p-dialog fechado ocupa espaço e desloca busca/notificações/avatar. Regressão
 IM03 coberta por teste de geometria; Chrome conferido em 390/1280/1920 px, antes de abrir,
 com modal aberto e após Esc (14 px de margem direita).
+
+## 2FA opcional — etapa 9.4
+
+Login aceita prova temporária de senha e exibe segundo passo apenas para MFA confirmado
+(TOTP ou código reserva). Prova/códigos só em memória, sem sessão até a resposta final;
+requisição cancelada ao destruir, resposta de sessão antiga ignorada.
+`/auth/login/mfa/` é pública, sem Bearer/contexto; /me/mfa/ usa JWT sem organização.
+
+Perfil → Verificação em duas etapas renderiza MfaSettings apenas ao abrir a aba,
+sem busca no carregamento cotidiano. MFA é opcional. QR local via qrcode, sem serviço
+externo; reservas em memória, download explícito e confirmação de guarda antes de
+limpar AuthSessionService e voltar ao login. Desativação pede senha+código e sai após
+sucesso. Mudanças revogam todos os refresh no servidor; access já emitido dura até
+15 min conforme decisão 83. Reset com confirmação nas ações de Usuários e Admins do
+contrato; autorização e isolamento são revalidados no backend. Ver ADR 0041.

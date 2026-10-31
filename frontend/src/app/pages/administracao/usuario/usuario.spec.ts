@@ -75,7 +75,7 @@ describe('Usuários na área do cliente', () => {
 
         page.ngOnInit();
         expect(page.canCreate).toBeFalse();
-        expect(page.tableActions.map((action) => action.id)).toEqual(['edit', 'reset-password']);
+        expect(page.tableActions.map((action) => action.id)).toEqual(['edit', 'reset-password', 'reset-mfa']);
     });
 
     it('usa as rotas do Core com o identificador codificado', () => {
@@ -88,6 +88,11 @@ describe('Usuários na área do cliente', () => {
         expect(request.request.method).toBe('POST');
         expect(request.request.headers.get('X-Organization-Id')).toBe(ORG_ID);
         request.flush({ user: USER, temporary_password: 'Temp-Password-16' });
+        service.resetMfa('../x').subscribe();
+        const resetMfa = controller.expectOne('/api/v1/users/..%2Fx/reset-mfa/');
+
+        expect(resetMfa.request.headers.get('X-Organization-Id')).toBe(ORG_ID);
+        resetMfa.flush(null, { status: 204, statusText: 'No Content' });
     });
 
     it('cria o usuário e mostra a senha temporária uma vez, sem sair da tela', () => {

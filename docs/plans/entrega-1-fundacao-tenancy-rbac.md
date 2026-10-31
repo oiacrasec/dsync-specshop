@@ -97,6 +97,7 @@ e só começa após aprovação do usuário.
 | 85 | Aba Sessões do Perfil só de visualização: sessões ativas + últimos 20 logins do registro de acesso; rotas de encerrar mantidas na API |
 | 86 | 2FA (9.4) por implementação própria adaptada do django-otp (Unlicense): espera crescente após falhas, antirreuso pelo último intervalo (`last_t`) e código reserva apagado ao usar; `pyotp` só para o cálculo. Corrigido em relação a ele: segredo cifrado, códigos reserva com hash, linha travada na verificação, login em dois passos no JWT |
 | 87 | Segredo do 2FA cifrado (Fernet, `cryptography`) com chave própria `DJANGO_MFA_ENCRYPTION_KEY`; a 9.4 é entregue de uma vez (backend, Perfil, login e reset por admin) |
+| 88 | MFA permanece opcional e só é pedido após ativação confirmada pelo usuário. Ativar, desativar, regenerar reservas ou resetar encerra todas as sessões e pede novo login; mostrar as reservas antes da saída. Preservada a decisão 83 para access já emitido |
 
 ## Bloco 0 — Fundação
 
@@ -219,7 +220,7 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 | 9.1 | Mídia configurável por `.env` (`filesystem` ou `s3`, `django-storages`), URL temporária assinada nos dois modos, bucket/pasta privados; comando `transfer_media` para migrar entre os modos; fachada `media` com campos próprios | backend | 0039 | ✅ |
 | 9.2 | Perfil `/perfil` (formulário no padrão, abas): Principal com foto (256 px WebP sem metadados, remover), nome editável, usuário só leitura, fuso horário IANA aplicado às datas; aba Senha (troca pelo próprio usuário) | backend + frontend | 0039 | ✅ |
 | 9.3 | Sessões: navegador/IP de cada sessão (claim `sid`), aba Sessões só leitura com ativas + últimos logins; rotas de encerrar uma e as outras prontas na API | backend + frontend | 0004 | ✅ |
-| 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |
+| 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | 0041 | ✅ |
 | 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |
 
 ## Melhoria aprovada — escolha e troca de organização (2026-10-31)
@@ -233,3 +234,30 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
   performance sem novos achados no escopo. Chrome com API simulada: desktop e
   320 px sem overflow horizontal, busca e Esc. Sem auditoria WCAG completa/E2E real.
 - ✅ Resultado revisado e commit autorizado pelo usuário, incluindo os ajustes do topo/avatar e rótulo Entrar.
+
+### Situação da 9.4 em 2026-10-31
+
+- MFA opcional por conta: setup pendente não exige segundo fator; confirmação do
+  primeiro TOTP ativa. Login com fator confirmado só emite tokens/sessão após TOTP
+  ou reserva. Segredo cifrado, reservas HMAC, antirreuso/locks e espera persistida.
+- Decisão 88 registrada no ADR 0041: todas as sessões/refresh e provas revogados ao
+  mudar o fator. Reservas exibidas antes de limpar a sessão local e pedir novo login.
+  Access já emitido preserva limite de até 15 min, sem consulta na navegação (83).
+- Perfil integrado, QR local, reservas uma vez/download explícito. Reset nas ações de
+  Usuários e Admins do contrato; papel de administrador preservado mesmo inativo.
+  Comando auditado para recuperação de superadmin até 5.3.
+- Migrations users.0008/audit.0011 aplicadas localmente com autorização; chave MFA
+  independente gerada apenas no .env ignorado. Nenhuma conta ativada automaticamente.
+- Validação: 756 testes backend e 128 frontend; ruff check/format, lint/format:check/
+  build, OpenAPI validate/fail-on-warn, migration check, check e check --deploy passaram.
+  Isolamento, falhas persistidas, concorrência e consultas constantes com 30 contas
+  adicionais cobertos; sem consulta MFA na navegação. Sem teste de capacidade em produção.
+- Revisão OWASP A01–A10: sem achados pendentes neste diff; corrigido reset de admin
+  inativo. Conformidade: credenciais cifradas/sem logs, reservas só HMAC, QR local,
+  autoria auditada, licenças verificadas, controles acessíveis e recurso opcional.
+- Etapa concluída; alterações sem commit aguardando revisão. Não iniciar 9.5 sem aprovação.
+
+- Revisão visual solicitada após entrega: segundo passo do login redesenhado no
+  FigCraft, página Login · Verificação em duas etapas, tomando a seleção de organização
+  como referência. Autenticador/reserva/erro e 390/320 px conferidos; proposta ainda
+  aguardando aprovação, sem alteração da implementação ou regra opcional do MFA.

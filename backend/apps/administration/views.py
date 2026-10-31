@@ -14,7 +14,7 @@ from apps.users.serializers import UserSummarySerializer
 
 from .filters import ContractFilterSet, PlanFilterSet
 from .serializers import ContractAdminSerializer, ContractProvisionSerializer, ContractSerializer, PlanSerializer
-from .services import provision_contract, reset_admin_password
+from .services import provision_contract, reset_admin_mfa, reset_admin_password
 
 
 class PlanViewSet(BaseAdminModelViewSet):
@@ -31,6 +31,15 @@ class ContractViewSet(BaseAdminModelViewSet):
     schema_columns = ('name', 'start_date', 'licenses')
     schema_column_overrides = {'start_date': {'label': _('Início')}}
     schema_filters = ('plan',)
+
+    @extend_schema(request=None, responses={204: None})
+    @action(detail=True, methods=['post'], url_path='admins/<uuid:user_public_id>/reset-mfa')
+    def admin_mfa_reset(self, request, user_public_id, *args, **kwargs):
+        try:
+            reset_admin_mfa(contract=self.get_object(), user_public_id=user_public_id, actor=request.user)
+            return build_result_response(None, status_code=status.HTTP_204_NO_CONTENT)
+        except Exception as exc:
+            return build_exception_response(exception=exc, request=request)
 
     @extend_schema(
         request=ContractProvisionSerializer,

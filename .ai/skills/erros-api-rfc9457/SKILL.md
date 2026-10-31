@@ -67,6 +67,7 @@ Cada `type` novo é cadastrado aqui **e** documentado em `docs/api/errors/<slug>
 | `last-active-organization` | **409** | desativar/excluir a única organização ativa do contrato | ADR 0037 |
 | `profile-in-use` | **409** | exclusão de perfil ainda atribuído | ADR 0009 §2 |
 | `last-contract-admin` | **409** | remoção do último admin do contrato | ADR 0009 §5 |
+| `mfa-state-conflict` | **409** | estado da credencial não permite a operação de 2FA | ADR 0041 |
 | `not-found` | 404 | registro inexistente **ou fora do contexto** (nunca revela qual) | ADR 0006 §4 |
 | `authentication-required` | 401 | token ausente, inválido ou expirado | ADR 0006 §3 |
 

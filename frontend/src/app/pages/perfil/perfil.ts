@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { SelectModule } from 'primeng/select';
@@ -7,6 +8,7 @@ import { TabsModule } from 'primeng/tabs';
 import { concatMap, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '@/app/core/services/auth.service';
+import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { ProfileService } from '@/app/core/services/profile.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
 import { supportedTimeZones } from '@/app/core/utils/time-zone';
@@ -16,6 +18,7 @@ import { UiImagePreview } from '@/app/shared/ui/image-preview/image-preview';
 import { UiInputText } from '@/app/shared/ui/input-text/input-text';
 import { ZonedDatePipe } from '@/app/shared/pipes/zoned-date.pipe';
 import { LoginHistoryItem, UserSession } from '@/app/types/profile';
+import { MfaSettings } from './mfa-settings';
 
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -25,7 +28,7 @@ const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 @Component({
     selector: 'app-perfil',
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText, ZonedDatePipe],
+    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText, ZonedDatePipe, MfaSettings],
     templateUrl: './perfil.html'
 })
 export class PerfilPage implements OnInit, OnDestroy {
@@ -33,7 +36,10 @@ export class PerfilPage implements OnInit, OnDestroy {
     private profileService = inject(ProfileService);
     private auth = inject(AuthService);
     private messages = inject(MessageService);
+    private session = inject(AuthSessionService);
+    private router = inject(Router);
 
+    readonly activeTab = signal<string | number | undefined>('principal');
     readonly username = signal('');
     readonly currentAvatar = this.profileService.avatarSrc;
     readonly selectedFile = signal<File | null>(null);
@@ -82,6 +88,8 @@ export class PerfilPage implements OnInit, OnDestroy {
 
     // A aba Sessões só busca os dados quando é aberta pela primeira vez.
     onTabChange(tab: string | number | undefined) {
+        this.activeTab.set(tab);
+
         if (tab !== 'sessoes' || this.sessions() !== null) {
             return;
         }
@@ -93,6 +101,12 @@ export class PerfilPage implements OnInit, OnDestroy {
             },
             error: (error: unknown) => this.messages.add({ severity: 'error', summary: 'Falha ao carregar', detail: problemMessage(error, 'Não foi possível carregar as sessões.') })
         });
+    }
+
+    onMfaChanged() {
+        this.session.clearSession();
+        this.messages.add({ severity: 'success', summary: 'Verificação em duas etapas atualizada', detail: 'As sessões foram encerradas. Entre novamente.' });
+        void this.router.navigateByUrl('/landing/login');
     }
 
     chooseAvatar(event: Event) {

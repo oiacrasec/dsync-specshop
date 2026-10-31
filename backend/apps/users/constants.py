@@ -42,3 +42,12 @@ TIME_ZONES = tuple(sorted(available_timezones()))
 
 # Claim do JWT com o public_id da sessão (9.3); refresh e access carregam.
 SESSION_CLAIM = 'sid'
+
+# TOTP: 30 segundos e tolerância de um intervalo de relógio (RFC 6238).
+MFA_TOTP_INTERVAL = 30
+MFA_TOTP_WINDOW = 1
+MFA_CHALLENGE_SECONDS = 300
+MFA_MAX_LOGIN_CHALLENGES = 5
+# O teto acompanha o bloqueio temporário de 60 s do login; nunca dormir sob lock.
+MFA_MAX_RETRY_SECONDS = 60
+MFA_RECOVERY_CODE_COUNT = 10

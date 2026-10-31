@@ -1,4 +1,6 @@
-from datetime import UTC, datetime
+import secrets
+from datetime import UTC, datetime, timedelta
+from hashlib import sha256
 from uuid import UUID
 
 from django.contrib.auth import authenticate, get_user_model
@@ -6,6 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import router, transaction
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -185,8 +188,22 @@ def login(*, request, username, password):
     user = authenticate(request=request, username=username, password=password)
     if user is None or not api_settings.USER_AUTHENTICATION_RULE(user):
         raise AuthenticationFailed()
-    ensure_contract_available(user)  # Só depois da senha válida: não revela nada a quem errou.
-    request.user = user  # Usuário validado para o registro de autenticação (ADR 0019).
+    # Serializa login e alterações de credencial; não refaz Argon2 sob lock.
+    try:
+        current = _lock_mfa_user(user.pk, include_mfa=True)
+    except get_user_model().DoesNotExist:
+        raise AuthenticationFailed() from None
+    if not constant_time_compare(current.password, user.password) or not api_settings.USER_AUTHENTICATION_RULE(current):
+        raise AuthenticationFailed()
+    ensure_contract_available(current)
+    challenge = _mfa_challenge(current)
+    if challenge is not None:
+        return challenge
+    return _issue_login_tokens(current, request)
+
+
+def _issue_login_tokens(user, request):
+    request.user = user  # Só autenticação completa entra no registro de sucesso (ADR 0019).
     refresh = RefreshToken.for_user(user)
     _start_session(user, refresh, request)
     return {'access': str(refresh.access_token), 'refresh': str(refresh)}
@@ -435,3 +452,254 @@ def reset_password(*, user, actor):
         after={'must_change_password': True},
     )
     return current, temporary_password
+
+
+def _mfa_challenge(user):
+    """Só o hash da prova da senha vai ao banco, com cinco minutos e uso único."""
+    from .constants import MFA_CHALLENGE_SECONDS, MFA_MAX_LOGIN_CHALLENGES
+    from .models import UserMfa, UserMfaChallenge
+
+    try:
+        device = user.mfa
+    except UserMfa.DoesNotExist:
+        return None
+    if not device.confirmed:
+        return None
+    now = timezone.now()
+    UserMfaChallenge.objects.filter(user=user, expires_at__lte=now).delete()
+    # Limita armazenamento por conta; o lock do usuário serializa emissões concorrentes.
+    stale = list(
+        UserMfaChallenge.objects.filter(user=user)
+        .order_by('-pk')
+        .values_list('pk', flat=True)[MFA_MAX_LOGIN_CHALLENGES - 1 :]
+    )
+    if stale:
+        UserMfaChallenge.objects.filter(pk__in=stale).delete()
+    token = secrets.token_urlsafe(32)
+    UserMfaChallenge.objects.create(
+        user=user,
+        digest=sha256(token.encode()).hexdigest(),
+        generation=device.generation,
+        password_digest=user.get_session_auth_hash(),
+        expires_at=now + timedelta(seconds=MFA_CHALLENGE_SECONDS),
+    )
+    return {'mfa_required': True, 'mfa_token': token, 'expires_in': MFA_CHALLENGE_SECONDS}
+
+
+def _lock_mfa_user(pk, *, include_mfa=False):
+    queryset = get_user_model().objects.unscoped().select_related('contract')
+    if include_mfa:
+        queryset = queryset.select_related('mfa')
+    user = queryset.select_for_update(of=('self',)).get(pk=pk, is_active=True)
+    if not api_settings.USER_AUTHENTICATION_RULE(user):
+        raise AuthenticationFailed()
+    ensure_contract_available(user)
+    return user
+
+
+@system_scope
+def login_mfa(*, request, mfa_token, code):
+    from .mfa import Mfa
+    from .models import UserMfa, UserMfaChallenge
+
+    digest = sha256(mfa_token.encode()).hexdigest()
+    owner = (
+        UserMfaChallenge.objects.filter(digest=digest, expires_at__gt=timezone.now())
+        .values_list('user_id', flat=True)
+        .first()
+    )
+    if owner is None:
+        raise AuthenticationFailed()
+    error = None
+    with transaction.atomic():
+        try:
+            user = _lock_mfa_user(owner)
+        except get_user_model().DoesNotExist:
+            raise AuthenticationFailed() from None
+        challenge = (
+            UserMfaChallenge.objects.select_for_update()
+            .filter(digest=digest, user=user, expires_at__gt=timezone.now())
+            .first()
+        )
+        device = UserMfa.objects.select_for_update().filter(user=user, confirmed=True).first()
+        if (
+            challenge is None
+            or device is None
+            or challenge.generation != device.generation
+            or not constant_time_compare(challenge.password_digest, user.get_session_auth_hash())
+        ):
+            raise AuthenticationFailed()
+        error = Mfa(device).verify(code, allow_recovery=True)
+        if error is None:
+            challenge.delete()
+            result = _issue_login_tokens(user, request)
+    # A view é non_atomic_requests: o contador de falhas já está confirmado aqui.
+    if error:
+        raise error
+    return result
+
+
+@system_scope
+@transaction.atomic
+def setup_mfa(*, user):
+    from uuid import uuid4
+
+    import pyotp
+
+    from apps.core.exceptions import MfaStateConflict
+
+    from .constants import MFA_CHALLENGE_SECONDS
+    from .mfa import Mfa
+    from .models import UserMfa
+
+    current = _lock_mfa_user(user.pk)
+    device, _ = UserMfa.objects.select_for_update().get_or_create(user=current)
+    if device.confirmed:
+        raise MfaStateConflict()
+    device.secret = Mfa.encrypt(pyotp.random_base32())
+    device.generation = uuid4()
+    device.last_t = -1
+    device.setup_expires_at = timezone.now() + timedelta(seconds=MFA_CHALLENGE_SECONDS)
+    # Não zera falhas ao reiniciar: setup não pode contornar a espera crescente.
+    device.save(update_fields=['secret', 'generation', 'last_t', 'setup_expires_at'])
+    return Mfa(device).provisioning(current.username)
+
+
+@system_scope
+def change_mfa(*, user, operation, code, password=None):
+    """Confirma o fator e encerra sessões; falhas confirmam o contador antes do erro HTTP."""
+    from apps.audit.models import AuditEventType as Event
+    from apps.core.exceptions import MfaStateConflict
+
+    from .mfa import Mfa
+    from .models import UserMfa
+
+    events = {
+        'enable': Event.USER_MFA_ENABLED,
+        'disable': Event.USER_MFA_DISABLED,
+        'regenerate': Event.USER_MFA_RECOVERY_REGENERATED,
+    }
+    event = events[operation]
+    result = None
+    with transaction.atomic():
+        try:
+            current = _lock_mfa_user(user.pk)
+        except get_user_model().DoesNotExist:
+            raise AuthenticationFailed() from None
+        device = UserMfa.objects.select_for_update().filter(user=current).first()
+        if (
+            device is None
+            or (
+                operation == 'enable'
+                and (device.confirmed or not device.setup_expires_at or device.setup_expires_at <= timezone.now())
+            )
+            or (operation != 'enable' and not device.confirmed)
+        ):
+            raise MfaStateConflict()
+        factor = Mfa(device)
+        # A espera também limita tentativas de senha ao desativar, antes do hash caro.
+        from rest_framework.exceptions import Throttled
+
+        wait = factor.retry_after()
+        if wait:
+            error = Throttled(wait=wait)
+        elif operation == 'disable' and not current.check_password(password):
+            error = factor.failure(field='password')
+        else:
+            error = factor.verify(code, allow_recovery=operation != 'enable')
+        if error is None:
+            before = device.confirmed
+            if operation == 'disable':
+                _clear_mfa(device)
+            else:
+                device.confirmed = True
+                device.setup_expires_at = None
+                result = {'recovery_codes': factor.new_recovery_codes()}
+            _finish_mfa_change(current, device, actor=current, event=event, before=before)
+    if error:
+        raise error
+    return result
+
+
+def _clear_mfa(device):
+    device.confirmed = False
+    device.secret = ''
+    device.last_t = -1
+    device.failures = 0
+    device.last_failure_at = None
+    device.setup_expires_at = None
+    device.recovery_codes.all().delete()
+
+
+def _finish_mfa_change(user, device, *, actor, event, before):
+    from uuid import uuid4
+
+    from apps.audit.services import record
+
+    from .models import UserMfaChallenge
+
+    device.generation = uuid4()
+    device.save()
+    UserMfaChallenge.objects.filter(user=user).delete()
+    _revoke_refresh_tokens(user)
+    record(
+        event,
+        actor=actor,
+        contract_id=user.contract_id,
+        target=user,
+        before={'mfa_enabled': before},
+        after={'mfa_enabled': device.confirmed},
+    )
+
+
+@system_scope
+@transaction.atomic
+def reset_mfa(*, user, actor, allow_superadmin=False):
+    """Recuperação administrativa; serializa com alterações de papéis e da própria conta."""
+    from rest_framework.exceptions import NotFound, PermissionDenied
+
+    from apps.audit.models import AuditEventType
+    from apps.rbac.selectors import contract_admin_users
+    from apps.rbac.services import begin_write
+
+    from .models import UserMfa
+
+    begin_write(actor, contract_id=user.contract_id)
+    # A mesma ordem entre duas contas evita deadlock em resets concorrentes.
+    accounts = {
+        account.pk: account
+        for account in get_user_model()
+        .objects.unscoped()
+        .select_for_update()
+        .filter(
+            pk__in=[actor.pk, user.pk],
+        )
+        .order_by('pk')
+    }
+    current_actor = accounts.get(actor.pk)
+    current = accounts.get(user.pk)
+    if current is None:
+        raise NotFound()
+    if current_actor is None or not current_actor.is_active:
+        raise PermissionDenied()
+    # O papel de admin permanece mesmo com a conta inativa (decisão 43).
+    target_is_admin = (
+        current.contract_id is not None and contract_admin_users(current.contract_id).filter(pk=current.pk).exists()
+    )
+    if current.is_superuser:
+        permitted = allow_superadmin and current_actor.is_superuser
+    elif current_actor.is_superuser:
+        permitted = target_is_admin
+    else:
+        permitted = (
+            current_actor.pk != current.pk
+            and current_actor.contract_id == current.contract_id
+            and contract_admin_users(current_actor.contract_id).filter(pk=current_actor.pk).exists()
+            and not target_is_admin
+        )
+    if not permitted:
+        raise PermissionDenied(_('A redefinição do MFA exige autorização administrativa.'))
+    device, created = UserMfa.objects.select_for_update().get_or_create(user=current)
+    before = device.confirmed
+    _clear_mfa(device)
+    _finish_mfa_change(current, device, actor=current_actor, event=AuditEventType.USER_MFA_RESET, before=before)

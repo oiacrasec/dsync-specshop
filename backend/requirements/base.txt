@@ -10,3 +10,5 @@ PyJWT~=2.15.1  # restrição da dependência transitiva de assinatura JWT
 django-environ~=0.14.0
 psycopg[binary]~=3.3.6
 argon2-cffi~=25.1.0
+pyotp~=2.10.0  # TOTP (RFC 6238), MIT
+cryptography~=50.0.2  # segredo do TOTP cifrado com Fernet, Apache-2.0/BSD-3

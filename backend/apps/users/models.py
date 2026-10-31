@@ -1,4 +1,4 @@
-from uuid import uuid7
+from uuid import uuid4, uuid7
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -88,3 +88,64 @@ class UserSession(models.Model, metaclass=DscModelBase):
 
     def __str__(self):
         return f'{self.device} ({self.public_id})'
+
+
+class UserMfa(models.Model, metaclass=DscModelBase):
+    """Credencial de autenticação do dono, antes do contexto de organização (ADR 0041)."""
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_('usuário'),
+                                on_delete=models.CASCADE, related_name='mfa')
+    secret = models.TextField(verbose_name=_('segredo cifrado'), blank=True)
+    confirmed = models.BooleanField(verbose_name=_('confirmado'), default=False)
+    generation = models.UUIDField(verbose_name=_('geração da credencial'), default=uuid4, editable=False)
+    last_t = models.BigIntegerField(verbose_name=_('último intervalo utilizado'), default=-1)
+    failures = models.PositiveSmallIntegerField(verbose_name=_('falhas consecutivas'), default=0)
+    last_failure_at = models.DateTimeField(verbose_name=_('última falha'), null=True, blank=True)
+    setup_expires_at = models.DateTimeField(verbose_name=_('expiração da configuração'), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('verificação em duas etapas')
+        verbose_name_plural = _('verificações em duas etapas')
+
+    def __str__(self):
+        return f'MFA {self.pk}'
+
+
+class UserRecoveryCode(models.Model, metaclass=DscModelBase):
+    """Só o HMAC do código; a linha é apagada no uso, regeneração ou reset."""
+
+    id = models.BigAutoField(primary_key=True)
+    mfa = models.ForeignKey(UserMfa, verbose_name=_('verificação em duas etapas'),
+                            on_delete=models.CASCADE, related_name='recovery_codes')
+    digest = models.CharField(verbose_name=_('hash do código'), max_length=64, unique=True)
+
+    class Meta:
+        verbose_name = _('código reserva')
+        verbose_name_plural = _('códigos reserva')
+
+    def __str__(self):
+        return f'Recovery code {self.pk}'
+
+
+class UserMfaChallenge(models.Model, metaclass=DscModelBase):
+    """Prova temporária da senha: só digest, uso único, TTL de cinco minutos.
+
+    Nunca é access/refresh e não autoriza qualquer API; o login completo consome a linha.
+    O proprietário e a geração/senha são revalidados sob lock antes de emitir os tokens.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('usuário'),
+                             on_delete=models.CASCADE, related_name='+')
+    digest = models.CharField(verbose_name=_('hash do token temporário'), max_length=64, unique=True)
+    generation = models.UUIDField(verbose_name=_('geração da credencial'))
+    password_digest = models.CharField(verbose_name=_('prova da senha'), max_length=64)
+    expires_at = models.DateTimeField(verbose_name=_('expiração'), db_index=True)
+
+    class Meta:
+        verbose_name = _('login pendente de verificação')
+        verbose_name_plural = _('logins pendentes de verificação')
+
+    def __str__(self):
+        return f'MFA challenge {self.pk}'

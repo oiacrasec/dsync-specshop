@@ -82,3 +82,16 @@ class LastContractAdmin(ProblemException):
     problem_type = 'urn:datasync:problem:last-contract-admin'
     title = _('Último administrador do contrato')
     default_detail = _('O contrato precisa manter pelo menos um administrador.')
+
+
+class MfaStateConflict(ProblemException):
+    status_code = 409
+    problem_type = 'urn:datasync:problem:mfa-state-conflict'
+    title = _('Estado da verificação em duas etapas alterado')
+    default_detail = _('Atualize a página e inicie a operação novamente.')
+
+
+class MfaUnavailable(ProblemException):
+    status_code = 503
+    title = _('Verificação em duas etapas indisponível')
+    default_detail = _('Não foi possível concluir a verificação. Entre em contato com o administrador.')

@@ -427,6 +427,66 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/admin/contracts/{public_id}/admins/{user_public_id}/reset-mfa/:
+    post:
+      operationId: admin_contracts_admins_reset_mfa_create
+      description: CRUD global autorizado só ao superadmin, sem contexto organizacional.
+      parameters:
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/admin/contracts/{public_id}/admins/{user_public_id}/reset-password/:
     post:
       operationId: admin_contracts_admins_reset_password_create
@@ -1171,6 +1231,44 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/LoginResult'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/auth/login/mfa/:
+    post:
+      operationId: auth_login_mfa_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaLoginRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/LoginResponse'
           description: ''
         '400':
@@ -1294,6 +1392,228 @@ paths:
                 $ref: '#/components/schemas/Problem'
         '403':
           description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/mfa/:
+    get:
+      operationId: me_mfa_retrieve
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatus'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/mfa/disable/:
+    post:
+      operationId: me_mfa_disable_create
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaDisableRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/mfa/enable/:
+    post:
+      operationId: me_mfa_enable_create
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaRecoveryCodes'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/mfa/recovery-codes/:
+    post:
+      operationId: me_mfa_recovery_codes_create
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaRecoveryCodes'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/me/mfa/setup/:
+    post:
+      operationId: me_mfa_setup_create
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetup'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
           content:
             application/problem+json:
               schema:
@@ -3422,6 +3742,73 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/users/{public_id}/reset-mfa/:
+    post:
+      operationId: users_reset_mfa_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwt: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/users/{public_id}/reset-password/:
     post:
       operationId: users_reset_password_create
@@ -4045,6 +4432,10 @@ components:
       - access
       - refresh
       - user
+    LoginResult:
+      oneOf:
+      - $ref: '#/components/schemas/LoginResponse'
+      - $ref: '#/components/schemas/MfaChallenge'
     MenuModeEnum:
       enum:
       - static
@@ -4063,6 +4454,101 @@ components:
         * `reveal` - reveal
         * `drawer` - drawer
         * `horizontal` - horizontal
+    MfaChallenge:
+      type: object
+      properties:
+        mfa_required:
+          type: boolean
+          readOnly: true
+        mfa_token:
+          type: string
+          readOnly: true
+        expires_in:
+          type: integer
+          readOnly: true
+      required:
+      - expires_in
+      - mfa_required
+      - mfa_token
+    MfaCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 64
+      required:
+      - code
+    MfaDisableRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 64
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - code
+      - password
+    MfaLoginRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 64
+        mfa_token:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+      required:
+      - code
+      - mfa_token
+    MfaRecoveryCodes:
+      type: object
+      properties:
+        recovery_codes:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - recovery_codes
+    MfaSetup:
+      type: object
+      properties:
+        secret:
+          type: string
+          readOnly: true
+        otpauth_url:
+          type: string
+          readOnly: true
+      required:
+      - otpauth_url
+      - secret
+    MfaStatus:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          readOnly: true
+        setup_pending:
+          type: boolean
+          readOnly: true
+        recovery_codes_remaining:
+          type: integer
+          readOnly: true
+      required:
+      - enabled
+      - recovery_codes_remaining
+      - setup_pending
     MyProfile:
       type: object
       description: |-

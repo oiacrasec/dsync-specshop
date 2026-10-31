@@ -113,6 +113,14 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   só administração) e `users.services.reset_password` (flag + revoga refresh + auditoria).
   Locks de conta e refresh sempre usuário → OutstandingToken → UserSession (refresh, reset,
   encerrar sessões); não inverter.
+- MFA opcional (ADR 0041): exigir segundo passo apenas quando UserMfa.confirmed.
+  Segredo Fernet com DJANGO_MFA_ENCRYPTION_KEY própria; reservas somente HMAC.
+  Views de confirmação são non_atomic_requests, com atomic explícito no service:
+  persistir falhas antes de levantar erro. Lock usuário → fator → token → sessão;
+  reset administrativo começa pelo lock RBAC e ordena contas por pk. Mudanças
+  revogam todos os refresh/sessões/provas; access já emitido até 15 min (decisão 83).
+  Reset de admin, inclusive inativo, só pelo superadmin; comuns pelo admin do contrato.
+  Sem consultas novas de MFA na navegação. Contratos em ../docs/api/mfa.md.
 - Chave JWT independente via `DJANGO_JWT_SIGNING_KEY`; nunca versionar seu valor,
   logar tokens ou retornar respostas de autenticação cacheáveis.
 - Limite de login conta apenas falhas por conta: `DJANGO_AUTH_LOGIN_RATE=5/min`,

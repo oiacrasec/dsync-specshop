@@ -1,0 +1,123 @@
+:host {
+    display: block;
+}
+.mfa-screen {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+}
+.mfa-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 560px;
+    padding: 28px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 20px;
+    font-size: 14px;
+}
+.mfa-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    h1 {
+        margin: 0;
+        font-size: 21px;
+        font-weight: 600;
+        line-height: 1.25;
+    }
+    p {
+        margin: 5px 0 0;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+}
+.mfa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    font-size: 18px;
+}
+.mfa-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.mfa-code {
+    width: 100%;
+    min-width: 0;
+    height: 64px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: 12px;
+    text-indent: 12px;
+    text-align: center;
+    &::placeholder {
+        color: var(--p-surface-700);
+        opacity: 1;
+    }
+    &.mfa-code-recovery {
+        font-size: 17px;
+        letter-spacing: 1px;
+        text-indent: 1px;
+    }
+    &.mfa-code-invalid {
+        border-color: var(--p-inputtext-invalid-border-color);
+    }
+}
+.mfa-help {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.mfa-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 16px;
+    border-top-width: 1px;
+    border-top-style: solid;
+    button {
+        min-height: 40px;
+        padding: 8px 0;
+        background: transparent;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
+        &:hover:not(:disabled) {
+            text-decoration: underline;
+        }
+        &:focus-visible {
+            outline: 2px solid var(--p-primary-color);
+            outline-offset: 3px;
+        }
+        &:disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+    }
+}
+@media (max-width: 480px) {
+    .mfa-card {
+        padding: 24px;
+    }
+}
+@media (max-width: 360px) {
+    .mfa-card {
+        padding: 20px;
+    }
+    .mfa-footer {
+        flex-direction: column;
+        gap: 0;
+    }
+}

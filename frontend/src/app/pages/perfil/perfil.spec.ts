@@ -4,10 +4,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import localePt from '@angular/common/locales/pt';
 import { LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
 import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
+import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { ZonedDatePipe } from '@/app/shared/pipes/zoned-date.pipe';
 import { PerfilPage } from './perfil';
 
@@ -81,6 +82,27 @@ describe('Perfil', () => {
         page.passwordForm.setValue({ current_password: 'a', new_password: 'b', new_password_confirm: 'c' });
         page.save();
         expect(add).toHaveBeenCalledTimes(2);
+        controller.verify();
+    });
+
+    it('só carrega MFA ao abrir a aba e limpa a sessão ao concluir a alteração', () => {
+        const { page, controller } = configure();
+        const fixture = TestBed.createComponent(PerfilPage);
+
+        fixture.detectChanges();
+        controller.expectOne(URL).flush(PROFILE);
+        controller.expectNone('/api/v1/me/mfa/');
+        fixture.componentInstance.onTabChange('mfa');
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/mfa/').flush({ enabled: false, setup_pending: false, recovery_codes_remaining: 0 });
+        fixture.detectChanges();
+        expect(fixture.nativeElement.textContent).toContain('Este recurso é opcional');
+        const clear = spyOn(TestBed.inject(AuthSessionService), 'clearSession');
+        const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
+
+        page.onMfaChanged();
+        expect(clear).toHaveBeenCalledTimes(1);
+        expect(navigate).toHaveBeenCalledWith('/landing/login');
         controller.verify();
     });
 });

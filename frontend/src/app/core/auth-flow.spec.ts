@@ -107,7 +107,7 @@ describe('Core authentication and shared organization', () => {
     });
 
     it('does not send organization to admin, organization selection or password change', () => {
-        for (const path of ['/admin/contracts/', '/me/organizations/', '/auth/change-password/']) {
+        for (const path of ['/admin/contracts/', '/me/organizations/', '/auth/change-password/', '/me/mfa/', '/me/mfa/setup/']) {
             http.get(`/api/v1${path}`).subscribe();
             const request = controller.expectOne(`/api/v1${path}`);
 
@@ -118,7 +118,7 @@ describe('Core authentication and shared organization', () => {
     });
 
     it('does not add Bearer or context to login, refresh and logout', () => {
-        for (const path of ['login', 'refresh', 'logout']) {
+        for (const path of ['login', 'login/mfa', 'refresh', 'logout']) {
             http.post(`/api/v1/auth/${path}/`, {}).subscribe();
             const request = controller.expectOne(`/api/v1/auth/${path}/`);
 

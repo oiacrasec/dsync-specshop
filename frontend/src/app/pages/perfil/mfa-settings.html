@@ -1,0 +1,73 @@
+<section class="flex flex-col gap-6 max-w-2xl text-surface-950 dark:text-surface-0" [attr.aria-busy]="loading()">
+    @if (error()) {
+    <p role="alert" class="text-red-700 dark:text-red-300 m-0">{{ error() }}</p>
+    } @if (loading()) {
+    <p role="status" class="text-surface-700 dark:text-surface-200 m-0">Aguarde…</p>
+    } @if (recoveryCodes().length) {
+    <h3 class="text-xl font-semibold">Guarde seus códigos reserva</h3>
+    <p>Use um código reserva se perder o acesso ao aplicativo autenticador. Cada código funciona uma vez.</p>
+    <p class="font-medium">Eles são exibidos apenas agora. Os códigos anteriores, se existiam, deixaram de funcionar.</p>
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-xl border border-surface-300 dark:border-surface-600 p-4">
+        @for (code of recoveryCodes(); track code) {
+        <li class="font-mono select-all break-all">{{ code }}</li>
+        }
+    </ul>
+    <ui-button label="Baixar códigos" icon="fa-solid fa-download" severity="secondary" (onClick)="downloadCodes()" />
+    <label class="flex gap-3 items-center min-h-11 cursor-pointer"><input #saved type="checkbox" [checked]="savedCodes()" (change)="savedCodes.set(saved.checked)" />Guardei os códigos em local seguro.</label>
+    <p>Suas sessões foram encerradas. Depois de guardar os códigos, entre novamente.</p>
+    <ui-button label="Concluir e entrar novamente" [disabled]="!savedCodes()" (onClick)="finish()" />
+    } @else if (setup(); as currentSetup) {
+    <h3 class="text-xl font-semibold">Configure seu aplicativo autenticador</h3>
+    <p>Leia o QR Code com o seu aplicativo ou informe a chave manualmente. Ao ativar, suas sessões serão encerradas e você entrará novamente.</p>
+    @if (qr()) { <img [src]="qr()" width="240" height="240" alt="QR Code para configurar seu aplicativo autenticador" class="bg-white rounded-lg max-w-full" /> }
+    <div class="flex flex-col gap-2"><span class="font-medium">Chave de configuração manual</span><code class="select-all break-all rounded-lg border border-surface-300 dark:border-surface-600 p-3">{{ currentSetup.secret }}</code></div>
+    <form [formGroup]="codeForm" (ngSubmit)="enable()" class="flex flex-col gap-3">
+        <label for="mfa-enable-code" class="font-medium">Código de 6 dígitos</label>
+        <input pInputText id="mfa-enable-code" formControlName="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="w-full min-h-11" />
+        <div class="flex flex-wrap gap-3">
+            <ui-button label="Ativar" type="submit" [disabled]="loading() || codeForm.invalid" [loading]="loading()" /><ui-button label="Reiniciar configuração" severity="secondary" [disabled]="loading()" (onClick)="start()" />
+        </div>
+    </form>
+    } @else if (status(); as current) {
+    <div class="flex flex-col gap-3">
+        <h3 class="text-xl font-semibold">{{ current.enabled ? 'Verificação em duas etapas ativada' : 'Proteja sua conta com duas etapas' }}</h3>
+        <p class="text-surface-700 dark:text-surface-200">Este recurso é opcional. Depois de ativar, você informa um código do aplicativo autenticador ao entrar, além da senha.</p>
+        @if (current.enabled) {
+        <p role="status">{{ current.recovery_codes_remaining }} códigos reserva disponíveis.</p>
+        }
+    </div>
+    @if (!current.enabled) {
+    <ui-button label="Configurar verificação em duas etapas" icon="fa-solid fa-shield-halved" [disabled]="loading()" (onClick)="start()" />
+    } @else if (!action()) {
+    <div class="flex flex-wrap gap-3">
+        <ui-button label="Gerar novos códigos reserva" severity="secondary" [disabled]="loading()" (onClick)="chooseAction('regenerate')" /><ui-button
+            label="Desativar"
+            severity="secondary"
+            [disabled]="loading()"
+            (onClick)="chooseAction('disable')"
+        />
+    </div>
+    } @else if (action() === 'disable') {
+    <form [formGroup]="disableForm" (ngSubmit)="submitAction()" class="flex flex-col gap-4">
+        <p>Confirme sua senha e um código do aplicativo ou um código reserva para desativar a proteção. Suas sessões serão encerradas e você entrará novamente.</p>
+        <ui-input-password inputId="mfa-disable-password" label="Senha atual" formControlName="password" autocomplete="current-password" [feedback]="false" />
+        <label for="mfa-disable-code" class="font-medium">Código do aplicativo ou código reserva</label><input pInputText id="mfa-disable-code" formControlName="code" autocomplete="one-time-code" maxlength="64" class="min-h-11" />
+        <div class="flex flex-wrap gap-3">
+            <ui-button label="Desativar verificação" type="submit" severity="danger" [disabled]="loading() || disableForm.invalid" [loading]="loading()" /><ui-button
+                label="Cancelar"
+                severity="secondary"
+                [disabled]="loading()"
+                (onClick)="chooseAction(null)"
+            />
+        </div>
+    </form>
+    } @else {
+    <form [formGroup]="codeForm" (ngSubmit)="submitAction()" class="flex flex-col gap-4">
+        <p>Os códigos reserva anteriores deixarão de funcionar e suas sessões serão encerradas. Confirme com um código do aplicativo ou um código reserva. Guarde os novos códigos antes de entrar novamente.</p>
+        <label for="mfa-regenerate-code" class="font-medium">Código do aplicativo ou código reserva</label><input pInputText id="mfa-regenerate-code" formControlName="code" autocomplete="one-time-code" maxlength="64" class="min-h-11" />
+        <div class="flex flex-wrap gap-3">
+            <ui-button label="Gerar novos códigos" type="submit" [disabled]="loading() || codeForm.invalid" [loading]="loading()" /><ui-button label="Cancelar" severity="secondary" [disabled]="loading()" (onClick)="chooseAction(null)" />
+        </div>
+    </form>
+    } } @else if (!loading()) { <ui-button label="Tentar novamente" severity="secondary" (onClick)="load()" /> }
+</section>

@@ -1,5 +1,39 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Proposta visual do segundo passo do login
+
+- Por solicitação do usuário e com referência em IM03.png, desenhada a página
+  Login · Verificação em duas etapas em design/datasync-core-telas.figcraft.
+- Reutilizados fundo, card branco de 560 px, Figtree, cores e componentes da seleção
+  de organização aprovada. Campo ampliado, Verificar em largura total, alternativas
+  no rodapé; autenticador/reserva/erro e versões 390/320 px conferidos visualmente.
+- Navegação autenticador ↔ reserva no protótipo desktop. Exemplos fictícios; sem
+  segredos reais. Biblioteca/tokens e código da aplicação não alterados nesta revisão.
+- FigCraft salvo e aberto na proposta. Aguardando aprovação antes de implementar.
+
+## 2026-10-31 — 9.4 MFA TOTP opcional
+
+- Decisão 88: usuário aprovou encerrar todas as sessões ao mudar o fator e reafirmou
+  que MFA é opcional, exigido apenas após ativação. ADR 0041 atualizado no mesmo assunto.
+- Backend users: credenciais cifradas, reservas HMAC, prova opaca com TTL/uso único,
+  proteção contra reuso e espera crescente persistida; tokens só após segundo fator.
+  Configuração, ativação, desativação, renovação e reset completos e auditados.
+- Recuperação: admin do contrato redefine comuns do próprio contrato; superadmin
+  redefine admins, inclusive inativos. Comando auditado para superadmins até 5.3.
+  Revisão corrigiu a distinção entre papel administrativo e situação ativa da conta.
+- Frontend: Perfil integrado, QR local, reservas uma vez/download e guarda antes de
+  sair; login com TOTP/reserva; resets nas telas de Usuários e Admins do contrato.
+- Dependências verificadas em fontes oficiais: PyOTP 2.10.0, cryptography 50.0.2,
+  qrcode 1.5.4 e tipos 1.5.6, licenças permissivas. QR em chunk sob demanda.
+- Migrations users.0008/audit.0011 aplicadas por solicitação; chave própria gerada
+  somente em backend/.env ignorado, sem exibição. Nenhum usuário ativado automaticamente.
+- Validação concluída: 756 testes backend/128 frontend, ruff check/format, lint,
+  format:check/build, OpenAPI validate/fail-on-warn, checks de migration/sistema/produção.
+  Concorrência e consultas constantes com 30 contas adicionais; sem teste de carga
+  produtiva. OWASP A01–A10 revisados, sem achados pendentes no diff.
+- ADR/API/OpenAPI/AGENTS/README/plano e memória sincronizados. Alterações sem commit,
+  aguardando revisão do usuário; próxima etapa 9.5 exige aprovação.
+
 ## 2026-10-31 — Seleção de organização no login e em modal
 
 - Avatar: seletores de `frontend/src/assets/layout/_topbar.scss` abrangem também

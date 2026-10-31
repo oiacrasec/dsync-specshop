@@ -25,3 +25,20 @@ def recent_logins(user, limit=RECENT_LOGINS):
         .order_by('-occurred_at')
         .values('occurred_at', 'ip')[:limit]
     )
+
+
+def mfa_status(user):
+    from django.utils import timezone
+
+    from .models import UserMfa
+
+    device = UserMfa.objects.filter(user_id=user.pk).first()
+    if device is None:
+        return {'enabled': False, 'setup_pending': False, 'recovery_codes_remaining': 0}
+    return {
+        'enabled': device.confirmed,
+        'setup_pending': not device.confirmed
+        and device.setup_expires_at is not None
+        and device.setup_expires_at > timezone.now(),
+        'recovery_codes_remaining': device.recovery_codes.count() if device.confirmed else 0,
+    }

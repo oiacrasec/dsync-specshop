@@ -104,3 +104,10 @@ Os tipos abstratos não criam tabelas ou migrations. Desde a etapa 2.1, `Plan` u
 `SharedModel`, `Organization` usa `ContractScopedModel` e `Contract` permanece
 como raiz do tenant e exceção do ADR 0012; esses concretos têm migration própria.
 As docstrings dos quatro tipos trazem exemplos das regras de visibilidade alvo.
+
+## Credenciais de 2FA (ADR 0041, etapa 9.4 em implementação)
+
+UserMfa, UserRecoveryCode e UserMfaChallenge são registros técnicos da conta,
+antes do tenant, como UserSession. Constam em UNSCOPED_RECORDS/OWNER_ONLY;
+sem CRUD genérico, consultas/ações filtradas pelo dono e testes de isolamento.
+Não são novos tipos de escopo para dados de negócio.

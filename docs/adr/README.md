@@ -58,6 +58,7 @@ para assunto novo; o status "Substituído por" fica para os ADRs antigos já sub
 | [0038](0038-excecao-de-permissao-na-atribuicao.md) | Exceção de permissão na atribuição de perfil | Aceito |
 | [0039](0039-armazenamento-de-midia.md) | Armazenamento de mídia configurável e privado | Aceito |
 | [0040](0040-design-system-no-figcraft.md) | Design system no FigCraft, versionado em `design/` | Aceito |
+| [0041](0041-verificacao-em-duas-etapas.md) | Verificação em duas etapas por TOTP | Aceito |
 
 ## Modelo
 

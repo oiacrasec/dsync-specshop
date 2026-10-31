@@ -50,6 +50,10 @@ export class ContratoService extends BaseCrudService {
         return this.http.post<ContractAdminPasswordReset>(`${this.contractUrl(publicId)}admins/${encodeURIComponent(userPublicId)}/reset-password/`, {});
     }
 
+    resetAdminMfa(publicId: string, userPublicId: string) {
+        return this.http.post<void>(`${this.contractUrl(publicId)}admins/${encodeURIComponent(userPublicId)}/reset-mfa/`, {});
+    }
+
     // Identificadores entram no caminho codificados: um valor forjado não muda o endpoint (CSPT).
     private contractUrl(publicId: string) {
         return `${this.baseUrl}/${CONTRACTS}/${encodeURIComponent(publicId)}/`;

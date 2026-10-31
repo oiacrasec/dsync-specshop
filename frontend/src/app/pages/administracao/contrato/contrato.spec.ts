@@ -277,6 +277,31 @@ describe('ContratoFormPage', () => {
         expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail }));
     });
 
+    it('só redefine o MFA do admin depois da confirmação e libera a ação ao terminar', () => {
+        configure(CONTRACT_ID);
+        controller = TestBed.inject(HttpTestingController);
+        const fixture = TestBed.createComponent(ContratoFormPage);
+        const page = fixture.componentInstance;
+        const confirmations = fixture.debugElement.injector.get(ConfirmationService);
+        let accept: (() => void) | undefined;
+
+        spyOn(confirmations, 'confirm').and.callFake((options) => {
+            accept = options.accept as () => void;
+
+            return confirmations;
+        });
+        page.ngOnInit();
+        controller.expectOne(`/api/v1/admin/contracts/${CONTRACT_ID}/`).flush(CONTRACT);
+        controller.expectOne((request) => request.url === `/api/v1/admin/contracts/${CONTRACT_ID}/admins/`).flush({ data: [ADMIN], total_records: 1 });
+        page.confirmResetMfa(ADMIN);
+        controller.expectNone(`/api/v1/admin/contracts/${CONTRACT_ID}/admins/${ADMIN_ID}/reset-mfa/`);
+        accept?.();
+        expect(page.isResetting(ADMIN_ID)).toBeTrue();
+        controller.expectOne(`/api/v1/admin/contracts/${CONTRACT_ID}/admins/${ADMIN_ID}/reset-mfa/`).flush(null, { status: 204, statusText: 'No Content' });
+        expect(page.isResetting(ADMIN_ID)).toBeFalse();
+        expect(page.resetResult).toBeNull();
+    });
+
     it('só redefine a senha do admin depois da confirmação', () => {
         configure(CONTRACT_ID);
         controller = TestBed.inject(HttpTestingController);

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterRenderEffect, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthLogoWidget } from '@/app/pages/auth/components/authlogowidget';
 import { Router, RouterModule } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
@@ -12,48 +13,15 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '@/app/core/services/auth.service';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { problemMessage } from '@/app/core/utils/api-problem';
+import { UiButton } from '@/app/shared/ui/button/button';
+import { LoginResponse } from '@/app/types/auth';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, AuthLogoWidget, RouterModule, InputTextModule, CheckboxModule, ButtonModule, ReactiveFormsModule],
-    template: `
-        <section class="animate-fadein animate-duration-300 animate-ease-in relative lg:pb-14 lg:py-52 py-36">
-            <div class="landing-container mx-auto relative z-10 px-12">
-                <div class="relative mt-28 max-w-184 mx-auto">
-                    <div
-                        class="w-full h-full inset-0 bg-white/64 dark:bg-surface-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[4deg] lg:rotate-[7deg] backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)] dark:shadow-sm"
-                    ></div>
-                    <div
-                        class="w-full h-full inset-0 bg-white/64 dark:bg-surface-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] lg:-rotate-[7deg] backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)] dark:shadow-sm"
-                    ></div>
-                    <form
-                        [formGroup]="form"
-                        (ngSubmit)="submit()"
-                        class="space-y-8 p-8 relative z-10 bg-white/64 dark:bg-surface-800 backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)]"
-                    >
-                        <div class="pt-8 pb-8">
-                            <div class="flex items-center justify-center">
-                                <app-auth-logo-widget />
-                            </div>
-                            <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync</h1>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <label for="username" class="font-medium text-surface-700 dark:text-white/64">Usuário</label>
-                            <input name="username" pInputText id="username" formControlName="username" autocomplete="username" class="w-full" />
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <label for="password" class="font-medium text-surface-700 dark:text-white/64">Senha</label>
-                            <input name="password" pInputText id="password" formControlName="password" type="password" autocomplete="current-password" class="w-full" />
-                        </div>
-                        <p class="text-red-500" role="alert">{{ errorMessage() }}</p>
-                        <p-button class="w-full" rounded type="submit" [loading]="loading()" [disabled]="loading()" label="Entrar"></p-button>
-                        <!-- DESABILITADO: recuperação e cadastro público fora do escopo atual. -->
-                    </form>
-                </div>
-            </div>
-        </section>
-    `
+    imports: [CommonModule, AuthLogoWidget, RouterModule, InputTextModule, CheckboxModule, ButtonModule, ReactiveFormsModule, UiButton],
+    templateUrl: './login.html',
+    styleUrl: './login.scss'
 })
 export class Login {
     private fb = inject(FormBuilder);
@@ -61,15 +29,27 @@ export class Login {
     private authSession = inject(AuthSessionService);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly mfaCode = viewChild<ElementRef<HTMLInputElement>>('mfaCode');
+    private readonly usernameInput = viewChild<ElementRef<HTMLInputElement>>('usernameInput');
 
     loading = signal(false);
     errorMessage = signal('');
+    readonly mfaToken = signal<string | null>(null);
+    readonly recoveryMode = signal(false);
+    readonly mfaForm = this.fb.nonNullable.group({ code: ['', Validators.required] });
     form = this.fb.nonNullable.group({
         username: ['', Validators.required],
         password: ['', Validators.required]
     });
 
     constructor() {
+        afterRenderEffect(() => {
+            const input = this.mfaCode() ?? this.usernameInput();
+
+            input?.nativeElement.focus();
+        });
+
         if (this.authSession.isAuthenticated()) {
             this.navigateAfterLogin();
         }
@@ -94,20 +74,30 @@ export class Login {
         this.loading.set(true);
         this.errorMessage.set('');
         const payload = this.form.getRawValue();
+        const revision = this.authSession.getRevision();
 
         this.authService
             .login(payload)
-            .pipe(finalize(() => this.loading.set(false)))
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                finalize(() => this.loading.set(false))
+            )
             .subscribe({
                 next: (response) => {
-                    try {
-                        this.authSession.setSession(response);
-                        this.form.controls.password.reset();
-                        this.navigateAfterLogin();
-                    } catch {
-                        this.authSession.clearSession();
-                        this.errorMessage.set('Não foi possível guardar a sessão neste navegador.');
+                    if (revision !== this.authSession.getRevision()) {
+                        return;
                     }
+
+                    this.form.controls.password.reset();
+
+                    if ('mfa_required' in response && response.mfa_required) {
+                        this.mfaToken.set(response.mfa_token);
+                        this.mfaForm.reset();
+
+                        return;
+                    }
+
+                    this.finishLogin(response as LoginResponse);
                 },
                 error: (error) => {
                     this.errorMessage.set(problemMessage(error, 'Não foi possível entrar. Tente novamente.'));
@@ -120,6 +110,65 @@ export class Login {
             });
     }
 
+    submitMfa() {
+        const token = this.mfaToken();
+
+        if (this.loading() || !token) {
+            return;
+        }
+
+        if (this.mfaForm.invalid) {
+            this.mfaForm.markAllAsTouched();
+            this.errorMessage.set('Informe o código para continuar.');
+
+            return;
+        }
+
+        this.loading.set(true);
+        this.errorMessage.set('');
+        const revision = this.authSession.getRevision();
+
+        this.authService
+            .loginMfa({ mfa_token: token, code: this.mfaForm.controls.code.value.trim() })
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                finalize(() => this.loading.set(false))
+            )
+            .subscribe({
+                next: (response) => {
+                    if (revision === this.authSession.getRevision()) {
+                        this.finishLogin(response);
+                    }
+                },
+                error: (error) => this.errorMessage.set(problemMessage(error, 'Não foi possível verificar. Tente novamente ou volte ao login.'))
+            });
+    }
+
+    private finishLogin(response: LoginResponse) {
+        try {
+            this.authSession.setSession(response);
+            this.mfaToken.set(null);
+            this.mfaForm.reset();
+            this.navigateAfterLogin();
+        } catch {
+            this.authSession.clearSession();
+            this.errorMessage.set('Não foi possível guardar a sessão neste navegador.');
+        }
+    }
+
+    toggleRecovery() {
+        this.recoveryMode.update((value) => !value);
+        this.mfaForm.reset();
+        this.errorMessage.set('');
+        this.mfaCode()?.nativeElement.focus();
+    }
+
+    backToPassword() {
+        this.mfaToken.set(null);
+        this.mfaForm.reset();
+        this.recoveryMode.set(false);
+        this.errorMessage.set('');
+    }
     private navigateAfterLogin() {
         const user = this.authSession.getUser();
 

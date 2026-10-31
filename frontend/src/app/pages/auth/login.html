@@ -1,0 +1,82 @@
+@if (mfaToken()) {
+<section class="mfa-screen">
+    <form [formGroup]="mfaForm" (ngSubmit)="submitMfa()" class="mfa-card bg-surface-0 dark:bg-surface-900 border-surface-200 dark:border-surface-700 text-surface-950 dark:text-surface-0" aria-labelledby="mfa-title" [attr.aria-busy]="loading()">
+        <header class="mfa-header">
+            <span class="mfa-icon bg-primary-50 dark:bg-primary-950 text-primary" aria-hidden="true"><i class="fa-regular fa-user"></i></span>
+            <div class="min-w-0 flex-1">
+                <h1 id="mfa-title">{{ recoveryMode() ? 'Use um código reserva' : 'Verificação em duas etapas' }}</h1>
+                <p class="text-surface-700 dark:text-surface-200">{{ recoveryMode() ? 'Recupere o acesso com um dos códigos que você guardou.' : 'Abra seu aplicativo autenticador e informe o código para continuar.' }}</p>
+            </div>
+        </header>
+        <div class="mfa-field">
+            <label for="mfa-code" class="font-medium text-surface-700 dark:text-surface-200">{{ recoveryMode() ? 'Código reserva' : 'Código do autenticador' }}</label>
+            <input
+                #mfaCode
+                pInputText
+                id="mfa-code"
+                type="text"
+                formControlName="code"
+                autocomplete="one-time-code"
+                autocapitalize="off"
+                spellcheck="false"
+                [attr.inputmode]="recoveryMode() ? 'text' : 'numeric'"
+                [maxlength]="recoveryMode() ? 64 : 6"
+                [placeholder]="recoveryMode() ? 'XXXX-XXXX-XXXX-XXXX' : '000000'"
+                class="mfa-code"
+                [class.mfa-code-recovery]="recoveryMode()"
+                [class.mfa-code-invalid]="!!errorMessage()"
+                [attr.aria-invalid]="!!errorMessage() || (mfaForm.controls.code.touched && mfaForm.controls.code.invalid)"
+                [attr.aria-describedby]="errorMessage() ? 'mfa-code-error' : 'mfa-code-help'"
+            />
+            @if (errorMessage()) {
+            <p id="mfa-code-error" role="alert" class="mfa-help text-red-700 dark:text-red-300">{{ errorMessage() }}</p>
+            } @else {
+            <p id="mfa-code-help" class="mfa-help text-surface-700 dark:text-surface-200">{{ recoveryMode() ? 'Cada código reserva pode ser usado uma única vez.' : 'São 6 dígitos. Você também pode colar o código.' }}</p>
+            }
+        </div>
+        <ui-button label="Verificar" type="submit" styleClass="block w-full" [style]="{ width: '100%', minHeight: '44px' }" [loading]="loading()" [disabled]="loading()" />
+        <footer class="mfa-footer border-surface-200 dark:border-surface-700">
+            <button type="button" class="text-surface-700 dark:text-surface-200" [disabled]="loading()" (click)="backToPassword()">Voltar ao login</button>
+            <button type="button" class="text-primary" [disabled]="loading()" (click)="toggleRecovery()">{{ recoveryMode() ? 'Usar autenticador' : 'Usar código reserva' }}</button>
+        </footer>
+    </form>
+</section>
+} @else {
+
+<section class="animate-fadein animate-duration-300 animate-ease-in relative lg:pb-14 lg:py-52 py-36">
+    <div class="landing-container mx-auto relative z-10 px-12">
+        <div class="relative mt-28 max-w-184 mx-auto">
+            <div
+                class="w-full h-full inset-0 bg-white/64 dark:bg-surface-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[4deg] lg:rotate-[7deg] backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)] dark:shadow-sm"
+            ></div>
+            <div
+                class="w-full h-full inset-0 bg-white/64 dark:bg-surface-800 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] lg:-rotate-[7deg] backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)] dark:shadow-sm"
+            ></div>
+            <form
+                [formGroup]="form"
+                (ngSubmit)="submit()"
+                class="space-y-8 p-8 relative z-10 bg-white/64 dark:bg-surface-800 backdrop-blur-[90px] rounded-3xl shadow-[0px_87px_24px_0px_rgba(120,149,206,0.00),0px_56px_22px_0px_rgba(120,149,206,0.01),0px_31px_19px_0px_rgba(120,149,206,0.03),0px_14px_14px_0px_rgba(120,149,206,0.04),0px_3px_8px_0px_rgba(120,149,206,0.06)]"
+            >
+                <div class="pt-8 pb-8">
+                    <div class="flex items-center justify-center">
+                        <app-auth-logo-widget />
+                    </div>
+                    <h1 class="text-4xl lg:text-6xl font-semibold text-surface-950 dark:text-surface-0 text-center">Datasync</h1>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label for="username" class="font-medium text-surface-700 dark:text-white/64">Usuário</label>
+                    <input name="username" pInputText id="username" #usernameInput formControlName="username" autocomplete="username" class="w-full" />
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="password" class="font-medium text-surface-700 dark:text-white/64">Senha</label>
+                    <input name="password" pInputText id="password" formControlName="password" type="password" autocomplete="current-password" class="w-full" />
+                </div>
+                <p class="text-red-500" role="alert">{{ errorMessage() }}</p>
+                <p-button class="w-full" rounded type="submit" [loading]="loading()" [disabled]="loading()" label="Entrar"></p-button>
+                <!-- DESABILITADO: recuperação e cadastro público fora do escopo atual. -->
+            </form>
+        </div>
+    </div>
+</section>
+}

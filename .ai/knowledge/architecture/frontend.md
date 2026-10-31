@@ -53,3 +53,17 @@
 
 - Ajuste aprovado: ação de confirmar usa sempre **Entrar**, sem nome de organização
   (frontend e FigCraft); seleção continua preservada ao filtrar.
+
+- 9.4 (2026-10-31): MFA opcional no Perfil → Verificação em duas etapas, componente
+  renderizado só ao abrir a aba. QR local sob demanda; segredo/códigos só em memória,
+  download explícito e confirmação de guarda antes de limpar sessão e voltar ao login.
+  Login mfa_required não grava sessão; /auth/login/mfa/ público, TOTP ou reserva,
+  resposta antiga ignorada/HTTP cancelado ao destruir. /me/mfa/ sem organização.
+  Mudanças encerram todas as sessões; exibição das reservas precede a saída (88).
+  Reset com confirmação nas ações de Usuários e Admins do contrato; validação real
+  no backend. Abas do Perfil roláveis em tela estreita; nenhum polling novo.
+
+- Proposta visual posterior à 9.4: FigCraft → Login · Verificação em duas etapas.
+  Mesmo cartão/fundo da seleção de organização, campo de código ampliado, Verificar
+  em largura total e alternativas no rodapé; estados autenticador/reserva/erro e
+  390/320 px. Ainda não aplicada ao código; aguarda aprovação do usuário.

@@ -111,8 +111,9 @@
                                 <p-tag value="Troca de senha pendente" severity="warn" />
                                 }
                             </div>
-                            <div>
+                            <div class="flex flex-wrap gap-2">
                                 <ui-button label="Redefinir senha" icon="pi pi-key" severity="secondary" [loading]="isResetting(admin.public_id)" (onClick)="confirmResetPassword(admin)"></ui-button>
+                                <ui-button label="Redefinir verificação em duas etapas" icon="fa-solid fa-shield-halved" severity="secondary" [disabled]="isResetting(admin.public_id)" (onClick)="confirmResetMfa(admin)"></ui-button>
                             </div>
                         </div>
                         }

@@ -1,12 +1,13 @@
+from django.db import transaction
 from django.utils.cache import add_never_cache_headers
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import AuthenticationFailed, NotFound
+from rest_framework.exceptions import AuthenticationFailed, NotFound, ValidationError
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
 from rest_framework.renderers import JSONRenderer
@@ -31,6 +32,13 @@ from apps.users.serializers import (
     ContractUserSerializer,
     LoginHistorySerializer,
     LoginSerializer,
+    MfaChallengeSerializer,
+    MfaCodeSerializer,
+    MfaDisableSerializer,
+    MfaLoginSerializer,
+    MfaRecoveryCodesSerializer,
+    MfaSetupSerializer,
+    MfaStatusSerializer,
     MyProfileSerializer,
     PasswordChangeSerializer,
     PreferencesSerializer,
@@ -54,7 +62,16 @@ LOGIN_RESPONSE = inline_serializer('LoginResponse', {**TOKENS, 'user': UserSumma
 USER_RESPONSE = inline_serializer('PasswordChangeResponse', {'user': UserSummarySerializer()})
 
 
-@extend_schema(request=LoginSerializer, responses={200: LOGIN_RESPONSE})
+@extend_schema(
+    request=LoginSerializer,
+    responses={
+        200: PolymorphicProxySerializer(
+            component_name='LoginResult',
+            serializers=[LOGIN_RESPONSE, MfaChallengeSerializer],
+            resource_type_field_name=None,
+        )
+    },
+)
 class LoginView(AuthView):
     throttle_classes = [LoginThrottle]
 
@@ -75,6 +92,8 @@ class LoginView(AuthView):
         except ContractInactive:
             mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
             raise
+        if tokens.get('mfa_required'):
+            return Response(tokens)
         mark_auth_access(request, action=AccessLogAction.LOGIN_SUCCESS, user=request.user)
         return Response({**tokens, 'user': UserSummarySerializer(request.user).data})
 
@@ -219,6 +238,7 @@ class UserViewSet(BaseModelViewSet):
     permission_resource = 'user'
     required_permission = {
         'reset_password': 'user:manage',
+        'reset_mfa': 'user:manage',
         'access': 'user:view',
         'replace_access': 'assignment:create',
     }
@@ -247,6 +267,15 @@ class UserViewSet(BaseModelViewSet):
         add_never_cache_headers(response)
         return response
 
+    @extend_schema(request=None, responses={204: None})
+    @action(detail=True, methods=['post'], url_path='reset-mfa')
+    def reset_mfa(self, request, *args, **kwargs):
+        try:
+            services.reset_mfa(user=self.get_object(), actor=request.user)
+            return build_result_response(None, status_code=status.HTTP_204_NO_CONTENT)
+        except Exception as exc:
+            return build_exception_response(exception=exc, request=request)
+
     @extend_schema(request=None, responses={200: UserAccessOutputSerializer})
     @action(detail=True, methods=['get'])
     def access(self, request, *args, **kwargs):
@@ -260,3 +289,70 @@ class UserViewSet(BaseModelViewSet):
         serializer.is_valid(raise_exception=True)
         rbac_services.replace_user_access(user=user, actor=request.user, **serializer.validated_data)
         return Response(user_access(user))
+
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+@method_decorator(sensitive_post_parameters('mfa_token', 'code'), name='dispatch')
+@extend_schema(request=MfaLoginSerializer, responses={200: LOGIN_RESPONSE})
+class MfaLoginView(AuthView):
+    def post(self, request):
+        serializer = MfaLoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            tokens = services.login_mfa(request=request, **serializer.validated_data)
+        except AuthenticationFailed, ContractInactive, ValidationError:
+            mark_auth_access(request, action=AccessLogAction.LOGIN_FAILURE)
+            raise
+        mark_auth_access(request, action=AccessLogAction.LOGIN_SUCCESS, user=request.user)
+        return Response({**tokens, 'user': UserSummarySerializer(request.user).data})
+
+
+@extend_schema(responses={200: MfaStatusSerializer})
+class MyMfaView(BaseAPIView):
+    permission_classes = [AllowAuthenticated]
+
+    def get(self, request):
+        from .selectors import mfa_status
+
+        return Response(mfa_status(request.user))
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@extend_schema(request=None, responses={200: MfaSetupSerializer})
+class MfaSetupView(BaseAPIView):
+    permission_classes = [AllowAuthenticated]
+    throttle_classes = [PasswordChangeThrottle]
+
+    def post(self, request):
+        return Response(services.setup_mfa(user=request.user))
+
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+@method_decorator(sensitive_post_parameters('code', 'password'), name='dispatch')
+class MfaChangeView(BaseAPIView):
+    permission_classes = [AllowAuthenticated]
+    serializer_class = MfaCodeSerializer
+    operation = None
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = services.change_mfa(user=request.user, operation=self.operation, **serializer.validated_data)
+        response_status = status.HTTP_204_NO_CONTENT if self.operation == 'disable' else status.HTTP_200_OK
+        return Response(result, status=response_status)
+
+
+@extend_schema(request=MfaCodeSerializer, responses={200: MfaRecoveryCodesSerializer})
+class MfaEnableView(MfaChangeView):
+    operation = 'enable'
+
+
+@extend_schema(request=MfaDisableSerializer, responses={204: None})
+class MfaDisableView(MfaChangeView):
+    serializer_class = MfaDisableSerializer
+    operation = 'disable'
+
+
+@extend_schema(request=MfaCodeSerializer, responses={200: MfaRecoveryCodesSerializer})
+class MfaRecoveryCodesView(MfaChangeView):
+    operation = 'regenerate'

@@ -1,14 +1,15 @@
 # Autenticação — JWT (API v1)
 
 Implementação das etapas 0.3 e 6.4, conforme ADRs 0004, 0007 e 0034. A API exige autenticação
-por padrão; apenas login, refresh e logout são públicos. Não usa sessões ou cookies
+por padrão; apenas login (incluindo o segundo passo de 2FA), refresh e logout são públicos. Não usa sessões ou cookies
 de autenticação do Django. Entrada e saída em JSON, sob HTTPS em produção.
 
 ## Endpoints
 
 | Método e rota | Entrada | Sucesso |
 |---|---|---|
-| `POST /api/v1/auth/login/` | `username`, `password` | 200, `access`, `refresh` e `user` |
+| `POST /api/v1/auth/login/` | `username`, `password` | 200, tokens/user sem 2FA; prova temporária se houver 2FA confirmado |
+| `POST /api/v1/auth/login/mfa/` | `mfa_token`, `code` | 200, `access`, `refresh` e `user` após verificar o segundo fator |
 | `POST /api/v1/auth/refresh/` | `refresh` | 200, novos `access` e `refresh` |
 | `POST /api/v1/auth/logout/` | `refresh` | 204, sem corpo |
 | `POST /api/v1/auth/change-password/` (autenticado) | `current_password`, `new_password`, `new_password_confirm` | 200, resumo `user` atualizado |
@@ -19,7 +20,7 @@ Login:
 {"username": "usuario", "password": "senha-do-usuario"}
 ```
 
-Login retorna:
+Login sem 2FA retorna:
 
 ```json
 {
@@ -37,6 +38,12 @@ Login retorna:
 
 `name` vem de `first_name` e pode ser vazio. Os campos do resumo são explícitos;
 sem ID interno, e-mail, contrato, hash de senha ou permissões. Não acrescenta consulta.
+Contas com 2FA confirmado recebem no primeiro passo
+`{"mfa_required": true, "mfa_token": "<prova-temporaria>", "expires_in": 300}`.
+Ainda não há JWT nem UserSession; só o segundo passo confirma o login. A prova fica
+só em memória no cliente e não autentica qualquer outro endpoint. Ver [2FA](mfa.md)
+para configuração opcional, recuperação e encerramento das sessões após alterações.
+
 Refresh continua retornando somente:
 
 ```json

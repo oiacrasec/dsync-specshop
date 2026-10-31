@@ -44,7 +44,11 @@ export class UsuarioPage implements OnInit {
         this.tableActions = permissions.actions;
 
         if (this.permissionContext.hasPermission(PERMISSION_KEYS.USER_MANAGE)) {
-            this.tableActions = [...this.tableActions, { id: 'reset-password', label: 'Redefinir senha', icon: 'pi pi-key', handler: (row) => this.confirmResetPassword(row) }];
+            this.tableActions = [
+                ...this.tableActions,
+                { id: 'reset-password', label: 'Redefinir senha', icon: 'pi pi-key', handler: (row) => this.confirmResetPassword(row) },
+                { id: 'reset-mfa', label: 'Redefinir verificação em duas etapas', icon: 'fa-solid fa-shield-halved', handler: (row) => this.confirmResetMfa(row) }
+            ];
         }
     }
 
@@ -91,6 +95,19 @@ export class UsuarioPage implements OnInit {
                     }
                 });
             }
+        });
+    }
+
+    private confirmResetMfa(user: ContractUser) {
+        this.confirmationService.confirm({
+            header: 'Redefinir verificação em duas etapas',
+            message: `Remover a verificação em duas etapas de "${user.username}"? As sessões serão encerradas e os códigos reserva serão invalidados. O usuário poderá configurar novamente no Perfil. Esta ação está disponível apenas para usuários que não são administradores do contrato.`,
+            icon: 'pi pi-exclamation-triangle',
+            accept: () =>
+                this.usuarioService.resetMfa(user.public_id).subscribe({
+                    next: () => this.messageService.add({ severity: 'success', summary: 'Verificação redefinida', detail: 'Proteção removida e sessões encerradas. O usuário pode configurar novamente.' }),
+                    error: (error: unknown) => this.messageService.add({ severity: 'error', summary: 'Falha ao redefinir', detail: problemMessage(error, 'Não foi possível redefinir a verificação em duas etapas.') })
+                })
         });
     }
 }

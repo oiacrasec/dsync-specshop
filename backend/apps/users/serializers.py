@@ -173,3 +173,36 @@ class UserSessionSerializer(BaseSerializer):
 class LoginHistorySerializer(BaseSerializer):
     occurred_at = serializers.DateTimeField(read_only=True)
     ip = serializers.IPAddressField(read_only=True)
+
+
+class MfaCodeSerializer(BaseSerializer):
+    code = serializers.CharField(max_length=64, trim_whitespace=True, write_only=True)
+
+
+class MfaLoginSerializer(MfaCodeSerializer):
+    mfa_token = serializers.CharField(max_length=128, trim_whitespace=False, write_only=True)
+
+
+class MfaDisableSerializer(MfaCodeSerializer):
+    password = serializers.CharField(trim_whitespace=False, write_only=True)
+
+
+class MfaStatusSerializer(BaseSerializer):
+    enabled = serializers.BooleanField(read_only=True)
+    setup_pending = serializers.BooleanField(read_only=True)
+    recovery_codes_remaining = serializers.IntegerField(read_only=True)
+
+
+class MfaSetupSerializer(BaseSerializer):
+    secret = serializers.CharField(read_only=True)
+    otpauth_url = serializers.CharField(read_only=True)
+
+
+class MfaRecoveryCodesSerializer(BaseSerializer):
+    recovery_codes = serializers.ListField(child=serializers.CharField(), read_only=True)
+
+
+class MfaChallengeSerializer(BaseSerializer):
+    mfa_required = serializers.BooleanField(read_only=True)
+    mfa_token = serializers.CharField(read_only=True)
+    expires_in = serializers.IntegerField(read_only=True)
