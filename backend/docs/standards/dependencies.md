@@ -1,5 +1,8 @@
 # Dependências de autenticação
 
+Revisão posterior de frontend/backend, incluindo Pillow 13.0.0 e os requirements:
+[segurança das dependências — 2026-10-31](../../../docs/security/dependencies.md).
+
 Inventário das dependências adicionadas na etapa JWT. O inventário das demais
 dependências do backend ainda não foi materializado nesta entrega.
 

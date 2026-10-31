@@ -1,5 +1,22 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Primeiro lote de segurança das dependências validado
+
+- Escopo frontend + backend aprovado; plano ativo agora em
+  `docs/plans/entrega-2-seguranca-dependencias.md`.
+- Angular 21.2.25/CLI-build 21.2.29/CDK 21.2.14, PostCSS 8.5.32; `primeclt` sem uso
+  removida. npm 101 → 48 avisos: zero críticas/altas, 47 moderadas de ferramentas
+  (glob/minimatch/uuid) e Quill baixo. Produção: 21 → 1 (Quill).
+- Quill só no CMS desabilitado: pergunta enviada sobre remover/manter/avaliar versão
+  anterior; ainda sem resposta, dependência não alterada. Não reativar o exemplo.
+- Pillow 12.3.0 → 13.0.0 (MIT-CMU): 39 avisos → zero. SDK e resolução dos requirements
+  produção/desenvolvimento auditados, `pip check` OK; ferramenta temporária fora do SDK.
+- 769 testes backend/143 frontend passaram; lint/formato/build/ruff/migrations/checks
+  passaram. Bundle ~1,31 MB (~272,20 kB); sem alteração de queries/locks de produto.
+- Relatório com fontes, alcance, limites e pendências: `docs/security/dependencies.md`.
+  Dependências, READMEs, inventário, overview e handoff atualizados; commit do primeiro
+  lote autorizado pelo usuário. 48 avisos npm e decisão sobre Quill continuam pendentes.
+
 ## 2026-10-31 — Prioridades e requisitos de deploy definidos pelo usuário
 
 - Ordem: 1) segurança das dependências; 2) deploy em VPS / servidor local.

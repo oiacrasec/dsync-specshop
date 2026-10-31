@@ -6,7 +6,7 @@ da Entrega 1. Comunica-se com o backend **só pela API HTTP** (`/api/v1/`).
 
 | Item | Versão |
 |---|---|
-| Angular | 21 (LTS) |
+| Angular | 21.2.25 (LTS; CLI/build 21.2.29) |
 | PrimeNG | 21 |
 | Node (build) | 24 LTS |
 
@@ -20,6 +20,11 @@ npm run format:check  # Prettier
 npm run build
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
+
+Revisão de segurança das dependências: [relatório de 2026-10-31](../docs/security/dependencies.md).
+Angular/CDK/PostCSS atualizados; ferramenta `primeclt` sem uso removida. Auditorias:
+`npm audit` e `npm audit --omit=dev`. Quill e ferramentas transitivas ainda possuem
+avisos documentados; o relatório distingue o alcance de desenvolvimento/produção.
 
 ## Ambientes
 

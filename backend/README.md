@@ -2,6 +2,11 @@
 
 API Django autônoma do monorepo.
 
+Revisão de dependências: Pillow 13.0.0 corrige os avisos encontrados na 12.3.0,
+com fluxos de mídia/perfil validados. Auditorias do SDK e da resolução dos
+requirements de produção/desenvolvimento sem avisos conhecidos em 2026-10-31.
+Detalhes e limites no [relatório de segurança](../docs/security/dependencies.md).
+
 Não usa Django Admin, sessões nem messages (ADR 0008). A administração própria será
 implementada na API e no frontend; por enquanto, a manutenção usa management commands,
 como `createsuperuser`. As rotas versionadas usam `/api/v1/`. JWT e `IsAuthenticated` são globais. Login, refresh e

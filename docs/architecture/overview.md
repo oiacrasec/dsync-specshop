@@ -67,6 +67,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/docs/standards/django-style.md` e `backend/docs/examples/model.md` (estilo compacto de models, limite de 120 caracteres) | criado |
 | `backend/` + `frontend/` (9.4: MFA TOTP opcional, Perfil/login, reservas e reset administrativo auditado, ADR 0041) | implementado |
 | `backend/` + `frontend/` (9.5: Minhas permissões no Perfil, retrato próprio `/me/access/` com organizações, perfis e códigos efetivos; acesso total do admin em aviso) | implementado |
+| `backend/` + `frontend/` (Entrega 2: Angular 21 LTS/CDK/PostCSS e Pillow 13 atualizados; auditoria de dependências em `docs/security/dependencies.md`) | correções validadas; pendências npm documentadas |
 | `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
 | `frontend/` | criado; auth/contexto (6.5) e administração de contratos (6.8) adaptados ao Core |
 | `AGENTS.md` (frontend) | criado |
