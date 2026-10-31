@@ -25,16 +25,22 @@ largura total e alternativas no rodapé. Inclui autenticador, reserva, erro e ve
 Valores mostrados são fictícios. Aplicada ao frontend (`pages/auth/login.html`/`.scss`); falta conferência visual.
 MFA continua opcional e só aparece no login de quem o ativou.
 
-A página **Login · proposta** leva o primeiro passo ao mesmo cartão: logo e título
+A página **Login** leva o primeiro passo ao mesmo cartão: logo e título
 compactos, campos de 44 px com mostrar senha, Entrar em largura total, erro junto aos
 campos e rodapé orientando a pedir a redefinição da senha ao administrador. Inclui o
-login atual (antes), o erro e versões 390/320 px. O campo de senha foi desvinculado do
+erro e versões 390/320 px. O campo de senha foi desvinculado do
 componente para receber o ícone. Aplicada em `pages/auth/login.html`/`.scss`.
 
-A página **Filtros avançados · proposta** traz a v2 aprovada (seção "Proposta v2"): barra
+A página **Filtros avançados** traz o desenho aprovado: barra
 única com busca, Filtros avançados (com quantidade) e Limpar só com filtro aplicado; os
 campos dinâmicos abrem presos à barra, em grade de colunas de pelo menos 240 px.
-Aplicada em `shared/ui/filter`. As versões anteriores ficam na página como histórico.
+Aplicada em `shared/ui/filter`.
+
+A página **Perfil · Verificação em duas etapas** mostra a aba do Perfil em quatro estados:
+desativada (situação e como funciona), configurando (QR Code, chave manual, código e senha
+atual), códigos reserva exibidos uma única vez e ativada (reservas restantes e desativação).
+
+Propostas superadas e capturas "antes" são removidas do arquivo depois de aplicadas.
 
 ## Biblioteca
 
