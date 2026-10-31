@@ -4,7 +4,7 @@ from django.db.models import Exists, OuterRef, Prefetch, Q
 from apps.core.permission_registry import PERMISSIONS, PermissionScope
 
 from .constants import ESSENTIAL_PROFILE_KEY
-from .evaluation import Grant
+from .evaluation import Grant, evaluate
 from .models import Assignment, AssignmentExclusion, Profile, ProfilePermission
 
 
@@ -41,7 +41,11 @@ def user_grants(user):
     """
     if user.contract_id is None:
         return []
-    assignments = (
+    return [_assignment_grant(assignment) for assignment in _active_assignments(user)]
+
+
+def _active_assignments(user):
+    return (
         Assignment.objects.filter(user=user, contract_id=user.contract_id, is_active=True)
         .filter(
             Q(profile__isnull=True)
@@ -60,31 +64,28 @@ def user_grants(user):
         )
         .only('scope', 'scope_organization_id', 'permission_code', 'profile__system_key')
     )
-    grants = []
-    for assignment in assignments:
-        if assignment.profile_id is None:
-            codes = frozenset({assignment.permission_code})
-            essential = False
-        else:
-            codes = frozenset(item.permission_code for item in assignment.profile.permissions.all())
-            essential = assignment.profile.system_key == ESSENTIAL_PROFILE_KEY
-        grants.append(
-            Grant(
-                scope=PermissionScope(assignment.scope),
-                scope_organization=assignment.scope_organization_id,
-                excluded_organizations=frozenset(
-                    item.excluded_organization_id for item in assignment.exclusions.all() if not item.permission_code
-                ),
-                codes=codes,
-                essential=essential,
-                excluded_codes=frozenset(
-                    (item.excluded_organization_id, item.permission_code)
-                    for item in assignment.exclusions.all()
-                    if item.permission_code
-                ),
-            )
-        )
-    return grants
+
+
+def _assignment_grant(assignment):
+    if assignment.profile_id is None:
+        codes = frozenset({assignment.permission_code})
+        essential = False
+    else:
+        codes = frozenset(item.permission_code for item in assignment.profile.permissions.all())
+        essential = assignment.profile.system_key == ESSENTIAL_PROFILE_KEY
+    exclusions = assignment.exclusions.all()
+    return Grant(
+        scope=PermissionScope(assignment.scope),
+        scope_organization=assignment.scope_organization_id,
+        excluded_organizations=frozenset(
+            item.excluded_organization_id for item in exclusions if not item.permission_code
+        ),
+        codes=codes,
+        essential=essential,
+        excluded_codes=frozenset(
+            (item.excluded_organization_id, item.permission_code) for item in exclusions if item.permission_code
+        ),
+    )
 
 
 def active_admin_count(contract_id, *, exclude_assignment_id=None, exclude_user_id=None):
@@ -136,9 +137,12 @@ def accessible_organizations(user):
     do usuário, alcançada por alguma concessão ativa (CONTRACT menos exceções, ou
     ORGANIZATION). Filtra no banco: 3 queries de concessões + 1 de organizações.
     """
+    return _reachable_organizations(user, user_grants(user))
+
+
+def _reachable_organizations(user, grants):
     from apps.contracts.models import Organization
 
-    grants = user_grants(user)
     if not grants:
         return Organization.objects.unscoped().none()  # Superadmin não tem contrato no contexto.
     organizations = Organization.objects.filter(contract_id=user.contract_id, is_active=True).order_by('name', 'pk')
@@ -226,3 +230,44 @@ def user_access(user):
         ],
         'grants': grants,
     }
+
+
+def my_access(user):
+    """Retrato só leitura do próprio acesso; não expõe perfis atribuíveis nem outras contas.
+
+    Carrega concessões e metadados uma vez, em 3 queries, e organizações em mais uma.
+    Avaliação em memória reaproveita exatamente as regras da autorização (ADR 0009).
+    """
+    assignments = list(
+        _active_assignments(user).only(
+            'scope',
+            'scope_organization_id',
+            'permission_code',
+            'profile__system_key',
+            'profile__public_id',
+            'profile__name',
+        )
+    )
+    grants = [_assignment_grant(assignment) for assignment in assignments]
+    organizations = _reachable_organizations(user, grants).only('public_id', 'name')
+    result = []
+    for organization in organizations:
+        evaluation = evaluate(grants, organization.pk, registry=PERMISSIONS)
+        profiles = {
+            assignment.profile_id: {
+                'public_id': assignment.profile.public_id,
+                'name': assignment.profile.name,
+            }
+            for assignment, grant in zip(assignments, grants, strict=True)
+            if assignment.profile_id is not None and grant.reaches(organization.pk)
+        }
+        result.append(
+            {
+                'public_id': organization.public_id,
+                'name': organization.name,
+                'profiles': sorted(profiles.values(), key=lambda item: (item['name'], str(item['public_id']))),
+                'permissions': sorted(evaluation.permissions),
+                'all_permissions': any(grant.essential and grant.reaches(organization.pk) for grant in grants),
+            }
+        )
+    return {'organizations': result}

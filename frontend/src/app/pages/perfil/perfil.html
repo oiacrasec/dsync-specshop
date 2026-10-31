@@ -12,6 +12,9 @@
                 <p-tab value="principal">Principal</p-tab>
                 <p-tab value="senha">Senha</p-tab>
                 <p-tab value="mfa">Verificação em duas etapas</p-tab>
+                @if (showMyPermissions()) {
+                <p-tab value="permissoes">Minhas permissões</p-tab>
+                }
                 <p-tab value="sessoes">Sessões</p-tab>
             </p-tablist>
             <p-tabpanels>
@@ -83,6 +86,13 @@
                     <app-mfa-settings (changed)="onMfaChanged()" />
                     }
                 </p-tabpanel>
+                @if (showMyPermissions()) {
+                <p-tabpanel value="permissoes">
+                    @if (permissionsOpened()) {
+                    <app-my-permissions />
+                    }
+                </p-tabpanel>
+                }
                 <p-tabpanel value="sessoes">
                     @if (sessions(); as active) {
                     <div class="flex flex-col gap-8">

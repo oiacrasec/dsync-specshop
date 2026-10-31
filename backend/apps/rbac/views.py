@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from apps.core.context import resolve_organization
@@ -12,8 +13,8 @@ from .constants import ACTION_LABELS, PERMISSION_LABELS, RESOURCE_LABELS
 from .filters import ProfileFilterSet
 from .models import Profile, ProfilePermission
 from .permissions import AllowAuthenticated
-from .selectors import accessible_organizations
-from .serializers import OrganizationSummarySerializer, ProfileSerializer
+from .selectors import accessible_organizations, my_access
+from .serializers import MyAccessSerializer, OrganizationSummarySerializer, ProfileSerializer
 from .utils import access_evaluation
 
 
@@ -29,6 +30,18 @@ class MyOrganizationsView(BaseAPIView):
     def get(self, request):
         organizations = accessible_organizations(request.user).only('public_id', 'name')
         return Response(OrganizationSummarySerializer(organizations, many=True).data)
+
+
+@extend_schema(responses={200: MyAccessSerializer})
+class MyAccessView(BaseAPIView):
+    """Retrato do próprio acesso em todas as organizações; sem header de organização."""
+
+    permission_classes = [AllowAuthenticated]
+
+    def get(self, request):
+        if request.user.is_superuser:
+            raise PermissionDenied()
+        return Response(MyAccessSerializer(my_access(request.user)).data)
 
 
 @extend_schema(

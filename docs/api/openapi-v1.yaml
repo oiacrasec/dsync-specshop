@@ -1361,6 +1361,40 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/me/access/:
+    get:
+      operationId: me_access_retrieve
+      description: Retrato do próprio acesso em todas as organizações; sem header
+        de organização.
+      tags:
+      - me
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyAccess'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/me/logins/:
     get:
       operationId: me_logins_list
@@ -4549,6 +4583,54 @@ components:
       - enabled
       - recovery_codes_remaining
       - setup_pending
+    MyAccess:
+      type: object
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyOrganizationAccess'
+      required:
+      - organizations
+    MyAccessProfile:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+      - public_id
+    MyOrganizationAccess:
+      type: object
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        name:
+          type: string
+          readOnly: true
+          title: Nome
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyAccessProfile'
+        permissions:
+          type: array
+          items:
+            type: string
+        all_permissions:
+          type: boolean
+      required:
+      - all_permissions
+      - name
+      - permissions
+      - profiles
+      - public_id
     MyProfile:
       type: object
       description: |-

@@ -50,5 +50,5 @@ export const PUBLIC_AUTH_PATHS = ['/auth/login/', '/auth/login/mfa/', '/auth/ref
 
 // X-Organization-Id só na área do cliente: superadmin, autenticação, admin e troca de organização ficam sem.
 export function needsOrganizationHeader(path: string, superuser: boolean): boolean {
-    return !superuser && !path.startsWith('/auth/') && !path.startsWith('/admin/') && !path.startsWith('/me/mfa/') && path !== '/me/organizations/';
+    return !superuser && !path.startsWith('/auth/') && !path.startsWith('/admin/') && !path.startsWith('/me/mfa/') && path !== '/me/organizations/' && path !== '/me/access/';
 }

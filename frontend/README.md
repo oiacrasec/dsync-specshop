@@ -43,6 +43,15 @@ compatível). Sem polling. Primeiro acesso obrigatório redireciona à troca de 
 superadmin vai direto à home sem organização. Campos de senha não são persistidos.
 Erros seguem RFC 9457. Detalhes e limites: [autenticação](docs/architecture/authentication.md).
 
+## Perfil — Minhas permissões
+
+O Perfil inclui **Minhas permissões** antes de Sessões (9.5), oculta para superadmin.
+Carrega `/me/access/` ao abrir a aba, sem header de organização, e usa o catálogo de
+permissões para os rótulos. Mostra organizações em acordeão com a atual aberta,
+perfis e ações concedidas; administrador do contrato vê aviso de acesso total.
+Resultado em memória até sair do Perfil; falhas permitem nova tentativa. Contrato:
+[Minhas permissões](../docs/api/my-access.md).
+
 ## Locale
 
 `LOCALE_ID` é `pt-BR` (`registerLocaleData` no `app.config.ts`) e o `index.html` declara

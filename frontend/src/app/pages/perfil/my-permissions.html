@@ -1,0 +1,68 @@
+<section class="flex flex-col gap-4" aria-labelledby="my-permissions-title" [attr.aria-busy]="loading()">
+    <div class="flex flex-col gap-1">
+        <h3 id="my-permissions-title" class="text-base font-semibold text-surface-900 dark:text-surface-0">{{ contractAdmin() ? 'Seu acesso como administrador do contrato' : 'O que você pode fazer em cada organização' }}</h3>
+        <p class="text-sm text-surface-700 dark:text-white/64">{{ contractAdmin() ? 'Somente leitura. Você tem acesso a todas as organizações do contrato.' : 'Somente leitura. Para mudar suas permissões, fale com o administrador do contrato.' }}</p>
+    </div>
+
+    @if (loading()) {
+    <p role="status" class="text-sm text-surface-700 dark:text-white/64">Carregando suas permissões…</p>
+    } @else if (error()) {
+    <div class="flex flex-col items-start gap-2">
+        <p role="alert" class="text-sm text-red-700 dark:text-red-300">{{ error() }}</p>
+        <ui-button label="Tentar novamente" severity="secondary" (onClick)="load()" />
+    </div>
+    } @else { @for (organization of organizations(); track organization.public_id) {
+    <details class="group rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden min-w-0" [open]="organization.public_id === currentOrganization()">
+        <summary
+            class="flex flex-wrap items-center gap-2.5 min-h-13 px-4 py-3 cursor-pointer list-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary group-open:bg-surface-50 dark:group-open:bg-surface-800 [&::-webkit-details-marker]:hidden"
+        >
+            <i class="fa-solid fa-chevron-right text-xs text-surface-700 dark:text-surface-200 group-open:rotate-90" aria-hidden="true"></i>
+            <i class="fa-regular fa-building text-primary" aria-hidden="true"></i>
+            <span class="font-semibold text-sm text-surface-900 dark:text-surface-0 break-words min-w-0 flex-1 sm:flex-initial">{{ organization.name }}</span>
+            @if (organization.public_id === currentOrganization()) {
+            <p-tag value="Atual" severity="info" />
+            }
+            <span class="w-full sm:w-auto sm:ml-auto text-xs text-surface-700 dark:text-white/64">
+                @if (organization.all_permissions) { Todas as permissões } @else { {{ organization.groups.length }} {{ organization.groups.length === 1 ? 'recurso' : 'recursos' }} · {{ organization.permissions.length }} {{
+                organization.permissions.length === 1 ? 'permissão' : 'permissões' }} }
+            </span>
+        </summary>
+        <div class="flex flex-col gap-3.5 p-4 border-t border-surface-200 dark:border-surface-700">
+            <div class="flex flex-wrap items-center gap-2 text-sm">
+                <span class="text-surface-700 dark:text-white/64">Perfis:</span>
+                @for (profile of organization.profiles; track profile.public_id) {
+                <span class="px-2.5 py-1 rounded-full bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0 break-words max-w-full">{{ profile.name }}</span>
+                } @empty {
+                <span class="text-surface-700 dark:text-white/64">Nenhum perfil atribuído. Acesso por permissões avulsas.</span>
+                }
+            </div>
+            @if (organization.all_permissions) {
+            <div class="flex flex-col gap-1 text-sm">
+                <p class="font-semibold text-surface-900 dark:text-surface-0">Todas as permissões</p>
+                <p class="text-surface-700 dark:text-white/64">Seu perfil concede todas as permissões desta organização, inclusive as adicionadas depois.</p>
+            </div>
+            } @else if (organization.groups.length) {
+            <dl class="rounded-lg border border-surface-200 dark:border-surface-700 divide-y divide-surface-200 dark:divide-surface-700">
+                @for (group of organization.groups; track group.resource) {
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-3.5 py-3">
+                    <dt class="sm:w-44 shrink-0 font-medium text-sm text-surface-900 dark:text-surface-0">{{ group.label }}</dt>
+                    <dd class="flex flex-wrap gap-2">
+                        @for (permission of group.permissions; track permission.code) {
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 px-2.5 py-1 text-xs">
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            <span><span class="sr-only">Permitido: </span>{{ permission.label }}</span>
+                        </span>
+                        }
+                    </dd>
+                </div>
+                }
+            </dl>
+            } @else {
+            <p class="text-sm text-surface-700 dark:text-white/64">Nenhuma permissão concedida nesta organização.</p>
+            }
+        </div>
+    </details>
+    } @empty {
+    <p class="text-sm text-surface-700 dark:text-white/64">Você não tem acesso a nenhuma organização. Fale com o administrador do contrato.</p>
+    } }
+</section>

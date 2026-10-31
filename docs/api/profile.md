@@ -11,6 +11,9 @@ autenticado, inclusive o superadmin; sem `X-Organization-Id`. Respostas `no-stor
 A **senha não entra aqui**: `POST /api/v1/auth/change-password/` (a tela chama depois do PUT, só se
 a aba Senha foi preenchida).
 
+A aba **Minhas permissões**, antes de Sessões, usa o retrato somente leitura de
+[`GET /api/v1/me/access/`](my-access.md). O superadmin não vê essa aba (decisão 90).
+
 | Campo | Regra |
 |---|---|
 | `username` | só leitura |

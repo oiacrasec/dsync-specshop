@@ -182,6 +182,10 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   (Bloco 7), com `organization:view/create/update/delete` não reservadas (create só CONTRACT).
   Não recriar rota de organizações sob `/admin/`; suporte do superadmin fica para depois.
   `GET /api/v1/me/permissions/` (rbac, 7.2) só reflete para a interface; não usar como autorização.
+  `GET /api/v1/me/access/` (rbac, 9.5) é o retrato do próprio usuário: sem header,
+  só organizações acessíveis e perfis atribuídos ativos; reutiliza o avaliador com
+  concessões carregadas uma vez. Não reutilizar `user_access` (expõe perfis atribuíveis).
+  Superadmin recebe 403 `permission-denied` antes de carregar concessões (decisão 92).
   CRUD em `/api/v1/organizations/` (contracts, 7.3) com `ContractWidePermission`: código em qualquer
   escopo vale no contrato inteiro, mas o header e o acesso à organização ativa continuam obrigatórios.
   Escritas travam a linha do contrato (nome único 422, última ativa e em uso 409).

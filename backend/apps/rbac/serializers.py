@@ -19,6 +19,25 @@ class OrganizationSummarySerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class MyAccessProfileSerializer(BaseSerializer):
+    public_id = serializers.UUIDField()
+    name = serializers.CharField()
+
+
+class MyOrganizationAccessSerializer(OrganizationSummarySerializer):
+    profiles = MyAccessProfileSerializer(many=True)
+    permissions = serializers.ListField(child=serializers.CharField())
+    all_permissions = serializers.BooleanField()
+
+    class Meta(OrganizationSummarySerializer.Meta):
+        fields = ['public_id', 'name', 'profiles', 'permissions', 'all_permissions']
+        read_only_fields = fields
+
+
+class MyAccessSerializer(BaseSerializer):
+    organizations = MyOrganizationAccessSerializer(many=True)
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     """Perfis da área do cliente (8.2): do contrato (editáveis) e do sistema (só leitura).
 

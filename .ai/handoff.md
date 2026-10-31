@@ -1,62 +1,49 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-31 18:30
-- **Agente:** Claude → Codex
+- **Atualizado em:** 2026-10-31 18:41
+- **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md
-- **Último commit:** ver `git log -3` (handoff e proposta 9.5 commitados juntos)
+- **Commit da etapa:** feat(users): add read-only personal permissions tab (este handoff integra o commit; hash em `git log -1`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.5 Minhas permissões — 🔄 em andamento (só decisões e proposta visual; nenhum código) |
-| Próximo passo exato | Terminar a proposta no FigCraft (estado 2: administrador do contrato) e pedir aprovação; só então backend + frontend |
-| Aguardando o usuário? | sim — aprovação da proposta visual da 9.5 |
+| Etapa atual | 9.5 Minhas permissões — ✅ concluída; resultado e commit autorizados pelo usuário |
+| Próximo passo exato | Aguardar usuário definir próxima prioridade; 5.3 depende da decisão sobre acesso total do superadmin |
+| Aguardando o usuário? | sim — próxima etapa, sem pendência na 9.5 |
 
-## Decisões da 9.5 (plano, decisões 89–90)
+## Entregue na 9.5
 
-- Aba **Minhas permissões** no Perfil, **antes de Sessões**; somente leitura.
-- Mostra **todas as organizações** do usuário (a ativa em destaque/aberta), com perfis e
-  permissões efetivas de cada uma.
-- **Superadmin não vê a aba** por ora; o acesso total do superadmin está em reavaliação pelo
-  usuário — não mudar nada nisso até ele decidir.
+- Decisões 89–92: aba antes de Sessões, só leitura, organizações acessíveis,
+  ativa aberta/destacada, perfis e ações concedidas. Superadmin não vê a aba.
+- FigCraft: dois estados salvos/aprovados; administrador com aviso de todas as
+  permissões, inclusive futuras, sem repetir a grade. Código usa rótulos do catálogo.
+- GET /api/v1/me/access/ sem header, só próprio usuário; concessões carregadas
+  uma vez e evaluate compartilhado, 4 SELECTs de dados; sem perfis atribuíveis.
+- Superadmin recebe 403 permission-denied antes de consultar concessões; demais
+  permissões do superadmin preservadas. Proteção coberta por teste.
+- Frontend: componente my-permissions carregado na primeira abertura; acordeões
+  nativos, carga/vazio/erro com nova tentativa, consulta cancelada na saída.
+- 769 testes backend/143 frontend passaram; ruff check/format, lint, format:check,
+  build, OpenAPI validate/fail-on-warn, migrations check, check e check --deploy passaram.
+- Validador por comandos equivalentes com SDK do PyCharm (.venv não existe).
+  Suíte backend completa: --reuse-db --create-db.
+- OWASP A01–A10 sem achados pendentes no diff; leitura sem escrita/locks e queries
+  constantes com 30 organizações/perfis adicionais. Cálculo/resposta crescem com o retrato.
+- Chrome com API simulada: desktop/320 px dos dois estados, sem overflow horizontal;
+  abertura por Enter. Imagens /tmp/datasync-95-{common,admin}-{desktop,mobile}.png.
+- Docs/API/OpenAPI/overview/READMEs/memória atualizados; sem migration/dependência nova.
 
-## Feito
+## Limites / avisos
 
-- FigCraft `design/datasync-core-telas.figcraft`, página **Perfil · Minhas permissões**:
-  estado 1 (usuário com 2 organizações): abas com a nova antes de Sessões; orientação
-  "Somente leitura. Para mudar…, fale com o administrador do contrato"; organização ativa
-  aberta (ícone, nome, tag Atual, resumo "N recursos · N permissões", perfis em chips,
-  tabela recurso → ações concedidas com ✓); outra organização recolhida (acordeão).
-
-## Falta
-
-- FigCraft: estado 2 (administrador do contrato: aviso de acesso a todas as permissões do
-  contrato, sem listar código a código?) — confirmar com o usuário; ordenar ações como
-  Ver · Criar · Editar e recursos como Organizações · Usuários · Perfis no estado 1.
-- Backend (após aprovação): endpoint só leitura do próprio usuário, ex. `GET /api/v1/me/access/`,
-  sem header de organização. Reusar `rbac.evaluation.evaluate(grants, organization, registry)`
-  por organização em memória (concessões carregadas uma vez → queries constantes); não
-  expor perfis não atribuídos (diferente de `user_access`, que é da tela do admin). 403/404
-  para superadmin ou ocultar no frontend (decidir junto). Rótulos vêm de `/permissions/`.
-  Testes de isolamento, custo constante com N organizações, OpenAPI, docs/api, ADR se preciso.
-- Frontend: aba em `pages/perfil` (componente próprio, carregado sob demanda como Sessões),
-  oculta para `is_superuser`; testes.
-
-## Avisos
-
+- Sem auditoria WCAG completa, E2E com API real ou ensaio de capacidade em produção.
 - Não imprimir/versionar .env, chave MFA, segredos, provas ou reservas.
-- Python: /home/cesar/Virtual/datasync-core-3.14/bin/python. Após subconjuntos de testes,
-  suíte completa com `pytest --reuse-db --create-db`.
-- Push só quando pedido; nunca --amend na main; usuário revisa o diff antes de cada commit.
-- FigCraft: app aberto com `figcraft --control 7710` (MCP usa `--attach 7710`); se o MCP
-  não conectar, o app não está aberto. Salvar após editar.
-- 20 perfis mock ZZ-01..ZZ-20 no CLIENTE X (banco local): apagar quando o usuário pedir.
-- Conferência visual no navegador ainda pendente: login, aba MFA, filtros, contagem/paginação,
-  seletor de organização (extensão do Chrome estava desconectada).
-
-## Próximas etapas (não iniciar sem aprovação)
-
-- 5.3 superadmins/admins adicionais (aguarda decisão sobre o acesso total do superadmin).
-- Produção: HTTPS/CSP, cache compartilhado/borda, recuperação, expurgo/LegalHold e infraestrutura.
-- npm audit adiado; não reativar telas DESABILITADO sem aprovação. 9.1–9.4 concluídas.
+- Python: /home/cesar/Virtual/datasync-core-3.14/bin/python (consultar SDK PyCharm).
+- Push só quando pedido; nunca --amend na main; usuário revisa diff antes de cada commit.
+- FigCraft: --control 7710; MCP --attach 7710. Salvar após editar.
+- 20 perfis mock ZZ-01..ZZ-20 no CLIENTE X local: apagar só quando pedido.
+- Conferência visual anterior (login/MFA/filtros/contagem/seletor com API real) pendente.
+- 9.1–9.5 concluídas. Não iniciar 5.3 sem decisão sobre acesso total do superadmin.
+- Produção: HTTPS/CSP, cache compartilhado/borda, recuperação, expurgo/LegalHold e infra.
+- npm audit adiado; não reativar telas DESABILITADO sem aprovação.

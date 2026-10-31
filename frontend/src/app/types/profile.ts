@@ -30,3 +30,16 @@ export interface LoginHistoryItem {
     occurred_at: string;
     ip: string;
 }
+
+// GET /api/v1/me/access/: retrato das próprias permissões em todas as organizações acessíveis.
+export interface MyOrganizationAccess {
+    public_id: string;
+    name: string;
+    profiles: { public_id: string; name: string }[];
+    permissions: string[];
+    all_permissions: boolean;
+}
+
+export interface MyAccess {
+    organizations: MyOrganizationAccess[];
+}

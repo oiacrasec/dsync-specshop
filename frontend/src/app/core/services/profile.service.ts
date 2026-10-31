@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import { apiEndpoint } from '@/app/core/utils/api-url';
 import { mediaUrl } from '@/app/core/utils/media-url';
-import { LoginHistoryItem, MyProfile, MyProfileWrite, SYSTEM_TIME_ZONE, UserSession } from '@/app/types/profile';
+import { LoginHistoryItem, MyAccess, MyProfile, MyProfileWrite, SYSTEM_TIME_ZONE, UserSession } from '@/app/types/profile';
 
 // Perfil do usuário logado (GET/PUT /api/v1/me/profile/): carregado uma vez ao entrar e usado
 // pelo topo (foto) e pelas datas (fuso). Um envio só, em multipart; a senha fica fora.
@@ -44,6 +44,10 @@ export class ProfileService {
 
     logins(): Observable<LoginHistoryItem[]> {
         return this.http.get<LoginHistoryItem[]>(apiEndpoint(this.baseUrl, '/me/logins/'));
+    }
+
+    access(): Observable<MyAccess> {
+        return this.http.get<MyAccess>(apiEndpoint(this.baseUrl, '/me/access/'));
     }
 
     clear() {

@@ -19,6 +19,7 @@ import { UiInputText } from '@/app/shared/ui/input-text/input-text';
 import { ZonedDatePipe } from '@/app/shared/pipes/zoned-date.pipe';
 import { LoginHistoryItem, UserSession } from '@/app/types/profile';
 import { MfaSettings } from './mfa-settings';
+import { MyPermissions } from './my-permissions';
 
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -28,7 +29,7 @@ const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 @Component({
     selector: 'app-perfil',
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText, ZonedDatePipe, MfaSettings],
+    imports: [FormsModule, ReactiveFormsModule, AvatarModule, SelectModule, TabsModule, UiButton, UiImagePreview, UiInputPassword, UiInputText, ZonedDatePipe, MfaSettings, MyPermissions],
     templateUrl: './perfil.html'
 })
 export class PerfilPage implements OnInit, OnDestroy {
@@ -40,6 +41,8 @@ export class PerfilPage implements OnInit, OnDestroy {
     private router = inject(Router);
 
     readonly activeTab = signal<string | number | undefined>('principal');
+    readonly permissionsOpened = signal(false);
+    readonly showMyPermissions = computed(() => !this.session.getUser()?.is_superuser);
     readonly username = signal('');
     readonly currentAvatar = this.profileService.avatarSrc;
     readonly selectedFile = signal<File | null>(null);
@@ -89,6 +92,10 @@ export class PerfilPage implements OnInit, OnDestroy {
     // A aba Sessões só busca os dados quando é aberta pela primeira vez.
     onTabChange(tab: string | number | undefined) {
         this.activeTab.set(tab);
+
+        if (tab === 'permissoes' && this.showMyPermissions()) {
+            this.permissionsOpened.set(true);
+        }
 
         if (tab !== 'sessoes' || this.sessions() !== null) {
             return;

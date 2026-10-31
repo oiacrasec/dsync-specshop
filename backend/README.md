@@ -59,6 +59,11 @@ Busca geral: FilterSets declaram general_search_fields, com OR e icontains padr�
 filtros individuais combinam com AND. Schema descreve general_search separado
 de filters para o frontend montar um campo único e controles independentes (ADR 0029).
 
+Minhas permissões (9.5): `GET /api/v1/me/access/` em `apps/rbac` entrega o retrato do
+próprio acesso, sem organização no header: organizações acessíveis, perfis atribuídos
+e códigos efetivos. Reutiliza o avaliador e carrega concessões uma vez, sem escritas
+ou consultas por organização. [Contrato da API](../docs/api/my-access.md).
+
 | Item | Versão |
 |---|---|
 | Python | 3.14 |

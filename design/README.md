@@ -42,6 +42,13 @@ atual), códigos reserva exibidos uma única vez e ativada (reservas restantes e
 
 Propostas superadas e capturas "antes" são removidas do arquivo depois de aplicadas.
 
+A página **Perfil · Minhas permissões** (9.5, aprovada) traz dois estados:
+usuário com organizações em acordeão, perfis e ações efetivas por recurso; e
+administrador do contrato com perfil identificado e aviso de todas as permissões,
+inclusive futuras, sem repetir a grade por organização. A organização atual fica
+aberta e marcada nos dois estados. Proposta salva e aplicada no frontend; rótulos
+das ações vêm do catálogo da API ("Visualizar" para a ação de ver).
+
 ## Biblioteca
 
 | Página | Conteúdo |

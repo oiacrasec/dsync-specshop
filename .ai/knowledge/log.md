@@ -1,5 +1,30 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Minhas permissões (9.5 concluída)
+
+- Novo `GET /me/access/` em rbac: organizações acessíveis, perfis atribuídos e códigos
+  efetivos do próprio usuário. Concessões carregadas uma vez e avaliador compartilhado;
+  4 SELECTs de dados constantes com 30 organizações/perfis adicionais, sem escritas/locks.
+- Aba antes de Sessões, só leitura, carregada na primeira abertura; atual aberta e
+  destacada, perfis/ações em acordeões; admin com aviso de acesso total. Superadmin oculto.
+- 769 testes backend/143 frontend passaram; ruff, lint/formato/build, OpenAPI, migrations
+  e checks Django/produção passaram. Chrome com API simulada: desktop/320 px, sem
+  overflow e abertura por Enter. Sem auditoria WCAG completa/E2E real/capacidade de produção.
+- Superadmin recebe 403 `permission-denied` antes da consulta de concessões (decisão 92),
+  com teste de regressão. Revisão OWASP A01–A10 sem achados pendentes no diff.
+- Arquivos: backend/apps/rbac/{selectors,serializers,views,urls,tests/test_my_access}.py;
+  frontend/src/app/pages/perfil/{perfil,my-permissions}.{ts,html}, my-permissions.spec.ts,
+  core/services/profile.service.ts, core/utils/api-url.ts, types/profile.ts;
+  docs/api/{my-access,profile}.md e openapi-v1.yaml, overview, plano, READMEs e handoff.
+
+## 2026-10-31 — Proposta de Minhas permissões: administrador do contrato
+
+- FigCraft: segundo estado com perfil e aviso de acesso total, inclusive permissões
+  futuras, preservando organizações em acordeão e a atual em destaque; sem grade repetida.
+- Primeiro estado ordenado: Organizações · Usuários · Perfis; Ver · Criar · Editar.
+- Proposta salva e imagens desktop conferidas; aprovação visual pendente, sem código de aplicação.
+  Arquivos: design/datasync-core-telas.figcraft, design/README.md e .ai/handoff.md.
+
 ## 2026-10-31 — Busca do seletor de organização a partir de 6
 
 - Busca aparece junto com a rolagem: 6 ou mais organizações (antes, mais de 7).
