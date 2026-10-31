@@ -5,12 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 
 import { UiAutocomplete, UiLookupOptionsProvider, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
-import { UiButton } from '@/app/shared/ui/button/button';
 import { toLookupResponse } from '@/app/core/utils/table-schema';
 import { OptionsResponse } from '@/app/types/options';
 
@@ -34,16 +31,133 @@ export interface UiFilterField {
 @Component({
     selector: 'ui-filter',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiButton, UiAutocomplete, InputTextModule, IconFieldModule, InputIconModule, SelectModule, InputNumberModule],
+    imports: [CommonModule, FormsModule, UiAutocomplete, InputTextModule, SelectModule, InputNumberModule],
     templateUrl: './filter.html',
     styles: [
         `
-            .ui-filter-advanced-panel {
-                background: color-mix(in srgb, var(--p-button-secondary-background, #e5e7eb) 18%, white 82%);
+            .ui-filter-box {
+                border-width: 1px;
+                border-style: solid;
+                border-radius: 8px;
+                overflow: hidden;
             }
 
-            :host-context(.app-dark) .ui-filter-advanced-panel {
-                background: color-mix(in srgb, var(--p-button-secondary-background, #4b5563) 24%, black 76%);
+            .ui-filter-bar {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                min-height: 44px;
+                padding: 0 4px 0 12px;
+            }
+
+            .ui-filter-search {
+                display: flex;
+                flex: 1;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                cursor: text;
+            }
+
+            .ui-filter-search input {
+                flex: 1;
+                min-width: 0;
+                height: 42px;
+                border: 0;
+                outline: 0;
+                background: transparent;
+                font: inherit;
+                font-size: 14px;
+            }
+
+            .ui-filter-search input::placeholder {
+                color: var(--p-inputtext-placeholder-color);
+            }
+
+            .ui-filter-box:focus-within {
+                border-color: var(--p-primary-color);
+            }
+
+            .ui-filter-divider {
+                width: 1px;
+                height: 24px;
+                flex-shrink: 0;
+            }
+
+            .ui-filter-action {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                min-height: 36px;
+                padding: 0 12px;
+                border: 0;
+                border-radius: 6px;
+                background: transparent;
+                font-size: 14px;
+                font-weight: 500;
+                white-space: nowrap;
+                cursor: pointer;
+            }
+
+            .ui-filter-action:hover {
+                background: var(--p-surface-100);
+            }
+
+            .ui-filter-action:focus-visible {
+                outline: 2px solid var(--p-primary-color);
+                outline-offset: -2px;
+            }
+
+            .ui-filter-action-open,
+            .ui-filter-action-open:hover {
+                background: var(--p-primary-50);
+                color: var(--p-primary-700);
+            }
+
+            .ui-filter-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 20px;
+                height: 20px;
+                padding: 0 6px;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .ui-filter-fields {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 16px;
+                padding: 16px 16px 20px;
+                border-top-width: 1px;
+                border-top-style: solid;
+            }
+
+            :host-context(.app-dark) .ui-filter-action:hover {
+                background: var(--p-surface-800);
+            }
+
+            :host-context(.app-dark) .ui-filter-action-open,
+            :host-context(.app-dark) .ui-filter-action-open:hover {
+                background: color-mix(in srgb, var(--p-primary-color) 18%, transparent);
+                color: var(--p-primary-200);
+            }
+
+            @media (max-width: 640px) {
+                .ui-filter-bar {
+                    flex-wrap: wrap;
+                    padding: 4px 4px 4px 12px;
+                }
+
+                .ui-filter-search {
+                    flex-basis: 100%;
+                }
+
+                .ui-filter-bar > .ui-filter-divider:first-of-type {
+                    display: none;
+                }
             }
         `
     ]
@@ -121,6 +235,14 @@ export class UiFilter implements OnChanges, OnDestroy {
 
     get hasActiveFilters() {
         return !!this.generalTerm.trim() || Object.values(this.advancedValues).some((value) => value !== undefined && value !== null && value !== '');
+    }
+
+    get activeAdvancedCount() {
+        return this.advancedFilters.filter((filter) => {
+            const value = this.advancedValues[filter.field];
+
+            return value !== undefined && value !== null && value !== '';
+        }).length;
     }
 
     get hasAnyFilters() {

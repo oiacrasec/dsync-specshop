@@ -86,7 +86,7 @@ describe('UiTable — paginação e Limpar', () => {
         return { fixture, table, element: fixture.nativeElement as HTMLElement };
     }
 
-    const clearButton = (element: HTMLElement) => Array.from(element.querySelectorAll('ui-button')).find((button) => button.textContent?.includes('Limpar'));
+    const clearButton = (element: HTMLElement) => Array.from(element.querySelectorAll('ui-filter button')).find((button) => button.textContent?.includes('Limpar'));
 
     it('com tudo numa página, troca a paginação pela contagem', async () => {
         const { element } = await render(2);
