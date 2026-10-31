@@ -78,6 +78,7 @@ Antes de uma tarefa, verifique se existe skill em `.ai/skills/` para ela.
 | `validar-etapa` | **sempre** ao terminar cada etapa do plano de entrega, antes do commit |
 | `revisao-performance` | **sempre** ao projetar, implementar e revisar mudanças: banco, processamento, memória, rede e concorrência; medir conforme o risco |
 | `owasp-top-10` | **sempre** em code review e antes de entregar mudanças em auth, permissões, endpoints, queries, dependências ou configuração |
+| `leis-do-ux` | **sempre** ao criar, alterar ou revisar telas, componentes, formulários, menus, mensagens e layout (inclusive no FigCraft) |
 
 **Nunca inferir, nunca supor; conflitos não se resolvem em silêncio:** sem fonte
 verificada, pergunte; ao encontrar divergência, pare, mostre as

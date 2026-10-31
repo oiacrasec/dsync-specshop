@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-10-30 — Skill leis-do-ux
+
+- `.ai/skills/leis-do-ux/SKILL.md`: as 30 leis de UX em 5 grupos (percepção, decisão e memória,
+  interação, expectativas, experiência), cada uma com regra do datasync; exceções (login genérico
+  por segurança, acessibilidade, custo de autenticação) e checklist. Texto próprio: lawsofux.com é
+  CC BY-NC-ND 4.0 e o artigo da Aela não tem licença aberta (só referência). Registrada no
+  `AGENTS.md` e no índice `project-skills`.
+
 ## 2026-10-23 — 9.4 desenhada (2FA)
 
 - Decisões 86–87: implementação própria adaptada do django-otp (caminho C), segredo cifrado com
