@@ -14,6 +14,8 @@ import { LoginResponse } from '@/app/types/auth';
 import { Login } from './login';
 import { PrimeiroAcessoTrocarSenhaPage } from './primeiro-acesso-trocar-senha';
 import { ContextoSelecaoPage } from './contexto-selecao';
+import { AppTopbar } from '@/app/layout/components/app.topbar';
+import { UiOrganizationPicker } from '@/app/shared/ui/organization-picker/organization-picker';
 
 const USER_ID = '019a0000-0000-7000-8000-000000000001';
 const ORG_ID = '019a0000-0000-7000-8000-000000000002';
@@ -117,7 +119,7 @@ describe('Core auth pages and route guards', () => {
         expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBeFalse();
     });
 
-    it('renders labeled organization options and submits the selected UUID through the form', async () => {
+    it('renders labeled radio cards and confirms the selected UUID', async () => {
         session.setSession(response());
         const open = spyOn(contexts, 'openContext');
         const fixture = TestBed.createComponent(ContextoSelecaoPage);
@@ -126,13 +128,15 @@ describe('Core auth pages and route guards', () => {
         controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
         await fixture.whenStable();
         expect(open).not.toHaveBeenCalled();
-        const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+        const radio = fixture.nativeElement.querySelector('input[type="radio"]') as HTMLInputElement;
 
-        expect(fixture.nativeElement.querySelector('label').htmlFor).toBe(select.id);
-        expect(select.options[1].value).toBe(ORG_ID);
-        select.value = ORG_ID;
-        select.dispatchEvent(new Event('change'));
-        fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        expect(radio.labels?.[0].textContent).toContain('Organização');
+        expect(radio.value).toBe(ORG_ID);
+        radio.click();
+        fixture.detectChanges();
+        const confirm = Array.from(fixture.nativeElement.querySelectorAll('button')).find((button) => (button as HTMLButtonElement).textContent?.trim() === 'Entrar') as HTMLButtonElement;
+
+        confirm.click();
         expect(open).toHaveBeenCalledWith('/dashboards');
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
     });
@@ -179,14 +183,14 @@ describe('Core auth pages and route guards', () => {
 
     it('selects a UUID from the accessible organization list and starts a fresh page', () => {
         session.setSession(response());
-        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const page = createPicker();
         const open = spyOn(contexts, 'openContext');
 
         page.ngOnInit();
         page.loadOrganizations();
         controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
         expect(open).not.toHaveBeenCalled();
-        page.form.controls.organization.setValue(ORG_ID);
+        page.selectedId.set(ORG_ID);
         page.confirm();
         expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
         expect(open).toHaveBeenCalledWith('/dashboards');
@@ -195,7 +199,7 @@ describe('Core auth pages and route guards', () => {
 
     it('enters the only available organization directly, preserving returnUrl rules', () => {
         session.setSession(response());
-        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const page = createPicker();
         const open = spyOn(contexts, 'openContext');
 
         page.ngOnInit();
@@ -207,27 +211,203 @@ describe('Core auth pages and route guards', () => {
     it('keeps the screen when the only organization is already active (switch from inside the app)', () => {
         session.setSession(response());
         contexts.setActiveContext({ organization_public_id: ORG_ID, organization_name: 'Organização' });
-        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const page = createPicker();
         const open = spyOn(contexts, 'openContext');
 
         page.ngOnInit();
         controller.expectOne('/api/v1/me/organizations/').flush([{ public_id: ORG_ID, name: 'Organização' }]);
         expect(open).not.toHaveBeenCalled();
-        expect(page.form.controls.organization.value).toBe(ORG_ID);
+        expect(page.selectedId()).toBe(ORG_ID);
     });
 
     it('rejects a manually inserted organization outside the accessible list', () => {
         session.setSession(response());
-        const page = TestBed.runInInjectionContext(() => new ContextoSelecaoPage());
+        const page = createPicker();
         const open = spyOn(contexts, 'openContext');
 
         page.ngOnInit();
         controller.expectOne('/api/v1/me/organizations/').flush([]);
-        page.form.controls.organization.setValue(ORG_ID);
+        page.selectedId.set(ORG_ID);
         page.confirm();
         expect(page.errorMessage()).toContain('disponível');
         expect(open).not.toHaveBeenCalled();
     });
+
+    it('filters 100 organizations locally, keeps the selection and only scrolls the list', async () => {
+        session.setSession(response());
+        const open = spyOn(contexts, 'openContext');
+        const fixture = TestBed.createComponent(UiOrganizationPicker);
+        const picker = fixture.componentInstance;
+        const organizations = Array.from({ length: 100 }, (_, index) => ({ public_id: '019a0000-0000-7000-8000-' + (index + 10).toString(16).padStart(12, '0'), name: 'Organização ' + String(index + 1).padStart(3, '0') }));
+
+        fixture.componentRef.setInput('switching', true);
+        fixture.componentRef.setInput('returnUrl', '/perfil');
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/organizations/').flush(organizations);
+        await fixture.whenStable();
+        const element = fixture.nativeElement as HTMLElement;
+        const radios = element.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+
+        expect(radios.length).toBe(100);
+        radios[1].click();
+        fixture.detectChanges();
+        expect(contexts.hasActiveContext()).toBeFalse();
+        const list = element.querySelector('.organization-list') as HTMLElement;
+        const footer = element.querySelector('footer') as HTMLElement;
+        const footerTop = footer.getBoundingClientRect().top;
+
+        expect(list.clientHeight).toBeLessThanOrEqual(350);
+        expect(list.scrollHeight).toBeGreaterThan(list.clientHeight);
+        list.scrollTop = 200;
+        expect(list.scrollTop).toBeGreaterThan(0);
+        expect(footer.getBoundingClientRect().top).toBe(footerTop);
+        const search = element.querySelector<HTMLInputElement>('#organization-search')!;
+
+        search.value = ' ORGANIZACAO 09 ';
+        search.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        expect(picker.filtered().length).toBe(10);
+        expect(element.querySelectorAll('input[type="radio"]').length).toBe(10);
+        expect(picker.selected()?.name).toBe('Organização 002');
+        search.value = 'inexistente';
+        search.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        expect(element.textContent).toContain('Nenhuma organização encontrada');
+        expect(picker.selected()?.public_id).toBe(organizations[1].public_id);
+        picker.confirm();
+        expect(contexts.getActiveContext()?.organization_public_id).toBe(organizations[1].public_id);
+        expect(open).toHaveBeenCalledOnceWith('/perfil');
+        controller.expectNone('/api/v1/me/organizations/');
+    });
+
+    it('shows search only above seven organizations and escapes names', async () => {
+        session.setSession(response());
+        const fixture = TestBed.createComponent(UiOrganizationPicker);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
+        await fixture.whenStable();
+        expect(fixture.nativeElement.querySelector('#organization-search')).toBeNull();
+        fixture.componentInstance.organizations.set(Array.from({ length: 7 }, (_, i) => ({ public_id: String(i), name: '<img src=x onerror=alert(1)>' })));
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('#organization-search')).toBeNull();
+        expect(fixture.nativeElement.querySelector('img')).toBeNull();
+        expect(fixture.nativeElement.textContent).toContain('<img src=x onerror=alert(1)>');
+        fixture.componentInstance.organizations.update((items) => [...items, { public_id: '8', name: 'Oitava' }]);
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('#organization-search')).not.toBeNull();
+    });
+
+    it('retries an organization load error and never applies a stale response', async () => {
+        session.setSession(response());
+        const fixture = TestBed.createComponent(UiOrganizationPicker);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/organizations/').flush({}, { status: 503, statusText: 'Unavailable' });
+        await fixture.whenStable();
+        expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Não foi possível carregar');
+        fixture.componentInstance.loadOrganizations();
+        const pending = controller.expectOne('/api/v1/me/organizations/');
+
+        session.clearSession();
+        pending.flush(TWO_ORGS);
+        expect(fixture.componentInstance.organizations()).toEqual([]);
+        expect(contexts.hasActiveContext()).toBeFalse();
+    });
+
+    it('cancels an outstanding organization request when the picker is destroyed', () => {
+        session.setSession(response());
+        const fixture = TestBed.createComponent(UiOrganizationPicker);
+
+        fixture.detectChanges();
+        const request = controller.expectOne('/api/v1/me/organizations/');
+
+        fixture.destroy();
+        expect(request.cancelled).toBeTrue();
+    });
+
+    it('opens organization switching in a dialog without navigation and cancels without changing context', async () => {
+        session.setSession(response());
+        contexts.setActiveContext({ organization_public_id: ORG_ID, organization_name: 'Organização' });
+        const fixture = TestBed.createComponent(AppTopbar);
+        const topbar = fixture.componentInstance;
+        const routeNavigation = spyOn(router, 'navigate');
+        const open = spyOn(contexts, 'openContext');
+
+        fixture.detectChanges();
+        topbar.switchContext(new Event('click'));
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
+        await fixture.whenStable();
+        const dialog = document.querySelector('[role="dialog"]')!;
+
+        expect(dialog).not.toBeNull();
+        expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)?.textContent).toContain('Trocar organização');
+        expect(routeNavigation).not.toHaveBeenCalled();
+        const pickerElement = document.querySelector('ui-organization-picker')!;
+        const radios = pickerElement.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+
+        radios[1].click();
+        const cancel = Array.from(pickerElement.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Cancelar')!;
+
+        cancel.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(topbar.contextDialogVisible()).toBeFalse();
+        expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
+        expect(open).not.toHaveBeenCalled();
+        topbar.restoreProfileFocus();
+        expect(document.activeElement?.getAttribute('aria-label')).toBe('Abrir menu do perfil');
+    });
+
+    it('closes the dialog with Escape without changing the active organization', async () => {
+        session.setSession(response());
+        contexts.setActiveContext({ organization_public_id: ORG_ID, organization_name: 'Organização' });
+        const fixture = TestBed.createComponent(AppTopbar);
+
+        fixture.detectChanges();
+        fixture.componentInstance.switchContext(new Event('click'));
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/me/organizations/').flush(TWO_ORGS);
+        await fixture.whenStable();
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(fixture.componentInstance.contextDialogVisible()).toBeFalse();
+        expect(contexts.getActiveContext()?.organization_public_id).toBe(ORG_ID);
+    });
+
+    it('keeps the profile icons at the right edge while the organization dialog is closed', () => {
+        session.setSession(response());
+        const fixture = TestBed.createComponent(AppTopbar);
+
+        fixture.detectChanges();
+        const bar = fixture.nativeElement.querySelector('.layout-topbar') as HTMLElement;
+        const icons = bar.querySelector('.topbar-right') as HTMLElement;
+        const padding = parseFloat(getComputedStyle(bar).paddingRight);
+
+        expect(icons.getBoundingClientRect().right).toBeCloseTo(bar.getBoundingClientRect().right - padding, 0);
+        expect(fixture.componentInstance.contextDialogVisible()).toBeFalse();
+        expect(getComputedStyle(bar.querySelector('[aria-label="Abrir menu do perfil"]')!).cursor).toBe('pointer');
+    });
+
+    it('never offers a switch dialog for superadmins', () => {
+        session.setSession(response({ is_superuser: true }));
+        const fixture = TestBed.createComponent(AppTopbar);
+
+        fixture.detectChanges();
+        fixture.componentInstance.switchContext(new Event('click'));
+        expect(fixture.componentInstance.contextDialogVisible()).toBeFalse();
+        controller.expectNone('/api/v1/me/organizations/');
+    });
+
+    function createPicker() {
+        const fixture = TestBed.createComponent(UiOrganizationPicker);
+
+        fixture.componentRef.setInput('returnUrl', '/dashboards');
+
+        return fixture.componentInstance;
+    }
 
     function guard(url: string, audience: AccessAudience = ACCESS_AUDIENCE.AUTHENTICATED, requireContext = true) {
         const route = { pathFromRoot: [{ data: { audience, requireContext } }] } as unknown as ActivatedRouteSnapshot;

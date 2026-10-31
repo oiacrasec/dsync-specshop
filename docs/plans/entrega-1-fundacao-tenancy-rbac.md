@@ -221,3 +221,15 @@ Página do item "Perfil" do menu do avatar (`/perfil`), com abas Principal, Segu
 | 9.3 | Sessões: navegador/IP de cada sessão (claim `sid`), aba Sessões só leitura com ativas + últimos logins; rotas de encerrar uma e as outras prontas na API | backend + frontend | 0004 | ✅ |
 | 9.4 | 2FA TOTP opcional: ativar por QR, 10 códigos reserva, 2º passo no login, desativar com senha + código, reset por admin auditado | backend + frontend | nova | ⬜ |
 | 9.5 | Meu acesso (só leitura): organizações, perfis e permissões | backend + frontend | — | ⬜ |
+
+## Melhoria aprovada — escolha e troca de organização (2026-10-31)
+
+- ✅ FigCraft: escolha no login, troca em modal e cenários com 100 organizações/busca/vazio.
+- ✅ Frontend: `UiOrganizationPicker` compartilhado, rota em AuthLayout, diálogo pelo
+  avatar; busca local acima de 7, seleção preservada e lista limitada a 350 px.
+- ✅ Entrada direta com organização única, guards e sincronização/recarregamento
+  mantidos (ADR 0035); Cancelar/X/Esc preservam contexto/URL e retornam foco ao avatar.
+- Validação: 120 testes ChromeHeadless; lint/formato/build; revisão OWASP A01–A10 e
+  performance sem novos achados no escopo. Chrome com API simulada: desktop e
+  320 px sem overflow horizontal, busca e Esc. Sem auditoria WCAG completa/E2E real.
+- ✅ Resultado revisado e commit autorizado pelo usuário, incluindo os ajustes do topo/avatar e rótulo Entrar.

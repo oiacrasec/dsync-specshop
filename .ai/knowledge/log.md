@@ -1,5 +1,29 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Seleção de organização no login e em modal
+
+- Avatar: seletores de `frontend/src/assets/layout/_topbar.scss` abrangem também
+  o botão semântico do perfil (cursor de mão, hover e foco), sem voltar a um link.
+  Teste existente do topo verifica o cursor computado.
+
+- Regressão IM03: p-dialog retirado do flex de `.layout-topbar`; o host fechado
+  dividia o space-between e deslocava os ícones. Teste de geometria e Chrome
+  em 390/1280/1920 px confirmam margem direita de 14 px, estável ao abrir/fechar.
+
+- Ajuste posterior solicitado: ação com rótulo fixo Entrar, sem o nome escolhido.
+  Template do seletor, testes existentes, FigCraft e docs de autenticação sincronizados.
+
+- Aplicado desenho aprovado no FigCraft, incluindo cenário com 100 organizações.
+- Novo `frontend/src/app/shared/ui/organization-picker/`, seleção em AuthLayout e
+  troca em p-dialog no `layout/components/app.topbar.ts`; rota em `src/app.routes.ts`.
+- Busca local acima de 7, lista até 350 px, seleção preservada e retorno do foco;
+  uma chamada por abertura, destroy cancela HTTP e resposta antiga é rejeitada.
+  ADR 0035 e API preservados. Sem backend, dependências ou configuração de ambiente.
+- `pages/auth/auth-pages.spec.ts` adaptado/ampliado; 120 testes passando.
+  Desktop e 320 px, busca e Esc conferidos no Chrome com API simulada.
+- Docs de autenticação, memória de frontend, plano e handoff atualizados.
+  Resultado revisado; commit autorizado pelo usuário, sem push.
+
 ## 2026-10-31 — Melhorias de layout (proposta de Organizações aplicada)
 
 - Listas (`shared/ui/table`, `filter`, `core/utils/table-schema.ts`): "Novo …" primário nas 11 listas;

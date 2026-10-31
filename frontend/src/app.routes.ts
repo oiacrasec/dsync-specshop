@@ -8,6 +8,13 @@ import { ACCESS_AUDIENCE } from '@/app/core/tokens/access.types';
 
 export const appRoutes: Routes = [
     {
+        path: 'contexto/selecao',
+        component: AuthLayout,
+        canActivate: [accessGuard],
+        data: { audience: ACCESS_AUDIENCE.COMMON, requireContext: false },
+        children: [{ path: '', loadComponent: () => import('@/app/pages/auth/contexto-selecao').then((c) => c.ContextoSelecaoPage) }]
+    },
+    {
         path: '',
         component: AppLayout,
         canActivate: [accessGuard],
@@ -20,17 +27,6 @@ export const appRoutes: Routes = [
                 path: '',
                 redirectTo: 'dashboards',
                 pathMatch: 'full'
-            },
-            {
-                path: 'contexto/selecao',
-                canActivate: [accessGuard],
-                loadComponent: () => import('@/app/pages/auth/contexto-selecao').then((c) => c.ContextoSelecaoPage),
-                data: {
-                    breadcrumb: 'Selecionar organização',
-                    audience: ACCESS_AUDIENCE.COMMON,
-                    requireContext: false,
-                    hideBreadcrumbBar: true
-                }
             },
             {
                 path: 'primeiro-acesso/trocar-senha',

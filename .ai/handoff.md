@@ -1,19 +1,61 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-31 11:40
-- **Agente:** Claude
+- **Atualizado em:** 2026-10-31 13:26
+- **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-1-fundacao-tenancy-rbac.md (Blocos 7 e 8 concluídos)
-- **Último commit:** 86e35f0 docs(ai): add the leis-do-ux skill
+- **Commit desta entrega:** `feat(frontend): improve organization selection and switching` (hash em `git log -1`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 9.4 2FA desenhada, não iniciada · em paralelo: design system em `design/` (ver abaixo) |
-| Próximo passo exato | Melhorias de layout aplicadas e commitadas; próximo bloco a escolher (ex.: 9.4) |
-| Aguardando o usuário? | sim — escolha do próximo bloco |
+| Etapa atual | Melhoria da seleção/troca de organização implementada; 9.4 2FA permanece não iniciada |
+| Próximo passo exato | Escolher o próximo bloco; 9.4 2FA já desenhada, ainda não iniciada |
+| Aguardando o usuário? | sim — escolha do próximo trabalho; commit desta entrega autorizado |
 
-## Design system (`design/`, ADR 0040 Aceito)
+## Troca de organização (concluída e aprovada)
+
+- Avatar: `_topbar.scss` agora estiliza também `button.right-sidebar-button`,
+  restaurando cursor pointer/hover/foco perdidos na troca de link por botão.
+  Assert de cursor adicionado ao teste existente do topo.
+
+- Regressão IM03 corrigida: p-dialog movido para fora do flex `.layout-topbar`.
+  O host fechado ocupava uma terceira posição no space-between e deslocava os ícones.
+  Chrome: margem direita de 14 px em 390/1280/1920 px; estável aberto/fechado/após Esc.
+  Teste de geometria adicionado em `pages/auth/auth-pages.spec.ts`.
+
+- Ajuste posterior pedido pelo usuário: botão com rótulo fixo **Entrar**, sem o nome
+  da organização, aplicado no frontend e nos seis botões das propostas do FigCraft.
+
+- Usuário aprovou os desenhos, inclusive 100 organizações, e pediu aplicar.
+- `frontend/src/app/shared/ui/organization-picker/`: cartões/rádios, Atual no modal,
+  busca local acima de 7 (nomes normalizados por carregamento), seleção preservada,
+  vazio com Limpar e lista até 350 px; busca/ações fora da rolagem.
+- `pages/auth/contexto-selecao.ts` usa o componente; `src/app.routes.ts` move a seleção
+  para AuthLayout sem menu. Guards/audiência comum e entrada direta com organização única mantidos.
+- `layout/components/app.topbar.ts`: p-dialog no avatar sem navegar; Cancelar/X/Esc
+  preservam contexto/URL e devolvem foco ao avatar. Confirmação usa setActiveContext/openContext
+  (ADR 0035); confirmar a já ativa apenas fecha. Superadmin não troca.
+- Uma chamada por abertura; destroy cancela HTTP, revisão da sessão ignora resposta antiga.
+  Nenhum endpoint/backend/dependência/configuração de ambiente alterado.
+- 120 testes ChromeHeadless; lint, formato e build passando. Revisão OWASP A01–A10/performance:
+  sem novos achados no escopo. Bundle inicial ~1,29 MB. Docs, plano e memória atualizados.
+- Chrome com API simulada: desktop 1280×900 e login 320×800 sem overflow horizontal,
+  lista de 350 px, busca e Esc/foco. Sem E2E com banco real/auditoria WCAG completa.
+- Resultado revisado pelo usuário e commit autorizado; código, desenhos e documentação
+  reunidos nesta entrega. Nenhum push solicitado ou realizado.
+- `design/datasync-core-telas.figcraft`: páginas **Troca de organização** (login/modal)
+  e **Troca · 100 organizações** (lista/busca/vazio/login; busca em estados simulados).
+  Salvo via MCP anexado (7710); não encerrar/sobrescrever janela desnecessariamente.
+
+## Como trabalhar no FigCraft (MCP pode estar desconectado)
+
+- Sem janela: `figcraft-cli run <script.json> --in/--out <arquivo> --automation-read-root design/ --automation-read-root
+  <pasta do script> --automation-write-root design/`. Fechar o app (`pkill -x figcraft`) antes de editar o arquivo.
+- Biblioteca: publicar com `library.publish` e aceitar no arquivo de telas com `library.acceptUpdates`;
+  reexportar `design/tokens.json` (`variable.export`). Ver `design/README.md`.
+
+## Design system (`design/`, ADR 0040 Aceito; tudo abaixo já commitado)
 
 - Arquivos em `design/`: `datasync-ds.figcraft` (biblioteca v1), `datasync-core-telas.figcraft`
   (vínculo com a biblioteca refeito para `design/`), `tokens.json`, `README.md`. Abrir/editar e

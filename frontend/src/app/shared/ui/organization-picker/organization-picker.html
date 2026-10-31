@@ -1,0 +1,70 @@
+<section class="organization-picker text-surface-950 dark:text-surface-0" [attr.aria-busy]="loading() || entering()" aria-labelledby="organization-picker-title">
+    <header class="flex items-start gap-4 shrink-0">
+        <span class="flex items-center justify-center rounded-full bg-primary-50 dark:bg-primary-950 text-primary w-12 h-12 shrink-0" aria-hidden="true"><i class="fa-solid fa-sitemap"></i></span>
+        <div class="min-w-0 flex-1">
+            <h1 id="organization-picker-title" class="text-xl font-semibold text-surface-950 dark:text-surface-0 m-0">{{ switching() ? 'Trocar organização' : 'Escolha a organização' }}</h1>
+            <p class="text-sm text-surface-700 dark:text-surface-200 mt-1 mb-0">A escolha será aplicada a todas as abas abertas.</p>
+        </div>
+        @if (switching()) {
+        <ui-button icon="fa-solid fa-xmark" ariaLabel="Fechar troca de organização" severity="secondary" [text]="true" [style]="{ width: '40px', height: '40px' }" (onClick)="cancelled.emit()" />
+        }
+    </header>
+
+    @if (loading()) {
+    <p role="status" class="m-0 text-surface-700 dark:text-surface-200">Carregando organizações…</p>
+    } @if (errorMessage()) {
+    <div role="alert" class="flex flex-col gap-3">
+        <p class="m-0 text-red-700 dark:text-red-300">{{ errorMessage() }}</p>
+        <ui-button label="Tentar novamente" severity="secondary" [disabled]="loading() || leaving() || entering()" (onClick)="loadOrganizations()" />
+    </div>
+    } @if (showSearch()) {
+    <div class="shrink-0">
+        <label for="organization-search" class="sr-only">Buscar organização</label>
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-surface-600" aria-hidden="true"></i>
+            <input #searchInput pInputText id="organization-search" type="search" class="w-full pl-10! pr-12! min-h-11" placeholder="Buscar organização" autocomplete="off" [value]="query()" (input)="search(searchInput.value)" />
+            @if (query()) {
+            <button type="button" class="absolute right-0 top-0 w-11 h-11 text-surface-700 dark:text-surface-200 rounded-lg focus-visible:outline-2 focus-visible:outline-primary" aria-label="Limpar busca" (click)="search(''); searchInput.focus()">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            }
+        </div>
+        <p role="status" aria-live="polite" aria-atomic="true" class="text-sm text-surface-700 dark:text-surface-200 mb-0 mt-3">{{ filtered().length }} de {{ organizations().length }} organizações</p>
+    </div>
+    } @if (!loading() && organizations().length === 0 && !errorMessage()) {
+    <p class="m-0 text-surface-700 dark:text-surface-200">Nenhuma organização disponível. Entre em contato com o administrador do contrato.</p>
+    } @if (organizations().length) {
+    <div class="organization-list" [class.organization-list-searchable]="showSearch()" role="group" aria-label="Organizações disponíveis">
+        @for (organization of filtered(); track organization.public_id) {
+        <label class="organization-option" [class.organization-option-selected]="selectedId() === organization.public_id">
+            <input type="radio" name="work-organization" [value]="organization.public_id" [checked]="selectedId() === organization.public_id" [disabled]="entering() || leaving()" (change)="selectedId.set(organization.public_id)" />
+            <span class="flex items-center justify-center w-9 h-9 rounded-full bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-200 shrink-0" aria-hidden="true"><i class="fa-solid fa-building"></i></span>
+            <span class="flex-1 min-w-0 break-words">{{ organization.name }}</span>
+            @if (switching() && organization.public_id === activeId()) {
+            <span class="text-xs font-semibold bg-primary-50 dark:bg-primary-950 text-primary px-2 py-1 rounded shrink-0">Atual</span>
+            }
+        </label>
+        } @empty {
+        <div class="flex flex-col items-center justify-center gap-3 text-center min-h-48 px-4" role="status">
+            <p class="font-semibold m-0">Nenhuma organização encontrada</p>
+            <p class="text-sm text-surface-700 dark:text-surface-200 m-0">Tente outro nome ou limpe a busca.</p>
+            <ui-button label="Limpar busca" [text]="true" [style]="{ minHeight: '40px' }" (onClick)="search('')" />
+        </div>
+        }
+    </div>
+    }
+
+    <footer class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-surface-200 dark:border-surface-700 shrink-0">
+        @if (switching()) {
+        <span></span>
+        } @else {
+        <ui-button label="Sair" severity="secondary" [text]="true" [style]="{ minHeight: '40px' }" [loading]="leaving()" [disabled]="leaving() || entering()" (onClick)="logout()" />
+        }
+        <div class="flex flex-wrap justify-end gap-3 min-w-0">
+            @if (switching()) {
+            <ui-button label="Cancelar" severity="secondary" [text]="true" [disabled]="entering()" [style]="{ minHeight: '40px' }" (onClick)="cancelled.emit()" />
+            }
+            <ui-button label="Entrar" [loading]="entering()" [disabled]="loading() || leaving() || entering() || !selected()" [style]="{ minHeight: '40px', maxWidth: '100%', whiteSpace: 'normal', overflowWrap: 'anywhere' }" (onClick)="confirm()" />
+        </div>
+    </footer>
+</section>

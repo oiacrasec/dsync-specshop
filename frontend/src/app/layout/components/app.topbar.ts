@@ -18,6 +18,8 @@ import { ProfileService } from '@/app/core/services/profile.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
+import { DialogModule } from 'primeng/dialog';
+import { UiOrganizationPicker } from '@/app/shared/ui/organization-picker/organization-picker';
 
 interface NotificationsBars {
     id: string;
@@ -28,161 +30,194 @@ interface NotificationsBars {
 @Component({
     selector: '[app-topbar]',
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule, StyleClassModule, AppBreadcrumb, InputTextModule, ButtonModule, IconFieldModule, InputIconModule, RippleModule, BadgeModule, OverlayBadgeModule, AvatarModule],
+    imports: [RouterModule, CommonModule, FormsModule, StyleClassModule, AppBreadcrumb, InputTextModule, ButtonModule, IconFieldModule, InputIconModule, RippleModule, BadgeModule, OverlayBadgeModule, AvatarModule, DialogModule, UiOrganizationPicker],
     template: ` <div class="layout-topbar">
-        <div class="topbar-left">
-            <img class="horizontal-logo" src="/layout/images/logo-white.svg" alt="logo" />
-            <a tabindex="0" #menubutton type="button" class="menu-button" aria-label="Recolher ou abrir o menu" (click)="onMenuButtonClick()">
-                <i class="pi pi-bars" aria-hidden="true"></i>
-            </a>
-            @if (shouldShowBreadcrumb()) {
-                <div app-breadcrumb></div>
-            }
-            <a routerLink="/">
-                <img class="mobile-logo" src="/layout/images/logo-{{ isDarkTheme() ? 'white' : 'dark' }}.svg" alt="logo" />
-            </a>
-        </div>
+            <div class="topbar-left">
+                <img class="horizontal-logo" src="/layout/images/logo-white.svg" alt="logo" />
+                <a tabindex="0" #menubutton type="button" class="menu-button" aria-label="Recolher ou abrir o menu" (click)="onMenuButtonClick()">
+                    <i class="pi pi-bars" aria-hidden="true"></i>
+                </a>
+                @if (shouldShowBreadcrumb()) {
+                    <div app-breadcrumb></div>
+                }
+                <a routerLink="/">
+                    <img class="mobile-logo" src="/layout/images/logo-{{ isDarkTheme() ? 'white' : 'dark' }}.svg" alt="logo" />
+                </a>
+            </div>
 
-        <div class="topbar-right">
-            <ul class="topbar-menu">
-                <li class="right-sidebar-item">
-                    <a class="right-sidebar-button" (click)="toggleSearchBar()">
-                        <i class="pi pi-search"></i>
-                    </a>
-                </li>
-                <li class="right-sidebar-item static sm:relative">
-                    <a class="right-sidebar-button relative z-50" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveActiveClass="animate-fadeout" leaveToClass="hidden" [hideOnOutsideClick]="true">
-                        <span class="w-2 h-2 rounded-full bg-red-500 absolute top-2 right-2.5"></span>
-                        <i class="pi pi-bell"></i>
-                    </a>
-                    <div
-                        class="list-none m-0 py-4 px-4 rounded-3xl border border-surface absolute bg-surface-0 dark:bg-surface-900 overflow-hidden hidden origin-top min-w-72 sm:w-[24rem] mt-2 right-0 z-50 top-auto shadow-[0px_56px_16px_0px_rgba(0,0,0,0.00),0px_36px_14px_0px_rgba(0,0,0,0.01),0px_20px_12px_0px_rgba(0,0,0,0.02),0px_9px_9px_0px_rgba(0,0,0,0.03),0px_2px_5px_0px_rgba(0,0,0,0.04)]"
-                        style="right: -100px"
-                    >
-                        <div class="flex items-center gap-2 justify-between">
-                            <span class="text-lg font-medium text-surface-950 dark:text-surface-0">Notifications</span>
-                            <button pRipple class="text-surface-700 dark:text-surface-300 text-sm font-medium">Mark all as read</button>
-                        </div>
-                        <div class="my-2 shadow-custom-shadow border border-surface-200 dark:border-surface-800 bg-white/55 dark:bg-white/8 flex items-center gap-2 rounded-full p-1">
-                            @for (item of notificationsBars(); track item.id; let i = $index) {
-                                <button
-                                    [ngClass]="{ 'bg-primary-100 dark:bg-primary-900': selectedNotificationBar() === item.id, 'hover:bg-primary-100/30 dark:hover:bg-primary-900/30': selectedNotificationBar() !== item.id }"
-                                    class="rounded-full p-2 flex-1 flex items-center justify-center transition-all hover:cursor-pointer"
-                                    (click)="selectedNotificationBar.set(item.id)"
-                                >
-                                    <span class="capitalize font-medium text-surface-950 dark:text-surface-0">{{ item.id }}</span>
-                                </button>
-                            }
-                        </div>
-                        <div class="mt-4 mb-8">
-                            <p-icon-field>
-                                <p-inputicon class="pi pi-search" />
-                                <input pInputText [(ngModel)]="notificationSearch" placeholder="Search" class="w-full!" />
-                            </p-icon-field>
-                        </div>
-                        <ul class="flex flex-col gap-8">
-                            @for (item of selectedNotificationsBarData(); track item.name; let i = $index) {
-                                <li class="flex gap-3">
-                                    <div class="flex flex-col items-center gap-1">
-                                        <p-overlay-badge value="" severity="danger" class="inline-flex">
-                                            <p-avatar size="large">
-                                                <img [src]="item.image" class="rounded-lg" />
-                                            </p-avatar>
-                                        </p-overlay-badge>
-                                        <span class="flex-1 w-px bg-surface-200 dark:bg-surface-800"></span>
-                                    </div>
-                                    <div class="flex-1 pt-2 space-y-2">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="font-medium text-surface-950 dark:text-surface-0">{{ item.name }}</span>
-                                            <div class="text-sm text-surface-700 dark:text-surface-200 flex items-center gap-1">
-                                                {{ item.time }}
-                                                @if (!item.read) {
-                                                    <div class="w-2! h-2! rounded-full bg-green-500"></div>
-                                                }
-                                            </div>
+            <div class="topbar-right">
+                <ul class="topbar-menu">
+                    <li class="right-sidebar-item">
+                        <a class="right-sidebar-button" (click)="toggleSearchBar()">
+                            <i class="pi pi-search"></i>
+                        </a>
+                    </li>
+                    <li class="right-sidebar-item static sm:relative">
+                        <a class="right-sidebar-button relative z-50" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveActiveClass="animate-fadeout" leaveToClass="hidden" [hideOnOutsideClick]="true">
+                            <span class="w-2 h-2 rounded-full bg-red-500 absolute top-2 right-2.5"></span>
+                            <i class="pi pi-bell"></i>
+                        </a>
+                        <div
+                            class="list-none m-0 py-4 px-4 rounded-3xl border border-surface absolute bg-surface-0 dark:bg-surface-900 overflow-hidden hidden origin-top min-w-72 sm:w-[24rem] mt-2 right-0 z-50 top-auto shadow-[0px_56px_16px_0px_rgba(0,0,0,0.00),0px_36px_14px_0px_rgba(0,0,0,0.01),0px_20px_12px_0px_rgba(0,0,0,0.02),0px_9px_9px_0px_rgba(0,0,0,0.03),0px_2px_5px_0px_rgba(0,0,0,0.04)]"
+                            style="right: -100px"
+                        >
+                            <div class="flex items-center gap-2 justify-between">
+                                <span class="text-lg font-medium text-surface-950 dark:text-surface-0">Notifications</span>
+                                <button pRipple class="text-surface-700 dark:text-surface-300 text-sm font-medium">Mark all as read</button>
+                            </div>
+                            <div class="my-2 shadow-custom-shadow border border-surface-200 dark:border-surface-800 bg-white/55 dark:bg-white/8 flex items-center gap-2 rounded-full p-1">
+                                @for (item of notificationsBars(); track item.id; let i = $index) {
+                                    <button
+                                        [ngClass]="{ 'bg-primary-100 dark:bg-primary-900': selectedNotificationBar() === item.id, 'hover:bg-primary-100/30 dark:hover:bg-primary-900/30': selectedNotificationBar() !== item.id }"
+                                        class="rounded-full p-2 flex-1 flex items-center justify-center transition-all hover:cursor-pointer"
+                                        (click)="selectedNotificationBar.set(item.id)"
+                                    >
+                                        <span class="capitalize font-medium text-surface-950 dark:text-surface-0">{{ item.id }}</span>
+                                    </button>
+                                }
+                            </div>
+                            <div class="mt-4 mb-8">
+                                <p-icon-field>
+                                    <p-inputicon class="pi pi-search" />
+                                    <input pInputText [(ngModel)]="notificationSearch" placeholder="Search" class="w-full!" />
+                                </p-icon-field>
+                            </div>
+                            <ul class="flex flex-col gap-8">
+                                @for (item of selectedNotificationsBarData(); track item.name; let i = $index) {
+                                    <li class="flex gap-3">
+                                        <div class="flex flex-col items-center gap-1">
+                                            <p-overlay-badge value="" severity="danger" class="inline-flex">
+                                                <p-avatar size="large">
+                                                    <img [src]="item.image" class="rounded-lg" />
+                                                </p-avatar>
+                                            </p-overlay-badge>
+                                            <span class="flex-1 w-px bg-surface-200 dark:bg-surface-800"></span>
                                         </div>
-                                        <div class="p-2 bg-surface-100 dark:bg-surface-800 border border-surface rounded-lg">
-                                            <p class="text-sm text-surface-700 dark:text-surface-200 line-clamp-2 text-ellipsis">
-                                                {{ item.description }}
-                                            </p>
-                                        </div>
-                                        @if (item.attachment) {
-                                            <div class="p-2 bg-surface-100 dark:bg-surface-800 border border-surface rounded-lg flex items-start gap-3">
-                                                <div class="w-8 h-8 flex items-center justify-center rounded-md shadow-sm bg-surface-0 dark:bg-surface-950">
-                                                    <i class="pi pi-file-pdf text-primary"></i>
+                                        <div class="flex-1 pt-2 space-y-2">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="font-medium text-surface-950 dark:text-surface-0">{{ item.name }}</span>
+                                                <div class="text-sm text-surface-700 dark:text-surface-200 flex items-center gap-1">
+                                                    {{ item.time }}
+                                                    @if (!item.read) {
+                                                        <div class="w-2! h-2! rounded-full bg-green-500"></div>
+                                                    }
                                                 </div>
-                                                <div class="flex-1 flex flex-col gap-0.5">
-                                                    <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ item.attachment.title }}</span>
-                                                    <span class="text-xs text-surface-700 dark:text-surface-200">{{ item.attachment.size }}</span>
-                                                </div>
-                                                <p-button icon="pi pi-download" severity="contrast" class="w-8! h-8! p-0!"></p-button>
                                             </div>
-                                        }
-                                    </div>
-                                </li>
+                                            <div class="p-2 bg-surface-100 dark:bg-surface-800 border border-surface rounded-lg">
+                                                <p class="text-sm text-surface-700 dark:text-surface-200 line-clamp-2 text-ellipsis">
+                                                    {{ item.description }}
+                                                </p>
+                                            </div>
+                                            @if (item.attachment) {
+                                                <div class="p-2 bg-surface-100 dark:bg-surface-800 border border-surface rounded-lg flex items-start gap-3">
+                                                    <div class="w-8 h-8 flex items-center justify-center rounded-md shadow-sm bg-surface-0 dark:bg-surface-950">
+                                                        <i class="pi pi-file-pdf text-primary"></i>
+                                                    </div>
+                                                    <div class="flex-1 flex flex-col gap-0.5">
+                                                        <span class="text-sm font-medium text-surface-700 dark:text-surface-200">{{ item.attachment.title }}</span>
+                                                        <span class="text-xs text-surface-700 dark:text-surface-200">{{ item.attachment.size }}</span>
+                                                    </div>
+                                                    <p-button icon="pi pi-download" severity="contrast" class="w-8! h-8! p-0!"></p-button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="profile-item static sm:relative">
+                        <button
+                            #profileButton
+                            type="button"
+                            aria-label="Abrir menu do perfil"
+                            class="right-sidebar-button relative z-50"
+                            pStyleClass="@next"
+                            enterFromClass="hidden"
+                            enterActiveClass="animate-scalein"
+                            leaveActiveClass="animate-fadeout"
+                            leaveToClass="hidden"
+                            [hideOnOutsideClick]="true"
+                        >
+                            @if (profile.avatarSrc(); as avatar) {
+                                <p-avatar class="w-10! h-10!" shape="circle">
+                                    <img [src]="avatar" alt="Sua foto" />
+                                </p-avatar>
+                            } @else {
+                                <p-avatar class="w-10! h-10!" shape="circle" [label]="initials()" aria-label="Seu perfil" />
                             }
-                        </ul>
-                    </div>
-                </li>
-                <li class="profile-item static sm:relative">
-                    <a class="right-sidebar-button relative z-50" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveActiveClass="animate-fadeout" leaveToClass="hidden" [hideOnOutsideClick]="true">
-                        @if (profile.avatarSrc(); as avatar) {
-                            <p-avatar class="w-10! h-10!" shape="circle">
-                                <img [src]="avatar" alt="Sua foto" />
-                            </p-avatar>
-                        } @else {
-                            <p-avatar class="w-10! h-10!" shape="circle" [label]="initials()" aria-label="Seu perfil" />
-                        }
-                    </a>
-                    <div
-                        #profileMenu
-                        class="list-none p-2 m-0 rounded-2xl border border-surface overflow-hidden absolute bg-surface-0 dark:bg-surface-900 hidden origin-top w-52 mt-2 right-0 z-999 top-auto shadow-[0px_56px_16px_0px_rgba(0,0,0,0.00),0px_36px_14px_0px_rgba(0,0,0,0.01),0px_20px_12px_0px_rgba(0,0,0,0.02),0px_9px_9px_0px_rgba(0,0,0,0.03),0px_2px_5px_0px_rgba(0,0,0,0.04)]"
-                    >
-                        <ul class="flex flex-col gap-1" (click)="closeProfileMenu()">
-                            @if (canSwitchContext()) {
+                        </button>
+                        <div
+                            #profileMenu
+                            class="list-none p-2 m-0 rounded-2xl border border-surface overflow-hidden absolute bg-surface-0 dark:bg-surface-900 hidden origin-top w-52 mt-2 right-0 z-999 top-auto shadow-[0px_56px_16px_0px_rgba(0,0,0,0.00),0px_36px_14px_0px_rgba(0,0,0,0.01),0px_20px_12px_0px_rgba(0,0,0,0.02),0px_9px_9px_0px_rgba(0,0,0,0.03),0px_2px_5px_0px_rgba(0,0,0,0.04)]"
+                        >
+                            <ul class="flex flex-col gap-1" (click)="closeProfileMenu()">
+                                @if (canSwitchContext()) {
+                                    <li>
+                                        <button
+                                            type="button"
+                                            class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer w-full text-left min-h-10"
+                                            (click)="switchContext($event)"
+                                        >
+                                            <i class="pi pi-sitemap"></i>
+                                            <span>Trocar organização</span>
+                                        </button>
+                                    </li>
+                                }
                                 <li>
-                                    <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer" (click)="switchContext($event)">
-                                        <i class="pi pi-sitemap"></i>
-                                        <span>Trocar organização</span>
+                                    <a routerLink="/perfil" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
+                                        <i class="pi pi-user"></i>
+                                        <span>Perfil</span>
                                     </a>
                                 </li>
-                            }
-                            <li>
-                                <a routerLink="/perfil" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
-                                    <i class="pi pi-user"></i>
-                                    <span>Perfil</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
-                                    <i class="pi pi-calendar"></i>
-                                    <span>Agenda</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a routerLink="/documentacoes" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
-                                    <i class="pi pi-book"></i>
-                                    <span>Documentações</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a routerLink="/configuracoes" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
-                                    <i class="pi pi-cog"></i>
-                                    <span>Configurações</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer" (click)="logout($event)">
-                                    <i class="pi pi-power-off"></i>
-                                    <span>Sair</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
+                                <li>
+                                    <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
+                                        <i class="pi pi-calendar"></i>
+                                        <span>Agenda</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/documentacoes" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
+                                        <i class="pi pi-book"></i>
+                                        <span>Documentações</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/configuracoes" class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer">
+                                        <i class="pi pi-cog"></i>
+                                        <span>Configurações</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="label-small dark:text-surface-400 flex gap-2 py-2 px-2.5 rounded-lg items-center hover:bg-emphasis transition-colors duration-150 cursor-pointer" (click)="logout($event)">
+                                        <i class="pi pi-power-off"></i>
+                                        <span>Sair</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>`
+        <p-dialog
+            [(visible)]="contextDialogVisible"
+            header="Trocar organização"
+            [pt]="{ header: { style: { display: 'none' } } }"
+            [modal]="true"
+            [draggable]="false"
+            [resizable]="false"
+            [blockScroll]="true"
+            [closeOnEscape]="true"
+            appendTo="body"
+            [style]="{ width: '560px', maxWidth: 'calc(100vw - 32px)' }"
+            [contentStyle]="{ padding: '0', overflow: 'hidden' }"
+            (onHide)="restoreProfileFocus()"
+        >
+            @if (contextDialogVisible()) {
+                <ui-organization-picker [switching]="true" [returnUrl]="contextReturnUrl" (cancelled)="contextDialogVisible.set(false)" />
+            }
+        </p-dialog>`
 })
 export class AppTopbar {
     layoutService = inject(LayoutService);
@@ -194,6 +229,9 @@ export class AppTopbar {
 
     readonly profile = inject(ProfileService);
     private profileMenu = viewChild<ElementRef<HTMLElement>>('profileMenu');
+    private profileButton = viewChild<ElementRef<HTMLButtonElement>>('profileButton');
+    readonly contextDialogVisible = signal(false);
+    contextReturnUrl = '/dashboards';
     readonly initials = computed(() => {
         const name = this.profile.profile()?.name || this.authSession.getUser()?.name || '';
         const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -353,9 +391,18 @@ export class AppTopbar {
 
     switchContext(event: Event) {
         event.preventDefault();
-        const currentUrl = this.router.url || '/dashboards';
 
-        this.router.navigate(['/contexto/selecao'], { queryParams: { returnUrl: currentUrl } });
+        if (!this.canSwitchContext()) {
+            return;
+        }
+
+        this.closeProfileMenu();
+        this.contextReturnUrl = this.router.url || '/dashboards';
+        this.contextDialogVisible.set(true);
+    }
+
+    restoreProfileFocus() {
+        this.profileButton()?.nativeElement.focus();
     }
 
     canSwitchContext() {

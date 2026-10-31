@@ -49,13 +49,24 @@ primeiro acesso. Erros de contexto voltam à seleção; 403 de permissão não a
 ou organização anterior são descartadas. Confirmar a organização exige um UUID da
 lista acessível, mas isso não substitui a validação RBAC do backend.
 
-Sem menu (após login, sem organização ou com troca de senha pendente), o `AppLayout` centraliza o card
-na vertical. Troca de organização aberta de dentro do app continua no layout completo.
+`/contexto/selecao` usa `AuthLayout`, sem menu, como etapa centralizada do login.
+No sistema, avatar → **Trocar organização** abre um `p-dialog` sobre a página atual.
+Cancelar, X ou Esc fecham o modal e devolvem o foco ao avatar, sem mudar contexto/URL.
+Confirmar uma organização diferente mantém `setActiveContext/openContext` e o
+recarregamento entre abas (ADR 0035); confirmar a já ativa apenas fecha o modal.
+
+`UiOrganizationPicker` compartilha cartões com rádios nativos nas duas apresentações.
+A organização ativa recebe a tag **Atual** no modal. Acima de 7 organizações, busca
+local por nome ignora maiúsculas/acentos; a seleção permanece ao filtrar e o botão
+usa o rótulo fixo **Entrar**. Lista com até 350 px e rolagem interna, mantendo busca/ações
+fora da rolagem; estado vazio permite limpar a busca. Cada abertura busca a lista
+uma vez; digitar não acessa a API. Destroy cancela HTTP pendente e a revisão da sessão
+impede aplicar resposta antiga. Falhas mostram mensagem segura e permitem tentar novamente.
 
 Senhas: autocomplete apropriado, mínimo de 12 caracteres e confirmação na UI;
 validadores completos continuam no Django. Senhas não entram no storage e campos
 são limpos após sucesso. Forms usam submit, labels e mensagens `role=alert`;
-seleção usa controle nativo acessível por teclado. Não foi realizada auditoria
+seleção usa rádios nativos com foco visível nos cartões. Não foi realizada auditoria
 WCAG completa com leitor de tela nesta etapa.
 
 ## Validação e performance
@@ -79,3 +90,19 @@ retenção/expurgo e adequação jurídica de AccessLog permanecem pendências a
 
 Dev: API relativa com proxy Angular; homol/prod aguardam URL. Cache ETag global por
 URL fica desabilitado até revisão de isolamento/no-store. Contratos adaptados na 6.8 (README).
+
+## Validação da melhoria de seleção (2026-10-31)
+
+120 testes ChromeHeadless: cenário com 100 organizações, busca sem HTTP adicional,
+seleção preservada, rolagem interna/rodapé estável, limiar 7/8, nomes escapados,
+falha/retry, resposta antiga, cancelamento da requisição ao destruir e modal sem navegar.
+Chrome com API simulada: desktop 1280 × 900 e login móvel 320 × 800 sem rolagem horizontal;
+lista de 350 px; Esc fecha e devolve foco ao avatar, preservando URL/contexto.
+Não constitui E2E com banco real nem auditoria WCAG completa. Nenhuma nova dependência,
+API, query ou lock no backend. Busca normaliza nomes por carregamento, usa computed
+por texto e renderização rastreada por public_id.
+
+O diálogo do topo deve ser irmão de `.layout-topbar`, fora do seu flex. Dentro dele,
+o host do p-dialog fechado ocupa espaço e desloca busca/notificações/avatar. Regressão
+IM03 coberta por teste de geometria; Chrome conferido em 390/1280/1920 px, antes de abrir,
+com modal aberto e após Esc (14 px de margem direita).

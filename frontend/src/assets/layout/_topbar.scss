@@ -85,7 +85,8 @@
             }
 
             &.profile-item {
-                > a {
+                > a,
+                > button.right-sidebar-button {
                     width: auto;
                     height: auto;
                     display: flex;
@@ -100,7 +101,8 @@
                 }
             }
 
-            > a {
+            > a,
+            > button.right-sidebar-button {
                 width: 2.5rem;
                 height: 2.5rem;
                 line-height: 2.5rem;

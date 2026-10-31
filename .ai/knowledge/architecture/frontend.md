@@ -42,3 +42,14 @@
   options, retenção 0–365 (padrão 90), provisionamento (username + nome), admins e reset
   com confirmação; senha temporária só em memória. Erros por problemMessage (RFC 9457).
   52 testes ChromeHeadless; bundle inicial ~1,25 MB. Bloco 6 concluído.
+
+- 2026-10-31: `shared/ui/organization-picker` compartilha escolha no AuthLayout e
+  troca em p-dialog pelo avatar. Busca local acima de 7, seleção preservada,
+  lista até 350 px, busca/ações fora da rolagem; Atual no modal. Uma chamada por
+  abertura; destroy cancela HTTP, revisão da sessão rejeita respostas antigas.
+  Cancelar/X/Esc mantêm contexto/URL e devolvem foco ao avatar; confirmação mantém
+  setActiveContext/openContext (ADR 0035). 120 testes ChromeHeadless; desktop e
+  320 px conferidos com API simulada. Sem mudanças de backend/dependências.
+
+- Ajuste aprovado: ação de confirmar usa sempre **Entrar**, sem nome de organização
+  (frontend e FigCraft); seleção continua preservada ao filtrar.
