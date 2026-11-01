@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Tutorial de servidor com N projetos
+
+- docs/deployment/tutorial.md: preparar VPS e máquina de operação, adicionar projetos
+  (banco, clone, setup, configuração, portas distintas, deploy), gateway pendente (3.2),
+  rotina de atualização e backup. Linkado no README de deployment.
+
 ## 2026-10-31 — Deploy em Python com operação remota por Fabric
 
 - scripts/*.sh → Python: `deploy.py` (máquina de operação, Fabric 3.2.3, SSH sem PTY,

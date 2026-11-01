@@ -3,6 +3,7 @@
 Servidor Linux com Docker Engine/Compose ≥ 2.24, Git e Python ≥ 3.11 (só biblioteca padrão).
 A máquina de operação usa Python com Fabric (`scripts/requirements.txt`) para acionar o servidor por SSH.
 Cada projeto tem repositório e implantação próprios; PostgreSQL fica em outra VPS.
+Passo a passo de um servidor com N projetos: [tutorial](tutorial.md).
 O CORE mantém a automação em `scripts/`, autorizada pelo usuário. Os builds continuam
 isolados: backend/ e frontend/ são os únicos contextos das respectivas imagens.
 
