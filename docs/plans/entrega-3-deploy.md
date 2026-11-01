@@ -8,7 +8,7 @@ Karma da Entrega 2 continuam documentados, sem decisão de migração.
 
 | Etapa | Escopo | Estado |
 |---|---|---|
-| 3.1 | Setup/deploy (Python + Fabric/SSH), Dockerfiles/Compose independentes e mídia persistente no host | ✅ Implementado e validado localmente; sem commit |
+| 3.1 | Setup/deploy (Python + Fabric/SSH), Dockerfiles/Compose independentes e mídia persistente no host | ✅ Implementado e validado localmente (5a467a6) |
 | 3.2 | Gateway HTTPS: Nginx + certbot no host (ADR 0043), modelo de site por projeto, DNS e headers confiáveis | 🔄 Modelo e docs prontos, validados localmente; teste no subdomínio do usuário pendente |
 | 3.3 | Validar implantação integrada, backup/restauração e dimensionamento em servidor | ⬜ Pendente de ambiente/configuração real |
 
