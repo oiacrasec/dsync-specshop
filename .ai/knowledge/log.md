@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Guia para criar projeto derivado
+
+- docs/derived-projects/README.md: criar repositório com histórico (clone + remote
+  `core`), personalizar nome/banco/chaves/docs, ambiente local, regra de só acrescentar,
+  atualizar por `git fetch core && git merge`, limitações atuais e venda. Linkado no
+  overview (2.3) e no ADR 0036. Primeiro projeto previsto: SPECSHOP.
+
 ## 2026-10-31 — Gateway HTTPS: Nginx + certbot (3.2)
 
 - Usuário escolheu Nginx + certbot no host (familiaridade). ADR 0043; modelo

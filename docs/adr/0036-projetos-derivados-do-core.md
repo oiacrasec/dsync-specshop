@@ -67,6 +67,10 @@ um core próprio, sem acesso ao core original.
 - Fork de repositório privado no GitHub continua privado, e o GitHub não permite fork
   de um repositório para a mesma conta; nesses casos usa-se o espelhamento do item 6.
 
+## Referência
+
+[Passo a passo para criar um projeto](../derived-projects/README.md).
+
 ## Pendências
 
 - Como um projeto acrescenta regras de agente sem editar o `AGENTS.md` do core (por

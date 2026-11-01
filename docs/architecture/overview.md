@@ -150,7 +150,8 @@ Contract (cliente)  →  Organization (unidade)  →  Sector (futuro)
 O core é a base de vários projetos. Cada projeto é um fork com histórico preservado e
 um remote `core`, evolui no próprio ritmo e recebe as evoluções de arquitetura do core
 por merge manual. O fluxo é só do core para os projetos, e o projeto apenas acrescenta
-código novo, sem editar arquivos que vêm do core (ADR 0036).
+código novo, sem editar arquivos que vêm do core (ADR 0036). Passo a passo para criar
+um projeto: [docs/derived-projects](../derived-projects/README.md).
 
 O nome exibido nos textos é configuração, não código: `appName`/`companyName` nos
 `environments` do frontend (token `APP_BRAND`) e `DJANGO_APP_NAME` no `.env` do backend
