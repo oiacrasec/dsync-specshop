@@ -1,6 +1,6 @@
 # Handoff
 
-- **Atualizado em:** 2026-10-31 22:05
+- **Atualizado em:** 2026-10-31 22:15
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-3-deploy.md
 - **Último commit:** ver `git log -2` (e6b0cab gateway + este handoff)
@@ -10,7 +10,7 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 3.2 Gateway HTTPS — 🔄 modelo/docs prontos e validados localmente; falta o teste real |
-| Próximo passo exato | Teste na VPS do usuário com um subdomínio, seguindo docs/deployment/tutorial.md (partes 1 a 4), pedindo autorização a cada comando remoto |
+| Próximo passo exato | Perguntar ao usuário qual frente seguir: (a) teste real da 3.2 na VPS; (b) preparar o core para o primeiro projeto derivado, **SPECSHOP** (seção abaixo) |
 | Aguardando o usuário? | sim — IP/usuário SSH (fingerprint conferido), subdomínio com DNS A, URL do banco, Docker/Git/Python/Nginx/certbot instalados e portas 80/443 liberadas |
 
 ## Entrega 3 até aqui (tudo commitado, sem push)
@@ -33,6 +33,26 @@
   smoke de contêineres (/tmp/dsync-container-smoke.sh); `nginx -t` 1.30.6 e gateway local
   na frente das imagens reais (HTTP chega ao Django e vira 301; cabeçalho forjado
   ignorado; SPA 200; 3 MB sem 413). Certificado/HTTPS real não testado.
+
+## Próxima frente: SPECSHOP a partir do core (ADR 0036)
+
+Usuário quer iniciar o SPECSHOP usando o core como base e continuar levando as
+atualizações do core aos projetos. Estratégia do ADR 0036 (fork com histórico, remote
+`core`, fluxo só core → projeto, projeto só acrescenta, merge por tags) recomendada e
+aceita na conversa. Antes de criar o projeto, tratar **um item por vez, com decisão do
+usuário** em cada um:
+
+1. ADR 0036 está "Proposto": revisar com o usuário e passar a "Aceito".
+2. Criar a primeira tag do core (`v1.0`) no estado aprovado; o SPECSHOP nasce dela.
+3. Ponto de extensão para regras de agente do projeto sem editar o `AGENTS.md` do core
+   (ex.: `AGENTS.project.md` também carregado pelo hook de `.claude/settings.json`).
+4. Ampliar a lista de arquivos do projeto (item 5 do ADR) com `frontend/src/environments/*`
+   (appName/companyName/apiBaseUrl) e `design/`.
+5. Automatizar com `merge=ours` no `.gitattributes` (+ `git config merge.ours.driver true`).
+6. Roteiro em `docs/`: criar projeto (repo vazio + `clone --mirror`/`push --mirror`, remote
+   `core`, nome do sistema, domínio em apps novos), atualizar por tag e vender.
+
+Nada disso foi iniciado; nenhum repositório do SPECSHOP foi criado.
 
 ## Cuidados para o teste real
 
