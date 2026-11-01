@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Gateway HTTPS: Nginx + certbot (3.2)
+
+- Usuário escolheu Nginx + certbot no host (familiaridade). ADR 0043; modelo
+  `scripts/nginx-site.conf.example` (/api/ → backend, resto → frontend, cabeçalhos de
+  proxy sempre sobrescritos, 10 MB, sem access_log). Tutorial seção 4 e guia atualizados.
+- Validado localmente: `nginx -t` (1.30.6) e gateway na frente das imagens reais (HTTP
+  chega ao Django e redireciona; cabeçalho forjado ignorado; SPA 200; 3 MB sem 413).
+  Teste no subdomínio real do usuário pendente.
+
 ## 2026-10-31 — Tutorial de servidor com N projetos
 
 - docs/deployment/tutorial.md: preparar VPS e máquina de operação, adicionar projetos

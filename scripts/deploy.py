@@ -22,7 +22,7 @@ def execute_remote(connection, *, repo_dir, directory, command, name=None, no_pu
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Configurar/atualizar uma implantação remotamente por SSH.')
-    parser.add_argument('--host', required=True, help='Alias de ~/.ssh/config ou usuario@servidor')
+    parser.add_argument('--host', required=True, help='usuario@ip[:porta] ou alias de ~/.ssh/config')
     parser.add_argument('--repo-dir', required=True, help='Checkout Git já clonado na VPS')
     parser.add_argument('--directory', required=True, help='Diretório de implantação na VPS')
     commands = parser.add_subparsers(dest='command', required=True)

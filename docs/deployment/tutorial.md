@@ -47,17 +47,16 @@ Feito pelo administrador do servidor:
    pip install -r scripts/requirements.txt    # Fabric; não vai para a VPS
    ```
 
-2. Criar um alias no `~/.ssh/config`:
+2. Ter a chave SSH do usuário `deploy` na sua máquina (no agente SSH ou como chave
+   padrão, ex.: `~/.ssh/id_ed25519`). Os comandos usam o **IP** direto:
+   `--host deploy@203.0.113.10` (porta diferente de 22: `deploy@203.0.113.10:2222`).
 
-   ```text
-   Host apps-vps
-       HostName 203.0.113.10
-       User deploy
-       IdentityFile ~/.ssh/deploy_apps
-   ```
+3. Conectar uma vez com `ssh deploy@203.0.113.10` e **conferir o fingerprint** do
+   servidor antes de aceitar. O script recusa servidor desconhecido ou com chave alterada.
 
-3. Conectar uma vez com `ssh apps-vps` e **conferir o fingerprint** do servidor antes de
-   aceitar. O script recusa servidor desconhecido ou com chave alterada.
+   Se preferir um nome curto ou uma chave fora do padrão, um alias no `~/.ssh/config`
+   também funciona (ex.: `Host apps-vps` com `HostName`, `User` e `IdentityFile`; depois
+   `--host apps-vps`).
 
 ## 3. Adicionar um projeto (repetir para cada um)
 
@@ -69,14 +68,14 @@ com acesso liberado só a partir da VPS de aplicações. Guarde a URL de conexã
 ### 3.2 Clonar o repositório (na VPS)
 
 ```bash
-ssh apps-vps
+ssh deploy@203.0.113.10
 git clone git@github.com:sua-org/proj-x.git /srv/apps/proj-x
 ```
 
 ### 3.3 Criar a implantação (na sua máquina, dentro do checkout do projeto)
 
 ```bash
-python scripts/deploy.py --host apps-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-x --directory /srv/deploy/proj-x \
   setup --name proj-x
 ```
@@ -119,7 +118,7 @@ As portas ficam só em `127.0.0.1`; ninguém de fora acessa direto.
 ### 3.5 Primeiro deploy (na sua máquina)
 
 ```bash
-python scripts/deploy.py --host apps-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-x --directory /srv/deploy/proj-x \
   deploy
 ```
@@ -141,33 +140,72 @@ Mesmos passos 3.1 a 3.5, trocando o nome e as portas:
 git clone git@github.com:sua-org/proj-y.git /srv/apps/proj-y
 
 # na sua máquina, dentro do checkout do proj-y
-python scripts/deploy.py --host apps-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-y --directory /srv/deploy/proj-y setup --name proj-y
 # na VPS: preencher backend.env do proj-y e trocar as portas para 8001/8081 no .env
-python scripts/deploy.py --host apps-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-y --directory /srv/deploy/proj-y deploy
 ```
 
-## 4. Publicar na internet — gateway HTTPS (pendente)
+## 4. Publicar na internet — gateway HTTPS
 
-Os projetos ficam ouvindo só no `127.0.0.1` da VPS. Para acessar pelo navegador falta um
-**gateway HTTPS** que, para cada domínio, mande `/api/` para a porta do backend e o resto
-para a porta do frontend. Ele também precisa preencher `X-Real-IP`, `X-Real-Port` e
-`X-Forwarded-Proto`.
+O gateway é o **Nginx do host** com certificado do **certbot** (ADR 0043). Cada projeto
+ganha um site que manda `/api/` para a porta do backend e o resto para a do frontend:
 
 | Domínio | `/api/` → | demais → |
 |---|---|---|
 | x.exemplo.com.br | 127.0.0.1:8000 | 127.0.0.1:8080 |
 | y.exemplo.com.br | 127.0.0.1:8001 | 127.0.0.1:8081 |
 
-A escolha e a configuração do gateway são a etapa **3.2** do plano e ainda não foram
-decididas. Sem ele, o frontend abre mas não fala com a API.
+### 4.1 Preparar (uma vez, administrador do servidor)
+
+- Instalar **Nginx** e **certbot com o plugin do Nginx** pelo gerenciador da distribuição
+  ([certbot](https://certbot.eff.org/instructions)).
+- Liberar as portas **80 e 443** no firewall. A 80 é usada para emitir o certificado.
+
+### 4.2 Para cada projeto
+
+1. **DNS:** criar um registro **A** de `x.exemplo.com.br` apontando para o IP da VPS
+   (e **AAAA**, se a VPS tiver IPv6). Esperar propagar.
+2. **Site:** copiar o modelo do repositório e trocar domínio e portas pelos do `.env`:
+
+   ```bash
+   sudo cp /srv/apps/proj-x/scripts/nginx-site.conf.example /etc/nginx/sites-available/x.exemplo.com.br
+   sudo sed -i 's/DOMINIO/x.exemplo.com.br/; s/BACKEND_PORT/8000/; s/FRONTEND_PORT/8080/' \
+     /etc/nginx/sites-available/x.exemplo.com.br
+   sudo ln -s /etc/nginx/sites-available/x.exemplo.com.br /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+
+3. **Certificado:** o certbot acrescenta o HTTPS e o redirecionamento de HTTP:
+
+   ```bash
+   sudo certbot --nginx -d x.exemplo.com.br --redirect
+   sudo certbot renew --dry-run      # confere que a renovação automática funciona
+   ```
+
+4. **Conferir:** `https://x.exemplo.com.br` abre a tela de login e `https://x.exemplo.com.br/api/v1/me/profile/`
+   responde 401 (sem login).
+
+O modelo já sobrescreve `X-Forwarded-Proto`, `X-Real-IP`, `X-Real-Port` e
+`X-Forwarded-For` com os dados reais da conexão, aceita envios de até 10 MB e não grava
+log de acesso (as URLs de mídia levam assinatura no caminho).
+
+### 4.3 HSTS no primeiro teste
+
+O Django manda HSTS de **1 ano** por padrão: o navegador passa a exigir HTTPS nesse
+domínio e nos subdomínios dele. No primeiro teste, use um valor curto no `backend.env`
+e só depois volte ao padrão:
+
+```text
+DJANGO_SECURE_HSTS_SECONDS=3600
+```
 
 ## 5. Dia a dia
 
 | Tarefa | Como |
 |---|---|
-| Atualizar um projeto | `python scripts/deploy.py --host apps-vps --repo-dir … --directory … deploy` |
+| Atualizar um projeto | `python scripts/deploy.py --host deploy@203.0.113.10 --repo-dir … --directory … deploy` |
 | Atualizar direto na VPS | `python3 /srv/deploy/proj-x/deploy.py deploy` |
 | Publicar o commit já baixado, sem pull | acrescentar `--no-pull` ao `deploy` |
 | Backup da mídia | `rsync` da pasta `/srv/deploy/<projeto>/media/` por um usuário só de leitura ([README](README.md#mídia-e-backup-externo)) |

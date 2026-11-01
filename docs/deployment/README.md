@@ -14,11 +14,11 @@ máquina de operação**, num ambiente Python separado do projeto:
 
 ```bash
 pip install -r scripts/requirements.txt
-python scripts/deploy.py --host proj-x-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-x --directory /srv/deploy/proj-x setup --name proj-x
 ```
 
-`--host` é um alias do `~/.ssh/config` ou `usuario@servidor`, com o usuário responsável
+`--host` aceita `usuario@ip` (ou `usuario@ip:porta`) e também um alias do `~/.ssh/config`, com o usuário responsável
 pelo deploy (acesso ao Docker e permissão para criar o destino). A conexão usa chave/
 agente SSH, sem senha interativa nem PTY, e **recusa servidor desconhecido ou com chave
 alterada**: registre a chave do servidor em `known_hosts` antes (por exemplo, um `ssh`
@@ -60,10 +60,11 @@ altera o backend/.env local nem realiza rotação de chaves em implantações ex
 Referências: [secrets](https://docs.python.org/3/library/secrets.html),
 [formato da chave Fernet](https://cryptography.io/en/stable/fernet/).
 
-## Gateway HTTPS — requisito separado
+## Gateway HTTPS — Nginx + certbot (ADR 0043)
 
-Este lote entrega as aplicações, não instala/configura o gateway do servidor.
-Cada porta é publicada apenas em `127.0.0.1`. Um gateway no host deverá encaminhar:
+As aplicações publicam só em `127.0.0.1`. O gateway é o Nginx do host, um site por
+projeto a partir de `scripts/nginx-site.conf.example`, com certificado do certbot
+(passo a passo no [tutorial](tutorial.md#4-publicar-na-internet--gateway-https)). Ele:
 
 - `/api/` para a porta do backend, preservando o caminho.
 - Demais rotas para a porta do frontend.
@@ -71,8 +72,7 @@ Cada porta é publicada apenas em `127.0.0.1`. Um gateway no host deverá encami
   Não confiar nos valores enviados pelo navegador. Backend não pode ficar exposto
   diretamente à internet. Atrás de outro balanceador, alinhar a cadeia de confiança.
 
-Gateway em contêiner exige uma integração de rede própria, ainda por alinhar: o
-loopback desse contêiner não é o host. HTTPS, DNS e os headers devem estar corretos
+Gateway em contêiner não é suportado (o loopback do contêiner não é o host). HTTPS, DNS e os headers devem estar corretos
 antes de declarar a implantação pronta para produção. O acesso HTTP direto ao backend
 é redirecionado para HTTPS pelos settings de produção.
 
@@ -83,7 +83,7 @@ Os nomes appName/companyName seguem a configuração existente do projeto.
 ## Atualizar
 
 ```bash
-python scripts/deploy.py --host proj-x-vps \
+python scripts/deploy.py --host deploy@203.0.113.10 \
   --repo-dir /srv/apps/proj-x --directory /srv/deploy/proj-x deploy
 ```
 
