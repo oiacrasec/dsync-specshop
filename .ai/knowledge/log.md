@@ -1,5 +1,50 @@
 # Histórico do conhecimento
 
+## 2026-10-31 — Deploy em Python com operação remota por Fabric
+
+- scripts/*.sh → Python: `deploy.py` (máquina de operação, Fabric 3.2.3, SSH sem PTY,
+  RejectPolicy para host desconhecido) envia `deploy_server.py` por stdin; o worker na
+  VPS usa só a biblioteca padrão e gera as chaves com `secrets` no próprio servidor.
+  Atalho `<destino>/deploy.py`; `backend/scripts/start.py` substitui start.sh (Gunicorn via exec).
+- Testes: `scripts/test_deploy.py` (unittest) + Fabric real em SSH loopback; imagens
+  reconstruídas e smoke de contêineres ok. ADR 0042 revisado; docs/deployment e plano.
+
+## 2026-10-31 — Chaves automáticas no setup de nova implantação
+
+- Usuário solicitou reaproveitar .env.example e gerar as chaves de aplicação.
+  Setup deriva novo backend.env do modelo; OpenSSL CSPRNG gera chaves Django/JWT
+  independentes (48 bytes hex) e MFA/Fernet (32 bytes base64 URL-safe).
+- Sem exibição de valores, arquivo 0600 desde a criação; falha do gerador bloqueia
+  criação de configuração. Backend.env existente e .env local preservados; sem rotação.
+- Banco/domínio e credenciais externas continuam manuais; backup seguro das chaves
+  documentado. Testes cobrem formatos, independência entre implantações, preservação,
+  ausência de chaves no log e falha bloqueante. ADR 0042/plano/docs atualizados.
+
+## 2026-10-31 — Mapeamento de portas Compose explícito
+
+- Backend/frontend usam sintaxe longa (target, published, host_ip, protocol), com
+  validação :? separada em x-required-variables, pois a IDE rejeitava essa expressão
+  no published. Inspeções PyCharm sem erros; Docker Compose confirma portas
+  obrigatórias e acesso somente loopback preservados.
+
+## 2026-10-31 — Base de deploy Git/Compose e mídia acessível no host
+
+- Usuário aprovou scripts na raiz para setup inicial e deploy por Git/build na VPS;
+  backup de mídia será coletado por outra máquina. ADR 0042 e plano Entrega 3 criados.
+- scripts/setup-deploy.sh cria destino externo, configuração e wrapper; preserva
+  mídia/segredos existentes. scripts/deploy.sh faz pull --ff-only, build sequencial,
+  checks/migrations/up --wait com trava e falha bloqueante. Compose nunca é copiado.
+- Dockerfiles/Compose isolados por aplicação; Python 3.14.10, Node 24 LTS e Nginx
+  stable 1.30.6. API_BASE_URL aplicado apenas na imagem frontend. Backend não root;
+  mídia filesystem em <implantação>/media montada só no backend; URLs assinadas mantidas.
+- Sintaxe/testes de scripts, Compose real, builds e check --deploy passaram.
+  Migrations em PostgreSQL temporário separado, API perfil 401 sem autenticação,
+  mídia visível no host e preservada após recriação; SPA 200 e /media direto 404.
+- Configuração de SSH/ACL para backup, gateway HTTPS, restore e dimensionamento real
+  pendentes de alinhamento/ambiente. Sem implantação externa, sem commit desta etapa.
+- Documentação em docs/deployment/README.md; AGENTS, overview, READMEs e handoff
+  atualizados. Plano ativo Entrega 3; Entrega 2 mantém nove avisos npm do Karma.
+
 ## 2026-10-31 — Segundo lote frontend: produção sem avisos e 9 moderadas residuais
 
 - Autorização permanente para apagar arquivos comprovadamente desnecessários ao

@@ -59,6 +59,7 @@ para assunto novo; o status "Substituído por" fica para os ADRs antigos já sub
 | [0039](0039-armazenamento-de-midia.md) | Armazenamento de mídia configurável e privado | Aceito |
 | [0040](0040-design-system-no-figcraft.md) | Design system no FigCraft, versionado em `design/` | Aceito |
 | [0041](0041-verificacao-em-duas-etapas.md) | Verificação em duas etapas por TOTP | Aceito |
+| [0042](0042-deploy-git-compose.md) | Deploy por Git/Compose, scripts compartilhados e mídia no host | Aceito |
 
 ## Modelo
 

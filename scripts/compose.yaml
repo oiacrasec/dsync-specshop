@@ -1,0 +1,4 @@
+name: ${PROJECT_NAME:?Defina PROJECT_NAME}
+include:
+  - ${REPO_DIR:?Defina REPO_DIR}/backend/compose.yaml
+  - ${REPO_DIR}/frontend/compose.yaml

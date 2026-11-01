@@ -1,62 +1,59 @@
 # Handoff
 
 - **Atualizado em:** 2026-10-31
-- **Agente:** Codex
-- **Plano ativo:** docs/plans/entrega-2-seguranca-dependencias.md
-- **Commit deste lote:** fix(frontend): reduce dependency security warnings (este handoff integra o commit; hash em `git log -1`)
-- **Lote anterior:** 3898118 — fix(deps): update Angular LTS and Pillow security releases
+- **Agente:** Claude (concluiu a migração Python iniciada pelo Codex)
+- **Plano ativo:** docs/plans/entrega-3-deploy.md
+- **Último commit:** 593315e — fix(frontend): reduce dependency security warnings
+- **Trabalho atual:** 3.1 implementada/validada, sem commit; usuário revisa antes de commitar.
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.1 🔄 segundo lote frontend validado e aprovado para commit; 2.2 backend ✅ concluída |
-| Próximo passo exato | Alinhar tratamento dos nove avisos do Karma/cobertura; migração do executor ainda não autorizada. Deploy é a prioridade seguinte, por alinhar |
-| Aguardando o usuário? | sim — decisão sobre a próxima atividade; commit deste lote solicitado |
+| Etapa atual | 3.1 ✅ base local de deploy Git/Compose e mídia persistente |
+| Próximo passo exato | Revisar arquivos da 3.1; commit quando solicitado. Depois alinhar gateway HTTPS (3.2), sem implementação automática |
+| Aguardando o usuário? | revisão e decisões sobre próxima etapa; sem autorização de deploy externo |
 
 ## Implementado / validado
 
-- Primeiro lote: Angular 21.2.25 LTS, CLI/build 21.2.29, CDK 21.2.14,
-  PostCSS 8.5.32, remoção de primeclt e Pillow 13.0.0. npm 101 → 48;
-  produção 21 → 1. Python: 39 avisos → zero; SDK e requirements auditados.
-- Autorização permanente para apagar arquivos comprovadamente desnecessários ao
-  commitar registrada em modo-de-trabalho. backend/package-lock.json vazio,
-  não versionado e acidental removido; lockfile frontend preservado/atualizado.
-- Quill removido (único consumidor no CMS desabilitado); exemplo preservado com
-  aviso de revisão/reinstalação antes de reativar. Autorização de limpeza supera
-  a pergunta pendente anterior. Três plugins ESLint não carregados também removidos.
-- ESLint 10.14.0 (9 em EOL), @eslint/js 10.0.1 explícito, typescript-eslint 8.72.1.
-  Inicialização descartada removida de lib/utils.ts; nenhuma regra desativada.
-- Overrides limitados: glob 13 → 14.0.3, minimatch 10 → 11.0.3 e uuid do SockJS →
-  11.1.1. Não substituir minimatch 3 globalmente: API incompatível.
-- npm 48 → **9 moderadas**, zero críticas/altas/baixas; produção 1 → **zero**.
-  Resíduo: GHSA-g3hv-75wg-m249 de minimatch 3/Karma/cobertura/glob 7.
-- 143 testes frontend, lint, formato, npm ls, build e smoke de ng serve passaram.
-  Os 77 arquivos JS/CSS de produção ficaram idênticos por SHA-256.
-- Antes de aplicar: 56.540 comparações minimatch, quatro padrões glob, cacache,
-  HTTP/WebSocket SockJS e 25 casos da redução de dados passaram. Cobertura limitada
-  aos caminhos citados; detalhes em docs/security/dependencies.md.
-- Backend sem alteração neste lote; seus 769 testes e checks passaram no primeiro.
-  Sem novas queries/escritas/locks; bundle ~1,31 MB. Licenças revisadas; OWASP A01–A10
-  revisado, A03 residual explícito. npm audit completo continua saindo com código 1.
+- Usuário escolheu Git pull/build na VPS, aprovou scripts/ na raiz e pediu mídia
+  acessível no host para backup por outra máquina. ADR 0042 registra o modelo.
+- Automação em Python (os .sh foram removidos). Na máquina de operação:
+  `pip install -r scripts/requirements.txt` (Fabric 3.2.3, só operação) e
+  `python scripts/deploy.py --host <alias-ssh> --repo-dir /srv/apps/x --directory /srv/deploy/x setup --name x | deploy [--no-pull]`.
+  SSH sem PTY/senha interativa; host desconhecido/alterado recusado (RejectPolicy).
+- `deploy_server.py` vai por stdin e roda com Python ≥ 3.11 da VPS (só stdlib): setup
+  cria .env, backend.env (do .env.example; chaves Django/JWT/MFA via `secrets` na VPS,
+  0600, sem exibir), media/ e atalho `deploy.py`; preserva o que existe. Deploy exige Git
+  limpo, pull --ff-only, trava, config, build sequencial, check --deploy, migrate, up --wait.
+- Compose/Dockerfile por aplicação; Python 3.14.10, Node 24 LTS, Nginx 1.30.6. Backend
+  não root, `backend/scripts/start.py` (collectstatic + exec Gunicorn). Mídia bind mount
+  só no backend; URLs assinadas (ADR 0039). Portas só em loopback; sem banco no Compose.
+- Validação (Claude, 31/10 ~21h): 10 testes `cd scripts && python -m unittest test_deploy`;
+  Fabric/Paramiko reais contra SSH local (/tmp/dsync-fabric-smoke.py, deps em
+  /tmp/dsync-fabric-tool); imagens reconstruídas com start.py e smoke de contêineres ok
+  (/tmp/dsync-container-smoke.sh: check --deploy, API 401, mídia persistente, SPA 200,
+  /media 404); `compose config` ok; ruff do backend e dos scripts ok; pip-audit sem vulns.
+- Nenhuma conexão com VPS real; nenhum banco/segredo real usado.
+- Docs: docs/deployment/README.md, ADR 0042 (revisão Python/Fabric), plano, log.
 
 ## Cuidados / próximas frentes
 
-- Não ocultar avisos: npm sinaliza minimatch <11.0.1; mantenedor cita 10.2.6.
-  Alcance aberto; sem decisão de migração nem aceitação definitiva dos avisos.
-- Evidências: /tmp/datasync-lot2-final-{audit,audit-prod}.json e
-  /tmp/datasync-lot2-final-{tests,build,lint,format,tree}.log. Comandos no relatório.
-- Sem auditoria WCAG completa, E2E com API real ou teste de carga neste lote.
-- Python SDK: /home/cesar/Virtual/datasync-core-3.14/bin/python; consultar PyCharm
-  antes de cada comando. Suíte completa após subconjuntos: --reuse-db --create-db.
-  pip-audit só em /tmp/datasync-pip-audit-tool; Gunicorn/WhiteNoise auditados pelos
-  requirements, ausentes no SDK. Faixas dos requirements podem resolver versões novas.
-- Não imprimir/versionar segredos. Push só quando pedido; nunca --amend na main.
+- Gateway HTTPS ainda não escolhido/configurado; precisa encaminhar /api/ e demais
+  rotas, sobrescrever IP/porta/protocolo reais. Gateway em contêiner exige rede própria.
+- PostgreSQL sempre em outra VPS; um ou N projetos por VPS de aplicações.
+- Backup: mídia acessível via SSH/rsync com leitura restrita e ACLs herdáveis; criação
+  de usuário/chave/ACL depende do servidor. Segredos precisam de backup separado.
+  Coordenar banco/escritas para snapshot consistente, retenção/LegalHold (ADR 0007).
+- Migrações incompatíveis exigem backup/janela de manutenção; sem rollback automático
+  ou garantia de atualização sem interrupção. Não declarar pronto para produção ainda.
+- Relatórios locais: /tmp/dsync-deploy-{backend,frontend}-build.log e
+  /tmp/dsync-container-smoke.log. Testes reproduzíveis em scripts/test_deploy.py.
+- Entrega 2: npm 101 → 9 moderadas do Karma; produção 21 → zero; Python 39 → zero
+  no lote anterior. Detalhes em docs/security/dependencies.md; sem decisão de migração.
 - 9.1–9.5 concluídas (b54a38b). 5.3/superadmin paralisados até pedido explícito.
-- Deploy: VPS/local com 1 ou N projetos derivados, banco sempre em outra VPS;
-  alinhar Docker antes de implementar (decisões 94–95 da Entrega 1).
-- Produção: retenção/expurgo/LegalHold (ADR 0007), HTTPS/CSP, cache/borda e recuperação.
-- Conferência visual anterior login/MFA/filtros/contagem/seletor com API real pendente.
+- Não imprimir/versionar segredos. Push só quando pedido; nunca --amend na main.
+- Python SDK: /home/cesar/Virtual/datasync-core-3.14/bin/python; consultar PyCharm antes
+  de cada comando. Suíte completa após subconjuntos: --reuse-db --create-db.
+- Não reativar telas DESABILITADO. 20 mocks ZZ-01..ZZ-20 no CLIENTE X: apagar só a pedido.
 - FigCraft --control 7710 / MCP --attach 7710; salvar após editar.
-- 20 mocks ZZ-01..ZZ-20 no CLIENTE X: apagar só quando pedido.
-- Não reativar telas DESABILITADO sem aprovação.

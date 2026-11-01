@@ -1,0 +1,26 @@
+# A validação fica separada porque a inspeção de portas da IDE não aceita :?.
+x-required-variables:
+  frontend_port: ${FRONTEND_PORT:?Defina FRONTEND_PORT}
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        API_BASE_URL: ${FRONTEND_API_BASE_URL:-/api/v1}
+    ports:
+      - target: 80
+        published: "${FRONTEND_PORT}"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/]
+      interval: 15s
+      timeout: 5s
+      retries: 4

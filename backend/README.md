@@ -338,3 +338,10 @@ auditado e comando `manage.py reset_mfa <username> --actor <superadmin>` para su
 Migrations users.0008/audit.0011 aplicadas localmente em 2026-10-31. Chave MFA local
 configurada apenas em .env, ignorado pelo Git; preservar em backup seguro. Nenhum
 usuário é ativado automaticamente. Ver [contratos e implantação](../docs/api/mfa.md).
+
+## Deploy Docker
+
+Dockerfile/compose.yaml próprios, Gunicorn sem root e PostgreSQL externo. Setup e
+atualizações por Git em [docs/deployment](../docs/deployment/README.md) (ADR 0042).
+Mídia privada montada da pasta `media/` da implantação; backup pode ler o host via SSH,
+sem publicar os arquivos nem acessar o socket Docker.

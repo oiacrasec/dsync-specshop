@@ -1,0 +1,42 @@
+# A validação fica separada porque a inspeção de portas da IDE não aceita :?.
+x-required-variables:
+  backend_port: ${BACKEND_PORT:?Defina BACKEND_PORT}
+
+services:
+  backend:
+    build:
+      context: .
+      args:
+        APP_UID: ${APP_UID:-10001}
+        APP_GID: ${APP_GID:-10001}
+    env_file:
+      - path: ${DEPLOY_DIR:?Defina DEPLOY_DIR}/backend.env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DJANGO_MEDIA_STORAGE: filesystem
+      DJANGO_MEDIA_ROOT: /app/media
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
+    volumes:
+      - type: bind
+        source: ${DEPLOY_DIR}/media
+        target: /app/media
+        bind:
+          create_host_path: false
+    ports:
+      - target: 8000
+        published: "${BACKEND_PORT}"
+        host_ip: 127.0.0.1
+        protocol: tcp
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+    healthcheck:
+      test: [CMD, python, -c, "import socket; socket.create_connection(('127.0.0.1', 8000), timeout=2).close()"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 30s

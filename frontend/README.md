@@ -146,3 +146,9 @@ cada projeto derivado implementa os seus) e páginas de erro. As demais ficam
 comentadas nas rotas e no menu com `DESABILITADO: fora do escopo atual`
 (`grep -rn DESABILITADO src`). Padrões herdados: [docs/standards/patterns-frontend.md](docs/standards/patterns-frontend.md).
 Regras para agentes: [AGENTS.md](AGENTS.md). `LICENSE.md` mantém o aviso da PrimeTek.
+
+## Deploy Docker
+
+Build Angular em Node 24 LTS e entrega estática via Nginx stable. Compose próprio,
+com `API_BASE_URL` aplicado somente na imagem durante o build. Setup, gateway e
+limites operacionais em [docs/deployment](../docs/deployment/README.md) (ADR 0042).

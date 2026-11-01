@@ -68,7 +68,7 @@ parcialmente — o restante deve ser criado seguindo exatamente este baseline.
 | `backend/` + `frontend/` (9.4: MFA TOTP opcional, Perfil/login, reservas e reset administrativo auditado, ADR 0041) | implementado |
 | `backend/` + `frontend/` (9.5: Minhas permissões no Perfil, retrato próprio `/me/access/` com organizações, perfis e códigos efetivos; acesso total do admin em aviso) | implementado |
 | `backend/` + `frontend/` (Entrega 2: Angular 21 LTS/CDK/PostCSS/Pillow 13 e ESLint 10; dependências sem uso removidas e overrides validados; `docs/security/dependencies.md`) | produção auditada sem avisos; 9 moderadas no executor de testes |
-| `backend/` (`Dockerfile`, `docker-compose.yml`, `Makefile`, docs com conteúdo) | **pendente** |
+| `backend/` e `frontend/` (Dockerfiles/compose.yaml isolados), `scripts/` (setup/deploy), `docs/deployment/` (ADR 0042) | implementado; gateway e validação integrada de produção pendentes |
 | `frontend/` | criado; auth/contexto (6.5) e administração de contratos (6.8) adaptados ao Core |
 | `AGENTS.md` (frontend) | criado |
 
@@ -1319,7 +1319,12 @@ docker compose up
 
 Nenhum dos dois deve depender de arquivos localizados no diretório do outro.
 
-A raiz é responsável pelo repositório e pelo contexto global, não pelo runtime das aplicações.
+A raiz é responsável pelo repositório e pelo contexto global. `scripts/` contém a
+orquestração de setup/deploy por Git/Compose (ADR 0042), autorizada pelo usuário;
+runtime e dependências permanecem dentro de cada aplicação. Os Compose individuais
+exigem as configurações de implantação descritas em `docs/deployment/README.md`.
+Checkout e implantação ficam separados; a mídia privada é bind mount da pasta media
+da implantação, acessível no host para backup externo autorizado.
 
 ---
 
