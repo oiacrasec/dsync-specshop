@@ -10,8 +10,8 @@
 | Item | Estado |
 |---|---|
 | Etapa atual | 1.2 App `catalog` — ✅ concluída (API `/api/v1/products/`) |
-| Próximo passo exato | 1) Trazer atualizações do core (pedido do usuário): `git fetch core` (GitHub) e `git fetch ../datasync-core main`, merge e testes; o core local tem 4 commits sem push (8ca3eaf, bd50f8b, f41dd3b, 5e73bde). 2) Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
-| Aguardando o usuário? | sim — confirmar a retomada; depois, aprovação do escopo da 1.3 |
+| Próximo passo exato | Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
+| Aguardando o usuário? | sim — aprovação do escopo da 1.3 (core já atualizado: `core/main` = 5e73bde, publicado) |
 
 ## Feito nesta sessão
 
@@ -20,7 +20,7 @@
 - Telas do MVP no FigCraft (`design/specshop-telas.figcraft`, inventário em `telas.md`).
 - 1.1 (ADR 2003): escopo dos dados, base global de observações, confiança na coleta,
   pesquisa por produto sem fila, permissões e perfis.
-- Core (`../datasync-core`, commits locais, **sem push**): ADR 0044 (permissões por app em
+- Core (`../datasync-core`, publicado no GitHub até 5e73bde): ADR 0044 (permissões por app em
   `permission_catalog.py`), arquivos do projeto `config/project.py` e
   `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
   Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
