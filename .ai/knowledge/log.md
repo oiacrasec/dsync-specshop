@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — ADRs de projetos derivados começam em 2000
+
+- ADR 0036 (item 6 e pendência do índice), `docs/adr/README.md` e
+  `docs/derived-projects/README.md`: o core numera ADRs de 0001 a 1999; cada projeto
+  derivado começa em 2000, evitando colisão com ADRs novos do core. Índice do projeto em
+  `docs/adr/projeto.md` (arquivo do projeto no item 5 do ADR 0036).
+
 ## 2026-11-07 — changepassword com contexto de tenant e calendário no body
 
 - `apps/core/management/commands/changepassword.py` sobrescreve o comando do Django e roda em

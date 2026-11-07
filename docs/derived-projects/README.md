@@ -80,7 +80,7 @@ Detalhes: [backend](../../backend/README.md#como-rodar-desenvolvimento) e
 |---|---|
 | Criar apps de domínio novos no backend | Editar arquivos que vêm do core |
 | Criar telas, rotas e serviços novos no frontend | Criar migrations em apps do core |
-| Criar docs, ADRs e planos do projeto | Fazer merge do projeto no core |
+| Criar docs, ADRs (numerados a partir de **2000** e listados em `docs/adr/projeto.md`) e planos do projeto | Fazer merge do projeto no core |
 
 Se o projeto precisar mudar algo do core, a mudança é feita **no core** e chega ao
 projeto pela atualização (passo 5).
