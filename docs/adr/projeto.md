@@ -9,3 +9,4 @@ Este arquivo pertence ao projeto: em conflito de merge com o core, vale a versã
 | [2000](2000-documentacao-e-adrs-do-specshop.md) | Documentação e ADRs do SPECSHOP | Aceito |
 | [2001](2001-regras-de-coleta-nas-fontes.md) | Regras de coleta de preços nas fontes | Aceito |
 | [2002](2002-mercado-livre-via-api-de-catalogo.md) | Mercado Livre via API de catálogo | Aceito |
+| [2003](2003-dados-e-acesso-do-specshop.md) | Dados e acesso do SPECSHOP sobre o core | Aceito |

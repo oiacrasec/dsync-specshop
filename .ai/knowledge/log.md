@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Dados e acesso do SPECSHOP (1.1)
+
+- ADR 2003: produto e correspondência por contrato, pesquisa e resultado por organização;
+  base global de observações anônima (exceção ao ADR 0006), chave (fonte, anúncio, dia,
+  preço), partição mensal, índice (produto do catálogo, dia) INCLUDE preço, uma consulta
+  por série; coleta servidor x navegador com limite de confirmações configurável (início 1),
+  quarentena de valor fora da curva e origem em tabela restrita; pesquisa por produto
+  disparada pela tela (sem fila); recursos, ações e 3 perfis iniciais.
+
 ## 2026-11-07 — Telas do MVP no FigCraft
 
 - `design/specshop-telas.figcraft` (arquivo do projeto, biblioteca do core sem edição):
