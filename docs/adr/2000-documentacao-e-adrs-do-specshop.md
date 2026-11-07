@@ -34,7 +34,9 @@ core, e como trazer a especificação para o padrão de documentação do reposi
    idealizador (pergunta, estado, decisão, motivo, requisitos, evidência, limites,
    responsável, revisão). A tabela de DT aponta para o ADR. Decisões de produto continuam
    como DEC, registradas a partir do idealizador.
-6. **Planos** de entrega do SPECSHOP seguem `docs/plans/entrega-N-<resumo>.md`.
+6. **Planos** de entrega do SPECSHOP são numerados a partir de **2001**
+   (`docs/plans/entrega-2001-<resumo>.md`), pelo mesmo motivo dos ADRs: o core também
+   cria planos em `docs/plans/`.
 
 ## Alternativas consideradas
 
@@ -50,5 +52,11 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 - `docs/domain/specshop/` é a única fonte do produto. Ao compartilhar o estado com o
   idealizador, enviar (ou exportar) esses arquivos.
 - Toda nova regra de produto entra primeiro nos documentos de domínio, preservando IDs.
-- `docs/domain/` e `docs/plans/` pertencem ao projeto (ADR 0036 §5); os ADRs 2000+ são
-  arquivos novos e não conflitam com o core.
+- `docs/domain/` e `docs/plans/` pertencem ao projeto (ADR 0036 §5); os ADRs 2000+ e os
+  planos 2001+ são arquivos novos e não conflitam com o core.
+
+## Revisões
+
+| Data | Decisão |
+|---|---|
+| 2026-11-07 | Usuário definiu planos do SPECSHOP a partir de 2001 (item 6) |

@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Plano do MVP do SPECSHOP
+
+- `docs/plans/entrega-2001-mvp.md`: blocos 0 (viabilidade das fontes) a 7 (piloto),
+  começando pelas fontes por decisão do usuário. Planos do SPECSHOP numerados a partir de
+  2001 (ADR 2000, revisão de 2026-11-07).
+
 ## 2026-11-07 — Especificação do SPECSHOP organizada no padrão
 
 - Especificação v0.8 do idealizador consolidada em `docs/domain/specshop/` (README,
