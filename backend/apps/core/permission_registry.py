@@ -34,14 +34,27 @@ class PermissionDefinition:
 
 class PermissionRegistry:
     def __init__(self, definitions):
-        entries = {}
+        self._data = {}
+        self._entries = MappingProxyType(self._data)
+        self._frozen = False
+        self.register(definitions)
+
+    def register(self, definitions):
+        """Acrescenta definições de um app (ADR 0044); só antes de freeze, sem sobrescrever."""
+        if self._frozen:
+            raise RuntimeError('Permission registry is frozen.')
+        added = {}
         for definition in definitions:
             if not isinstance(definition, PermissionDefinition):
                 raise TypeError('Use PermissionDefinition entries.')
-            if definition.code in entries:
+            if definition.code in self._data or definition.code in added:
                 raise ValueError('Duplicate permission code.')
-            entries[definition.code] = definition
-        self._entries = MappingProxyType(entries)
+            added[definition.code] = definition
+        self._data.update(added)
+
+    def freeze(self):
+        """Fecha o catálogo depois da carga dos apps; a partir daí ele só é lido."""
+        self._frozen = True
 
     def __contains__(self, code):
         return code in self._entries

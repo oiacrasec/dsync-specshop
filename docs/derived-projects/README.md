@@ -85,6 +85,11 @@ Detalhes: [backend](../../backend/README.md#como-rodar-desenvolvimento) e
 Se o projeto precisar mudar algo do core, a mudança é feita **no core** e chega ao
 projeto pela atualização (passo 5).
 
+**Permissões do projeto** (ADR 0044): declare-as em `apps/<app>/permission_catalog.py`,
+com `PERMISSIONS` (lista de `PermissionDefinition`) e, se quiser, `RESOURCE_LABELS` e
+`PERMISSION_LABELS`. O registry do core as carrega na inicialização; não edite
+`apps/core/permission_registry.py` nem `apps/rbac/constants.py`.
+
 ## 5. Receber atualizações do core
 
 ```bash
