@@ -73,7 +73,7 @@ export class UiInputDate implements ControlValueAccessor {
     @Input() required: string | boolean = false;
     @Input() styleClass?: string;
     @Input() inputStyleClass?: string;
-    @Input() appendTo?: HTMLElement | 'body';
+    @Input() appendTo: HTMLElement | 'body' = 'body';
     @Input() inputStyle?: Record<string, string | number>;
     @Input() useMask = true;
     @Input() locale?: string;
