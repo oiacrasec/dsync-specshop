@@ -33,7 +33,7 @@ do usuário.
 | 1.2 | App `catalog`: produto acompanhado (nome e modelo obrigatórios, marca e EAN opcionais, condição novo) e API CRUD; duplicado bloqueado; `docs/api/products.md` | RF-01, D-24 | ✅ |
 | 1.3 | Tela "Meus produtos" e navegação inicial do SPECSHOP (lista, formulário, arquivar; menu e rotas do projeto pelo core, ADR 0036 item 5); roxo pendente | RF-01, D-14 | ✅ |
 | **2 — Pesquisa** | | | |
-| 2.1 | Modelo de pesquisa, oferta e observação de preço, com identidade estável do produto e datas de referência/obtenção | DT-06, RF-08 | ⬜ |
+| 2.1 | Modelo de pesquisa, oferta e observação de preço, com identidade estável do produto e datas de referência/obtenção; app `pricing` e base global particionada medida (ADR 2003) | DT-06, RF-08 | ✅ |
 | 2.2 | Pesquisa sob demanda de até 10 produtos: estado por produto/fonte, falha parcial, limite explícito, nova tentativa manual | DT-07, RF-25, RF-29 | ⬜ |
 | 2.3 | Tela "Shopping": seleção de produtos, fontes e região; progresso e resultado | RF-10, RF-29 | ⬜ |
 | **3 — Primeiro preço real** | | | |

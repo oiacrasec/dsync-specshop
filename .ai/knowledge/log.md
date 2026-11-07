@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Pesquisa de preços e base global (2.1)
+
+- `apps/pricing`: pesquisa, item (fotografia dos indicadores) e ofertas por organização;
+  `PriceObservation` particionada por mês (PK composta, DEFAULT, filhas na primeira gravação)
+  e `ObservationOrigin` restrita, ambas sem escopo (`PROJECT_UNSCOPED_RECORDS`). Serviço
+  `record_observations` (comandos constantes) e selector `price_series` (uma consulta, mediana
+  por `Median`). Medição no ADR 2003: 2,88 mi linhas, série de 90 dias em 8,2 ms.
+
 ## 2026-11-07 — Tela Meus produtos (1.3)
 
 - Frontend: `pages/pesquisa-precos/produtos` (lista `ui-table`, formulário com aba Principal,

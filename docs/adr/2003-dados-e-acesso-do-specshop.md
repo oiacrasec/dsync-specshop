@@ -105,6 +105,25 @@ Perfis iniciais (o cliente pode criar outros):
 Só a equipe SPECSHOP (superadmin) acessa: origem das observações, quarentena, bloqueio por
 fraude e limites configuráveis (item 3).
 
+### Implementação (etapa 2.1, 2026-11-07)
+
+- App `pricing`: `PriceSearch`, `PriceSearchItem` (fotografia dos indicadores, gravada uma vez)
+  e `SearchOffer` com `OrganizationScopedModel`; `PriceObservation` e `ObservationOrigin` como
+  registros sem escopo do projeto (`PROJECT_UNSCOPED_RECORDS`, core 186f940, padrão do
+  AccessLog) com `GlobalOnlyManager`.
+- `PriceObservation`: chave primária composta (fonte, anúncio, dia, preço), tabela
+  particionada por mês criada por `SeparateDatabaseAndState` + `RunSQL`, partição DEFAULT e
+  filhas mensais criadas na primeira gravação do mês (`apps/pricing/partitions.py`, com o mês
+  seguinte e trava de transação). Mediana por agregado `Median` (`percentile_cont`).
+- Gravação em 4 comandos constantes por linha de pesquisa; série do histórico numa consulta.
+- **Medição** (base de desenvolvimento, 2,88 milhões de observações: 120 dias × 2.000 produtos
+  × 12 ofertas): série de 90 dias de 7 produtos (7.560 ofertas) em **8,2 ms** de execução,
+  lendo só as 4 partições do período (partition pruning) pelo índice (produto, dia) de cada
+  uma. Leitura só pelo índice não ocorre por causa dos filtros de quarentena e confirmação;
+  incluí-los no índice fica para quando a medição pedir.
+- Limite de confirmações pela variável `SPECSHOP_BROWSER_CONFIRMATIONS` (padrão 1); a
+  quarentena tem a coluna, e a regra de valor fora da curva entra com a elegibilidade (3.2).
+
 ## Alternativas consideradas
 
 Registradas em cada item acima.

@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 19:30
+- **Atualizado em:** 2026-11-07 20:05
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** ver `git log -3` (etapa 1.3, tela Meus produtos)
+- **Último commit:** ver `git log -3` (etapa 2.1, app `pricing`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 1.3 Tela "Meus produtos" — ✅ concluída (lista, formulário, arquivar) |
-| Próximo passo exato | Propor o escopo da 2.1: modelo de pesquisa, oferta e observação de preço (base global particionada, ADR 2003 §2–3) |
-| Aguardando o usuário? | sim — aprovação do escopo da 2.1 |
+| Etapa atual | 2.1 Modelo de pesquisa e base global de preços — ✅ concluída (sem API) |
+| Próximo passo exato | Propor o escopo da 2.2: pesquisa sob demanda de até 10 produtos (uma requisição por produto, ADR 2003 §4), estados por produto/fonte e nova tentativa |
+| Aguardando o usuário? | sim — aprovação do escopo da 2.2 |
 
 ## Feito nesta sessão
 
@@ -25,6 +25,8 @@
   `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
   Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
 - 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
+- 2.1: `apps/pricing` (models, base global particionada, gravação e série; medição no ADR 2003);
+  core ganhou `PROJECT_UNSCOPED_RECORDS` e `GlobalOnlyManager` (186f940).
 - 1.3: tela "Meus produtos" no frontend; core ganhou `frontend/src/app/project/project.menu.ts` e
   `project.routes.ts` (cce830c, ef62937 no core local, sem push).
 
