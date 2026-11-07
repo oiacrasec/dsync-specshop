@@ -19,7 +19,7 @@ export interface UiTableColumn {
     field: string;
     header: string;
     sortable?: boolean;
-    type?: 'text' | 'number' | 'date' | 'boolean' | 'boolean-tag' | 'choice' | 'relation';
+    type?: 'text' | 'number' | 'date' | 'boolean' | 'boolean-tag' | 'choice' | 'choice-tag' | 'relation';
     format?: string;
     // Instante (data e hora): exibido no fuso do Perfil.
     zoned?: boolean;
@@ -30,7 +30,8 @@ export interface UiTableColumn {
         falseLabel: string;
         falseSeverity: TagSeverity;
     };
-    choices?: Array<{ label: string; value: any }>;
+    // `choice-tag` usa a severidade de cada opção para colorir a tag (ex.: situação de uma linha).
+    choices?: Array<{ label: string; value: any; severity?: TagSeverity }>;
     displayField?: string;
     valueField?: string;
 }
@@ -415,6 +416,10 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         }
 
         return '';
+    }
+
+    resolveChoiceSeverity(column: UiTableColumn, value: any): TagSeverity {
+        return column.choices?.find((item) => item.value === value)?.severity ?? 'secondary';
     }
 
     resolveChoiceLabel(column: UiTableColumn, value: any) {

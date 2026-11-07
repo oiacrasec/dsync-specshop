@@ -24,14 +24,14 @@
     <ng-template #header>
         <tr>
             @for (col of tableColumns; track col.field) { @if (col.sortable) {
-            <th [pSortableColumn]="col.field" [class.ui-table-tag-col]="col.type === 'boolean-tag'">
+            <th [pSortableColumn]="col.field" [class.ui-table-tag-col]="col.type === 'boolean-tag' || col.type === 'choice-tag'">
                 <span class="flex items-center gap-2">
                     {{ col.header }}
                     <p-sortIcon [field]="col.field" />
                 </span>
             </th>
             } @else {
-            <th [class.ui-table-tag-col]="col.type === 'boolean-tag'">
+            <th [class.ui-table-tag-col]="col.type === 'boolean-tag' || col.type === 'choice-tag'">
                 <span class="flex items-center gap-2">{{ col.header }}</span>
             </th>
             } } @if (actionsTemplate || actions.length) {
@@ -45,13 +45,15 @@
     <ng-template #body let-row>
         <tr>
             @for (col of tableColumns; track col.field) {
-            <td [class.ui-table-tag-col]="col.type === 'boolean-tag'">
+            <td [class.ui-table-tag-col]="col.type === 'boolean-tag' || col.type === 'choice-tag'">
                 @switch (col.type) { @case ('date') { @if (getCellValue(row, col)) { @if (col.zoned) { {{ getCellValue(row, col) | zonedDate: (col.format || 'short') : timeZone() }} } @else { {{ getCellValue(row, col) | date: (col.format ||
                 'shortDate') }} } } @else { {{ resolveNullableValue(getCellValue(row, col), col) }} } } @case ('boolean') {
                 <i class="fa-solid" [ngClass]="getCellValue(row, col) ? 'fa-square-check text-green-500' : 'fa-square-xmark text-red-500'" aria-hidden="true"></i>
                 <span class="sr-only">{{ getCellValue(row, col) ? 'Sim' : 'Não' }}</span>
                 } @case ('boolean-tag') {
                 <p-tag [value]="getCellValue(row, col) ? col.booleanTag?.trueLabel : col.booleanTag?.falseLabel" [severity]="getCellValue(row, col) ? col.booleanTag?.trueSeverity : col.booleanTag?.falseSeverity" />
+                } @case ('choice-tag') {
+                <p-tag [value]="resolveChoiceLabel(col, getCellValue(row, col))" [severity]="resolveChoiceSeverity(col, getCellValue(row, col))" />
                 } @case ('choice') { {{ resolveNullableValue(resolveChoiceLabel(col, getCellValue(row, col)), col) }} } @default { {{ resolveNullableValue(getCellValue(row, col), col) }} } }
             </td>
             } @if (actionsTemplate || actions.length) {

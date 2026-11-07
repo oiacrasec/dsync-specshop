@@ -1,5 +1,10 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Coluna choice-tag no ui-table
+
+- `shared/ui/table`: tipo de coluna `choice-tag` (opção → rótulo e severidade da tag), para
+  situações com mais de dois valores; `resolveChoiceSeverity` cai em `secondary`.
+
 ## 2026-11-07 — Registros sem escopo declarados pelo projeto
 
 - `config/project.py` ganha `PROJECT_UNSCOPED_RECORDS` (setting `UNSCOPED_PROJECT_RECORDS`),
