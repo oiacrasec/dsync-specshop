@@ -112,6 +112,8 @@ entrega concreta.
 | Fase 2 | sistemas, formatos de estoque e indicadores |
 | Evolução | alertas, exportações, preço próprio, tendências e modelos substitutos |
 | Sucesso | tempo e medida de utilidade para o revendedor |
+| Fontes OLX/Facebook | Facebook Marketplace e lojas Facebook/Instagram bloqueados sem permissão escrita da Meta; OLX sem acesso confirmado (ADR 2001). O conjunto separado (D-20, D-23) pode ficar vazio no MVP: levar ao idealizador |
+| Jurídico | auditoria por advogado do ADR 2001 e dos termos de cada fonte antes da produção |
 
 ## Catálogo de referência
 

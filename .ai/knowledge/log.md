@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Regras de coleta nas fontes (0.1)
+
+- ADR 2001: API oficial primeiro com credencial da aplicação; sem API, só páginas públicas
+  liberadas pelo robots.txt e termos; nunca contornar login/CAPTCHA/bloqueio/limite;
+  só dados factuais; vendedor mínimo (nome exibido, ID na fonte, cidade/UF).
+- Levantamento: Mercado Livre via API (endpoint a confirmar no 0.2); KaBuM!, MegaMamute e
+  Buscapé condicionados pelo robots.txt; Magalu e OLX indeterminados (403 anti-robô);
+  Facebook/Instagram bloqueados sem permissão da Meta. Auditoria jurídica antes da produção.
+
 ## 2026-11-07 — Merge do core: índice de ADRs do projeto
 
 - Merge de `core/main` (77a3145): ADRs de projetos derivados a partir de 2000, índice em

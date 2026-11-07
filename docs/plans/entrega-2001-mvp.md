@@ -16,13 +16,14 @@ do usuário.
 | 2 | Testes exploratórios do bloco 0 ficam fora do código do produto; o resultado vira evidência no ADR da DT correspondente |
 | 3 | Enquanto uma fonte não for validada, telas e fluxos usam **dados de exemplo identificados** como tais; nunca simular fonte conectada (RF-03, DT-02) |
 | 4 | Domínio do SPECSHOP em apps novos, sem migrations em apps do core (ADR 0036) |
+| 5 | 0.1 (aprovado): foco em implementar; regras técnicas conservadoras de coleta no ADR 2001 e auditoria jurídica por advogado antes da produção |
 
 ## Etapas
 
 | Etapa | Escopo | DT / requisitos | Estado |
 |---|---|---|---|
 | **0 — Viabilidade das fontes** | | | |
-| 0.1 | Conformidade legal da coleta (skill `conformidade-legal`): termos de uso das fontes candidatas, LGPD para vendedores pessoa física, guarda de evidências; ADR 2001 | D-31, RQ-02 | ⬜ |
+| 0.1 | Conformidade legal da coleta (skill `conformidade-legal`): termos de uso das fontes candidatas, LGPD para vendedores pessoa física, guarda de evidências; ADR 2001 | D-31, RQ-02 | ✅ |
 | 0.2 | Teste exploratório no Mercado Livre com a Epson L3250: mecanismo (API oficial com chave da aplicação ou página pública), campos obtidos, menor preço, vendedor, localização, limites | DT-02, D-18 | ⬜ |
 | 0.3 | Teste exploratório de histórico anterior (Buscapé e outras): período, métrica, acesso e amostra real da L3250 | DT-03, D-26 | ⬜ |
 | 0.4 | Levantamento das candidatas (KaBuM!, MegaMamute, Magalu, Facebook Marketplace) e prioridade de integração; ADR das DT-02/DT-03 | DT-02, D-30 | ⬜ |

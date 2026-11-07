@@ -7,3 +7,4 @@ Este arquivo pertence ao projeto: em conflito de merge com o core, vale a versã
 | Nº | Título | Status |
 |---|---|---|
 | [2000](2000-documentacao-e-adrs-do-specshop.md) | Documentação e ADRs do SPECSHOP | Aceito |
+| [2001](2001-regras-de-coleta-nas-fontes.md) | Regras de coleta de preços nas fontes | Aceito |

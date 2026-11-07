@@ -59,6 +59,8 @@ como pendente/indisponível; credencial externa nunca vira requisito do MVP.
 | Amazon e Americanas | contextos de venda citados | possíveis fontes de evolução; integração e prioridade em aberto |
 | Fujioka, Martins e distribuidores | aquisição | **fora do MVP e do piloto** (D-19), mesmo com página pública |
 
+Regras de coleta e situação de cada fonte para o MVP: [ADR 2001](../../adr/2001-regras-de-coleta-nas-fontes.md)
+(Facebook/Instagram bloqueados sem permissão da Meta; OLX e Magalu indeterminados).
 Fonte citada aqui **não** é integração comprovada. A fonte agregadora e o
 vendedor/anúncio de origem devem ser identificados quando disponíveis. A mesma oferta
 encontrada em vários lugares precisa de tratamento de duplicidade nas estatísticas.

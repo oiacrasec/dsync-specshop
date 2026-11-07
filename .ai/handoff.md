@@ -9,9 +9,9 @@
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 0.1 Conformidade legal da coleta — ⬜ não iniciada |
-| Próximo passo exato | Propor ao usuário o escopo da 0.1 (skill `conformidade-legal`: termos de uso das fontes candidatas, LGPD de vendedores pessoa física) e aguardar aprovação |
-| Aguardando o usuário? | sim — aprovação do escopo da 0.1 |
+| Etapa atual | 0.1 Conformidade legal da coleta — ✅ concluída (ADR 2001) |
+| Próximo passo exato | Propor o escopo da 0.2: teste do Mercado Livre com a L3250 via API oficial e token da aplicação (`/products/search` e `/sites/MLB/search`) |
+| Aguardando o usuário? | sim — aprovação da 0.2 e app criado no portal de desenvolvedores do Mercado Livre (client_id/secret, fora do repositório) |
 
 ## Contexto do projeto
 
