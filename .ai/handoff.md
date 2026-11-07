@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 16:45
+- **Atualizado em:** 2026-11-07 19:01
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** ver `git log -3` (etapa 1.2, app `catalog`)
+- **Último commit:** 00c62ec feat(catalog): add tracked products API
 
 ## Situação
 
 | Item | Estado |
 |---|---|
 | Etapa atual | 1.2 App `catalog` — ✅ concluída (API `/api/v1/products/`) |
-| Próximo passo exato | Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
-| Aguardando o usuário? | sim — aprovação do escopo da 1.3 |
+| Próximo passo exato | 1) Trazer atualizações do core (pedido do usuário): `git fetch core` (GitHub) e `git fetch ../datasync-core main`, merge e testes; o core local tem 4 commits sem push (8ca3eaf, bd50f8b, f41dd3b, 5e73bde). 2) Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
+| Aguardando o usuário? | sim — confirmar a retomada; depois, aprovação do escopo da 1.3 |
 
 ## Feito nesta sessão
 
