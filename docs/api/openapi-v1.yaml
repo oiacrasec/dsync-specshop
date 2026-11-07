@@ -3752,6 +3752,472 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /api/v1/searches/:
+    get:
+      operationId: searches_list
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - name: first
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -created_at
+            - created_at
+        description: |-
+          Ordenado
+
+          * `created_at` - Created at
+          * `-created_at` - Created at (decrescente)
+        explode: false
+        style: form
+      - name: rows
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPriceSearchList'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      operationId: searches_create
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - searches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PriceSearchRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PriceSearchRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PriceSearchRequest'
+        required: true
+      security:
+      - jwt: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceSearch'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/searches/{public_id}/:
+    get:
+      operationId: searches_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: public_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceSearch'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/searches/{search_id}/items/{item_id}/retry/:
+    post:
+      operationId: searches_items_retry_create
+      description: 'Nova tentativa de uma linha indisponível ou com erro (RF-25: só
+        por ação do usuário).'
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: search_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceSearchItem'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/searches/{search_id}/items/{item_id}/run/:
+    post:
+      operationId: searches_items_run_create
+      description: |-
+        Executa uma linha pendente (uma requisição por produto, até 3 em paralelo pela tela).
+
+        Sem ATOMIC_REQUESTS: a chamada à fonte externa fica fora de transação; o serviço abre as
+        transações curtas de reserva e de gravação.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: path
+        name: item_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: search_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceSearchItem'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Recurso inexistente ou fora do contrato.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Conflito de estado.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Dados inválidos (`errors` por campo).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/searches/options/:
+    get:
+      operationId: searches_options_retrieve
+      description: Handler method for HTTP 'OPTIONS' request.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      - in: query
+        name: first
+        schema:
+          type: integer
+      - in: query
+        name: public_id
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Resolve rótulos; ignora `q`.
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Trecho do rótulo (até 255 caracteres).
+      - in: query
+        name: rows
+        schema:
+          type: integer
+        description: 1 a 100.
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /api/v1/searches/schema/:
+    get:
+      operationId: searches_schema_retrieve
+      description: |-
+        Monta `required_permission` a partir do recurso declarado na view (sem inferir do model).
+
+        `permission_resource = 'organization'` → list/retrieve/options/schema exigem
+        `organization:view`, create `:create`, update/partial_update `:update`, destroy `:delete`.
+        `required_permission` declarado na própria classe sobrescreve só as ações citadas (ex.:
+        actions customizadas, que nunca recebem código automático). Sem nenhum dos dois, a view
+        continua negada (ADR 0009 §4). Código ausente do registry é negado na requisição.
+      parameters:
+      - in: header
+        name: X-Organization-Id
+        schema:
+          type: string
+        description: public_id da organização ativa (ADR 0006).
+        required: true
+      tags:
+      - searches
+      security:
+      - jwt: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableSchema'
+          description: ''
+        '400':
+          description: Requisição malformada ou header de contexto inválido.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Sem autenticação válida.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Sem permissão ou sem acesso à organização.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api/v1/users/:
     get:
       operationId: users_list
@@ -5379,6 +5845,18 @@ components:
       required:
       - data
       - total_records
+    PaginatedPriceSearchList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceSearch'
+        total_records:
+          type: integer
+      required:
+      - data
+      - total_records
     PaginatedProfileList:
       type: object
       properties:
@@ -5777,6 +6255,160 @@ components:
         * `Aura` - Aura
         * `Lara` - Lara
         * `Nora` - Nora
+    PriceSearch:
+      type: object
+      description: |-
+        Cria a pesquisa e uma linha por produto × fonte, todas pendentes (ADR 2003 §4).
+
+        A coleta não acontece aqui: a tela dispara cada linha em `/run/` (D-16, RF-25).
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        sources:
+          title: Fontes
+        seller_states:
+          title: UFs do vendedor
+        destination_zip:
+          type: string
+          maxLength: 9
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceSearchItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Criado em
+      required:
+      - created_at
+      - items
+      - public_id
+    PriceSearchItem:
+      type: object
+      description: 'Linha da tela 2a: situação e fotografia dos indicadores (somente
+        leitura).'
+      properties:
+        public_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Identificador público
+        product:
+          type: string
+          format: uuid
+          readOnly: true
+        product_name:
+          type: string
+          readOnly: true
+        product_model:
+          type: string
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+          title: Fonte
+        source_label:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          title: Situação
+        detail:
+          type: string
+          readOnly: true
+          title: Detalhe
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Iniciada em
+        finished_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Concluída em
+        offer_count:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Ofertas elegíveis
+        min_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          title: Menor preço
+        median_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          title: Mediana
+        avg_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          title: Média
+        max_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+          title: Maior preço
+      required:
+      - avg_price
+      - detail
+      - finished_at
+      - max_price
+      - median_price
+      - min_price
+      - offer_count
+      - product
+      - product_model
+      - product_name
+      - public_id
+      - source
+      - source_label
+      - started_at
+      - status
+    PriceSearchRequest:
+      type: object
+      description: |-
+        Cria a pesquisa e uma linha por produto × fonte, todas pendentes (ADR 2003 §4).
+
+        A coleta não acontece aqui: a tela dispara cada linha em `/run/` (D-16, RF-25).
+      properties:
+        products:
+          type: array
+          items:
+            type: string
+            format: uuid
+            title: Identificador público
+            writeOnly: true
+          writeOnly: true
+        sources:
+          title: Fontes
+        seller_states:
+          title: UFs do vendedor
+        destination_zip:
+          type: string
+          maxLength: 9
+      required:
+      - products
     PrimaryEnum:
       enum:
       - noir
@@ -5900,6 +6532,22 @@ components:
       description: |-
         * `CONTRACT` - CONTRACT
         * `ORGANIZATION` - ORGANIZATION
+    StatusEnum:
+      enum:
+      - pending
+      - running
+      - done
+      - no_results
+      - unavailable
+      - error
+      type: string
+      description: |-
+        * `pending` - pendente
+        * `running` - pesquisando
+        * `done` - concluída
+        * `no_results` - sem resultado
+        * `unavailable` - fonte indisponível
+        * `error` - erro
     TableSchema:
       type: object
       properties:

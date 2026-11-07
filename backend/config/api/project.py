@@ -8,4 +8,5 @@ from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLPattern | URLResolver] = [
     path('', include('apps.catalog.urls')),
+    path('', include('apps.pricing.urls')),
 ]

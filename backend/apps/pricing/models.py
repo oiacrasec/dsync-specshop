@@ -16,6 +16,7 @@ class CollectionMechanism(models.TextChoices):
 
 class SearchItemStatus(models.TextChoices):
     PENDING = 'pending', _('pendente')
+    RUNNING = 'running', _('pesquisando')
     DONE = 'done', _('concluída')
     NO_RESULTS = 'no_results', _('sem resultado')
     UNAVAILABLE = 'unavailable', _('fonte indisponível')
@@ -68,6 +69,7 @@ class PriceSearchItem(OrganizationScopedModel):
     status = models.CharField(verbose_name=_('situação'), max_length=16, choices=SearchItemStatus.choices,
                               default=SearchItemStatus.PENDING)
     detail = models.CharField(verbose_name=_('detalhe'), max_length=255, blank=True)
+    started_at = models.DateTimeField(verbose_name=_('iniciada em'), null=True, blank=True)
     finished_at = models.DateTimeField(verbose_name=_('concluída em'), null=True, blank=True)
     offer_count = models.PositiveIntegerField(verbose_name=_('ofertas elegíveis'), null=True, blank=True)
     min_price = models.DecimalField(verbose_name=_('menor preço'), max_digits=12, decimal_places=2, null=True,

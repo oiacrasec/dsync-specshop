@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Pesquisa sob demanda (2.2)
+
+- `/api/v1/searches/` (criar com até 10 produtos, listar, detalhar) e `run`/`retry` por linha
+  em views sem ATOMIC_REQUESTS: lock da linha, conector fora de transação, gravação curta de
+  ofertas, fotografia e base global. Conectores em `apps/pricing/sources.py` (sem conector =
+  indisponível). Permissões `search:view/create/update`. Escrita global explícita com
+  `unscoped().bulk_create`. Docs: `docs/api/searches.md`.
+
 ## 2026-11-07 — Pesquisa de preços e base global (2.1)
 
 - `apps/pricing`: pesquisa, item (fotografia dos indicadores) e ofertas por organização;

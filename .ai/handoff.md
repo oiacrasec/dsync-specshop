@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:05
+- **Atualizado em:** 2026-11-07 20:20
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** ver `git log -3` (etapa 2.1, app `pricing`)
+- **Último commit:** ver `git log -3` (etapa 2.2, API de pesquisa)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.1 Modelo de pesquisa e base global de preços — ✅ concluída (sem API) |
-| Próximo passo exato | Propor o escopo da 2.2: pesquisa sob demanda de até 10 produtos (uma requisição por produto, ADR 2003 §4), estados por produto/fonte e nova tentativa |
-| Aguardando o usuário? | sim — aprovação do escopo da 2.2 |
+| Etapa atual | 2.2 Pesquisa sob demanda — ✅ concluída (API; conector do Mercado Livre na 3.1) |
+| Próximo passo exato | Propor o escopo da 2.3: tela Shopping (telas 2, 2a e 2b do FigCraft) consumindo `/api/v1/searches/` |
+| Aguardando o usuário? | sim — aprovação do escopo da 2.3 |
 
 ## Feito nesta sessão
 
@@ -25,6 +25,7 @@
   `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
   Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
 - 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
+- 2.2: API `/api/v1/searches/` com run/retry por linha e contrato de conector (`docs/api/searches.md`).
 - 2.1: `apps/pricing` (models, base global particionada, gravação e série; medição no ADR 2003);
   core ganhou `PROJECT_UNSCOPED_RECORDS` e `GlobalOnlyManager` (186f940).
 - 1.3: tela "Meus produtos" no frontend; core ganhou `frontend/src/app/project/project.menu.ts` e
