@@ -126,3 +126,26 @@ def test_user_profile_and_assignment_management_stay_reserved():
         'assignment:create',
         'assignment:delete',
     }
+
+
+def test_register_adds_definitions_until_frozen():
+    registry = PermissionRegistry([PermissionDefinition('record:view', {CONTRACT})])
+    registry.register([PermissionDefinition('record:create', {CONTRACT, ORGANIZATION})])
+    assert {item.code for item in registry} == {'record:view', 'record:create'}
+    with pytest.raises(ValueError):
+        registry.register([PermissionDefinition('record:view', {CONTRACT})])
+    with pytest.raises(TypeError):
+        registry.register(['record:delete'])
+    assert 'record:delete' not in registry
+    registry.freeze()
+    with pytest.raises(RuntimeError):
+        registry.register([PermissionDefinition('record:delete', {CONTRACT})])
+
+
+def test_failed_register_adds_nothing():
+    registry = PermissionRegistry([])
+    with pytest.raises(ValueError):
+        registry.register(
+            [PermissionDefinition('record:view', {CONTRACT}), PermissionDefinition('record:view', {CONTRACT})]
+        )
+    assert list(registry) == []

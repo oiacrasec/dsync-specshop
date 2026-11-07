@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Permissões declaradas por app
+
+- ADR 0044: `PermissionRegistry.register`/`freeze`; `apps/rbac/catalog.py` carrega
+  `permission_catalog.py` de cada app em `RbacConfig.ready()` (permissões e rótulos) e
+  congela o registry. Repetição de código ou rótulo interrompe a inicialização. Projetos
+  derivados declaram permissões sem editar o core (`docs/derived-projects/README.md`).
+
 ## 2026-11-07 — ADRs de projetos derivados começam em 2000
 
 - ADR 0036 (item 6 e pendência do índice), `docs/adr/README.md` e

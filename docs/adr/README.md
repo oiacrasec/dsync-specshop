@@ -63,6 +63,7 @@ para assunto novo; o status "Substituído por" fica para os ADRs antigos já sub
 | [0041](0041-verificacao-em-duas-etapas.md) | Verificação em duas etapas por TOTP | Aceito |
 | [0042](0042-deploy-git-compose.md) | Deploy por Git/Compose, scripts compartilhados e mídia no host | Aceito |
 | [0043](0043-gateway-nginx-certbot.md) | Gateway HTTPS com Nginx e certbot no host | Aceito |
+| [0044](0044-permissoes-declaradas-por-app.md) | Permissões declaradas por app | Aceito |
 
 ## Modelo
 
