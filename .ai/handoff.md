@@ -1,17 +1,31 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:40
-- **Agente:** Claude → próximo agente
+- **Atualizado em:** 2026-11-07 20:45
+- **Agente:** Claude → **Codex** (próximo agente)
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** ver `git log -3` (etapa 2.3, tela Shopping)
+- **Último commit:** d152659 feat(frontend): add the Shopping search and result screens
 
 ## Situação
 
 | Item | Estado |
 |---|---|
 | Etapa atual | 2.3 Tela Shopping — ✅ concluída (testada no navegador; fonte responde "indisponível" até a 3.1) |
-| Próximo passo exato | Propor o escopo da 3.1: conector do Mercado Livre conforme o 0.2 (ADR 2002) |
-| Aguardando o usuário? | sim — aprovação do escopo da 3.1 |
+| Próximo passo exato | Ajuste da 2.3 proposto pelo usuário: Shopping vira **grid das pesquisas feitas** (mesmo padrão de Meus produtos). Ver "Dúvidas abertas" |
+| Aguardando o usuário? | sim — aprovar as colunas da grid e a mudança no `telas.md`; depois, o escopo da 3.1 (conector do Mercado Livre, ADR 2002) |
+
+## Dúvidas abertas
+
+- **Grid do Shopping (proposta, não aprovada nem iniciada):**
+  - `shopping` = `ui-table` lazy sobre `GET /api/v1/searches/` (já existe, paginado, ordena por `created_at`)
+    com botão "+ Nova pesquisa" e ação "Abrir"; `shopping/nova` = formulário atual;
+    `shopping/:id` = resultado atual (o Pesquisar continua indo ao resultado com `autorun`).
+  - Colunas sugeridas para o MVP: Data, Produtos (quantidade), UF e CEP. Coluna "Situação"
+    (ex.: "3 de 5 concluídas") ficou fora: exige mudar a API.
+  - Muda a especificação: em `docs/domain/specshop/telas.md` a tela 2 é o formulário; passaria
+    a ser a grid, e o formulário viraria 2c. Atualizar no mesmo commit.
+  - Performance: a lista devolve as linhas de cada pesquisa (prefetch, consultas constantes;
+    até 100 linhas por página de 10). Aceitável no MVP; uma versão resumida da lista fica
+    para depois, se for preciso.
 
 ## Feito nesta sessão
 
@@ -59,5 +73,7 @@
   interface de auditoria mostra o código sem rótulo (extensão futura no core).
 - Candidato a mover para o core: aplicar erros 422 aos campos do formulário (hoje em
   `produtos/formulario/formulario.ts`).
-- Não há tela de histórico de pesquisas: a pesquisa fica gravada e reabre pela URL do resultado.
+- Hoje não há lista de pesquisas no frontend: a pesquisa fica gravada e reabre pela URL do resultado (ver a proposta da grid).
+- Frontend é zoneless: estado que muda após HTTP fica em `signal`, senão a tela não redesenha.
+- O campo CEP do Shopping não tem máscara (aceita só dígitos ou com hífen); não pedido.
 - O roxo do tema, ícones de arquivar/atualizar e prazos do dashboard seguem pendentes (`telas.md`).
