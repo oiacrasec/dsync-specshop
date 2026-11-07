@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Telas do MVP no FigCraft
+
+- `design/specshop-telas.figcraft` (arquivo do projeto, biblioteca do core sem edição):
+  telas 1 a 1e (produtos), 2 a 2b (shopping), 3 (dashboard macro), 4 (histórico) e 5
+  (auditoria em página). Inventário e pendências em `docs/domain/specshop/telas.md`.
+- Padrões seguem o app real (`ui-table`, `ui-filter`, formulário de usuário); a biblioteca
+  do core diverge do app em barra de filtros, altura do card, rodapé e lista vazia.
+
 ## 2026-11-07 — Mercado Livre via API de catálogo (0.2)
 
 - ADR 2002: API como fonte principal (`/products/search` com `domain_id` e paginação +

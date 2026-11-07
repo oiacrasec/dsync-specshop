@@ -13,6 +13,7 @@ atualização: [ADR 2000](../../adr/2000-documentacao-e-adrs-do-specshop.md).
 | [regras.md](regras.md) | regras de negócio: cadastro, fontes, valor, região, estatísticas, histórico, auditoria |
 | [requisitos.md](requisitos.md) | direções (D), requisitos funcionais (RF), de qualidade (RQ) e critérios de aceitação |
 | [decisoes-e-pendencias.md](decisoes-e-pendencias.md) | decisões de produto (DEC), perguntas respondidas (Q) e pendências de produto |
+| [telas.md](telas.md) | inventário das telas do MVP (`design/specshop-telas.figcraft`), decisões de desenho e pendências |
 | [fontes-de-para.md](fontes-de-para.md) | DE-PARA dos pedidos por loja: o que dá e o que não dá, com o motivo |
 | [decisoes-tecnicas.md](decisoes-tecnicas.md) | perguntas técnicas delegadas ao desenvolvimento (DT-01 a DT-10) e seu estado |
 
