@@ -75,3 +75,9 @@ jurídica. O 0.2 a 0.4 confirmam acesso real e termos de cada fonte.
   habilitada.
 - Termos e `robots.txt` mudam: conferir de novo ao habilitar uma fonte e registrar a data.
 - A tela de fontes mostra fonte indisponível/bloqueada como tal, sem simular conexão.
+
+## Revisões
+
+| Data | Mudança |
+|---|---|
+| 2026-11-07 | Novos testes atualizam o §3: OLX respondeu 200 (`robots.txt` e busca); MegaMamute exibe "Loja em manutenção"; KaBuM! testado. Situação atual por loja em [fontes-de-para.md](../domain/specshop/fontes-de-para.md); Mercado Livre no [ADR 2002](2002-mercado-livre-via-api-de-catalogo.md) |

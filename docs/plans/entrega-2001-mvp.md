@@ -17,6 +17,7 @@ do usuário.
 | 3 | Enquanto uma fonte não for validada, telas e fluxos usam **dados de exemplo identificados** como tais; nunca simular fonte conectada (RF-03, DT-02) |
 | 4 | Domínio do SPECSHOP em apps novos, sem migrations em apps do core (ADR 0036) |
 | 5 | 0.1 (aprovado): foco em implementar; regras técnicas conservadoras de coleta no ADR 2001 e auditoria jurídica por advogado antes da produção |
+| 6 | 0.2: Mercado Livre via API de catálogo (ADR 2002). Usuário decidiu implementar o Mercado Livre primeiro; 0.3 e 0.4 ficam para antes dos blocos 5 e 6, que dependem deles |
 
 ## Etapas
 
@@ -24,7 +25,7 @@ do usuário.
 |---|---|---|---|
 | **0 — Viabilidade das fontes** | | | |
 | 0.1 | Conformidade legal da coleta (skill `conformidade-legal`): termos de uso das fontes candidatas, LGPD para vendedores pessoa física, guarda de evidências; ADR 2001 | D-31, RQ-02 | ✅ |
-| 0.2 | Teste exploratório no Mercado Livre com a Epson L3250: mecanismo (API oficial com chave da aplicação ou página pública), campos obtidos, menor preço, vendedor, localização, limites | DT-02, D-18 | ⬜ |
+| 0.2 | Teste exploratório no Mercado Livre com a Epson L3250: mecanismo (API oficial com chave da aplicação ou página pública), campos obtidos, menor preço, vendedor, localização, limites; ADR 2002 | DT-02, D-18 | ✅ |
 | 0.3 | Teste exploratório de histórico anterior (Buscapé e outras): período, métrica, acesso e amostra real da L3250 | DT-03, D-26 | ⬜ |
 | 0.4 | Levantamento das candidatas (KaBuM!, MegaMamute, Magalu, Facebook Marketplace) e prioridade de integração; ADR das DT-02/DT-03 | DT-02, D-30 | ⬜ |
 | **1 — Fundação** | | | |
@@ -39,6 +40,7 @@ do usuário.
 | 3.1 | Conector do Mercado Livre conforme o 0.2 | DT-02, RF-03 | ⬜ |
 | 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos | DT-04, RF-05, RF-19, RF-27 | ⬜ |
 | 3.3 | Filtros de localização do vendedor e destino de entrega (SC primeiro) | RF-04, RF-24 | ⬜ |
+| 3.4 | Extensão do navegador acionada pelo SPECSHOP para a busca completa do Mercado Livre (ADR 2002, item 7) | DT-02, RF-03 | ⬜ |
 | **4 — Indicadores e auditoria** | | | |
 | 4.1 | Estatísticas por produto e conjunto de fontes (mín., máx., média, mediana, faixa, quantidade) | RF-22, RF-28 | ⬜ |
 | 4.2 | Dashboard sem URLs, com conjunto ativo e horário da pesquisa | DT-09, RF-10, D-32 | ⬜ |

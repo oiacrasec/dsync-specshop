@@ -1,5 +1,19 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Mercado Livre via API de catálogo (0.2)
+
+- ADR 2002: API como fonte principal (`/products/search` com `domain_id` e paginação +
+  `/products/{id}/items`, token `client_credentials`): 240 ofertas da L3250 em 7 produtos
+  de catálogo, com condição, UF e frete por CEP. `/sites/MLB/search` e `/items` dão 403
+  (política, não escopo); servidor recebe verificação de conta na busca pública.
+- Extensão do navegador como complemento (Pix, parcelamento, anúncios fora do catálogo),
+  acionada pelo SPECSHOP; instalação com 1 clique na loja oficial (etapa 3.4).
+- Pagamento sem dado = "desconhecido"; nota fiscal = "não informada"; histórico da base
+  global própria, compartilhada entre empresas sem revelar quem pesquisou.
+- Plano: Mercado Livre implementado primeiro; 0.3/0.4 antes dos blocos 5 e 6.
+- `docs/domain/specshop/fontes-de-para.md`: DE-PARA pedido × loja (ML, KaBuM!, OLX,
+  Buscapé, Magalu, MegaMamute, Meta) com testes de 07/11; ADR 2001 ganhou seção Revisões.
+
 ## 2026-11-07 — Variáveis do SPECSHOP no .env do core
 
 - ADR 2000 item 7: bloco `# SPECSHOP` no fim de `backend/.env.example` (ML_CLIENT_ID,
