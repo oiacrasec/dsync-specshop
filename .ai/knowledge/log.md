@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Merge do core: índice de ADRs do projeto
+
+- Merge de `core/main` (77a3145): ADRs de projetos derivados a partir de 2000, índice em
+  `docs/adr/projeto.md`. ADR 2000 e `docs/domain/specshop/README.md` alinhados: o índice
+  dos ADRs do SPECSHOP passa a ser `docs/adr/projeto.md`.
+
 ## 2026-11-07 — Plano do MVP do SPECSHOP
 
 - `docs/plans/entrega-2001-mvp.md`: blocos 0 (viabilidade das fontes) a 7 (piloto),

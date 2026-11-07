@@ -20,7 +20,7 @@
 - Produto: `docs/domain/specshop/` (fonte viva; a especificação original do idealizador,
   v0.8, foi absorvida e não é mantida). IDs D, RF, RQ, Q, DEC e DT preservados.
 - ADRs do SPECSHOP a partir de **2000**, planos a partir de **2001** (ADR 2000). Índice
-  dos ADRs do projeto em `docs/domain/specshop/README.md`.
+  dos ADRs do projeto em `docs/adr/projeto.md` (ADR 0036 §6).
 - Decisões técnicas DT-01 a DT-10 delegadas ao desenvolvimento; cada uma vira ADR 2000+
   (`docs/domain/specshop/decisoes-tecnicas.md`). Não devolver ao idealizador perguntas
   de framework, banco ou arquitetura; mudança de regra de produto volta a ele.

@@ -15,17 +15,17 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 
 ## Decisão
 
-1. **Numeração:** ADRs do SPECSHOP começam em **2000** (`docs/adr/2000-…`, `2001-…`). A
-   faixa 0001–1999 fica para o core. Decisão de interesse geral entra no core, com
-   numeração do core.
-2. **Índice próprio:** os ADRs 2000+ são listados em `docs/domain/specshop/README.md`,
-   porque o `docs/adr/README.md` pertence ao core.
+1. **Numeração:** ADRs do SPECSHOP começam em **2000** (`docs/adr/2000-…`, `2001-…`),
+   regra que o core adotou para todos os projetos derivados (ADR 0036 §6). Decisão de
+   interesse geral entra no core, com numeração do core.
+2. **Índice próprio:** os ADRs 2000+ são listados em `docs/adr/projeto.md`, arquivo do
+   projeto (ADR 0036 §5); o `docs/adr/README.md` pertence ao core.
 3. **Especificação absorvida:** o conteúdo da v0.8 foi consolidado nos documentos abaixo,
    com os IDs originais (D, RF, RQ, Q, DEC, DT) preservados, e o arquivo original não é
    mantido no repositório. Novas definições do idealizador entram direto nesses
    documentos.
 4. **Documentos vivos** em `docs/domain/specshop/`:
-   - `README.md`: visão, escopo por fase, jornada, navegação e índice de ADRs;
+   - `README.md`: visão, escopo por fase, jornada e navegação;
    - `regras.md`: regras de negócio e modelo conceitual;
    - `requisitos.md`: D, RF, RQ e critérios de aceitação;
    - `decisoes-e-pendencias.md`: DEC, Q e pendências de produto;
@@ -60,3 +60,4 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 | Data | Decisão |
 |---|---|
 | 2026-11-07 | Usuário definiu planos do SPECSHOP a partir de 2001 (item 6) |
+| 2026-11-07 | Índice movido para `docs/adr/projeto.md`, conforme o core (ADR 0036 §6, commit 77a3145) |

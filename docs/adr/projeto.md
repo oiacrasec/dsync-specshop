@@ -6,4 +6,4 @@ Este arquivo pertence ao projeto: em conflito de merge com o core, vale a versã
 
 | Nº | Título | Status |
 |---|---|---|
-| | *(nenhum ADR do projeto ainda)* | |
+| [2000](2000-documentacao-e-adrs-do-specshop.md) | Documentação e ADRs do SPECSHOP | Aceito |

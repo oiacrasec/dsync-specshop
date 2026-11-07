@@ -15,11 +15,7 @@ atualização: [ADR 2000](../../adr/2000-documentacao-e-adrs-do-specshop.md).
 | [decisoes-e-pendencias.md](decisoes-e-pendencias.md) | decisões de produto (DEC), perguntas respondidas (Q) e pendências de produto |
 | [decisoes-tecnicas.md](decisoes-tecnicas.md) | perguntas técnicas delegadas ao desenvolvimento (DT-01 a DT-10) e seu estado |
 
-**ADRs do SPECSHOP** (o índice `docs/adr/README.md` pertence ao core):
-
-| Nº | Título | Status |
-|---|---|---|
-| [2000](../../adr/2000-documentacao-e-adrs-do-specshop.md) | Documentação e ADRs do SPECSHOP | Aceito |
+ADRs do SPECSHOP (2000+): índice em [docs/adr/projeto.md](../../adr/projeto.md).
 
 **Estados das definições:**
 
