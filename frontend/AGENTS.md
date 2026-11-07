@@ -33,6 +33,10 @@ Regras do frontend do datasync-core. As regras globais estão no `AGENTS.md` da 
   `UUID_PATTERN`) e montar o caminho com `encodeURIComponent` (client-side path traversal).
 - Menu, guards e botões por permissão só via `PermissionContextService` (`/me/permissions/`) e
   `PERMISSION_KEYS` com os códigos do registry do Core; nunca liberar ação por padrão no front.
+- Projeto derivado (ADR 0036, item 5): menu em `src/app/project/project.menu.ts` (seções entre
+  Dashboards e Administração, item visível pela `permission` declarada) e páginas em
+  `src/app/project/project.routes.ts` (sob `/pages/`); códigos de permissão em constante do
+  próprio projeto. Não editar `app.menu.ts`, `pages.routes.ts` nem `PERMISSION_KEYS`.
 - Padrões dos componentes (20 linhas, `public_id`) ficam nos componentes; telas não repetem.
 - Formulários: campos dentro de `p-tabs` com a aba **Principal** (`value="principal"`), como o de
   contratos; seções extras (ex.: Permissões) viram outras abas. Cabeçalho, Voltar e os botões

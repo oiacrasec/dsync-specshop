@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Menu e páginas do projeto derivado no frontend
+
+- `frontend/src/app/project/project.menu.ts` (`PROJECT_MENU`, seções entre Dashboards e
+  Administração, item visível só para usuário comum com a `permission`) e `project.routes.ts`
+  (`PROJECT_ROUTES` em `/pages/` antes do coringa), vazios no core. Ligados em `app.menu.ts` e
+  `pages.routes.ts`; spec `app.menu.spec.ts`. ADR 0036 item 5, `frontend/AGENTS.md` e guia.
+
 ## 2026-11-07 — Fábricas de isolamento por app e OpenAPI em projetos derivados
 
 - `apps/core/tests/test_isolation.py` junta `FACTORIES`/`SHARED` de `apps/<app>/tests/isolation.py`

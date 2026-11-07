@@ -40,7 +40,8 @@ um core próprio, sem acesso ao core original.
    `README.md`, `docs/adr/projeto.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md` e
    `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua),
    `backend/config/project.py` (`PROJECT_APPS`, apps do projeto) e
-   `backend/config/api/project.py` (rotas da API v1 do projeto), vazios no core.
+   `backend/config/api/project.py` (rotas da API v1 do projeto), `frontend/src/app/project/project.menu.ts`
+   (menu) e `frontend/src/app/project/project.routes.ts` (páginas), vazios no core.
    Arquivo **gerado** (`docs/api/openapi-v1.yaml`) não se resolve à mão: em conflito,
    regenera-se a partir do código do projeto.
    Pode-se automatizar com `merge=ours` no `.gitattributes`, mais

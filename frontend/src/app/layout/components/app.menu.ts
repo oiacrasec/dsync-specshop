@@ -5,6 +5,7 @@ import { AppMenuitem } from './app.menuitem';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { PERMISSION_KEYS } from '@/app/core/tokens/permission.keys';
+import { PROJECT_MENU, ProjectMenuItem, ProjectMenuSection } from '@/app/project/project.menu';
 
 @Component({
     selector: '[app-menu]',
@@ -41,6 +42,8 @@ export class AppMenu implements OnInit {
             ]
         },
         { separator: true },
+        // Seções do projeto derivado (project/project.menu.ts, ADR 0036 item 5).
+        ...PROJECT_MENU.flatMap((section) => [this.projectSection(section), { separator: true }]),
         {
             label: 'Administração',
             icon: 'pi pi-fw pi-briefcase',
@@ -163,6 +166,25 @@ export class AppMenu implements OnInit {
 
     private isCommonUser() {
         return !this.isSuperuser();
+    }
+
+    private canViewProjectItem(item: ProjectMenuItem) {
+        return this.isCommonUser() && this.permissionContext.hasPermission(item.permission);
+    }
+
+    private projectSection(section: ProjectMenuSection) {
+        return {
+            label: section.label,
+            icon: section.icon,
+            path: section.path,
+            visible: () => section.items.some((item) => this.canViewProjectItem(item)),
+            items: section.items.map((item) => ({
+                label: item.label,
+                icon: item.icon,
+                visible: () => this.canViewProjectItem(item),
+                routerLink: item.routerLink
+            }))
+        };
     }
 
     private canViewContratos() {

@@ -90,6 +90,11 @@ projeto pela atualização (passo 5).
 `backend/config/api/project.py`. Esses arquivos vêm vazios do core e pertencem ao projeto;
 não edite `config/settings/base.py` nem `config/api/v1.py`.
 
+**Menu e páginas do projeto** (frontend): declare as seções do menu em
+`frontend/src/app/project/project.menu.ts` (cada item com a `permission` que o torna visível) e
+as rotas em `frontend/src/app/project/project.routes.ts`. Os dois vêm vazios do core e pertencem
+ao projeto; não edite `app.menu.ts`, `pages.routes.ts` nem `PERMISSION_KEYS`.
+
 **Isolamento dos models do projeto**: cada model novo precisa de fábrica de isolamento; declare-a
 em `apps/<app>/tests/isolation.py` (`FACTORIES` e, se houver, `SHARED`), sem editar
 `apps/core/tests/test_isolation.py`.
