@@ -2,6 +2,7 @@
 
 - **Status:** Proposto
 - **Data:** 2026-10-18
+- **Revisão:** 2026-11-07 — ADRs dos projetos derivados passam a numerar a partir de 2000.
 
 ## Contexto
 
@@ -36,11 +37,18 @@ um core próprio, sem acesso ao core original.
    ao core, e não feita no projeto.
 5. **Arquivos que pertencem ao projeto.** Alguns arquivos existem no core, mas dizem
    respeito ao estado de cada projeto. Em caso de conflito, vale a versão do projeto:
-   `README.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md` e
+   `README.md`, `docs/adr/projeto.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md` e
    `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua).
    Pode-se automatizar com `merge=ours` no `.gitattributes`, mais
    `git config merge.ours.driver true` em cada clone (essa configuração não é versionada).
-6. **Venda de um projeto.** Cria-se uma cópia do core que preserve o histórico
+6. **ADRs do projeto numeram a partir de 2000.** O core usa 0001–1999; cada projeto
+   derivado começa em `2000` (`docs/adr/2000-<resumo>.md`, `2001-...`). Assim o core pode
+   criar o ADR 0044 sem colidir com um ADR do projeto, e o merge do core não renumera nada.
+   A faixa é a mesma em todos os projetos: um ADR 2000 só tem sentido dentro do seu
+   repositório. Um prefixo explícito (ex.: `ADR-F`) fica para depois, se a faixa não bastar.
+   O índice dos ADRs do projeto é `docs/adr/projeto.md`, pois o `docs/adr/README.md` é do
+   core e o projeto não o edita.
+7. **Venda de um projeto.** Cria-se uma cópia do core que preserve o histórico
    (`git clone --mirror` seguido de `git push --mirror` para um repositório novo e
    vazio). No repositório do comprador: `git remote set-url core <nova-origem>`. Para
    cortar o vínculo: `git remote remove core`. Cópia sem histórico (`git init` do zero)

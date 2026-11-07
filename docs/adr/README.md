@@ -5,6 +5,8 @@ tomadas. **Um ADR por assunto:** quando o usuário revisa uma decisão aceita, o
 ADR é corrigido e ganha uma linha em "Revisões" (data e decisão do plano). ADR novo só
 para assunto novo; o status "Substituído por" fica para os ADRs antigos já substituídos.
 
+**Numeração:** o core usa 0001–1999. ADRs de projetos derivados começam em 2000 ([ADR 0036](0036-projetos-derivados-do-core.md)), indexados em [projeto.md](projeto.md).
+
 ## Status
 
 | Status | Significado |
