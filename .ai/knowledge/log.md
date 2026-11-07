@@ -1,5 +1,11 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Variáveis do SPECSHOP no .env do core
+
+- ADR 2000 item 7: bloco `# SPECSHOP` no fim de `backend/.env.example` (ML_CLIENT_ID,
+  ML_CLIENT_SECRET); `backend/.gitattributes` aplica `merge=union` para o merge do core
+  preservar as linhas do projeto e acrescentar as novas do core.
+
 ## 2026-11-07 — Regras de coleta nas fontes (0.1)
 
 - ADR 2001: API oficial primeiro com credencial da aplicação; sem API, só páginas públicas

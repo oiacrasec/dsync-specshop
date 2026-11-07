@@ -1,0 +1,2 @@
+# SPECSHOP: no merge do core, manter as linhas do projeto e acrescentar as do core (ADR 2000, item 7)
+.env.example merge=union

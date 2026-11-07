@@ -37,6 +37,11 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 6. **Planos** de entrega do SPECSHOP são numerados a partir de **2001**
    (`docs/plans/entrega-2001-<resumo>.md`), pelo mesmo motivo dos ADRs: o core também
    cria planos em `docs/plans/`.
+7. **Variáveis de ambiente** do SPECSHOP convivem com as do core em `backend/.env` e
+   `backend/.env.example`, num bloco `# SPECSHOP` no fim do arquivo. É a exceção aceita
+   à regra de não editar arquivos do core (ADR 0036): `backend/.gitattributes` aplica
+   `merge=union` ao `.env.example`, então o merge mantém as linhas do projeto e
+   acrescenta as novas do core sem conflito.
 
 ## Alternativas consideradas
 
@@ -54,6 +59,8 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 - Toda nova regra de produto entra primeiro nos documentos de domínio, preservando IDs.
 - `docs/domain/` e `docs/plans/` pertencem ao projeto (ADR 0036 §5); os ADRs 2000+ e os
   planos 2001+ são arquivos novos e não conflitam com o core.
+- Após merge do core, conferir o `backend/.env.example`: o `merge=union` não detecta
+  linha duplicada quando os dois lados alteram a mesma variável.
 
 ## Revisões
 
@@ -61,3 +68,4 @@ core, e como trazer a especificação para o padrão de documentação do reposi
 |---|---|
 | 2026-11-07 | Usuário definiu planos do SPECSHOP a partir de 2001 (item 6) |
 | 2026-11-07 | Índice movido para `docs/adr/projeto.md`, conforme o core (ADR 0036 §6, commit 77a3145) |
+| 2026-11-07 | Usuário definiu variáveis do SPECSHOP no mesmo `.env`/`.env.example` do core, com `merge=union` (item 7) |
