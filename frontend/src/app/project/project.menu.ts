@@ -1,3 +1,5 @@
+import { SPECSHOP_PERMISSION_KEYS } from './permission.keys';
+
 /**
  * Menu do projeto derivado (ADR 0036, item 5): arquivo do projeto, vazio no core.
  *
@@ -20,4 +22,18 @@ export interface ProjectMenuSection {
     items: ProjectMenuItem[];
 }
 
-export const PROJECT_MENU: ProjectMenuSection[] = [];
+export const PROJECT_MENU: ProjectMenuSection[] = [
+    {
+        label: 'Pesquisa de preços',
+        icon: 'pi pi-fw pi-search',
+        path: '/pesquisa-precos',
+        items: [
+            {
+                label: 'Meus produtos',
+                icon: 'pi pi-fw pi-briefcase',
+                permission: SPECSHOP_PERMISSION_KEYS.PRODUCT_VIEW,
+                routerLink: ['/pages/pesquisa-precos/produtos']
+            }
+        ]
+    }
+];

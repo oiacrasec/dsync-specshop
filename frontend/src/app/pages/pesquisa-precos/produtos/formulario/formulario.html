@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{ isEditing ? 'Editar produto' : 'Novo produto' }}</h2>
+            <p class="text-sm text-surface-700 dark:text-white/64">Nome e modelo direcionam a pesquisa; marca e EAN são opcionais. O SPECSHOP compara somente produtos novos.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <ui-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Principal</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="name" formControlName="name" [maxlength]="255" label="Nome" [errorMessage]="errorMessage('name')" />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="model" formControlName="model" [maxlength]="120" label="Modelo" [errorMessage]="errorMessage('model')" />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="brand" formControlName="brand" [maxlength]="120" label="Marca (opcional)" [errorMessage]="errorMessage('brand')" />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="ean" formControlName="ean" [maxlength]="13" label="EAN (opcional)" inputMode="numeric" placeholder="8 ou 13 dígitos" [errorMessage]="errorMessage('ean')" />
+                        </div>
+                    </form>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button label="Salvar" icon="pi pi-check" [loading]="saving" (onClick)="save()"></ui-button>
+    </div>
+</div>

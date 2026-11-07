@@ -6,4 +6,10 @@ import { Routes } from '@angular/router';
  * Entram em `/pages/` antes da rota coringa. O core nunca altera este arquivo e, em conflito
  * de merge, vale a versão do projeto.
  */
-export const PROJECT_ROUTES: Routes = [];
+export const PROJECT_ROUTES: Routes = [
+    {
+        path: 'pesquisa-precos',
+        loadChildren: () => import('@/app/pages/pesquisa-precos/pesquisa-precos.routes'),
+        data: { breadcrumb: 'Pesquisa de preços' }
+    }
+];

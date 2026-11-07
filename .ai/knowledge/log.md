@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Tela Meus produtos (1.3)
+
+- Frontend: `pages/pesquisa-precos/produtos` (lista `ui-table`, formulário com aba Principal,
+  arquivar com confirmação), `types/produto.ts`, `project/permission.keys.ts`; menu
+  "Pesquisa de preços › Meus produtos" em `project/project.menu.ts` e rotas em
+  `project/project.routes.ts`. Erros 422 do backend aparecem junto ao campo do formulário.
+
 ## 2026-11-07 — App catalog (1.2)
 
 - `apps/catalog`: `TrackedProduct` (ContractScopedModel; nome, modelo, marca, EAN), unique

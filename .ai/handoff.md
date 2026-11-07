@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 19:01
+- **Atualizado em:** 2026-11-07 19:30
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** 00c62ec feat(catalog): add tracked products API
+- **Último commit:** ver `git log -3` (etapa 1.3, tela Meus produtos)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 1.2 App `catalog` — ✅ concluída (API `/api/v1/products/`) |
-| Próximo passo exato | Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
-| Aguardando o usuário? | sim — aprovação do escopo da 1.3 (core já atualizado: `core/main` = 5e73bde, publicado) |
+| Etapa atual | 1.3 Tela "Meus produtos" — ✅ concluída (lista, formulário, arquivar) |
+| Próximo passo exato | Propor o escopo da 2.1: modelo de pesquisa, oferta e observação de preço (base global particionada, ADR 2003 §2–3) |
+| Aguardando o usuário? | sim — aprovação do escopo da 2.1 |
 
 ## Feito nesta sessão
 
@@ -25,6 +25,8 @@
   `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
   Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
 - 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
+- 1.3: tela "Meus produtos" no frontend; core ganhou `frontend/src/app/project/project.menu.ts` e
+  `project.routes.ts` (cce830c, ef62937 no core local, sem push).
 
 ## Contexto do projeto
 
@@ -49,4 +51,6 @@
   `test_nobody_uses_django_file_storage_directly` e, no core, `test_versioned_schema_file_matches_the_code`.
 - Eventos de auditoria do SPECSHOP (`product.*`) não estão nas choices do core: gravam, mas a
   interface de auditoria mostra o código sem rótulo (extensão futura no core).
+- Candidato a mover para o core: aplicar erros 422 aos campos do formulário (hoje em
+  `produtos/formulario/formulario.ts`).
 - O roxo do tema, ícones de arquivar/atualizar e prazos do dashboard seguem pendentes (`telas.md`).
