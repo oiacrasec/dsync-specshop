@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Fábricas de isolamento por app e OpenAPI em projetos derivados
+
+- `apps/core/tests/test_isolation.py` junta `FACTORIES`/`SHARED` de `apps/<app>/tests/isolation.py`
+  (repetição de model é erro). `backend/AGENTS.md`, ADR 0036 item 5 e
+  `docs/derived-projects/README.md`: projeto declara fábricas sem editar o core; conflito no
+  `docs/api/openapi-v1.yaml` gerado se resolve regenerando.
+
 ## 2026-11-07 — Apps e rotas do projeto derivado
 
 - ADR 0036 item 5: `backend/config/project.py` (`PROJECT_APPS`) e

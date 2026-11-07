@@ -65,7 +65,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
 - Settings por ambiente em `config/settings/`. Segredos e valores de ambiente **só** por variável de ambiente (`.env.example` documenta todas).
 - `AUTH_USER_MODEL = 'users.User'`: sempre use `get_user_model()` ou `settings.AUTH_USER_MODEL`.
 - API segura por padrão: `IsAuthenticated` global; libere rotas públicas explicitamente na view.
-- Rotas da API em `config/api/v1.py`, sob `/api/v1/`. Erros via exceções e handler
+- Rotas da API em `config/api/v1.py`, sob `/api/v1/`; apps e rotas de projeto derivado em
+  `config/project.py` e `config/api/project.py` (ADR 0036, item 5). Erros via exceções e handler
   global RFC 9457 (classes em `apps.core.exceptions`, respostas e handler em
   `apps.core.problems`), nunca corpo de erro manual na view.
 - OpenAPI (ADR 0004, `drf-spectacular`): `APIView` e actions customizadas declaram
@@ -216,8 +217,9 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   sobrescrevem apenas os campos desejados. Ordenação vem do OrderingFilter, sem
   ordering_fields na view. Usar SchemaRouter: options de relações são resolvidos
   por model/basename registrado e reverse, sem montar URLs por convenção (ADR 0026).
-- Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) no mesmo
-  commit; sem ela a suíte falha (camada F).
+- Model novo → fábrica em `apps/core/tests/test_isolation.py` (`FACTORIES` ou `SHARED`) ou, em app
+  novo (inclusive de projeto derivado), em `apps/<app>/tests/isolation.py`, no mesmo commit; sem ela
+  a suíte falha (camada F).
 - Autoria explícita: `save(actor=user)` e `delete(actor=user)`; operações de sistema
   sem usuário deixam autoria nula. Em `update`/operações bulk, preencher auditoria
   explicitamente. Soft delete não faz cascata; relações são tratadas no service.
