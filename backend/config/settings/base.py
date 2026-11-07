@@ -13,7 +13,7 @@ import environ
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import constant_time_compare
 
-from config.project import PROJECT_APPS
+from config.project import PROJECT_APPS, PROJECT_UNSCOPED_RECORDS
 from config.storage import media_storage
 
 # backend/
@@ -59,6 +59,8 @@ LOCAL_APPS = [
 
 # Apps do projeto derivado ficam em config/project.py (ADR 0036, item 5).
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + PROJECT_APPS
+# Registros sem escopo do projeto derivado, aceitos pelo check core.E001 (ADR 0036, item 5).
+UNSCOPED_PROJECT_RECORDS = PROJECT_UNSCOPED_RECORDS
 
 MIDDLEWARE = [
     'apps.core.middleware.RequestIdMiddleware',

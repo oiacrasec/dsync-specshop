@@ -83,6 +83,12 @@
   `docs/domain/specshop/README.md`, DT registradas como ADR 2000+.
 - Alerta para DT-02: coleta em sites de terceiros exige passar por `conformidade-legal`
   (termos de uso das fontes; LGPD para vendedores pessoa física em OLX/Facebook).
+## 2026-11-07 — Registros sem escopo declarados pelo projeto
+
+- `config/project.py` ganha `PROJECT_UNSCOPED_RECORDS` (setting `UNSCOPED_PROJECT_RECORDS`),
+  aceito pelo check `core.E001` como o `UNSCOPED_RECORDS` do core; `GlobalOnlyManager` em
+  `apps/core/managers.py` (leitura só global, padrão do AccessLog); `GLOBAL_ONLY` do teste de
+  isolamento vira dicionário de fábricas, também carregado de `apps/<app>/tests/isolation.py`.
 
 ## 2026-11-07 — Menu e páginas do projeto derivado no frontend
 

@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils import timezone
 
+from .tenancy import TenantContextMissing, get_context
 from .utils import scope_filter
 
 
@@ -54,3 +55,17 @@ class AllObjectsManager(ScopedManagerMixin, models.Manager.from_queryset(SoftDel
     """`all_objects`: com escopo, inclui excluídos (auditoria, expurgo)."""
 
     include_deleted = True
+
+
+class GlobalOnlyManager(models.Manager):
+    """Registro sem escopo (padrão do AccessLog, ADR 0018): leitura só em `system_context()`
+    ou por `unscoped()`, sempre explícita. Uso em registros declarados como sem escopo."""
+
+    def get_queryset(self):
+        context = get_context()
+        if context is None or not context.system:
+            raise TenantContextMissing(f'{self.model._meta.label} só é lido em system_context() ou por unscoped().')
+        return super().get_queryset()
+
+    def unscoped(self):
+        return super().get_queryset()
