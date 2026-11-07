@@ -8,7 +8,7 @@ import { AuthSessionService } from '@/app/core/services/auth-session.service';
 import { PermissionContextService } from '@/app/core/services/permission-context.service';
 import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import pagesRoutes from '@/app/pages/pages.routes';
-import { PROJECT_MENU } from '@/app/project/project.menu';
+import { PROJECT_MENU, ProjectMenuSection } from '@/app/project/project.menu';
 import { PROJECT_ROUTES } from '@/app/project/project.routes';
 import { AppMenu } from './app.menu';
 
@@ -40,10 +40,16 @@ function projectSection(menu: AppMenu) {
 }
 
 describe('AppMenu project sections', () => {
-    beforeEach(() => PROJECT_MENU.push(SECTION));
+    // Num projeto derivado o PROJECT_MENU já tem conteúdo: acrescentar e depois restaurar.
+    let original: ProjectMenuSection[] = [];
+
+    beforeEach(() => {
+        original = [...PROJECT_MENU];
+        PROJECT_MENU.push(SECTION);
+    });
 
     afterEach(() => {
-        PROJECT_MENU.length = 0;
+        PROJECT_MENU.splice(0, PROJECT_MENU.length, ...original);
         TestBed.resetTestingModule();
     });
 
@@ -72,8 +78,6 @@ describe('AppMenu project sections', () => {
 });
 
 describe('pages routes', () => {
-    afterEach(() => (PROJECT_ROUTES.length = 0));
-
     it('keeps project routes before the wildcard route', () => {
         const routes = pagesRoutes as Routes;
         const wildcard = routes.findIndex((route) => route.path === '**');
