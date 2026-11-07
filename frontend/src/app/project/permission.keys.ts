@@ -3,5 +3,8 @@ export const SPECSHOP_PERMISSION_KEYS = {
     PRODUCT_VIEW: 'product:view',
     PRODUCT_CREATE: 'product:create',
     PRODUCT_UPDATE: 'product:update',
-    PRODUCT_DELETE: 'product:delete'
+    PRODUCT_DELETE: 'product:delete',
+    SEARCH_VIEW: 'search:view',
+    SEARCH_CREATE: 'search:create',
+    SEARCH_UPDATE: 'search:update'
 } as const;

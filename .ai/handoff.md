@@ -1,17 +1,17 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:20
+- **Atualizado em:** 2026-11-07 20:40
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** ver `git log -3` (etapa 2.2, API de pesquisa)
+- **Último commit:** ver `git log -3` (etapa 2.3, tela Shopping)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.2 Pesquisa sob demanda — ✅ concluída (API; conector do Mercado Livre na 3.1) |
-| Próximo passo exato | Propor o escopo da 2.3: tela Shopping (telas 2, 2a e 2b do FigCraft) consumindo `/api/v1/searches/` |
-| Aguardando o usuário? | sim — aprovação do escopo da 2.3 |
+| Etapa atual | 2.3 Tela Shopping — ✅ concluída (testada no navegador; fonte responde "indisponível" até a 3.1) |
+| Próximo passo exato | Propor o escopo da 3.1: conector do Mercado Livre conforme o 0.2 (ADR 2002) |
+| Aguardando o usuário? | sim — aprovação do escopo da 3.1 |
 
 ## Feito nesta sessão
 
@@ -25,6 +25,9 @@
   `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
   Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
 - 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
+- 2.3: tela Shopping (`pages/pesquisa-precos/shopping`): criar pesquisa e resultado que executa
+  as linhas pendentes (até 3 em paralelo) com nova tentativa; core ganhou a coluna `choice-tag`
+  no `ui-table` (1c0c31d). Estado assíncrono das telas em `signal` (app zoneless).
 - 2.2: API `/api/v1/searches/` com run/retry por linha e contrato de conector (`docs/api/searches.md`).
 - 2.1: `apps/pricing` (models, base global particionada, gravação e série; medição no ADR 2003);
   core ganhou `PROJECT_UNSCOPED_RECORDS` e `GlobalOnlyManager` (186f940).
@@ -56,4 +59,5 @@
   interface de auditoria mostra o código sem rótulo (extensão futura no core).
 - Candidato a mover para o core: aplicar erros 422 aos campos do formulário (hoje em
   `produtos/formulario/formulario.ts`).
+- Não há tela de histórico de pesquisas: a pesquisa fica gravada e reabre pela URL do resultado.
 - O roxo do tema, ícones de arquivar/atualizar e prazos do dashboard seguem pendentes (`telas.md`).

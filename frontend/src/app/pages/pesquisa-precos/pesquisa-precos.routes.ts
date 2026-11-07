@@ -37,5 +37,27 @@ export default [
             requireContext: true,
             requiredPermission: SPECSHOP_PERMISSION_KEYS.PRODUCT_UPDATE
         }
+    },
+    {
+        path: 'shopping',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/pesquisa-precos/shopping/shopping').then((c) => c.ShoppingPage),
+        data: {
+            breadcrumb: 'Shopping',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
+            requiredPermission: SPECSHOP_PERMISSION_KEYS.SEARCH_CREATE
+        }
+    },
+    {
+        path: 'shopping/:id',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/pesquisa-precos/shopping/resultado/resultado').then((c) => c.ShoppingResultadoPage),
+        data: {
+            breadcrumb: 'Resultado',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
+            requiredPermission: SPECSHOP_PERMISSION_KEYS.SEARCH_VIEW
+        }
     }
 ] as Routes;

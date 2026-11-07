@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Tela Shopping (2.3)
+
+- Frontend: `pages/pesquisa-precos/shopping` (criar pesquisa com até 10 produtos, fontes, UFs e
+  CEP) e `shopping/resultado` (executa as linhas pendentes só após o clique em Pesquisar, até 3
+  em paralelo; "Tentar de novo" em indisponível/erro). `types/pesquisa.ts`,
+  `project/pricing.constants.ts`, permissões `search:*` e menu "Shopping". App zoneless: estado
+  que muda após HTTP fica em `signal`, senão a tela não redesenha.
+
 ## 2026-11-07 — Pesquisa sob demanda (2.2)
 
 - `/api/v1/searches/` (criar com até 10 produtos, listar, detalhar) e `run`/`retry` por linha

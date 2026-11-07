@@ -33,6 +33,12 @@ export const PROJECT_MENU: ProjectMenuSection[] = [
                 icon: 'pi pi-fw pi-briefcase',
                 permission: SPECSHOP_PERMISSION_KEYS.PRODUCT_VIEW,
                 routerLink: ['/pages/pesquisa-precos/produtos']
+            },
+            {
+                label: 'Shopping',
+                icon: 'pi pi-fw pi-search',
+                permission: SPECSHOP_PERMISSION_KEYS.SEARCH_VIEW,
+                routerLink: ['/pages/pesquisa-precos/shopping']
             }
         ]
     }

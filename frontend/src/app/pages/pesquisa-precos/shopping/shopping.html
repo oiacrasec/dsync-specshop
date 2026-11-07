@@ -1,0 +1,50 @@
+<div class="flex flex-col gap-6 bg-surface-0 dark:bg-surface-900 rounded-xl border border-surface-200 dark:border-surface-700 overflow-hidden p-4 lg:p-6">
+    <div class="dss-page-header border-b border-surface-200 dark:border-surface-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Shopping</h2>
+            <p class="text-sm text-surface-700 dark:text-white/64">Escolha até {{ maxProducts }} produtos, as fontes e a região. A pesquisa só acontece quando você clicar em Pesquisar.</p>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-6">
+        <p-tabs value="principal">
+            <p-tablist>
+                <p-tab value="principal">Nova pesquisa</p-tab>
+            </p-tablist>
+            <p-tabpanels>
+                <p-tabpanel value="principal">
+                    <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-2">
+                            <ui-multi-select
+                                inputId="products"
+                                formControlName="products"
+                                label="Produtos (até {{ maxProducts }})"
+                                placeholder="Selecione os produtos"
+                                [options]="productOptions()"
+                                [errorMessage]="overLimit ? 'Você pode pesquisar até ' + maxProducts + ' produtos por vez.' : 'Selecione pelo menos um produto.'"
+                                [helpText]="selectedCount + ' de ' + maxProducts + ' produtos selecionados.'"
+                            />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-multi-select inputId="sources" formControlName="sources" label="Fontes" [options]="sourceOptions" [filter]="false" errorMessage="Selecione pelo menos uma fonte." />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-multi-select inputId="seller_states" formControlName="seller_states" label="UF do vendedor" placeholder="Todas as UFs" [options]="stateOptions" />
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <ui-input-text inputId="destination_zip" formControlName="destination_zip" [maxlength]="9" label="CEP de entrega" inputMode="numeric" placeholder="00000-000" />
+                        </div>
+                    </form>
+                </p-tabpanel>
+            </p-tabpanels>
+        </p-tabs>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <ui-button label="Cancelar" severity="secondary" text (onClick)="goBack()"></ui-button>
+        <ui-button [label]="selectedCount === 1 ? 'Pesquisar 1 produto' : 'Pesquisar ' + selectedCount + ' produtos'" icon="pi pi-search" [loading]="saving()" (onClick)="search()"></ui-button>
+    </div>
+</div>

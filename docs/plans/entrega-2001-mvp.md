@@ -35,7 +35,7 @@ do usuário.
 | **2 — Pesquisa** | | | |
 | 2.1 | Modelo de pesquisa, oferta e observação de preço, com identidade estável do produto e datas de referência/obtenção; app `pricing` e base global particionada medida (ADR 2003) | DT-06, RF-08 | ✅ |
 | 2.2 | Pesquisa sob demanda de até 10 produtos: estado por produto/fonte, falha parcial, limite explícito, nova tentativa manual; API `/api/v1/searches/` com run/retry por linha, conector por fonte (`docs/api/searches.md`) | DT-07, RF-25, RF-29 | ✅ |
-| 2.3 | Tela "Shopping": seleção de produtos, fontes e região; progresso e resultado | RF-10, RF-29 | ⬜ |
+| 2.3 | Tela "Shopping": seleção de produtos, fontes e região; progresso e resultado (`pages/pesquisa-precos/shopping`) | RF-10, RF-29 | ✅ |
 | **3 — Primeiro preço real** | | | |
 | 3.1 | Conector do Mercado Livre conforme o 0.2 | DT-02, RF-03 | ⬜ |
 | 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos | DT-04, RF-05, RF-19, RF-27 | ⬜ |
