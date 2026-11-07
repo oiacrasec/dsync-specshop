@@ -95,6 +95,12 @@ não edite `config/settings/base.py` nem `config/api/v1.py`.
 as rotas em `frontend/src/app/project/project.routes.ts`. Os dois vêm vazios do core e pertencem
 ao projeto; não edite `app.menu.ts`, `pages.routes.ts` nem `PERMISSION_KEYS`.
 
+**Registros sem escopo do projeto** (padrão do `AccessLog`, ADR 0018): tabela técnica fora dos tipos
+de escopo (ex.: grande volume, particionada) é declarada em `PROJECT_UNSCOPED_RECORDS`
+(`backend/config/project.py`), não herda `BaseModel` e usa `GlobalOnlyManager`
+(`apps.core.managers`): leitura só em `system_context()` ou `unscoped()`. A fábrica do teste de
+isolamento vai em `GLOBAL_ONLY` (`apps/<app>/tests/isolation.py`). Justifique em ADR do projeto.
+
 **Isolamento dos models do projeto**: cada model novo precisa de fábrica de isolamento; declare-a
 em `apps/<app>/tests/isolation.py` (`FACTORIES` e, se houver, `SHARED`), sem editar
 `apps/core/tests/test_isolation.py`.

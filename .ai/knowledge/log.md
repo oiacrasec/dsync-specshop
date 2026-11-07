@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Registros sem escopo declarados pelo projeto
+
+- `config/project.py` ganha `PROJECT_UNSCOPED_RECORDS` (setting `UNSCOPED_PROJECT_RECORDS`),
+  aceito pelo check `core.E001` como o `UNSCOPED_RECORDS` do core; `GlobalOnlyManager` em
+  `apps/core/managers.py` (leitura só global, padrão do AccessLog); `GLOBAL_ONLY` do teste de
+  isolamento vira dicionário de fábricas, também carregado de `apps/<app>/tests/isolation.py`.
+
 ## 2026-11-07 — Menu e páginas do projeto derivado no frontend
 
 - `frontend/src/app/project/project.menu.ts` (`PROJECT_MENU`, seções entre Dashboards e

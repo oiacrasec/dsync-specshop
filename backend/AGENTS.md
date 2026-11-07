@@ -129,7 +129,8 @@ caracteres** (`E501` ativo); demais regras de lint continuam ativas.
   Preservar normalização do username, HMAC da chave e operações atômicas de cache;
   cache compartilhado e proteção da borda são requisitos antes de produção.
 - Models próprios herdam exatamente um dos quatro tipos de escopo de
-  `apps.core.models`; somente `users.User` e `contracts.Contract` herdam diretamente
+  `apps.core.models` (registros técnicos sem escopo: `UNSCOPED_RECORDS` do core ou
+  `PROJECT_UNSCOPED_RECORDS` do projeto, com `GlobalOnlyManager`); somente `users.User` e `contracts.Contract` herdam diretamente
   `BaseModel` (ADR 0012). Check `core.E001/E002/E003` exige declaração e campos
   compatíveis, inclusive em proxies/unmanaged. Ver
   [escopos de persistência](docs/architecture/model-scopes.md).

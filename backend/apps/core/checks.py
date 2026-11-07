@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.conf import settings
 from django.core.checks import Error, Tags, register
 from django.db import models
 
@@ -50,7 +51,8 @@ def check_model_scopes(app_configs, **kwargs):
             scopes = [scope for scope in SCOPE_TYPES if issubclass(model, scope)]
             if model._meta.label in SCOPE_EXCEPTIONS and issubclass(model, BaseModel) and not scopes:
                 continue
-            if model._meta.label in UNSCOPED_RECORDS and not issubclass(model, BaseModel):
+            unscoped = UNSCOPED_RECORDS | getattr(settings, 'UNSCOPED_PROJECT_RECORDS', frozenset())
+            if model._meta.label in unscoped and not issubclass(model, BaseModel):
                 continue
             if not scopes:
                 errors.append(

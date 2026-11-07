@@ -6,8 +6,8 @@ nunca fica sem teste. Os testes criam dois contratos (A e B), cada um com duas
 organizações, e conferem pelos managers que um contexto não enxerga o outro.
 
 Apps novos (inclusive de projetos derivados, ADR 0036) declaram as fábricas em
-`apps/<app>/tests/isolation.py`, com `FACTORIES` e, se houver, `SHARED`; este módulo as
-junta sem que o projeto edite arquivos do core.
+`apps/<app>/tests/isolation.py`, com `FACTORIES` e, se houver, `SHARED` e `GLOBAL_ONLY`
+(registros sem escopo); este módulo as junta sem que o projeto edite arquivos do core.
 """
 
 from datetime import date
@@ -86,7 +86,8 @@ FACTORIES = {
 }
 SHARED = {Plan, ScopingCountry}
 # Registros fora dos tipos de escopo (ADR 0018): leitura só global explícita.
-GLOBAL_ONLY = {AccessLog}
+# Fábrica recebe o cenário e cria um registro (apps declaram as suas em tests/isolation.py).
+GLOBAL_ONLY = {AccessLog: lambda world: AccessLog(ip='203.0.113.7', contract=world['a']['contract']).save()}
 # Registros do próprio usuário (sessões, 9.3): sem contrato; toda leitura filtra pelo dono
 # (`users.selectors.active_sessions`, `users.services.end_sessions`), coberto em test_sessions.py.
 OWNER_ONLY = {UserSession, UserMfa, UserRecoveryCode, UserMfaChallenge}
@@ -108,6 +109,7 @@ def _load_app_factories():
         assert not repeated, f'Fábrica de isolamento repetida: {sorted(m._meta.label for m in repeated)}'
         FACTORIES.update(factories)
         SHARED.update(getattr(module, 'SHARED', set()))
+        GLOBAL_ONLY.update(getattr(module, 'GLOBAL_ONLY', {}))
 
 
 _load_app_factories()
@@ -124,7 +126,7 @@ def own_models():
 
 
 def test_every_model_is_covered():
-    covered = FACTORIES.keys() | SHARED | GLOBAL_ONLY | OWNER_ONLY
+    covered = FACTORIES.keys() | SHARED | GLOBAL_ONLY.keys() | OWNER_ONLY
     missing = [model._meta.label for model in own_models() if model not in covered]
     assert missing == [], f'Registre uma fábrica de isolamento para: {missing}'
     assert all(issubclass(model, SharedModel) for model in SHARED)
@@ -217,7 +219,7 @@ def test_shared_models_are_visible_in_any_context(model, world):
 
 @pytest.mark.parametrize('model', sorted(GLOBAL_ONLY, key=lambda m: m._meta.label), ids=lambda m: m._meta.label)
 def test_global_only_records_are_read_only_in_system_context(model, world):
-    AccessLog(ip='203.0.113.7', contract=world['a']['contract']).save()
+    GLOBAL_ONLY[model](world)
     for any_context in (None, context(world, 'a'), TenantContext(superuser=True)):
         with use_context(any_context), pytest.raises(TenantContextMissing):
             model.objects.exists()

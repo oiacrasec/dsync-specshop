@@ -135,3 +135,14 @@ def test_registered_check_rejects_new_unscoped_model():
 def test_scope_bases_are_abstract_and_do_not_create_tables(scope):
     assert scope._meta.abstract
     assert scope not in apps.get_models()
+
+
+@isolate_apps('apps.core')
+def test_project_unscoped_records_are_accepted_only_outside_base_model(settings):
+    record = make_model('ProjectRecord', models.Model)
+    scoped_impostor = make_model('ProjectBaseRecord', BaseModel)
+    assert [error.id for error in check_model_scopes([config_for(record)])] == ['core.E001']
+
+    settings.UNSCOPED_PROJECT_RECORDS = frozenset({'core.ProjectRecord', 'core.ProjectBaseRecord'})
+    assert check_model_scopes([config_for(record)]) == []
+    assert [error.id for error in check_model_scopes([config_for(scoped_impostor)])] == ['core.E001']
