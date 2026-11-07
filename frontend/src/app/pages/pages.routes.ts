@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { PROJECT_ROUTES } from '@/app/project/project.routes';
+
 export default [
     /* DESABILITADO: fora do escopo atual
     {
@@ -52,6 +54,8 @@ export default [
         data: { breadcrumb: 'Contact Us' }
     },
     */
+    // Páginas do projeto derivado (project/project.routes.ts, ADR 0036 item 5).
+    ...PROJECT_ROUTES,
     {
         path: 'error',
         redirectTo: '/notfound'
