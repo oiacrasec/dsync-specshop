@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — App catalog (1.2)
+
+- `apps/catalog`: `TrackedProduct` (ContractScopedModel; nome, modelo, marca, EAN), unique
+  parcial (lower(nome), lower(modelo), contrato) entre não arquivados, índice parcial
+  (contrato, nome). API `/api/v1/products/` com `ContractWidePermission`, permissões
+  `product:*` em `permission_catalog.py` ("Arquivar" = delete), EAN-8/13 validado,
+  auditoria `product.*`. Ligado por `config/project.py` e `config/api/project.py`; fábrica
+  em `apps/catalog/tests/isolation.py`. Docs: `docs/api/products.md`, `openapi-v1.yaml`.
+
 ## 2026-11-07 — Dados e acesso do SPECSHOP (1.1)
 
 - ADR 2003: produto e correspondência por contrato, pesquisa e resultado por organização;

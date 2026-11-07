@@ -30,7 +30,7 @@ do usuário.
 | 0.4 | Levantamento das candidatas (KaBuM!, MegaMamute, Magalu, Facebook Marketplace) e prioridade de integração; ADR das DT-02/DT-03 | DT-02, D-30 | ⬜ |
 | **1 — Fundação** | | | |
 | 1.1 | ADR das DT-01 e DT-08 apoiado no core: escopo dos dados, base global, confiança na coleta, execução da pesquisa e permissões; ADR 2003 | DT-01, DT-08, RF-15 | ✅ |
-| 1.2 | App `catalog`: produto acompanhado (nome e modelo obrigatórios, marca e EAN opcionais, condição novo) e API CRUD | RF-01, D-24 | ⬜ |
+| 1.2 | App `catalog`: produto acompanhado (nome e modelo obrigatórios, marca e EAN opcionais, condição novo) e API CRUD; duplicado bloqueado; `docs/api/products.md` | RF-01, D-24 | ✅ |
 | 1.3 | Tela "Meus produtos" e navegação inicial do SPECSHOP, direção roxa | RF-01, D-14 | ⬜ |
 | **2 — Pesquisa** | | | |
 | 2.1 | Modelo de pesquisa, oferta e observação de preço, com identidade estável do produto e datas de referência/obtenção | DT-06, RF-08 | ⬜ |

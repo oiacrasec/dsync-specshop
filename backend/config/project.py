@@ -4,4 +4,6 @@ Cada projeto derivado lista aqui os próprios apps; o core nunca altera este arq
 em conflito de merge, vale a versão do projeto.
 """
 
-PROJECT_APPS: list[str] = []
+PROJECT_APPS: list[str] = [
+    'apps.catalog',
+]

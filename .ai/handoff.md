@@ -1,36 +1,52 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 11:50
+- **Atualizado em:** 2026-11-07 16:45
 - **Agente:** Claude → próximo agente
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** fd64f8f docs(specshop): add product domain docs and ADR 2000
+- **Último commit:** ver `git log -3` (etapa 1.2, app `catalog`)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 0.1 Conformidade legal da coleta — ✅ concluída (ADR 2001) |
-| Próximo passo exato | Propor o escopo da 0.2: teste do Mercado Livre com a L3250 via API oficial e token da aplicação (`/products/search` e `/sites/MLB/search`) |
-| Aguardando o usuário? | sim — aprovação da 0.2 e app criado no portal de desenvolvedores do Mercado Livre (client_id/secret, fora do repositório) |
+| Etapa atual | 1.2 App `catalog` — ✅ concluída (API `/api/v1/products/`) |
+| Próximo passo exato | Propor o escopo da 1.3: tela "Meus produtos" no frontend (telas 1 a 1e de `design/specshop-telas.figcraft`), consumindo `/api/v1/products/` |
+| Aguardando o usuário? | sim — aprovação do escopo da 1.3 |
+
+## Feito nesta sessão
+
+- 0.2 Mercado Livre (ADR 2002): API de catálogo como fonte principal, extensão do navegador
+  como complemento; DE-PARA por loja em `docs/domain/specshop/fontes-de-para.md`.
+- Telas do MVP no FigCraft (`design/specshop-telas.figcraft`, inventário em `telas.md`).
+- 1.1 (ADR 2003): escopo dos dados, base global de observações, confiança na coleta,
+  pesquisa por produto sem fila, permissões e perfis.
+- Core (`../datasync-core`, commits locais, **sem push**): ADR 0044 (permissões por app em
+  `permission_catalog.py`), arquivos do projeto `config/project.py` e
+  `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
+  Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
+- 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
 
 ## Contexto do projeto
 
 - Este repositório é o **SPECSHOP**, projeto derivado do core (ADR 0036): só acrescentar;
-  nunca editar arquivos do core nem criar migrations em apps do core.
-- Produto: `docs/domain/specshop/` (fonte viva; a especificação original do idealizador,
-  v0.8, foi absorvida e não é mantida). IDs D, RF, RQ, Q, DEC e DT preservados.
-- ADRs do SPECSHOP a partir de **2000**, planos a partir de **2001** (ADR 2000). Índice
-  dos ADRs do projeto em `docs/adr/projeto.md` (ADR 0036 §6).
-- Decisões técnicas DT-01 a DT-10 delegadas ao desenvolvimento; cada uma vira ADR 2000+
-  (`docs/domain/specshop/decisoes-tecnicas.md`). Não devolver ao idealizador perguntas
-  de framework, banco ou arquitetura; mudança de regra de produto volta a ele.
-- Usuário escolheu começar pelas fontes (bloco 0) antes da fundação.
+  nunca editar arquivos do core nem criar migrations em apps do core. Precisando mudar o
+  core, a mudança é feita em `../datasync-core` e trazida por merge.
+- Apps do projeto em `backend/config/project.py`; rotas em `backend/config/api/project.py`;
+  permissões em `apps/<app>/permission_catalog.py`; fábricas de isolamento em
+  `apps/<app>/tests/isolation.py`. `docs/api/openapi-v1.yaml` é regenerado, nunca mesclado à mão.
+- Produto: `docs/domain/specshop/`. ADRs do SPECSHOP a partir de **2000**, planos a partir
+  de **2001** (ADR 2000), índice em `docs/adr/projeto.md`.
+- Preferências do usuário: decidir item a item, um por vez, sempre com apresentação visual.
 
 ## Avisos
 
-- Não imprimir/versionar segredos. Push só quando pedido; nunca --amend na main;
-  usuário revisa o diff antes de cada commit.
-- Python: o PyCharm usa a venv `venv-specshop`; o caminho ainda não foi informado. O
-  shell do agente não a ativa (python global 3.9). Pedir o caminho antes de rodar testes.
-- Pendências herdadas do core (3.2/3.3 de deploy, tag `v1.0`, `merge=ours`, regras de
-  agente do projeto) pertencem ao core e não são trabalho deste repositório.
+- Não imprimir/versionar segredos (`ML_CLIENT_ID`/`ML_CLIENT_SECRET` no `backend/.env`).
+  Push só quando pedido (core e SPECSHOP têm commits locais sem push).
+- Python: sem `.venv` no SPECSHOP; testes rodados com `../datasync-core/.venv` (Python 3.14),
+  banco `dsync_spechop` do `backend/.env`.
+- Três testes do core falham só neste Windows (cp1252 ao ler fontes e lista de fusos no
+  OpenAPI): `test_views_and_serializers_extend_the_project_bases`,
+  `test_nobody_uses_django_file_storage_directly` e, no core, `test_versioned_schema_file_matches_the_code`.
+- Eventos de auditoria do SPECSHOP (`product.*`) não estão nas choices do core: gravam, mas a
+  interface de auditoria mostra o código sem rótulo (extensão futura no core).
+- O roxo do tema, ícones de arquivar/atualizar e prazos do dashboard seguem pendentes (`telas.md`).
