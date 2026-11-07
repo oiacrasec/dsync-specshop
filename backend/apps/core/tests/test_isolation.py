@@ -4,9 +4,14 @@ Cada model concreto dos nossos apps precisa de uma fábrica em FACTORIES (ou con
 SHARED). Model novo sem fábrica faz `test_every_model_is_covered` falhar: o isolamento
 nunca fica sem teste. Os testes criam dois contratos (A e B), cada um com duas
 organizações, e conferem pelos managers que um contexto não enxerga o outro.
+
+Apps novos (inclusive de projetos derivados, ADR 0036) declaram as fábricas em
+`apps/<app>/tests/isolation.py`, com `FACTORIES` e, se houver, `SHARED`; este módulo as
+junta sem que o projeto edite arquivos do core.
 """
 
 from datetime import date
+from importlib import import_module
 from itertools import count
 
 import pytest
@@ -85,6 +90,27 @@ GLOBAL_ONLY = {AccessLog}
 # Registros do próprio usuário (sessões, 9.3): sem contrato; toda leitura filtra pelo dono
 # (`users.selectors.active_sessions`, `users.services.end_sessions`), coberto em test_sessions.py.
 OWNER_ONLY = {UserSession, UserMfa, UserRecoveryCode, UserMfaChallenge}
+
+
+def _load_app_factories():
+    """Fábricas declaradas por app em `tests/isolation.py`; repetição de model é erro."""
+    for config in apps.get_app_configs():
+        if not config.name.startswith('apps.'):
+            continue
+        try:
+            module = import_module(f'{config.name}.tests.isolation')
+        except ModuleNotFoundError as error:
+            if error.name not in (f'{config.name}.tests', f'{config.name}.tests.isolation'):
+                raise
+            continue
+        factories = getattr(module, 'FACTORIES', {})
+        repeated = FACTORIES.keys() & factories.keys()
+        assert not repeated, f'Fábrica de isolamento repetida: {sorted(m._meta.label for m in repeated)}'
+        FACTORIES.update(factories)
+        SHARED.update(getattr(module, 'SHARED', set()))
+
+
+_load_app_factories()
 
 
 def own_models():

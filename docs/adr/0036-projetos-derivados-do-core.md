@@ -41,6 +41,8 @@ um core próprio, sem acesso ao core original.
    `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua),
    `backend/config/project.py` (`PROJECT_APPS`, apps do projeto) e
    `backend/config/api/project.py` (rotas da API v1 do projeto), vazios no core.
+   Arquivo **gerado** (`docs/api/openapi-v1.yaml`) não se resolve à mão: em conflito,
+   regenera-se a partir do código do projeto.
    Pode-se automatizar com `merge=ours` no `.gitattributes`, mais
    `git config merge.ours.driver true` em cada clone (essa configuração não é versionada).
 6. **ADRs do projeto numeram a partir de 2000.** O core usa 0001–1999; cada projeto

@@ -90,6 +90,15 @@ projeto pela atualização (passo 5).
 `backend/config/api/project.py`. Esses arquivos vêm vazios do core e pertencem ao projeto;
 não edite `config/settings/base.py` nem `config/api/v1.py`.
 
+**Isolamento dos models do projeto**: cada model novo precisa de fábrica de isolamento; declare-a
+em `apps/<app>/tests/isolation.py` (`FACTORIES` e, se houver, `SHARED`), sem editar
+`apps/core/tests/test_isolation.py`.
+
+**Contrato da API gerado**: `docs/api/openapi-v1.yaml` é gerado do código e, no projeto, inclui as
+rotas dele. Em conflito no merge do core, não resolva à mão: regenere com
+`python manage.py spectacular --validate --fail-on-warn --file ../docs/api/openapi-v1.yaml`
+(o teste `test_versioned_schema_file_matches_the_code` confere).
+
 **Permissões do projeto** (ADR 0044): declare-as em `apps/<app>/permission_catalog.py`,
 com `PERMISSIONS` (lista de `PermissionDefinition`) e, se quiser, `RESOURCE_LABELS` e
 `PERMISSION_LABELS`. O registry do core as carrega na inicialização; não edite
