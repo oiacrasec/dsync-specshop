@@ -2,6 +2,9 @@
 
 ## 2026-11-07 — Proposta da lista de pesquisas no FigCraft
 
+- Revisão solicitada pelo usuário: desenho ajustado ao `ui-table` real (`table.html`/`.ts`):
+  coluna Ações compacta (63 px), linhas de 40 px, menu ⋯ com Abrir ligado ao resultado 2a.
+  Quatro registros mantêm só a contagem, conforme a regra de página única do componente.
 - `design/specshop-telas.figcraft`: nova tela 2 (Shopping: pesquisas), usando a estrutura
   de Meus produtos, com Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Abrir.
   Formulário preservado como 2c; navegação do protótipo entre lista, formulário e resultado.

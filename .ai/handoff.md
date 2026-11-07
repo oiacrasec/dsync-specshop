@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:50
+- **Atualizado em:** 2026-11-07 20:56
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta revisão:** ea12e74 docs(ai): update handoff
+- **Último commit anterior a esta revisão:** 2cd8f62 docs(design): add the Shopping search list proposal
 
 ## Situação
 
@@ -17,7 +17,8 @@
 
 - **Grid do Shopping (desenho pronto para revisão, frontend não iniciado):**
   - Usuário pediu ajustar primeiro no FigCraft. Tela 2 desenhada em `design/specshop-telas.figcraft`:
-    Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Abrir; botão Nova pesquisa.
+    Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Ações (⋯ → Abrir); botão Nova pesquisa.
+    Conferido com `ui-table` real: linhas de 40 px, coluna Ações de 63 px e contagem para página única.
     Formulário preservado como 2c. Protótipo liga lista → formulário/resultado e Voltar/Cancelar → lista.
     Renderização e interações inspecionadas; dados identificados como exemplos.
   - `shopping` = `ui-table` lazy sobre `GET /api/v1/searches/` (já existe, paginado, ordena por `created_at`)
