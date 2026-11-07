@@ -85,6 +85,11 @@ Detalhes: [backend](../../backend/README.md#como-rodar-desenvolvimento) e
 Se o projeto precisar mudar algo do core, a mudança é feita **no core** e chega ao
 projeto pela atualização (passo 5).
 
+**Apps e rotas do projeto** (ADR 0036, item 5): liste os apps em
+`backend/config/project.py` (`PROJECT_APPS`) e inclua as rotas da API em
+`backend/config/api/project.py`. Esses arquivos vêm vazios do core e pertencem ao projeto;
+não edite `config/settings/base.py` nem `config/api/v1.py`.
+
 **Permissões do projeto** (ADR 0044): declare-as em `apps/<app>/permission_catalog.py`,
 com `PERMISSIONS` (lista de `PermissionDefinition`) e, se quiser, `RESOURCE_LABELS` e
 `PERMISSION_LABELS`. O registry do core as carrega na inicialização; não edite

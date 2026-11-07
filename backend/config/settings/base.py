@@ -13,6 +13,7 @@ import environ
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import constant_time_compare
 
+from config.project import PROJECT_APPS
 from config.storage import media_storage
 
 # backend/
@@ -56,7 +57,8 @@ LOCAL_APPS = [
     'apps.audit',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# Apps do projeto derivado ficam em config/project.py (ADR 0036, item 5).
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'apps.core.middleware.RequestIdMiddleware',
