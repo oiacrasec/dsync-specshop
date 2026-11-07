@@ -134,3 +134,39 @@ describe('UiTable — paginação e Limpar', () => {
         expect(clearButton(element)).toBeDefined();
     });
 });
+
+describe('UiTable — coluna choice-tag', () => {
+    beforeEach(() => {
+        TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient(), { provide: API_BASE_URL, useValue: '/api/v1' }] });
+    });
+
+    afterEach(() => TestBed.resetTestingModule());
+
+    it('mostra a opção como tag com a severidade declarada', async () => {
+        const fixture = TestBed.createComponent(UiTable);
+        const table = fixture.componentInstance;
+
+        table.value = [{ public_id: '1', status: 'done' }];
+        table.columns = [
+            {
+                field: 'status',
+                header: 'Situação',
+                type: 'choice-tag',
+                choices: [
+                    { label: 'Concluída', value: 'done', severity: 'success' },
+                    { label: 'Erro', value: 'error', severity: 'danger' }
+                ]
+            }
+        ];
+        table.lazy = false;
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        const tag: HTMLElement = fixture.nativeElement.querySelector('td p-tag, td .p-tag');
+
+        expect(tag.textContent?.trim()).toBe('Concluída');
+        expect(table.resolveChoiceSeverity(table.columns[0], 'error')).toBe('danger');
+        expect(table.resolveChoiceSeverity(table.columns[0], 'outro')).toBe('secondary');
+    });
+});

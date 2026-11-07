@@ -99,6 +99,11 @@
   `docs/domain/specshop/README.md`, DT registradas como ADR 2000+.
 - Alerta para DT-02: coleta em sites de terceiros exige passar por `conformidade-legal`
   (termos de uso das fontes; LGPD para vendedores pessoa física em OLX/Facebook).
+## 2026-11-07 — Coluna choice-tag no ui-table
+
+- `shared/ui/table`: tipo de coluna `choice-tag` (opção → rótulo e severidade da tag), para
+  situações com mais de dois valores; `resolveChoiceSeverity` cai em `secondary`.
+
 ## 2026-11-07 — Registros sem escopo declarados pelo projeto
 
 - `config/project.py` ganha `PROJECT_UNSCOPED_RECORDS` (setting `UNSCOPED_PROJECT_RECORDS`),
