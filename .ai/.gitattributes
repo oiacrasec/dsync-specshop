@@ -1,0 +1,2 @@
+# SPECSHOP: no merge do core, juntar as entradas dos dois lados em vez de gerar conflito
+knowledge/log.md merge=union
