@@ -1,28 +1,31 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:45
-- **Agente:** Claude → **Codex** (próximo agente)
+- **Atualizado em:** 2026-11-07 20:50
+- **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** d152659 feat(frontend): add the Shopping search and result screens
+- **Último commit anterior a esta revisão:** ea12e74 docs(ai): update handoff
 
 ## Situação
 
 | Item | Estado |
 |---|---|
 | Etapa atual | 2.3 Tela Shopping — ✅ concluída (testada no navegador; fonte responde "indisponível" até a 3.1) |
-| Próximo passo exato | Ajuste da 2.3 proposto pelo usuário: Shopping vira **grid das pesquisas feitas** (mesmo padrão de Meus produtos). Ver "Dúvidas abertas" |
-| Aguardando o usuário? | sim — aprovar as colunas da grid e a mudança no `telas.md`; depois, o escopo da 3.1 (conector do Mercado Livre, ADR 2002) |
+| Próximo passo exato | Revisar com o usuário a nova tela 2 (Shopping: pesquisas) já desenhada no FigCraft; ajustar o design antes de implementar a grid |
+| Aguardando o usuário? | sim — revisão visual do desenho; implementação da grid e etapa 3.1 ainda pendentes |
 
 ## Dúvidas abertas
 
-- **Grid do Shopping (proposta, não aprovada nem iniciada):**
+- **Grid do Shopping (desenho pronto para revisão, frontend não iniciado):**
+  - Usuário pediu ajustar primeiro no FigCraft. Tela 2 desenhada em `design/specshop-telas.figcraft`:
+    Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Abrir; botão Nova pesquisa.
+    Formulário preservado como 2c. Protótipo liga lista → formulário/resultado e Voltar/Cancelar → lista.
+    Renderização e interações inspecionadas; dados identificados como exemplos.
   - `shopping` = `ui-table` lazy sobre `GET /api/v1/searches/` (já existe, paginado, ordena por `created_at`)
     com botão "+ Nova pesquisa" e ação "Abrir"; `shopping/nova` = formulário atual;
     `shopping/:id` = resultado atual (o Pesquisar continua indo ao resultado com `autorun`).
   - Colunas sugeridas para o MVP: Data, Produtos (quantidade), UF e CEP. Coluna "Situação"
     (ex.: "3 de 5 concluídas") ficou fora: exige mudar a API.
-  - Muda a especificação: em `docs/domain/specshop/telas.md` a tela 2 é o formulário; passaria
-    a ser a grid, e o formulário viraria 2c. Atualizar no mesmo commit.
+  - `docs/domain/specshop/telas.md` atualizado com a proposta em revisão (tela 2 = grid, 2c = formulário).
   - Performance: a lista devolve as linhas de cada pesquisa (prefetch, consultas constantes;
     até 100 linhas por página de 10). Aceitável no MVP; uma versão resumida da lista fica
     para depois, se for preciso.

@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Proposta da lista de pesquisas no FigCraft
+
+- `design/specshop-telas.figcraft`: nova tela 2 (Shopping: pesquisas), usando a estrutura
+  de Meus produtos, com Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Abrir.
+  Formulário preservado como 2c; navegação do protótipo entre lista, formulário e resultado.
+- Dados fictícios identificados; conferência visual por renderização e inspeção das interações
+  pelo MCP. Biblioteca do core e código das aplicações sem alterações.
+- `docs/domain/specshop/telas.md` registra o desenho como proposta em revisão. Aprovação
+  visual e implementação da grid no frontend continuam pendentes.
+
 ## 2026-11-07 — Tela Shopping (2.3)
 
 - Frontend: `pages/pesquisa-precos/shopping` (criar pesquisa com até 10 produtos, fontes, UFs e
