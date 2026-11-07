@@ -4,6 +4,8 @@ from django.urls import URLPattern, URLResolver, include, path
 
 from apps.core.views import MediaFileView, OpenApiSchemaView
 
+from . import project
+
 urlpatterns: list[URLPattern | URLResolver] = [
     path('admin/', include('apps.administration.urls')),
     path('', include('apps.users.urls')),
@@ -11,4 +13,6 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path('', include('apps.rbac.urls')),
     path('schema/', OpenApiSchemaView.as_view(), name='openapi-schema'),
     path('media/<str:token>/', MediaFileView.as_view(), name='media-file'),
+    # Rotas do projeto derivado ficam em config/api/project.py (ADR 0036, item 5).
+    *project.urlpatterns,
 ]

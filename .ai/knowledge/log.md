@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Apps e rotas do projeto derivado
+
+- ADR 0036 item 5: `backend/config/project.py` (`PROJECT_APPS`) e
+  `backend/config/api/project.py` (rotas v1) são arquivos do projeto, vazios no core e
+  ligados em `config/settings/base.py` e `config/api/v1.py`. Teste da ligação em
+  `apps/core/tests/test_project_files.py`; guia em `docs/derived-projects/README.md`.
+
 ## 2026-11-07 — Permissões declaradas por app
 
 - ADR 0044: `PermissionRegistry.register`/`freeze`; `apps/rbac/catalog.py` carrega

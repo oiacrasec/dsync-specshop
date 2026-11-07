@@ -38,7 +38,9 @@ um core próprio, sem acesso ao core original.
 5. **Arquivos que pertencem ao projeto.** Alguns arquivos existem no core, mas dizem
    respeito ao estado de cada projeto. Em caso de conflito, vale a versão do projeto:
    `README.md`, `docs/adr/projeto.md`, `docs/domain/`, `docs/plans/`, `.ai/handoff.md`, `.ai/knowledge/log.md` e
-   `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua).
+   `frontend/src/app/pages/dashboards/` (home vazia no core; cada projeto implementa a sua),
+   `backend/config/project.py` (`PROJECT_APPS`, apps do projeto) e
+   `backend/config/api/project.py` (rotas da API v1 do projeto), vazios no core.
    Pode-se automatizar com `merge=ours` no `.gitattributes`, mais
    `git config merge.ours.driver true` em cada clone (essa configuração não é versionada).
 6. **ADRs do projeto numeram a partir de 2000.** O core usa 0001–1999; cada projeto
