@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — changepassword com contexto de tenant e calendário no body
+
+- `apps/core/management/commands/changepassword.py` sobrescreve o comando do Django e roda em
+  `system_context()` (o manager de usuário exige tenant). Só funciona porque `apps.core` agora
+  vem antes de `django.contrib.auth` em `INSTALLED_APPS`. Grava só o hash: sem auditoria e sem
+  revogar sessões.
+- `ui-input-date`: `appendTo` passa a ser `body` por padrão, para o popup não ser cortado
+  pelo card do formulário.
+
 ## 2026-10-31 — Guia para criar projeto derivado
 
 - docs/derived-projects/README.md: criar repositório com histórico (clone + remote

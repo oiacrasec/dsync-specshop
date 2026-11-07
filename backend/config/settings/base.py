@@ -34,6 +34,8 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
 # Application definition
 
 DJANGO_APPS = [
+    # Primeiro: os comandos de `apps.core` (ex.: changepassword) sobrescrevem os do Django.
+    'apps.core',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
@@ -47,7 +49,6 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.core',
     'apps.users',
     'apps.contracts',
     'apps.administration',
