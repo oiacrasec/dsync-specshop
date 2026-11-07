@@ -1,5 +1,15 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Especificação do SPECSHOP organizada no padrão
+
+- Especificação v0.8 do idealizador consolidada em `docs/domain/specshop/` (README,
+  regras, requisitos, decisoes-e-pendencias, decisoes-tecnicas), com IDs D, RF, RQ, Q,
+  DEC e DT preservados; o arquivo original não é mantido no repositório.
+- ADR 2000 (Aceito): ADRs do SPECSHOP a partir de 2000, índice em
+  `docs/domain/specshop/README.md`, DT registradas como ADR 2000+.
+- Alerta para DT-02: coleta em sites de terceiros exige passar por `conformidade-legal`
+  (termos de uso das fontes; LGPD para vendedores pessoa física em OLX/Facebook).
+
 ## 2026-11-07 — changepassword com contexto de tenant e calendário no body
 
 - `apps/core/management/commands/changepassword.py` sobrescreve o comando do Django e roda em
