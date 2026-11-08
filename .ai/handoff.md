@@ -86,3 +86,4 @@ Nada disso foi iniciado; nenhum repositório do SPECSHOP foi criado.
 - Validados lint, formato, build e testes no Chrome Headless. Sem push; deploy acima segue pendente.
 - ui-filter: datas gerais visíveis junto à busca, ISO sem hora; schema preserva placement opcional.
 - Agora 15 testes de componentes/adaptador passaram; frente de deploy permanece pendente.
+- Preferência permanente: seguir o padrão; perguntar antes de desviar; validar no FigCraft antes de desenvolver e conferir sincronização com a tela (modo-de-trabalho).

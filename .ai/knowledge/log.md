@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Padrão e validação visual antes de desenvolver
+
+- Preferência permanente em modo-de-trabalho: seguir o padrão ao máximo no app e FigCraft;
+  desvio exige perguntar antes. Validar o desenho com o usuário antes da implementação.
+- Desenho aprovado e tela devem permanecer sincronizados; conferir componentes, colunas,
+  filtros, ações, estados e mensagens antes de declarar a sincronização. Objetivo: evitar retrabalho.
+
 ## 2026-11-07 — Datas visíveis na barra de filtros
 
 - SchemaFilter aceita placement opcional; adaptador preserva a posição e os padrões anteriores.
