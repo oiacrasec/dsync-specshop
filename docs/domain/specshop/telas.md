@@ -30,7 +30,8 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 - **Auditoria como página** (DT-09): reaproveita a grade do core; painel lateral exigiria
   componente que a biblioteca não tem.
 - **Seleção dos produtos no Shopping** com o MultiSelect do core.
-- **Filtros de Meus produtos:** Marca e Arquivado (Não/Sim/Todos), sem Situação. Padrão:
+- **Filtros de Meus produtos:** apenas Arquivado (Não/Sim/Todos) nos avançados; marca já
+  participa da busca geral junto com nome/modelo/EAN. Sem Situação. Padrão:
   somente não arquivados. Arquivados são consultáveis na lista, com ações de escrita ocultas.
 - **Shopping como lista de pesquisas:** `/shopping` exige `search:view`; `/shopping/nova`
   exige `search:create`. Abrir leva a `/shopping/:id` sem iniciar coleta; só Pesquisar

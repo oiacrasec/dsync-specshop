@@ -16,7 +16,9 @@
 | Auditoria | eventos `product.created`, `product.updated`, `product.deleted` com nome, modelo, marca e EAN |
 | Contrato | vem do contexto; `contract` no payload é ignorado |
 
-O schema expõe Marca e Arquivado, sem Situação (`is_active`). Sem filtro de arquivamento,
+O schema expõe somente Arquivado nos filtros avançados, sem Marca ou Situação (`is_active`).
+Marca continua na busca geral; o parâmetro individual `brand` da API permanece compatível.
+Sem filtro de arquivamento,
 a lista continua mostrando somente não arquivados. Consultar arquivados amplia **apenas a
 lista**, mantendo o escopo do contrato: detalhes, edição, DELETE repetido e options continuam
 excluindo-os. A seleção de produtos para novas pesquisas mantém a lista padrão.

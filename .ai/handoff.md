@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:41
+- **Atualizado em:** 2026-11-07 21:42
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 452eb95 feat(catalog): filter products by archived status
+- **Último commit anterior a esta etapa:** 5389d7a fix(shopping): move date range to advanced filters
 
 ## Situação
 
@@ -16,6 +16,7 @@
 ## Feito nesta etapa
 
 - Meus produtos: substituído Situação por Arquivado (Não/Sim/Todos); padrão não arquivados.
+  Marca também removida dos avançados: permanece na busca geral. API brand preservada.
   Apenas list consulta all_objects escopado; detalhes/escritas/options excluem arquivados.
   is_archived somente leitura omite Editar/Arquivar. 21 testes API + 22 Produtos/Shopping,
   lint/formato/build/check/migrations pendentes passaram. OpenAPI e docs atualizados.

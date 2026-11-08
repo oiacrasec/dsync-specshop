@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Marca somente na busca geral de Meus produtos
+
+- Schema de produtos expõe apenas Arquivado nos filtros avançados; Marca permanece na
+  busca geral. Parâmetro individual brand da API preservado. Sem alterações nas consultas.
+- 21 testes do catálogo passaram, incluindo schema e busca geral por marca; lint/formato
+  OK e OpenAPI regenerado sem avisos (sem alterações no contrato estático).
+
 ## 2026-11-07 — Período do Shopping nos filtros avançados
 
 - Revisão do usuário: schema de pesquisas marca De/Até como `placement: advanced`;

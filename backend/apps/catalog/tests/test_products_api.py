@@ -182,8 +182,9 @@ def test_archived_filter_is_scoped_and_does_not_reopen_details_or_options(world)
     assert api.delete(detail(archived)).status_code == 404
     assert api.get(URL + 'options/', {'q': 'OLD'}).json()['data'] == []
     schema = api.get(URL + 'schema/').json()
-    assert [field['field'] for field in schema['filters']] == ['brand', 'archived']
-    archived_filter = schema['filters'][1]
+    assert [field['field'] for field in schema['filters']] == ['archived']
+    assert 'brand' in [field['field'] for field in schema['general_search']['fields']]
+    archived_filter = schema['filters'][0]
     assert archived_filter['label'] == 'Arquivado'
     assert [choice['value'] for choice in archived_filter['choices']] == ['false', 'true', 'all']
     invalid = api.get(URL, {'archived': 'invalid'})
@@ -224,6 +225,7 @@ def test_general_search_and_brand_filter(world):
     api = client(world['maria'], world['orgs']['Centro'])
 
     assert [item['model'] for item in api.get(URL, {'search': 'l3250'}).json()['data']] == ['L3250']
+    assert [item['model'] for item in api.get(URL, {'search': 'epson'}).json()['data']] == ['L3250']
     assert [item['model'] for item in api.get(URL, {'brand': 'hp'}).json()['data']] == ['581']
 
 
