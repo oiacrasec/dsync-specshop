@@ -1,6 +1,27 @@
 import { toTableResponse } from './table-schema';
 
 describe('toTableResponse', () => {
+    it('preserva a posição geral das datas e mantém avançados os filtros sem posição', () => {
+        const response = toTableResponse(
+            {
+                columns: [],
+                filters: [
+                    { field: 'date_from', label: 'De', type: 'date', placement: 'general' },
+                    { field: 'created_at', label: 'Criado em', type: 'datetime' }
+                ],
+                general_search: null,
+                ordering_fields: []
+            },
+            { data: [], total_records: 0 },
+            '/api/v1'
+        );
+
+        expect(response.filters?.map((field) => [field.field, field.type, field.placement])).toEqual([
+            ['date_from', 'date', 'general'],
+            ['created_at', 'date', 'advanced']
+        ]);
+    });
+
     it('mapeia tipos do schema para as células do ui-table', () => {
         const response = toTableResponse(
             {

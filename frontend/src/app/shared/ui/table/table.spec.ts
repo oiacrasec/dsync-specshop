@@ -207,3 +207,25 @@ describe('UiTable — ações por linha', () => {
         expect(table.getRowActions(done).length).toBe(1);
     });
 });
+
+describe('UiTable — posição dos filtros', () => {
+    it('atualiza a barra quando o schema muda apenas a posição do campo de data', async () => {
+        TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient(), { provide: API_BASE_URL, useValue: '/api/v1' }] });
+        const fixture = TestBed.createComponent(UiTable);
+        const table = fixture.componentInstance;
+        const list = jasmine.createSpy('list').and.returnValue(of({ data: [], totalRecords: 0, filters: [{ field: 'date_from', header: 'De', type: 'date', placement: 'advanced' }] }));
+
+        table.service = { list };
+        table.cacheEnabled = false;
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('.ui-filter-bar ui-input-date')).toBeNull();
+        list.and.returnValue(of({ data: [], totalRecords: 0, filters: [{ field: 'date_from', header: 'De', type: 'date', placement: 'general' }] }));
+        table.handleLazyLoad({ first: 0, rows: 10 });
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('.ui-filter-bar ui-input-date')).not.toBeNull();
+    });
+});

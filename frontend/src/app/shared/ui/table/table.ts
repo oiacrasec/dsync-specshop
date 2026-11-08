@@ -386,6 +386,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
             nextFilters.map((filter) => ({
                 field: filter.field,
                 type: filter.type,
+                placement: filter.placement,
                 lookups: filter.lookups ?? [],
                 choices: filter.choices ?? []
             }))

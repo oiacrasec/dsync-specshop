@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, LOCALE_ID, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
 import { UiAutocomplete, UiLookupOptionsProvider, UiLookupQuery } from '@/app/shared/ui/autocomplete/autocomplete';
+import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
 import { toLookupResponse } from '@/app/core/utils/table-schema';
 import { OptionsResponse } from '@/app/types/options';
 
@@ -31,7 +32,7 @@ export interface UiFilterField {
 @Component({
     selector: 'ui-filter',
     standalone: true,
-    imports: [CommonModule, FormsModule, UiAutocomplete, InputTextModule, SelectModule, InputNumberModule],
+    imports: [CommonModule, FormsModule, UiAutocomplete, UiInputDate, InputTextModule, SelectModule, InputNumberModule],
     templateUrl: './filter.html',
     styles: [
         `
@@ -82,6 +83,12 @@ export interface UiFilterField {
                 width: 1px;
                 height: 24px;
                 flex-shrink: 0;
+            }
+
+            .ui-filter-inline-field {
+                flex: 0 0 170px;
+                min-width: 0;
+                padding: 6px 0;
             }
 
             .ui-filter-action {
@@ -155,6 +162,10 @@ export interface UiFilterField {
                     flex-basis: 100%;
                 }
 
+                .ui-filter-inline-field {
+                    flex: 1 1 140px;
+                }
+
                 .ui-filter-bar > .ui-filter-divider:first-of-type {
                     display: none;
                 }
@@ -164,6 +175,7 @@ export interface UiFilterField {
 })
 export class UiFilter implements OnChanges, OnDestroy {
     private http = inject(HttpClient);
+    readonly locale = inject(LOCALE_ID);
 
     @Input() filters: UiFilterField[] = [];
     @Output() filtersChange = new EventEmitter<Record<string, any>>();
@@ -218,7 +230,11 @@ export class UiFilter implements OnChanges, OnDestroy {
     }
 
     get generalFilters() {
-        return this.filters.filter((filter) => filter.placement === 'general');
+        return this.filters.filter((filter) => filter.placement === 'general' && filter.type === 'text');
+    }
+
+    get inlineFilters() {
+        return this.filters.filter((filter) => filter.placement === 'general' && filter.type === 'date');
     }
 
     get advancedFilters() {
@@ -246,7 +262,7 @@ export class UiFilter implements OnChanges, OnDestroy {
     }
 
     get hasAnyFilters() {
-        return this.hasGeneralFilters || this.hasAdvancedFilters;
+        return this.hasGeneralFilters || this.hasAdvancedFilters || this.inlineFilters.length > 0;
     }
 
     get generalPlaceholder() {
@@ -288,7 +304,7 @@ export class UiFilter implements OnChanges, OnDestroy {
             query['search'] = normalizedTerm;
         }
 
-        for (const filter of this.advancedFilters) {
+        for (const filter of [...this.inlineFilters, ...this.advancedFilters]) {
             const value = this.advancedValues[filter.field];
 
             if (value === undefined || value === null || value === '') {
@@ -340,6 +356,7 @@ export class UiFilter implements OnChanges, OnDestroy {
             this.filters.map((filter) => ({
                 field: filter.field,
                 type: filter.type,
+                placement: filter.placement,
                 lookups: filter.lookups ?? [],
                 choices: filter.choices ?? []
             }))

@@ -17,6 +17,7 @@ export interface SchemaFilter {
     field: string;
     label: string;
     type: SchemaFieldType;
+    placement?: 'general' | 'advanced';
     options_url?: string | null;
     choices?: Array<{ value: unknown; label: string }>;
 }

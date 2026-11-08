@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Datas visíveis na barra de filtros
+
+- SchemaFilter aceita placement opcional; adaptador preserva a posição e os padrões anteriores.
+- UiFilter mostra datas gerais com ui-input-date e locale da aplicação, emite data ISO sem
+  hora e limpa os campos junto à busca. Datas avançadas também usam o componente de data.
+- Chaves do schema de UiFilter/UiTable incluem placement para atualizar a apresentação.
+- 15 testes de filtro, tabela e adaptador passaram no Chrome Headless; lint, formato e build
+  verificados. Sem dependências novas ou alteração nos padrões dos filtros existentes.
+
 ## 2026-11-07 — Ações condicionais no ui-table
 
 - `UiTableAction.visible(row)` e `getRowActions` preservam o menu compacto e omitem

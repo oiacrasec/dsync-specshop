@@ -84,3 +84,5 @@ Nada disso foi iniciado; nenhum repositório do SPECSHOP foi criado.
 
 - ui-table: ações condicionais por linha com visible(row), sem mudar o padrão das demais telas.
 - Validados lint, formato, build e testes no Chrome Headless. Sem push; deploy acima segue pendente.
+- ui-filter: datas gerais visíveis junto à busca, ISO sem hora; schema preserva placement opcional.
+- Agora 15 testes de componentes/adaptador passaram; frente de deploy permanece pendente.
