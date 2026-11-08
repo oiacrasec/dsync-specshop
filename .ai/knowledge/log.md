@@ -1,5 +1,23 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Filtros do Shopping e padrão da grid de resultado
+
+- API `searches`: `search` por nome/modelo de produto usado via `EXISTS` correlacionado;
+  `date_from`/`date_to` inclusivos, dias completos no fuso do perfil. Limites no timestamp,
+  sem cast na coluna. Período invertido e datas inválidas → 422 RFC 9457.
+- Schema publica produto geral e datas `placement: general`. ShoppingService preserva
+  paginação/schema em cache e mostra mensagem dos filtros inválidos. OpenAPI regenerado.
+- Resultado: Nova pesquisa preenchido, Continuar secundário, `UiTable.actions` com visibilidade
+  por linha no menu ⋯; contagem/paginação padrão. Nova tentativa revalida o estado atual.
+- Core: `b1310d8` (ações condicionais), `637feee` (datas gerais); merge local `281f25c`.
+  Sem push. FigCraft do projeto atualizado pela CLI após fechamento do editor.
+- Validação: 20 testes da API; 15 de componentes/adaptador + 13 do Shopping no Chrome
+  Headless; lint/formato frontend e backend, build, checks e checks de produção passaram;
+  sem migrations pendentes. Query count constante com 1/20 pesquisas, página limitada a 10;
+  esta amostra não é um benchmark de produção.
+- SDK local está criado sem dependências; comandos Python usaram o executável retornado
+  pelo PyCharm e `PYTHONPATH` para pacotes existentes em `../datasync-core/.venv/Lib/site-packages`.
+
 ## 2026-11-07 — Grid de pesquisas aplicada no Shopping
 
 - `/shopping`: `ui-table` com Data, Produtos (quantidade distinta entre fontes), UF e CEP;

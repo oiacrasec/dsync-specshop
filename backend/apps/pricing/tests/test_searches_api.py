@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from threading import Barrier
 
@@ -13,7 +13,7 @@ from apps.audit.models import AuditEvent
 from apps.catalog.models import TrackedProduct
 from apps.contracts.models import Organization
 from apps.pricing import sources
-from apps.pricing.models import PriceObservation, PriceSearchItem, SearchItemStatus, SearchOffer
+from apps.pricing.models import PriceObservation, PriceSearch, PriceSearchItem, SearchItemStatus, SearchOffer
 from apps.pricing.partitions import forget_ensured_partitions
 from apps.pricing.sources import SourceOffer, SourceResult
 from apps.rbac.tests.test_permissions import assign
@@ -101,6 +101,89 @@ def test_create_makes_one_pending_item_per_product_and_source_and_audits(world):
     assert body['seller_states'] == ['SC'] and body['destination_zip'] == '88010000'
     assert body['items'][0]['source_label'] == 'Mercado Livre'
     assert AuditEvent.objects.filter(event='search.created').exists()
+
+
+def test_search_filters_used_products_without_duplicates_or_other_organizations(world):
+    for product in world['products'][:2]:
+        product.name = 'Impressora Epson'
+        product.save(update_fields=['name'])
+    matching = create(world, count=2).json()
+    other_product = (
+        client(world)
+        .post(URL, {'products': [str(world['products'][3].public_id)], 'sources': [ML]}, format='json')
+        .json()
+    )
+    other_org = (
+        client(world, 'Norte')
+        .post(URL, {'products': [str(world['products'][0].public_id)], 'sources': [ML]}, format='json')
+        .json()
+    )
+    response = client(world).get(URL, {'search': '  ePsOn  '})
+    assert response.status_code == 200, response.content
+    assert response.json()['total_records'] == 1
+    assert [row['public_id'] for row in response.json()['data']] == [matching['public_id']]
+    assert other_product['public_id'] != matching['public_id'] != other_org['public_id']
+    by_model = client(world).get(URL, {'search': world['products'][0].model})
+    assert by_model.json()['total_records'] == 1
+
+
+def test_search_date_period_includes_complete_days_in_the_user_time_zone(world):
+    world['maria'].time_zone = 'America/Sao_Paulo'
+    world['maria'].save(update_fields=['time_zone'])
+    dates = (
+        '2026-11-07T03:00:00+00:00',
+        '2026-11-08T02:59:59.999999+00:00',
+        '2026-11-08T03:00:00+00:00',
+        '2026-11-07T02:59:59.999999+00:00',
+    )
+    ids = []
+    for date in dates:
+        search = create(world, count=1).json()
+        ids.append(search['public_id'])
+        PriceSearch.objects.filter(public_id=search['public_id']).update(created_at=datetime.fromisoformat(date))
+    response = client(world).get(URL, {'date_from': '2026-11-07', 'date_to': '2026-11-07'})
+    assert response.status_code == 200, response.content
+    assert {row['public_id'] for row in response.json()['data']} == set(ids[:2])
+    schema = client(world).get(URL + 'schema/').json()
+    assert schema['general_search']['fields'] == [{'field': 'product', 'label': 'Produto', 'lookup': 'icontains'}]
+    dates_schema = [field for field in schema['filters'] if field['field'].startswith('date_')]
+    assert [(field['field'], field['type'], field['placement']) for field in dates_schema] == [
+        ('date_from', 'date', 'general'),
+        ('date_to', 'date', 'general'),
+    ]
+
+
+@pytest.mark.parametrize(
+    ('query', 'field'),
+    [
+        ({'date_from': '2026-99-07'}, 'date_from'),
+        ({'date_to': 'ontem'}, 'date_to'),
+        ({'date_from': '2026-11-08', 'date_to': '2026-11-07'}, 'date_to'),
+    ],
+)
+def test_search_period_rejects_invalid_dates_with_problem_details(world, query, field):
+    response = client(world).get(URL, query)
+    assert response.status_code == 422
+    assert response['Content-Type'] == 'application/problem+json'
+    assert response.json()['type'] == PROBLEM + 'validation-error'
+    assert field in response.json()['errors']
+
+
+def test_filtered_search_list_has_constant_queries_and_server_pagination(world):
+    api = client(world)
+    create(world, count=1)
+    query = {'search': 'Produto', 'date_from': '2026-01-01', 'date_to': '2026-12-31', 'rows': 10}
+    api.get(URL, query)  # aquece caches de permissões
+    with CaptureQueriesContext(connection) as first:
+        assert api.get(URL, query).status_code == 200
+    for _ in range(19):
+        create(world, count=1)
+    with CaptureQueriesContext(connection) as many:
+        response = api.get(URL, query)
+    assert response.status_code == 200, response.content
+    assert response.json()['total_records'] == 20 and len(response.json()['data']) == 10
+    assert len(first) == len(many)
+    assert any('EXISTS' in item['sql'] for item in many)
 
 
 @pytest.mark.parametrize(

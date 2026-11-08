@@ -1,13 +1,18 @@
-import { Injectable } from '@angular/core';
-import { map, tap } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { MessageService } from 'primeng/api';
+import { throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import { BaseCrudService } from '@/app/core/services/base-crud.service';
+import { problemMessage } from '@/app/core/utils/api-problem';
 import { PriceSearch, PriceSearchItem, PriceSearchListRow, PriceSearchWrite } from '@/app/types/pesquisa';
 
 const SEARCHES = 'searches';
 
 @Injectable({ providedIn: 'root' })
 export class ShoppingService extends BaseCrudService {
+    private messageService = inject(MessageService);
+
     list(query: Record<string, unknown> = {}) {
         return this.listTable<PriceSearch>(SEARCHES, { ...query, ordering: query['ordering'] || '-created_at' }).pipe(
             map((page) => ({
@@ -31,7 +36,12 @@ export class ShoppingService extends BaseCrudService {
 
                     return [{ ...column, ...(column.field === 'destination_zip' ? { header: 'CEP de entrega', nullablePlaceholder: '—' } : {}) }];
                 })
-            }))
+            })),
+            catchError((error: unknown) => {
+                this.messageService.add({ severity: 'error', summary: 'Falha ao carregar pesquisas', detail: problemMessage(error, 'Confira os filtros e tente novamente.') });
+
+                return throwError(() => error);
+            })
         );
     }
 

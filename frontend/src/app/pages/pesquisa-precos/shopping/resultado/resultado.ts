@@ -10,7 +10,7 @@ import { problemMessage } from '@/app/core/utils/api-problem';
 import { UUID_PATTERN } from '@/app/core/utils/session-data';
 import { SPECSHOP_PERMISSION_KEYS } from '@/app/project/permission.keys';
 import { UiButton } from '@/app/shared/ui/button/button';
-import { UiTable, UiTableColumn } from '@/app/shared/ui/table/table';
+import { UiTable, UiTableAction, UiTableColumn } from '@/app/shared/ui/table/table';
 import { PriceSearch, PriceSearchItem } from '@/app/types/pesquisa';
 import { ShoppingService } from '../shopping.service';
 
@@ -49,6 +49,8 @@ export class ShoppingResultadoPage implements OnInit {
     readonly running = signal(false);
     canRun = false;
     canRetry = false;
+
+    readonly tableActions: UiTableAction<ResultRow>[] = [{ id: 'retry', label: 'Tentar de novo', icon: 'fa-solid fa-rotate-right', visible: (row) => this.canRetryRow(row), handler: (row) => this.retry(row) }];
 
     readonly columns: UiTableColumn[] = [
         { field: 'label', header: 'Produto e fonte' },
@@ -119,8 +121,9 @@ export class ShoppingResultadoPage implements OnInit {
 
     retry(row: ResultRow) {
         const search = this.search();
+        const current = this.rows().find((item) => item.public_id === row.public_id);
 
-        if (!search) {
+        if (!search || !current || !this.canRetryRow(current)) {
             return;
         }
 

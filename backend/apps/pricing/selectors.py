@@ -1,10 +1,31 @@
 """Leituras da base global de preços."""
 
-from django.db.models import Avg, Count, Max, Min, Q
+from datetime import datetime, time
+
+from django.db.models import Avg, Count, Exists, Max, Min, OuterRef, Q
+from django.utils import timezone
 
 from .aggregates import Median
-from .models import PriceObservation
+from .models import PriceObservation, PriceSearchItem
 from .utils import browser_confirmations
+
+
+def searches_using_product(queryset, term):
+    """Correlaciona itens da pesquisa sem multiplicar pesquisas ou consultar por linha."""
+    items = PriceSearchItem.objects.filter(search_id=OuterRef('pk')).filter(
+        Q(product__name__icontains=term) | Q(product__model__icontains=term)
+    )
+    return queryset.filter(Exists(items))
+
+
+def searches_on_dates(queryset, *, date_from=None, date_to=None, time_zone):
+    """Dias completos no fuso do usuário, com limites no timestamp sem cast na coluna."""
+    limits = {}
+    if date_from:
+        limits['created_at__gte'] = timezone.make_aware(datetime.combine(date_from, time.min), time_zone)
+    if date_to:
+        limits['created_at__lte'] = timezone.make_aware(datetime.combine(date_to, time.max), time_zone)
+    return queryset.filter(**limits)
 
 
 def price_series(catalog_product_ids, since, until):

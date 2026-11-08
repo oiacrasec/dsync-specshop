@@ -15,6 +15,21 @@ produto e sem fila (ADR 2003 §4). Contrato completo em [openapi-v1.yaml](openap
 `mercado_livre`), `seller_states` (UFs; vazio = todas) e `destination_zip` (CEP com ou sem
 hífen; guarda 8 dígitos). Escopo: organização ativa (ADR 2003 §1); auditoria `search.created`.
 
+**Filtros da lista** (`GET /searches/`), combinados com AND e aplicados antes da paginação:
+
+| Parâmetro | Semântica |
+|---|---|
+| `search` | trecho do nome **ou** modelo dos produtos usados na pesquisa, sem diferenciar maiúsculas; não repete pesquisas que contenham vários produtos correspondentes |
+| `date_from` | data inicial inclusiva, `AAAA-MM-DD`, desde o início do dia no fuso do usuário (ou fuso do sistema se o perfil não definir) |
+| `date_to` | data final inclusiva, `AAAA-MM-DD`, até o fim do dia no mesmo fuso |
+| `ordering` | `created_at` ou `-created_at`; padrão: mais recentes primeiro, com desempate por `public_id` |
+
+Datas inválidas ou período invertido retornam 422 RFC 9457 (`validation-error`, `errors`
+por campo). O schema expõe produto na busca geral e datas com `type: date`,
+`placement: general`; o frontend apresenta De/Até sem hora. A busca usa `EXISTS` dos itens
+correlacionados à pesquisa e o período filtra o timestamp por limites, sem cast de data.
+O escopo da organização/contrato permanece aplicado pelo core.
+
 **Execução de uma linha** (`run`/`retry`): a tela dispara até 3 em paralelo.
 
 1. Reserva a linha sob lock como `running`; outra execução da mesma linha → 409

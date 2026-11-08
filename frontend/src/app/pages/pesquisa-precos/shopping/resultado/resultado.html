@@ -6,20 +6,14 @@
         </div>
         <div class="flex items-center gap-2">
             @if (canRun && hasPending && !running()) {
-            <ui-button label="Continuar pesquisa" icon="pi pi-play" (onClick)="continueSearch()"></ui-button>
+            <ui-button label="Continuar pesquisa" icon="fa-solid fa-play" severity="secondary" outlined (onClick)="continueSearch()"></ui-button>
             }
             <ui-button label="Voltar" icon="fa-solid fa-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
             @if (canRun) {
-            <ui-button label="Nova pesquisa" icon="fa-solid fa-plus" severity="secondary" text (onClick)="create()"></ui-button>
+            <ui-button label="Nova pesquisa" icon="fa-solid fa-plus" (onClick)="create()"></ui-button>
             }
         </div>
     </div>
 
-    <ui-table [value]="rows()" [columns]="columns" [lazy]="false" [paginator]="false" emptyMessage="Nenhum produto nesta pesquisa.">
-        <ng-template #actions let-row>
-            @if (canRetryRow(row)) {
-            <ui-button label="Tentar de novo" icon="pi pi-refresh" severity="secondary" text (onClick)="retry(row)"></ui-button>
-            }
-        </ng-template>
-    </ui-table>
+    <ui-table [value]="rows()" [columns]="columns" [totalRecords]="rows().length" [lazy]="false" [actions]="canRetry ? tableActions : []" emptyMessage="Nenhum produto nesta pesquisa."></ui-table>
 </div>

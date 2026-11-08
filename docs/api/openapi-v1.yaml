@@ -3770,6 +3770,18 @@ paths:
           type: string
         description: public_id da organização ativa (ADR 0006).
         required: true
+      - in: query
+        name: date_from
+        schema:
+          type: string
+          format: date
+        description: De
+      - in: query
+        name: date_to
+        schema:
+          type: string
+          format: date
+        description: Até
       - name: first
         in: query
         required: false

@@ -17,7 +17,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 | 1c · Confirmar correspondência | produtos do catálogo da fonte com checkbox; kits e modelos diferentes ficam de fora | DT-04, ADR 2002 item 10 |
 | 1d · Arquivar produto | confirmação; o produto sai da lista e o histórico é mantido | proposta (ver pendências) |
 | 1e · Lista vazia | grade com "Nenhum registro encontrado." (`emptyMessage` do `ui-table`) | — |
-| 2 · Shopping: pesquisas | grid `ui-table`, com Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP de entrega e Ações (⋯ → Abrir); botão Nova pesquisa por permissão | ajuste da 2.3, aplicado |
+| 2 · Shopping: pesquisas | grid `ui-table`, com busca pelo produto usado e período De/Até visível, sem hora; Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP e Ações (⋯ → Abrir); Nova pesquisa por permissão | ajuste da 2.3, aplicado |
 | 2a · Shopping: resultado | uma linha por produto e fonte; concluída, indisponível; Pix quando a extensão captura; tentar de novo | RF-03, RQ-03, ADR 2002 |
 | 2b · Shopping: instalar extensão | diálogo com "Pesquisar só o catálogo" e "Instalar extensão" | ADR 2002 item 7 |
 | 2c · Shopping: nova pesquisa | até 10 produtos, fontes, UF do vendedor e CEP de entrega; pesquisa só no clique | RF-29, RF-25, D-16, D-22 |
@@ -36,6 +36,12 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 - **Grid paginada pelo servidor:** schema e data/fuso reutilizados pelo `BaseCrudService`;
   quantidade conta produtos distintos entre as fontes. UF vazia aparece como Todas, CEP
   com máscara e sem destino como travessão. Criar pesquisa invalida o cache da lista.
+- **Filtros do Shopping:** busca por nome/modelo dos produtos que a pesquisa usou e período
+  De/Até na barra geral, só data. O servidor inclui dias completos no fuso do perfil e
+  não duplica pesquisas; período invertido mostra mensagem de correção.
+- **Resultado no padrão do `ui-table`:** contagem/paginação padrão e menu ⋯ com Tentar de novo
+  apenas em linhas elegíveis e com permissão. Nova pesquisa usa botão preenchido; Continuar
+  pesquisa é secundário. Reabrir o resultado continua sem disparar coleta.
 - **Dashboard macro**: só contagens e variações por produto; nunca soma preços de produtos
   diferentes (RF-22).
 

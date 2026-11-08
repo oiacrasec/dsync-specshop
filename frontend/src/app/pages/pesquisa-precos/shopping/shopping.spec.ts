@@ -16,6 +16,9 @@ import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import { CONTEXT_KEY, SESSION_KEY } from '@/app/core/utils/session-data';
 import { PROJECT_MENU } from '@/app/project/project.menu';
 import { UiTable } from '@/app/shared/ui/table/table';
+import { UiFilter } from '@/app/shared/ui/filter/filter';
+import { UiInputDate } from '@/app/shared/ui/input-date/input-date';
+import { UiButton } from '@/app/shared/ui/button/button';
 import { LoginResponse } from '@/app/types/auth';
 import { PriceSearch, PriceSearchItem } from '@/app/types/pesquisa';
 import routes from '../pesquisa-precos.routes';
@@ -31,8 +34,11 @@ const SEARCH_SCHEMA = {
         { field: 'created_at', label: 'Criada em', type: 'datetime' },
         { field: 'destination_zip', label: 'CEP', type: 'text' }
     ],
-    filters: [],
-    general_search: null,
+    filters: [
+        { field: 'date_from', label: 'De', type: 'date', placement: 'general' },
+        { field: 'date_to', label: 'Até', type: 'date', placement: 'general' }
+    ],
+    general_search: { parameter: 'search', label: 'Busca geral', fields: [{ field: 'product', label: 'Produto', lookup: 'icontains' }] },
     ordering_fields: ['created_at']
 };
 
@@ -220,6 +226,93 @@ describe('Shopping', () => {
         expect(navigate).toHaveBeenCalledWith('/pages/pesquisa-precos/shopping/nova');
         TestBed.createComponent(NewSearchPage).componentInstance.goBack();
         expect(navigate).toHaveBeenCalledWith('/pages/pesquisa-precos/shopping');
+        controller.verify();
+    });
+
+    it('envia o produto e o período visível da barra ao servidor como datas sem hora', async () => {
+        const controller = configure(['search:view']);
+        const fixture = TestBed.createComponent(ShoppingPage);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/searches/schema/').flush(SEARCH_SCHEMA);
+        controller.expectOne((request) => request.url === '/api/v1/searches/').flush({ data: [], total_records: 0 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const filter = fixture.debugElement.query(By.directive(UiFilter)).componentInstance as UiFilter;
+        const dates = fixture.debugElement.queryAll(By.directive(UiInputDate));
+
+        expect(fixture.nativeElement.querySelectorAll('.ui-filter-bar ui-input-date').length).toBe(2);
+        expect(filter.generalPlaceholder).toBe('Buscar por produto');
+        filter.generalTerm = 'Epson';
+        dates[0].componentInstance.handleChange('07/11/2026');
+        const start = controller.expectOne((request) => request.url === '/api/v1/searches/');
+
+        expect(start.request.params.get('search')).toBe('Epson');
+        expect(start.request.params.get('date_from')).toBe('2026-11-07');
+        start.flush({ data: [], total_records: 0 });
+        dates[1].componentInstance.handleChange('08/11/2026');
+        const period = controller.expectOne((request) => request.url === '/api/v1/searches/');
+
+        expect(period.request.params.get('date_from')).toBe('2026-11-07');
+        expect(period.request.params.get('date_to')).toBe('2026-11-08');
+        expect(period.request.params.get('first')).toBe('0');
+        period.flush({ data: [], total_records: 0 });
+        controller.expectNone('/api/v1/searches/schema/');
+        controller.verify();
+    });
+
+    it('usa Nova pesquisa preenchido e menu compacto só nas linhas com nova tentativa', async () => {
+        const controller = configure(['search:view', 'search:create', 'search:update'], SEARCH_ID);
+        const fixture = TestBed.createComponent(ShoppingResultadoPage);
+
+        fixture.detectChanges();
+        controller.expectOne(`/api/v1/searches/${SEARCH_ID}/`).flush(search([item(1, { status: 'error' }), item(2, { status: 'done' })]));
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const table = fixture.debugElement.query(By.directive(UiTable)).componentInstance as UiTable;
+        const buttons = fixture.debugElement.queryAll(By.directive(UiButton)).map((element) => element.componentInstance as UiButton);
+        const create = buttons.find((button) => button.label === 'Nova pesquisa');
+
+        expect(create?.severity).toBeUndefined();
+        expect(create?.text).toBeFalse();
+        expect(table.actionsTemplate).toBeUndefined();
+        expect(fixture.nativeElement.querySelector('.ui-table-count')?.textContent.trim()).toBe('2 registros');
+        const menuButtons = fixture.nativeElement.querySelectorAll('.ui-table-actions-col--compact button[aria-label="Ações"]') as NodeListOf<HTMLButtonElement>;
+
+        expect(menuButtons.length).toBe(1);
+        menuButtons[0].click();
+        fixture.detectChanges();
+        const retry = table.menuItems[0].command;
+
+        expect(table.menuItems[0].label).toBe('Tentar de novo');
+        retry?.({});
+        controller.expectOne(`/api/v1/searches/${SEARCH_ID}/items/${itemId(1)}/retry/`).flush(item(1, { status: 'done' }));
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelectorAll('.ui-table-actions-col--compact button[aria-label="Ações"]').length).toBe(0);
+        retry?.({});
+        controller.expectNone((request) => request.url.endsWith('/retry/'));
+        controller.verify();
+    });
+
+    it('informa como corrigir o período inválido e encerra o carregamento da grid', async () => {
+        const controller = configure(['search:view']);
+        const add = spyOn(TestBed.inject(MessageService), 'add');
+        const fixture = TestBed.createComponent(ShoppingPage);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/searches/schema/').flush(SEARCH_SCHEMA);
+        controller.expectOne((request) => request.url === '/api/v1/searches/').flush({ data: [], total_records: 0 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const table = fixture.debugElement.query(By.directive(UiTable)).componentInstance as UiTable;
+
+        table.handleFiltersChange({ date_from: '2026-11-08', date_to: '2026-11-07' });
+        controller
+            .expectOne((request) => request.url === '/api/v1/searches/')
+            .flush({ type: 'urn:dsync:problem:validation-error', status: 422, errors: { date_to: ['A data final deve ser igual ou posterior à data inicial.'] } }, { status: 422, statusText: 'Unprocessable Entity' });
+        expect(add).toHaveBeenCalledWith(jasmine.objectContaining({ detail: 'A data final deve ser igual ou posterior à data inicial.' }));
+        expect(table.loading).toBeFalse();
         controller.verify();
     });
 

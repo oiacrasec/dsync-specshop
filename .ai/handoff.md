@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:06
+- **Atualizado em:** 2026-11-07 21:29
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 32882fe docs(design): align the Shopping grid with ui-table
+- **Último commit anterior a esta etapa:** 281f25c Merge core UI filters and row actions
 
 ## Situação
 
@@ -17,6 +17,10 @@
 
 - Usuário aprovou aplicar a grid desenhada no FigCraft. Shopping usa o `ui-table` real:
   Data, Produtos (quantidade distinta entre fontes), UF, CEP e Ações (⋯ → Abrir).
+- Revisão aplicada: busca geral por nome/modelo de produto usado, De/Até visíveis sem hora.
+  API usa EXISTS sem duplicar pesquisas e dias completos no fuso do usuário; erro 422 por campo.
+- Resultado com Nova pesquisa preenchido, Continuar secundário e menu ⋯ por linha elegível;
+  contagem/paginação padrão. Nova tentativa revalida a situação atual antes de enviar.
 - `/shopping` exige `search:view`; `/shopping/nova` exige `search:create`.
   Formulário preservado em `shopping/new-search/`; Nova pesquisa condicionado à permissão.
 - Abrir navega ao resultado existente sem coletar. Pesquisar cria e abre com `autorun`.
@@ -24,9 +28,11 @@
 - `ShoppingService.list` usa `BaseCrudService.listTable`, paginação/ordenação no servidor
   (`-created_at` por padrão), schema em cache e transformação só dos itens da página.
   Criar invalida o cache da lista. CEP formatado, UF vazia = Todas, CEP vazio = travessão.
-- FigCraft e `telas.md` sincronizados. Código do core e backend sem alterações.
-- Validação: 10 testes do Shopping em Chrome Headless, lint, format:check e build passaram.
-  Navegador precisou executar fora do sandbox. Sem novas dependências.
+- Core: b1310d8 (ações condicionais), 637feee (datas gerais), merge 281f25c; sem push.
+  FigCraft atualizado via CLI após fechamento do editor. OpenAPI regenerado e docs sincronizadas.
+- Validação: 20 testes da API, 15 de componentes/adaptador e 13 do Shopping no Chrome Headless;
+  lint/formato backend/frontend, build, check, check --deploy e migrations pendentes OK.
+  Query count constante com 1/20 pesquisas, página 10; não é benchmark de produção.
 - Concluídas no plano: 0.1, 0.2, 1.1–1.3 e 2.1–2.3. Histórico detalhado no plano/log.
 
 ## Contexto do projeto
@@ -46,8 +52,8 @@
 
 - Não imprimir/versionar segredos do `backend/.env` (incluindo credenciais do Mercado Livre).
   Push só quando pedido; core e SPECSHOP têm commits locais sem push.
-- Sem `.venv` local; sessão anterior usou `../datasync-core/.venv` (Python 3.14), banco
-  `dsync_spechop`. Consultar SDK do PyCharm antes de qualquer comando Python.
+- SDK local `.venv` (Python 3.14) existe sem dependências. Testes usaram o executável do SDK
+  com PYTHONPATH apontando a `../datasync-core/.venv/Lib/site-packages`; banco `dsync_spechop`.
 - Falhas conhecidas do core neste Windows: testes de leitura de fontes em cp1252 e schema
   OpenAPI/fusos (`test_views_and_serializers_extend_the_project_bases`,
   `test_nobody_uses_django_file_storage_directly`, `test_versioned_schema_file_matches_the_code`).

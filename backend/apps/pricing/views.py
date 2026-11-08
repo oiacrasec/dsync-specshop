@@ -27,6 +27,13 @@ class PriceSearchViewSet(BaseModelViewSet):
     schema_columns = ('created_at', 'destination_zip')
     schema_filters = ()
 
+    def get_schema_filters(self):
+        return [
+            *super().get_schema_filters(),
+            {'field': 'date_from', 'label': 'De', 'type': 'date', 'placement': 'general'},
+            {'field': 'date_to', 'label': 'Até', 'type': 'date', 'placement': 'general'},
+        ]
+
     def get_queryset(self):
         items = PriceSearchItem.objects.select_related('product').order_by('product__name', 'source', 'pk')
         return super().get_queryset().prefetch_related(Prefetch('items', queryset=items))
