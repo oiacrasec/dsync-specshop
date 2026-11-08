@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:58
+- **Atualizado em:** 2026-11-07 22:03
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 07b11a3 feat(catalog): show archived column after EAN
+- **Último commit anterior a esta etapa:** 1f80606 Merge core UI workflow preferences
 
 ## Situação
 
@@ -14,6 +14,9 @@
 | Aguardando o usuário? | sim — aprovação do escopo da 3.1 antes de iniciar |
 
 ## Feito nesta etapa
+
+- Lição registrada em modo-de-trabalho (core 9b2edd1, merge 1f80606): padrão ao máximo;
+  desvio só após perguntar; validar FigCraft antes de desenvolver e conferir desenho/tela juntos.
 
 - FigCraft Meus produtos sincronizado com código/schema: seis colunas, busca completa,
   só Arquivado nos avançados; variantes 1f–1i (painel aberto, Sim/Todos/Não), sem ações nos arquivados.
