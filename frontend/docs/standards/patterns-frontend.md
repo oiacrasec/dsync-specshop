@@ -132,3 +132,10 @@ Guards:
   mesmo quando só tem ela; seções extras viram abas seguintes (ex.: Permissões em perfil e
   usuário). Cabeçalho, Voltar e Cancelar/Salvar ficam fora das abas. Referência: formulário de contratos.
 - Em formularios com abas, `Observação` deve ser sempre a ultima aba.
+
+- `UiTableAction.visible(row)` limita uma ação às linhas às quais se aplica; sem predicado,
+  a ação continua disponível em todas as linhas. O menu compacto é omitido quando a linha
+  não tem ações. Botões e menus usam a mesma regra; o backend continua validando permissões.
+- Filtros do schema podem declarar `placement: general` para datas visíveis junto à busca.
+  Datas usam `ui-input-date` (calendário e máscara pelo locale) e enviam somente ISO de data,
+  sem hora. O padrão sem `placement` continua em Filtros avançados; Limpar zera ambos.

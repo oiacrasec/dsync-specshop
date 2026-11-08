@@ -42,6 +42,7 @@ export interface UiTableAction<T = any> {
     icon?: string;
     severity?: TagSeverity;
     handler?: (row: T) => void;
+    visible?: (row: T) => boolean;
 }
 
 export interface UiTableListResponse<T> {
@@ -385,6 +386,7 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
             nextFilters.map((filter) => ({
                 field: filter.field,
                 type: filter.type,
+                placement: filter.placement,
                 lookups: filter.lookups ?? [],
                 choices: filter.choices ?? []
             }))
@@ -432,8 +434,12 @@ export class UiTable<T = any> implements OnInit, OnChanges, OnDestroy {
         return match ? match.label : value;
     }
 
+    getRowActions(row: T): UiTableAction<T>[] {
+        return this.actions.filter((action) => !action.visible || action.visible(row));
+    }
+
     private buildMenuItems(row: T): MenuItem[] {
-        return this.actions.map((action) => ({
+        return this.getRowActions(row).map((action) => ({
             label: action.label,
             icon: action.icon,
             command: () => action.handler?.(row)

@@ -62,7 +62,7 @@ function toFilter(filter: SchemaFilter, baseUrl: string): UiFilterField {
         field: filter.field,
         header: filter.label,
         type: filter.type === 'datetime' ? 'date' : filter.type,
-        placement: 'advanced'
+        placement: filter.placement ?? 'advanced'
     };
 
     if (filter.type === 'choice') {

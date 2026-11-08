@@ -8,6 +8,10 @@
         </label>
         } @else {
         <span class="flex-1"></span>
+        } @for (filter of inlineFilters; track filter.field) {
+        <div class="ui-filter-inline-field">
+            <ui-input-date [inputId]="'ui-filter-' + filter.field" [label]="filter.header" [locale]="locale" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()" />
+        </div>
         } @if (hasAdvancedFilters) {
         <span class="ui-filter-divider bg-surface-200 dark:bg-surface-700" aria-hidden="true"></span>
         <button type="button" class="ui-filter-action text-surface-950 dark:text-surface-0" [class.ui-filter-action-open]="advancedOpen" [attr.aria-expanded]="advancedOpen" aria-controls="ui-filter-advanced" (click)="toggleAdvanced()">
@@ -64,6 +68,8 @@
                 [ngModel]="advancedValues[filter.field]"
                 (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()"
             ></p-select>
+            } @case ('date') {
+            <ui-input-date [inputId]="'ui-filter-' + filter.field" [locale]="locale" [ngModel]="advancedValues[filter.field]" (ngModelChange)="advancedValues[filter.field] = $event; onAdvancedChange()" />
             } @case ('relation') {
             <ui-autocomplete
                 [inputId]="'ui-filter-' + filter.field"
