@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:29
+- **Atualizado em:** 2026-11-07 21:33
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 281f25c Merge core UI filters and row actions
+- **Último commit anterior a esta etapa:** 1c4fc0c fix(shopping): add search filters and standardize results
 
 ## Situação
 
@@ -19,6 +19,8 @@
   Data, Produtos (quantidade distinta entre fontes), UF, CEP e Ações (⋯ → Abrir).
 - Revisão aplicada: busca geral por nome/modelo de produto usado, De/Até visíveis sem hora.
   API usa EXISTS sem duplicar pesquisas e dias completos no fuso do usuário; erro 422 por campo.
+- Removido do schema o filtro Ativo herdado. De/Até usam `ui-input-date`; teste com Aura
+  comprova os dois botões visíveis e abertura dos calendários ao clicar. FigCraft atualizado.
 - Resultado com Nova pesquisa preenchido, Continuar secundário e menu ⋯ por linha elegível;
   contagem/paginação padrão. Nova tentativa revalida a situação atual antes de enviar.
 - `/shopping` exige `search:view`; `/shopping/nova` exige `search:create`.

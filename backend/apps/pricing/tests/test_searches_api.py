@@ -147,6 +147,7 @@ def test_search_date_period_includes_complete_days_in_the_user_time_zone(world):
     schema = client(world).get(URL + 'schema/').json()
     assert schema['general_search']['fields'] == [{'field': 'product', 'label': 'Produto', 'lookup': 'icontains'}]
     dates_schema = [field for field in schema['filters'] if field['field'].startswith('date_')]
+    assert len(schema['filters']) == 2
     assert [(field['field'], field['type'], field['placement']) for field in dates_schema] == [
         ('date_from', 'date', 'general'),
         ('date_to', 'date', 'general'),

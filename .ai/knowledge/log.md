@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Remoção do filtro Ativo do Shopping
+
+- `PriceSearchViewSet.get_schema_filters` publica somente De/Até; não herda o filtro
+  técnico `is_active`. Sem mudanças no core ou nas consultas de dados da listagem.
+- De/Até já usam `ui-input-date`; teste da tela com tema Aura agora verifica botões
+  visíveis dentro dos campos e abertura real do calendário pelo clique em ambos.
+- 20 testes da API e 13 do Shopping passaram. Desenho atualizado sem Filtros avançados.
+
 ## 2026-11-07 — Filtros do Shopping e padrão da grid de resultado
 
 - API `searches`: `search` por nome/modelo de produto usado via `EXISTS` correlacionado;

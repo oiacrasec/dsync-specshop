@@ -39,6 +39,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 - **Filtros do Shopping:** busca por nome/modelo dos produtos que a pesquisa usou e período
   De/Até na barra geral, só data. O servidor inclui dias completos no fuso do perfil e
   não duplica pesquisas; período invertido mostra mensagem de correção.
+  Não há filtro Ativo. De/Até usam `ui-input-date` com botão que abre o calendário.
 - **Resultado no padrão do `ui-table`:** contagem/paginação padrão e menu ⋯ com Tentar de novo
   apenas em linhas elegíveis e com permissão. Nova pesquisa usa botão preenchido; Continuar
   pesquisa é secundário. Reabrir o resultado continua sem disparar coleta.

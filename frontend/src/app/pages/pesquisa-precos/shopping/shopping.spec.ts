@@ -7,6 +7,8 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Navigation, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 import { authInterceptor } from '@/app/core/interceptors/auth.interceptor';
 import { AuthSessionService } from '@/app/core/services/auth-session.service';
@@ -85,6 +87,7 @@ function configure(codes: string[], routeId: string | null = null) {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
+            providePrimeNG({ theme: { preset: Aura } }),
             provideRouter([]),
             provideHttpClient(withInterceptors([authInterceptor])),
             provideHttpClientTesting(),
@@ -242,6 +245,23 @@ describe('Shopping', () => {
         const dates = fixture.debugElement.queryAll(By.directive(UiInputDate));
 
         expect(fixture.nativeElement.querySelectorAll('.ui-filter-bar ui-input-date').length).toBe(2);
+        expect(filter.hasAdvancedFilters).toBeFalse();
+
+        for (const field of Array.from(fixture.nativeElement.querySelectorAll('.ui-filter-inline-field')) as HTMLElement[]) {
+            const calendar = field.querySelector('button[aria-haspopup="dialog"]') as HTMLButtonElement;
+
+            expect(calendar).not.toBeNull();
+            expect(calendar.getBoundingClientRect().width).toBeGreaterThan(0);
+            expect(calendar.getBoundingClientRect().right).toBeLessThanOrEqual(field.getBoundingClientRect().right + 1);
+            calendar.click();
+            fixture.detectChanges();
+            await fixture.whenStable();
+            expect(document.body.querySelector('.p-datepicker-panel')).not.toBeNull();
+            calendar.click();
+            fixture.detectChanges();
+            await fixture.whenStable();
+        }
+
         expect(filter.generalPlaceholder).toBe('Buscar por produto');
         filter.generalTerm = 'Epson';
         dates[0].componentInstance.handleChange('07/11/2026');

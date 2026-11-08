@@ -30,6 +30,9 @@ por campo). O schema expõe produto na busca geral e datas com `type: date`,
 correlacionados à pesquisa e o período filtra o timestamp por limites, sem cast de data.
 O escopo da organização/contrato permanece aplicado pelo core.
 
+O schema de pesquisas expõe somente os filtros De/Até, além da busca geral por produto;
+o filtro técnico herdado `is_active` não é apresentado nesta tela.
+
 **Execução de uma linha** (`run`/`retry`): a tela dispara até 3 em paralelo.
 
 1. Reserva a linha sob lock como `running`; outra execução da mesma linha → 409
