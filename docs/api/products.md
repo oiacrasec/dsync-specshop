@@ -17,6 +17,8 @@
 | Contrato | vem do contexto; `contract` no payload é ignorado |
 
 O schema expõe somente Arquivado nos filtros avançados, sem Marca ou Situação (`is_active`).
+As colunas são Nome, Modelo, Marca, EAN e Arquivado (`is_archived`, tipo `boolean`);
+o frontend usa a apresentação booleana padrão do `ui-table` (Sim/Não).
 Marca continua na busca geral; o parâmetro individual `brand` da API permanece compatível.
 Sem filtro de arquivamento,
 a lista continua mostrando somente não arquivados. Consultar arquivados amplia **apenas a

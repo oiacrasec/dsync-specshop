@@ -33,6 +33,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 - **Filtros de Meus produtos:** apenas Arquivado (Não/Sim/Todos) nos avançados; marca já
   participa da busca geral junto com nome/modelo/EAN. Sem Situação. Padrão:
   somente não arquivados. Arquivados são consultáveis na lista, com ações de escrita ocultas.
+- **Coluna Arquivado em Meus produtos:** após EAN, booleano Sim/Não pelo padrão do `ui-table`.
 - **Shopping como lista de pesquisas:** `/shopping` exige `search:view`; `/shopping/nova`
   exige `search:create`. Abrir leva a `/shopping/:id` sem iniciar coleta; só Pesquisar
   no formulário solicita execução. Voltar/Cancelar retornam à lista.

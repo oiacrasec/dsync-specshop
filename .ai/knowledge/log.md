@@ -1,5 +1,14 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Coluna Arquivado após EAN
+
+- Schema de produtos acrescenta `is_archived` com rótulo Arquivado e tipo boolean após EAN.
+  Reutiliza o campo somente leitura já existente e o mapeamento Sim/Não do `ui-table`.
+- Sem alteração nas consultas, payload de dados ou core. Testes existentes verificam a
+  ordem das colunas na API e a apresentação Sim/Não na grid para cada estado.
+- Validação: 21 testes do catálogo e 9 de Produtos no Chrome Headless, lint/formato e build
+  passaram; OpenAPI regenerado sem avisos e sem alteração no contrato estático.
+
 ## 2026-11-07 — Marca somente na busca geral de Meus produtos
 
 - Schema de produtos expõe apenas Arquivado nos filtros avançados; Marca permanece na

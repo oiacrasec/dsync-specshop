@@ -114,7 +114,13 @@ describe('Meus produtos', () => {
 
         fixture.detectChanges();
         controller.expectOne('/api/v1/products/schema/').flush({
-            columns: [{ field: 'name', label: 'Nome', type: 'text' }],
+            columns: [
+                { field: 'name', label: 'Nome', type: 'text' },
+                { field: 'model', label: 'Modelo', type: 'text' },
+                { field: 'brand', label: 'Marca', type: 'text' },
+                { field: 'ean', label: 'EAN', type: 'text' },
+                { field: 'is_archived', label: 'Arquivado', type: 'boolean' }
+            ],
             filters: [
                 {
                     field: 'archived',
@@ -137,6 +143,12 @@ describe('Meus produtos', () => {
         const filter = fixture.debugElement.query(By.directive(UiFilter)).componentInstance as UiFilter;
 
         expect(filter.filters.map((field) => field.header)).toEqual(['Arquivado']);
+        expect(
+            Array.from(fixture.nativeElement.querySelectorAll('th') as NodeListOf<HTMLElement>)
+                .slice(0, 5)
+                .map((cell) => cell.textContent?.trim())
+        ).toEqual(['Nome', 'Modelo', 'Marca', 'EAN', 'Arquivado']);
+        expect(fixture.nativeElement.querySelector('tbody tr td:nth-child(5)')?.textContent.trim()).toBe('Não');
         expect(table.getRowActions(PRODUCT).length).toBe(2);
         filter.advancedValues['archived'] = 'true';
         filter.onAdvancedChange();
@@ -147,6 +159,7 @@ describe('Meus produtos', () => {
         await fixture.whenStable();
         fixture.detectChanges();
         expect(table.getRowActions(table.tableValue[0])).toEqual([]);
+        expect(fixture.nativeElement.querySelector('tbody tr td:nth-child(5)')?.textContent.trim()).toBe('Sim');
         expect(fixture.nativeElement.querySelector('.ui-table-actions-col button')).toBeNull();
         fixture.componentInstance.archive(table.tableValue[0]);
         controller.expectNone((request) => request.method === 'DELETE');

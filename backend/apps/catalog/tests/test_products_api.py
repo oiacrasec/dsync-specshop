@@ -182,6 +182,8 @@ def test_archived_filter_is_scoped_and_does_not_reopen_details_or_options(world)
     assert api.delete(detail(archived)).status_code == 404
     assert api.get(URL + 'options/', {'q': 'OLD'}).json()['data'] == []
     schema = api.get(URL + 'schema/').json()
+    assert [field['field'] for field in schema['columns']] == ['name', 'model', 'brand', 'ean', 'is_archived']
+    assert schema['columns'][-1] == {'field': 'is_archived', 'label': 'Arquivado', 'type': 'boolean'}
     assert [field['field'] for field in schema['filters']] == ['archived']
     assert 'brand' in [field['field'] for field in schema['general_search']['fields']]
     archived_filter = schema['filters'][0]
