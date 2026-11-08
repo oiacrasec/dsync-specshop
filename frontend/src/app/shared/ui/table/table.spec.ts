@@ -170,3 +170,40 @@ describe('UiTable — coluna choice-tag', () => {
         expect(table.resolveChoiceSeverity(table.columns[0], 'outro')).toBe('secondary');
     });
 });
+
+describe('UiTable — ações por linha', () => {
+    beforeEach(() => {
+        TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([]), provideHttpClient(), { provide: API_BASE_URL, useValue: '/api/v1' }] });
+    });
+
+    afterEach(() => TestBed.resetTestingModule());
+
+    it('mantém o menu compacto e omite ações que não se aplicam à linha', async () => {
+        const fixture = TestBed.createComponent(UiTable);
+        const table = fixture.componentInstance as UiTable<{ public_id: string; status: string }>;
+        const failed = { public_id: '1', status: 'error' };
+        const done = { public_id: '2', status: 'done' };
+        const handler = jasmine.createSpy('retry');
+
+        table.value = [failed, done];
+        table.totalRecords = 2;
+        table.lazy = false;
+        table.columns = [{ field: 'status', header: 'Situação' }];
+        table.actions = [{ id: 'retry', label: 'Tentar de novo', visible: (row) => row.status === 'error', handler }];
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const rows = fixture.nativeElement.querySelectorAll('tbody tr') as NodeListOf<HTMLElement>;
+
+        expect(rows[0].querySelector('.ui-table-actions-col--compact button')).not.toBeNull();
+        expect(rows[1].querySelector('.ui-table-actions-col--compact button')).toBeNull();
+        table.openMenu(new Event('click'), { show: jasmine.createSpy('show') }, failed);
+        expect(table.menuItems.map((item) => item.label)).toEqual(['Tentar de novo']);
+        table.menuItems[0].command?.({});
+        expect(handler).toHaveBeenCalledOnceWith(failed);
+        table.openMenu(new Event('click'), { show: jasmine.createSpy('show') }, done);
+        expect(table.menuItems).toEqual([]);
+        table.actions = [{ id: 'open', label: 'Abrir', handler }];
+        expect(table.getRowActions(done).length).toBe(1);
+    });
+});

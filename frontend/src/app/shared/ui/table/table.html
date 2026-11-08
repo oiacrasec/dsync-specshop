@@ -60,18 +60,18 @@
             <td class="ui-table-actions-col" [class.ui-table-actions-col--compact]="!actionsTemplate && actionsMode === 'menu'">
                 @if (actionsTemplate) {
                 <ng-container [ngTemplateOutlet]="actionsTemplate" [ngTemplateOutletContext]="{ $implicit: row }"></ng-container>
-                } @else { @if (actionsMode === 'menu') {
+                } @else { @if (getRowActions(row).length) { @if (actionsMode === 'menu') {
                 <div class="ui-table-actions-wrapper ui-table-actions-wrapper--compact">
                     <p-menu #rowMenu [popup]="true" [appendTo]="'body'" [model]="menuItems"></p-menu>
                     <ui-button icon="pi pi-ellipsis-h" severity="secondary" text styleClass="ui-table-menu-button" ariaLabel="Ações" (onClick)="openMenu($event, rowMenu, row)"></ui-button>
                 </div>
                 } @else {
                 <div class="ui-table-actions-wrapper gap-1">
-                    @for (action of actions; track action.id) {
+                    @for (action of getRowActions(row); track action.id) {
                     <ui-button [icon]="action.icon" [severity]="action.severity" text (onClick)="action.handler?.(row)"></ui-button>
                     }
                 </div>
-                } }
+                } } }
             </td>
             }
         </tr>

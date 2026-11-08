@@ -1,5 +1,12 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Ações condicionais no ui-table
+
+- `UiTableAction.visible(row)` e `getRowActions` preservam o menu compacto e omitem
+  ações que não se aplicam à linha, em menus e botões. Sem predicado, comportamento anterior.
+- Teste renderizado comprova omissão por linha e execução do handler. Lint, format:check,
+  build e 14 testes de componentes/adaptador passaram. Sem novas dependências.
+
 ## 2026-11-07 — Coluna choice-tag no ui-table
 
 - `shared/ui/table`: tipo de coluna `choice-tag` (opção → rótulo e severidade da tag), para

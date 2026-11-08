@@ -79,3 +79,8 @@ Nada disso foi iniciado; nenhum repositório do SPECSHOP foi criado.
 - Python: /home/cesar/Virtual/datasync-core-3.14/bin/python. Suíte completa após
   subconjuntos: `pytest --reuse-db --create-db`.
 - Não reativar telas DESABILITADO. FigCraft: `figcraft --control 7710` / MCP `--attach 7710`.
+
+## Componentes — 2026-11-07
+
+- ui-table: ações condicionais por linha com visible(row), sem mudar o padrão das demais telas.
+- Validados lint, formato, build e testes no Chrome Headless. Sem push; deploy acima segue pendente.

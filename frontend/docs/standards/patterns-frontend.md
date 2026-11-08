@@ -132,3 +132,7 @@ Guards:
   mesmo quando só tem ela; seções extras viram abas seguintes (ex.: Permissões em perfil e
   usuário). Cabeçalho, Voltar e Cancelar/Salvar ficam fora das abas. Referência: formulário de contratos.
 - Em formularios com abas, `Observação` deve ser sempre a ultima aba.
+
+- `UiTableAction.visible(row)` limita uma ação às linhas às quais se aplica; sem predicado,
+  a ação continua disponível em todas as linhas. O menu compacto é omitido quando a linha
+  não tem ações. Botões e menus usam a mesma regra; o backend continua validando permissões.
