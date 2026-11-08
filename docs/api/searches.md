@@ -26,7 +26,7 @@ hífen; guarda 8 dígitos). Escopo: organização ativa (ADR 2003 §1); auditori
 
 Datas inválidas ou período invertido retornam 422 RFC 9457 (`validation-error`, `errors`
 por campo). O schema expõe produto na busca geral e datas com `type: date`,
-`placement: general`; o frontend apresenta De/Até sem hora. A busca usa `EXISTS` dos itens
+`placement: advanced`; o frontend apresenta De/Até sem hora em Filtros avançados. A busca usa `EXISTS` dos itens
 correlacionados à pesquisa e o período filtra o timestamp por limites, sem cast de data.
 O escopo da organização/contrato permanece aplicado pelo core.
 

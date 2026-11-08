@@ -29,8 +29,8 @@ class PriceSearchViewSet(BaseModelViewSet):
 
     def get_schema_filters(self):
         return [
-            {'field': 'date_from', 'label': 'De', 'type': 'date', 'placement': 'general'},
-            {'field': 'date_to', 'label': 'Até', 'type': 'date', 'placement': 'general'},
+            {'field': 'date_from', 'label': 'De', 'type': 'date', 'placement': 'advanced'},
+            {'field': 'date_to', 'label': 'Até', 'type': 'date', 'placement': 'advanced'},
         ]
 
     def get_queryset(self):

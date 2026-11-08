@@ -1,5 +1,13 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Período do Shopping nos filtros avançados
+
+- Revisão do usuário: schema de pesquisas marca De/Até como `placement: advanced`;
+  só produto permanece na busca geral. `ui-input-date` e botões de calendário preservados.
+- Teste da tela confirma campos ocultos inicialmente, abre Filtros avançados e os dois
+  calendários, e verifica os mesmos parâmetros ISO. 20 testes API e 13 Shopping passaram;
+  lint/formato e build OK. FigCraft e documentação sincronizados. Sem alteração nas queries.
+
 ## 2026-11-07 — Filtro Arquivado em Meus produtos
 
 - `apps/catalog`: schema sem `is_active`; filtro `archived=false/true/all`, Não/Sim/Todos.

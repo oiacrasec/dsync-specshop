@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:38
+- **Atualizado em:** 2026-11-07 21:41
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** c665eb3 fix(shopping): remove the unrelated active filter
+- **Último commit anterior a esta etapa:** 452eb95 feat(catalog): filter products by archived status
 
 ## Situação
 
@@ -21,7 +21,8 @@
   lint/formato/build/check/migrations pendentes passaram. OpenAPI e docs atualizados.
 - Usuário aprovou aplicar a grid desenhada no FigCraft. Shopping usa o `ui-table` real:
   Data, Produtos (quantidade distinta entre fontes), UF, CEP e Ações (⋯ → Abrir).
-- Revisão aplicada: busca geral por nome/modelo de produto usado, De/Até visíveis sem hora.
+- Revisão aplicada: busca geral por nome/modelo de produto usado; De/Até em Filtros avançados,
+  sem hora, com `ui-input-date` e calendários. Última revisão passou em 20 testes API e 13 Shopping.
   API usa EXISTS sem duplicar pesquisas e dias completos no fuso do usuário; erro 422 por campo.
 - Removido do schema o filtro Ativo herdado. De/Até usam `ui-input-date`; teste com Aura
   comprova os dois botões visíveis e abertura dos calendários ao clicar. FigCraft atualizado.

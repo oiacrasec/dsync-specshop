@@ -19,7 +19,7 @@ do usuário.
 | 5 | 0.1 (aprovado): foco em implementar; regras técnicas conservadoras de coleta no ADR 2001 e auditoria jurídica por advogado antes da produção |
 | 6 | 0.2: Mercado Livre via API de catálogo (ADR 2002). Usuário decidiu implementar o Mercado Livre primeiro; 0.3 e 0.4 ficam para antes dos blocos 5 e 6, que dependem deles |
 | 7 | Ajuste da 2.3 aprovado no FigCraft e aplicado: Shopping lista pesquisas em `ui-table`; ⋯ → Abrir leva ao resultado existente; Nova pesquisa abre o formulário separado. Colunas: Data, Produtos (quantidade), UF e CEP |
-| 8 | Revisão da 2.3: busca geral pelo produto usado na pesquisa e período De/Até visível, sem hora; resultado usa botão Nova pesquisa preenchido e ações/paginação padrão do `ui-table` |
+| 8 | Revisão da 2.3: busca geral pelo produto usado na pesquisa e período De/Até em Filtros avançados (revisado em 07/11), sem hora; resultado usa botão Nova pesquisa preenchido e ações/paginação padrão do `ui-table` |
 | 9 | Revisão da 1.3: Meus produtos substitui o filtro Situação por Arquivado (Não/Sim/Todos), preservando não arquivados por padrão e consulta de arquivados sem ações de escrita |
 
 ## Etapas

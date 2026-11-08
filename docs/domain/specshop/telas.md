@@ -17,7 +17,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 | 1c · Confirmar correspondência | produtos do catálogo da fonte com checkbox; kits e modelos diferentes ficam de fora | DT-04, ADR 2002 item 10 |
 | 1d · Arquivar produto | confirmação; o produto sai da lista e o histórico é mantido | proposta (ver pendências) |
 | 1e · Lista vazia | grade com "Nenhum registro encontrado." (`emptyMessage` do `ui-table`) | — |
-| 2 · Shopping: pesquisas | grid `ui-table`, com busca pelo produto usado e período De/Até visível, sem hora; Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP e Ações (⋯ → Abrir); Nova pesquisa por permissão | ajuste da 2.3, aplicado |
+| 2 · Shopping: pesquisas | grid `ui-table`, com busca pelo produto usado e período De/Até em Filtros avançados, sem hora; Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP e Ações (⋯ → Abrir); Nova pesquisa por permissão | ajuste da 2.3, aplicado |
 | 2a · Shopping: resultado | uma linha por produto e fonte; concluída, indisponível; Pix quando a extensão captura; tentar de novo | RF-03, RQ-03, ADR 2002 |
 | 2b · Shopping: instalar extensão | diálogo com "Pesquisar só o catálogo" e "Instalar extensão" | ADR 2002 item 7 |
 | 2c · Shopping: nova pesquisa | até 10 produtos, fontes, UF do vendedor e CEP de entrega; pesquisa só no clique | RF-29, RF-25, D-16, D-22 |
@@ -39,7 +39,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
   quantidade conta produtos distintos entre as fontes. UF vazia aparece como Todas, CEP
   com máscara e sem destino como travessão. Criar pesquisa invalida o cache da lista.
 - **Filtros do Shopping:** busca por nome/modelo dos produtos que a pesquisa usou e período
-  De/Até na barra geral, só data. O servidor inclui dias completos no fuso do perfil e
+  De/Até em Filtros avançados, só data. O servidor inclui dias completos no fuso do perfil e
   não duplica pesquisas; período invertido mostra mensagem de correção.
   Não há filtro Ativo. De/Até usam `ui-input-date` com botão que abre o calendário.
 - **Resultado no padrão do `ui-table`:** contagem/paginação padrão e menu ⋯ com Tentar de novo

@@ -37,8 +37,8 @@ const SEARCH_SCHEMA = {
         { field: 'destination_zip', label: 'CEP', type: 'text' }
     ],
     filters: [
-        { field: 'date_from', label: 'De', type: 'date', placement: 'general' },
-        { field: 'date_to', label: 'Até', type: 'date', placement: 'general' }
+        { field: 'date_from', label: 'De', type: 'date', placement: 'advanced' },
+        { field: 'date_to', label: 'Até', type: 'date', placement: 'advanced' }
     ],
     general_search: { parameter: 'search', label: 'Busca geral', fields: [{ field: 'product', label: 'Produto', lookup: 'icontains' }] },
     ordering_fields: ['created_at']
@@ -232,7 +232,7 @@ describe('Shopping', () => {
         controller.verify();
     });
 
-    it('envia o produto e o período visível da barra ao servidor como datas sem hora', async () => {
+    it('mantém produto na busca geral e período com calendário nos filtros avançados', async () => {
         const controller = configure(['search:view']);
         const fixture = TestBed.createComponent(ShoppingPage);
 
@@ -242,12 +242,21 @@ describe('Shopping', () => {
         await fixture.whenStable();
         fixture.detectChanges();
         const filter = fixture.debugElement.query(By.directive(UiFilter)).componentInstance as UiFilter;
+
+        expect(fixture.nativeElement.querySelector('.ui-filter-bar ui-input-date')).toBeNull();
+        expect(fixture.debugElement.queryAll(By.directive(UiInputDate)).length).toBe(0);
+        expect(filter.hasAdvancedFilters).toBeTrue();
+        const toggle = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find((button) => button.textContent?.includes('Filtros avançados'))!;
+
+        toggle.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
         const dates = fixture.debugElement.queryAll(By.directive(UiInputDate));
 
-        expect(fixture.nativeElement.querySelectorAll('.ui-filter-bar ui-input-date').length).toBe(2);
-        expect(filter.hasAdvancedFilters).toBeFalse();
+        expect(dates.length).toBe(2);
 
-        for (const field of Array.from(fixture.nativeElement.querySelectorAll('.ui-filter-inline-field')) as HTMLElement[]) {
+        for (const date of dates) {
+            const field = date.nativeElement.parentElement as HTMLElement;
             const calendar = field.querySelector('button[aria-haspopup="dialog"]') as HTMLButtonElement;
 
             expect(calendar).not.toBeNull();
