@@ -2,6 +2,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -14,6 +15,8 @@ import { CONTEXT_KEY, SESSION_KEY } from '@/app/core/utils/session-data';
 import { PROJECT_MENU } from '@/app/project/project.menu';
 import { LoginResponse } from '@/app/types/auth';
 import { TrackedProduct } from '@/app/types/produto';
+import { UiTable } from '@/app/shared/ui/table/table';
+import { UiFilter } from '@/app/shared/ui/filter/filter';
 import { ProdutoFormPage } from './formulario/formulario';
 import { ProdutosPage } from './produtos';
 import { ProdutosService } from './produtos.service';
@@ -21,7 +24,7 @@ import { ProdutosService } from './produtos.service';
 const USER_ID = '019a0000-0000-7000-8000-000000000001';
 const ORG_ID = '019a0000-0000-7000-8000-000000000002';
 const PRODUCT_ID = '019a0000-0000-7000-8000-000000000003';
-const PRODUCT: TrackedProduct = { public_id: PRODUCT_ID, name: 'Impressora EcoTank', model: 'L3250', brand: 'Epson', ean: '', created_at: '', updated_at: '' };
+const PRODUCT: TrackedProduct = { public_id: PRODUCT_ID, name: 'Impressora EcoTank', model: 'L3250', brand: 'Epson', ean: '', is_archived: false, created_at: '', updated_at: '' };
 
 function login(): LoginResponse {
     const token = `e30.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.signature`;
@@ -101,6 +104,53 @@ describe('Meus produtos', () => {
         expect(request.request.method).toBe('DELETE');
         request.flush(null, { status: 204, statusText: 'No Content' });
         expect(page.reloadKey).toBe(1);
+    });
+
+    it('filtra arquivados no servidor e omite ações de escrita nessas linhas', async () => {
+        const { controller, permissions } = configure();
+
+        grant(controller, permissions, ['product:view', 'product:update', 'product:delete']);
+        const fixture = TestBed.createComponent(ProdutosPage);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/products/schema/').flush({
+            columns: [{ field: 'name', label: 'Nome', type: 'text' }],
+            filters: [
+                {
+                    field: 'archived',
+                    label: 'Arquivado',
+                    type: 'choice',
+                    choices: [
+                        { value: 'false', label: 'Não' },
+                        { value: 'true', label: 'Sim' },
+                        { value: 'all', label: 'Todos' }
+                    ]
+                }
+            ],
+            general_search: null,
+            ordering_fields: ['name']
+        });
+        controller.expectOne((request) => request.url === '/api/v1/products/').flush({ data: [PRODUCT], total_records: 1 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const table = fixture.debugElement.query(By.directive(UiTable)).componentInstance as UiTable<TrackedProduct>;
+        const filter = fixture.debugElement.query(By.directive(UiFilter)).componentInstance as UiFilter;
+
+        expect(filter.filters.map((field) => field.header)).toEqual(['Arquivado']);
+        expect(table.getRowActions(PRODUCT).length).toBe(2);
+        filter.advancedValues['archived'] = 'true';
+        filter.onAdvancedChange();
+        const request = controller.expectOne((request) => request.url === '/api/v1/products/');
+
+        expect(request.request.params.get('archived')).toBe('true');
+        request.flush({ data: [{ ...PRODUCT, is_archived: true }], total_records: 1 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(table.getRowActions(table.tableValue[0])).toEqual([]);
+        expect(fixture.nativeElement.querySelector('.ui-table-actions-col button')).toBeNull();
+        fixture.componentInstance.archive(table.tableValue[0]);
+        controller.expectNone((request) => request.method === 'DELETE');
+        controller.verify();
     });
 
     it('usa a rota da API com o identificador codificado', () => {

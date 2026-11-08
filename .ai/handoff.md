@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:33
+- **Atualizado em:** 2026-11-07 21:38
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 1c4fc0c fix(shopping): add search filters and standardize results
+- **Último commit anterior a esta etapa:** c665eb3 fix(shopping): remove the unrelated active filter
 
 ## Situação
 
@@ -15,6 +15,10 @@
 
 ## Feito nesta etapa
 
+- Meus produtos: substituído Situação por Arquivado (Não/Sim/Todos); padrão não arquivados.
+  Apenas list consulta all_objects escopado; detalhes/escritas/options excluem arquivados.
+  is_archived somente leitura omite Editar/Arquivar. 21 testes API + 22 Produtos/Shopping,
+  lint/formato/build/check/migrations pendentes passaram. OpenAPI e docs atualizados.
 - Usuário aprovou aplicar a grid desenhada no FigCraft. Shopping usa o `ui-table` real:
   Data, Produtos (quantidade distinta entre fontes), UF, CEP e Ações (⋯ → Abrir).
 - Revisão aplicada: busca geral por nome/modelo de produto usado, De/Até visíveis sem hora.

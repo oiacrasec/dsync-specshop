@@ -5,6 +5,7 @@ export interface TrackedProduct {
     model: string;
     brand: string;
     ean: string;
+    is_archived: boolean;
     created_at: string;
     updated_at: string;
 }

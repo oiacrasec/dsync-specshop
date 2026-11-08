@@ -65,7 +65,16 @@ def test_view_in_one_organization_lists_products_of_the_whole_contract(world):
     response = client(world['maria'], world['orgs']['Norte']).get(URL)
     assert response.status_code == 200, response.content
     assert [item['model'] for item in response.json()['data']] == ['L3250', '15ITL6']
-    assert set(response.json()['data'][0]) == {'public_id', 'name', 'model', 'brand', 'ean', 'created_at', 'updated_at'}
+    assert set(response.json()['data'][0]) == {
+        'public_id',
+        'name',
+        'model',
+        'brand',
+        'ean',
+        'is_archived',
+        'created_at',
+        'updated_at',
+    }
 
 
 def test_product_of_another_contract_is_not_found(world):
@@ -149,6 +158,52 @@ def test_archive_is_a_soft_delete_that_leaves_the_list(world):
     assert archived.deleted_at is not None and archived.deleted_by == world['maria']
     assert api.get(URL).json()['total_records'] == 0
     assert AuditEvent.objects.filter(event='product.deleted', target_public_id=item.public_id).exists()
+
+
+def test_archived_filter_is_scoped_and_does_not_reopen_details_or_options(world):
+    current = product(world)
+    archived = product(world, name='Impressora arquivada', model='OLD')
+    archived.delete()
+    other = Contract.objects.create(name='Outro', start_date=date(2020, 1, 1), licenses=5)
+    foreign = TrackedProduct.objects.create(name='Alheio', model='X1', contract=other)
+    foreign.delete()
+    grant(world, *ALL_CODES)
+    api = client(world['maria'], world['orgs']['Centro'])
+
+    assert [row['public_id'] for row in api.get(URL).json()['data']] == [str(current.public_id)]
+    assert [row['public_id'] for row in api.get(URL, {'archived': 'false'}).json()['data']] == [str(current.public_id)]
+    archived_rows = api.get(URL, {'archived': 'true'}).json()['data']
+    assert [row['public_id'] for row in archived_rows] == [str(archived.public_id)]
+    assert archived_rows[0]['is_archived'] is True
+    all_rows = api.get(URL, {'archived': 'all'}).json()['data']
+    assert {row['public_id'] for row in all_rows} == {str(current.public_id), str(archived.public_id)}
+    assert api.get(detail(archived), {'archived': 'true'}).status_code == 404
+    assert api.patch(detail(archived), {'brand': 'Outra'}, format='json').status_code == 404
+    assert api.delete(detail(archived)).status_code == 404
+    assert api.get(URL + 'options/', {'q': 'OLD'}).json()['data'] == []
+    schema = api.get(URL + 'schema/').json()
+    assert [field['field'] for field in schema['filters']] == ['brand', 'archived']
+    archived_filter = schema['filters'][1]
+    assert archived_filter['label'] == 'Arquivado'
+    assert [choice['value'] for choice in archived_filter['choices']] == ['false', 'true', 'all']
+    invalid = api.get(URL, {'archived': 'invalid'})
+    assert invalid.status_code == 422 and 'archived' in invalid.json()['errors']
+
+
+def test_archived_list_query_count_is_constant_and_paginates(world):
+    grant(world, 'product:view')
+    api = client(world['maria'], world['orgs']['Centro'])
+    product(world).delete()
+    query = {'archived': 'true', 'rows': 10}
+    api.get(URL, query)
+    with CaptureQueriesContext(connection) as few:
+        assert api.get(URL, query).status_code == 200
+    for index in range(19):
+        product(world, model=f'OLD{index}').delete()
+    with CaptureQueriesContext(connection) as many:
+        response = api.get(URL, query)
+    assert len(few) == len(many)
+    assert response.json()['total_records'] == 20 and len(response.json()['data']) == 10
 
 
 def test_update_needs_its_own_permission(world):

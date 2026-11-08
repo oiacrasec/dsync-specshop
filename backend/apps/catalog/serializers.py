@@ -19,10 +19,14 @@ class TrackedProductSerializer(BaseModelSerializer):
 
     audit_fields = ('name', 'model', 'brand', 'ean')
     audit_events = {'create': PRODUCT_CREATED, 'update': PRODUCT_UPDATED, 'delete': PRODUCT_DELETED}
+    is_archived = serializers.SerializerMethodField()
+
+    def get_is_archived(self, instance) -> bool:
+        return instance.deleted_at is not None
 
     class Meta:
         model = TrackedProduct
-        fields = ('public_id', 'name', 'model', 'brand', 'ean', 'created_at', 'updated_at')
+        fields = ('public_id', 'name', 'model', 'brand', 'ean', 'is_archived', 'created_at', 'updated_at')
         read_only_fields = ('public_id', 'created_at', 'updated_at')
 
     def validate_name(self, value):

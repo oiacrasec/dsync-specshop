@@ -2667,6 +2667,20 @@ paths:
         description: public_id da organização ativa (ADR 0006).
         required: true
       - in: query
+        name: archived
+        schema:
+          type: string
+          enum:
+          - all
+          - 'false'
+          - 'true'
+        description: |-
+          Arquivado
+
+          * `false` - Não
+          * `true` - Sim
+          * `all` - Todos
+      - in: query
         name: brand
         schema:
           type: string
@@ -7824,6 +7838,9 @@ components:
         ean:
           type: string
           maxLength: 13
+        is_archived:
+          type: boolean
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -7836,6 +7853,7 @@ components:
           title: Atualizado em
       required:
       - created_at
+      - is_archived
       - model
       - name
       - public_id

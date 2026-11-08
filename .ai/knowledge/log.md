@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Filtro Arquivado em Meus produtos
+
+- `apps/catalog`: schema sem `is_active`; filtro `archived=false/true/all`, Não/Sim/Todos.
+  Padrão e opções para pesquisa continuam excluindo arquivados. Só a ação list usa
+  `all_objects` com escopo do contrato; detalhes/escritas/options mantêm `objects`.
+- Serializer expõe `is_archived` booleano somente leitura, sem datas/autoria; grid omite
+  Editar/Arquivar em linhas arquivadas. Não há restauração ou mudanças no core/banco.
+- 21 testes da API e 22 de Produtos/Shopping no Chrome Headless passaram; lint/formato,
+  build, check e migrations pendentes OK. OpenAPI regenerado sem avisos. Query count
+  constante com 1/20 arquivados e página limitada a 10; amostra sem benchmark de produção.
+
 ## 2026-11-07 — Remoção do filtro Ativo do Shopping
 
 - `PriceSearchViewSet.get_schema_filters` publica somente De/Até; não herda o filtro

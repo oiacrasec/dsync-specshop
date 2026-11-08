@@ -47,7 +47,7 @@ export class ProdutosPage implements OnInit {
         );
 
         this.canCreate = permissions.canCreate;
-        this.tableActions = permissions.actions;
+        this.tableActions = permissions.actions.map((action) => ({ ...action, visible: (row) => !row.is_archived }));
     }
 
     create() {
@@ -59,6 +59,10 @@ export class ProdutosPage implements OnInit {
     }
 
     archive(product: TrackedProduct) {
+        if (product.is_archived) {
+            return;
+        }
+
         this.confirmationService.confirm({
             header: 'Arquivar produto',
             message: `Arquivar "${product.name} · ${product.model}"? Ele sai da lista e das pesquisas. O histórico de preços é mantido.`,

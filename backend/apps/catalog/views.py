@@ -19,3 +19,21 @@ class TrackedProductViewSet(BaseModelViewSet):
     options_search_fields = ('name', 'model')
     schema_columns = ('name', 'model', 'brand', 'ean')
     schema_filters = ('brand',)
+
+    def get_queryset(self):
+        # Só a lista consulta arquivados; detalhes, options e escritas preservam a exclusão lógica.
+        return TrackedProduct.all_objects.all() if self.action == 'list' else super().get_queryset()
+
+    def get_schema_filters(self):
+        return [
+            *(field for field in super().get_schema_filters() if field['field'] != 'is_active'),
+            {
+                'field': 'archived',
+                'label': 'Arquivado',
+                'type': 'choice',
+                'choices': [
+                    {'value': value, 'label': label}
+                    for value, label in self.filterset_class.base_filters['archived'].extra['choices']
+                ],
+            },
+        ]
