@@ -46,6 +46,17 @@ export default [
             breadcrumb: 'Shopping',
             audience: ACCESS_AUDIENCE.COMMON,
             requireContext: true,
+            requiredPermission: SPECSHOP_PERMISSION_KEYS.SEARCH_VIEW
+        }
+    },
+    {
+        path: 'shopping/nova',
+        canActivate: [accessGuard, permissionGuard],
+        loadComponent: () => import('@/app/pages/pesquisa-precos/shopping/new-search/new-search').then((c) => c.NewSearchPage),
+        data: {
+            breadcrumb: 'Nova pesquisa',
+            audience: ACCESS_AUDIENCE.COMMON,
+            requireContext: true,
             requiredPermission: SPECSHOP_PERMISSION_KEYS.SEARCH_CREATE
         }
     },

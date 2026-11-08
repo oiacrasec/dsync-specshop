@@ -17,7 +17,7 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 | 1c · Confirmar correspondência | produtos do catálogo da fonte com checkbox; kits e modelos diferentes ficam de fora | DT-04, ADR 2002 item 10 |
 | 1d · Arquivar produto | confirmação; o produto sai da lista e o histórico é mantido | proposta (ver pendências) |
 | 1e · Lista vazia | grade com "Nenhum registro encontrado." (`emptyMessage` do `ui-table`) | — |
-| 2 · Shopping: pesquisas | proposta em revisão: grid no padrão `ui-table`, com Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP de entrega e Ações (⋯ → Abrir); botão Nova pesquisa; dados de exemplo | ajuste da 2.3, ainda sem implementação |
+| 2 · Shopping: pesquisas | grid `ui-table`, com Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP de entrega e Ações (⋯ → Abrir); botão Nova pesquisa por permissão | ajuste da 2.3, aplicado |
 | 2a · Shopping: resultado | uma linha por produto e fonte; concluída, indisponível; Pix quando a extensão captura; tentar de novo | RF-03, RQ-03, ADR 2002 |
 | 2b · Shopping: instalar extensão | diálogo com "Pesquisar só o catálogo" e "Instalar extensão" | ADR 2002 item 7 |
 | 2c · Shopping: nova pesquisa | até 10 produtos, fontes, UF do vendedor e CEP de entrega; pesquisa só no clique | RF-29, RF-25, D-16, D-22 |
@@ -30,6 +30,12 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 - **Auditoria como página** (DT-09): reaproveita a grade do core; painel lateral exigiria
   componente que a biblioteca não tem.
 - **Seleção dos produtos no Shopping** com o MultiSelect do core.
+- **Shopping como lista de pesquisas:** `/shopping` exige `search:view`; `/shopping/nova`
+  exige `search:create`. Abrir leva a `/shopping/:id` sem iniciar coleta; só Pesquisar
+  no formulário solicita execução. Voltar/Cancelar retornam à lista.
+- **Grid paginada pelo servidor:** schema e data/fuso reutilizados pelo `BaseCrudService`;
+  quantidade conta produtos distintos entre as fontes. UF vazia aparece como Todas, CEP
+  com máscara e sem destino como travessão. Criar pesquisa invalida o cache da lista.
 - **Dashboard macro**: só contagens e variações por produto; nunca soma preços de produtos
   diferentes (RF-22).
 
@@ -37,7 +43,6 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 
 | Pendência | Situação |
 |---|---|
-| Grid de pesquisas do Shopping | desenhada no FigCraft para revisão; linhas compactas, ações em menu ⋯ e contagem para página única, conforme o `ui-table` real; Nova pesquisa abre 2c, ⋯ → Abrir leva ao resultado de exemplo 2a, Voltar/Cancelar retornam à lista; frontend continua abrindo o formulário até aprovação e implementação |
 | Cor roxa (D-14) | tema "Tema SPECSHOP" estendido com roxo provisório `#7C3AED`, mas o FigCraft não aplica a extensão aos componentes da biblioteca; tom definitivo a definir com o idealizador |
 | Ícones | biblioteca do core sem ícone de arquivar (usada a lixeira) e de atualizar ("Tentar de novo" sem ícone) |
 | "Pesquisa antiga" no dashboard | prazo não definido na especificação (exemplo: 2 dias) |

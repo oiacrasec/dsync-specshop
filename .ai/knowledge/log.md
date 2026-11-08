@@ -1,5 +1,20 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Grid de pesquisas aplicada no Shopping
+
+- `/shopping`: `ui-table` com Data, Produtos (quantidade distinta entre fontes), UF e CEP;
+  menu ⋯ → Abrir navega ao resultado sem `autorun`. Rota e ação exigem `search:view`.
+- Formulário movido para `shopping/new-search/`, rota `/shopping/nova` (`search:create`);
+  Nova pesquisa aparece só com essa permissão. Voltar/Cancelar retornam à grid.
+- `ShoppingService.list` reutiliza `listTable`, schema em cache e paginação/ordenação do
+  servidor, por padrão `-created_at`; transformação linear só nos itens da página recebida.
+  Data/fuso vêm do adaptador existente; criar invalida o cache da lista.
+- Resultado preservado, com Voltar para a grid e Nova pesquisa para o formulário. FigCraft
+  sincronizado. Sem alterações no backend, contratos da API ou arquivos do core.
+- Validação: 10 testes do Shopping no Chrome Headless, lint, format:check e build passaram.
+  Testes cobrem renderização real de `ui-table`, menu, não coleta ao reabrir, paginação,
+  schema sem repetição, contagem distinta, visibilidade por permissão e invalidação do cache.
+
 ## 2026-11-07 — Proposta da lista de pesquisas no FigCraft
 
 - Revisão solicitada pelo usuário: desenho ajustado ao `ui-table` real (`table.html`/`.ts`):

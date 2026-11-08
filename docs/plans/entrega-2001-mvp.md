@@ -18,6 +18,7 @@ do usuário.
 | 4 | Domínio do SPECSHOP em apps novos, sem migrations em apps do core (ADR 0036) |
 | 5 | 0.1 (aprovado): foco em implementar; regras técnicas conservadoras de coleta no ADR 2001 e auditoria jurídica por advogado antes da produção |
 | 6 | 0.2: Mercado Livre via API de catálogo (ADR 2002). Usuário decidiu implementar o Mercado Livre primeiro; 0.3 e 0.4 ficam para antes dos blocos 5 e 6, que dependem deles |
+| 7 | Ajuste da 2.3 aprovado no FigCraft e aplicado: Shopping lista pesquisas em `ui-table`; ⋯ → Abrir leva ao resultado existente; Nova pesquisa abre o formulário separado. Colunas: Data, Produtos (quantidade), UF e CEP |
 
 ## Etapas
 
@@ -35,7 +36,7 @@ do usuário.
 | **2 — Pesquisa** | | | |
 | 2.1 | Modelo de pesquisa, oferta e observação de preço, com identidade estável do produto e datas de referência/obtenção; app `pricing` e base global particionada medida (ADR 2003) | DT-06, RF-08 | ✅ |
 | 2.2 | Pesquisa sob demanda de até 10 produtos: estado por produto/fonte, falha parcial, limite explícito, nova tentativa manual; API `/api/v1/searches/` com run/retry por linha, conector por fonte (`docs/api/searches.md`) | DT-07, RF-25, RF-29 | ✅ |
-| 2.3 | Tela "Shopping": seleção de produtos, fontes e região; progresso e resultado (`pages/pesquisa-precos/shopping`) | RF-10, RF-29 | ✅ |
+| 2.3 | Tela "Shopping": grid de pesquisas (`ui-table`), formulário em `shopping/nova`, seleção de produtos/fontes/região, progresso e resultado | RF-10, RF-29 | ✅ |
 | **3 — Primeiro preço real** | | | |
 | 3.1 | Conector do Mercado Livre conforme o 0.2 | DT-02, RF-03 | ⬜ |
 | 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos | DT-04, RF-05, RF-19, RF-27 | ⬜ |

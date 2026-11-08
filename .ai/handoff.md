@@ -1,83 +1,59 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 20:56
+- **Atualizado em:** 2026-11-07 21:06
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta revisão:** 2cd8f62 docs(design): add the Shopping search list proposal
+- **Último commit anterior a esta etapa:** 32882fe docs(design): align the Shopping grid with ui-table
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 2.3 Tela Shopping — ✅ concluída (testada no navegador; fonte responde "indisponível" até a 3.1) |
-| Próximo passo exato | Revisar com o usuário a nova tela 2 (Shopping: pesquisas) já desenhada no FigCraft; ajustar o design antes de implementar a grid |
-| Aguardando o usuário? | sim — revisão visual do desenho; implementação da grid e etapa 3.1 ainda pendentes |
+| Etapa atual | 2.3 Tela Shopping e ajuste da grid — ✅ concluídos |
+| Próximo passo exato | Propor o escopo da 3.1 (conector do Mercado Livre, ADR 2002), item a item |
+| Aguardando o usuário? | sim — aprovação do escopo da 3.1 antes de iniciar |
 
-## Dúvidas abertas
+## Feito nesta etapa
 
-- **Grid do Shopping (desenho pronto para revisão, frontend não iniciado):**
-  - Usuário pediu ajustar primeiro no FigCraft. Tela 2 desenhada em `design/specshop-telas.figcraft`:
-    Data, Produtos (quantidade), UF do vendedor, CEP de entrega e Ações (⋯ → Abrir); botão Nova pesquisa.
-    Conferido com `ui-table` real: linhas de 40 px, coluna Ações de 63 px e contagem para página única.
-    Formulário preservado como 2c. Protótipo liga lista → formulário/resultado e Voltar/Cancelar → lista.
-    Renderização e interações inspecionadas; dados identificados como exemplos.
-  - `shopping` = `ui-table` lazy sobre `GET /api/v1/searches/` (já existe, paginado, ordena por `created_at`)
-    com botão "+ Nova pesquisa" e ação "Abrir"; `shopping/nova` = formulário atual;
-    `shopping/:id` = resultado atual (o Pesquisar continua indo ao resultado com `autorun`).
-  - Colunas sugeridas para o MVP: Data, Produtos (quantidade), UF e CEP. Coluna "Situação"
-    (ex.: "3 de 5 concluídas") ficou fora: exige mudar a API.
-  - `docs/domain/specshop/telas.md` atualizado com a proposta em revisão (tela 2 = grid, 2c = formulário).
-  - Performance: a lista devolve as linhas de cada pesquisa (prefetch, consultas constantes;
-    até 100 linhas por página de 10). Aceitável no MVP; uma versão resumida da lista fica
-    para depois, se for preciso.
-
-## Feito nesta sessão
-
-- 0.2 Mercado Livre (ADR 2002): API de catálogo como fonte principal, extensão do navegador
-  como complemento; DE-PARA por loja em `docs/domain/specshop/fontes-de-para.md`.
-- Telas do MVP no FigCraft (`design/specshop-telas.figcraft`, inventário em `telas.md`).
-- 1.1 (ADR 2003): escopo dos dados, base global de observações, confiança na coleta,
-  pesquisa por produto sem fila, permissões e perfis.
-- Core (`../datasync-core`, publicado no GitHub até 5e73bde): ADR 0044 (permissões por app em
-  `permission_catalog.py`), arquivos do projeto `config/project.py` e
-  `config/api/project.py`, fábricas de isolamento em `apps/<app>/tests/isolation.py`.
-  Trazidos para cá com `git fetch ../datasync-core main && git merge FETCH_HEAD`.
-- 1.2: `apps/catalog` (TrackedProduct, API, permissões, testes, `docs/api/products.md`).
-- 2.3: tela Shopping (`pages/pesquisa-precos/shopping`): criar pesquisa e resultado que executa
-  as linhas pendentes (até 3 em paralelo) com nova tentativa; core ganhou a coluna `choice-tag`
-  no `ui-table` (1c0c31d). Estado assíncrono das telas em `signal` (app zoneless).
-- 2.2: API `/api/v1/searches/` com run/retry por linha e contrato de conector (`docs/api/searches.md`).
-- 2.1: `apps/pricing` (models, base global particionada, gravação e série; medição no ADR 2003);
-  core ganhou `PROJECT_UNSCOPED_RECORDS` e `GlobalOnlyManager` (186f940).
-- 1.3: tela "Meus produtos" no frontend; core ganhou `frontend/src/app/project/project.menu.ts` e
-  `project.routes.ts` (cce830c, ef62937 no core local, sem push).
+- Usuário aprovou aplicar a grid desenhada no FigCraft. Shopping usa o `ui-table` real:
+  Data, Produtos (quantidade distinta entre fontes), UF, CEP e Ações (⋯ → Abrir).
+- `/shopping` exige `search:view`; `/shopping/nova` exige `search:create`.
+  Formulário preservado em `shopping/new-search/`; Nova pesquisa condicionado à permissão.
+- Abrir navega ao resultado existente sem coletar. Pesquisar cria e abre com `autorun`.
+  Voltar/Cancelar retornam à lista; Nova pesquisa no resultado abre o formulário.
+- `ShoppingService.list` usa `BaseCrudService.listTable`, paginação/ordenação no servidor
+  (`-created_at` por padrão), schema em cache e transformação só dos itens da página.
+  Criar invalida o cache da lista. CEP formatado, UF vazia = Todas, CEP vazio = travessão.
+- FigCraft e `telas.md` sincronizados. Código do core e backend sem alterações.
+- Validação: 10 testes do Shopping em Chrome Headless, lint, format:check e build passaram.
+  Navegador precisou executar fora do sandbox. Sem novas dependências.
+- Concluídas no plano: 0.1, 0.2, 1.1–1.3 e 2.1–2.3. Histórico detalhado no plano/log.
 
 ## Contexto do projeto
 
-- Este repositório é o **SPECSHOP**, projeto derivado do core (ADR 0036): só acrescentar;
-  nunca editar arquivos do core nem criar migrations em apps do core. Precisando mudar o
-  core, a mudança é feita em `../datasync-core` e trazida por merge.
-- Apps do projeto em `backend/config/project.py`; rotas em `backend/config/api/project.py`;
-  permissões em `apps/<app>/permission_catalog.py`; fábricas de isolamento em
-  `apps/<app>/tests/isolation.py`. `docs/api/openapi-v1.yaml` é regenerado, nunca mesclado à mão.
-- Produto: `docs/domain/specshop/`. ADRs do SPECSHOP a partir de **2000**, planos a partir
-  de **2001** (ADR 2000), índice em `docs/adr/projeto.md`.
-- Preferências do usuário: decidir item a item, um por vez, sempre com apresentação visual.
+- SPECSHOP é derivado do core (ADR 0036): não editar arquivos do core ou criar migrations
+  nos apps dele. Mudanças necessárias no core são feitas em `../datasync-core` e mescladas.
+- Apps/rotas do projeto: `backend/config/project.py`, `backend/config/api/project.py`;
+  permissões: `apps/<app>/permission_catalog.py`; isolamento: `apps/<app>/tests/isolation.py`.
+- Menu/rotas frontend: `src/app/project/project.menu.ts` e `project.routes.ts`.
+- Produto: `docs/domain/specshop/`. ADRs do projeto a partir de 2000; planos de 2001.
+- Design: `design/specshop-telas.figcraft`; biblioteca do core preservada.
+- MCP FigCraft configurado em `~/.codex/config.toml`, attach porta 7710. CLI instalada em
+  `C:\Program Files\ArtCraft\FigCraft\figcraft-cli.exe`; editor precisa abrir com `--control`
+  e raízes de automação de `design/` (procedimento em `design/README.md`).
 
 ## Avisos
 
-- Não imprimir/versionar segredos (`ML_CLIENT_ID`/`ML_CLIENT_SECRET` no `backend/.env`).
-  Push só quando pedido (core e SPECSHOP têm commits locais sem push).
-- Python: sem `.venv` no SPECSHOP; testes rodados com `../datasync-core/.venv` (Python 3.14),
-  banco `dsync_spechop` do `backend/.env`.
-- Três testes do core falham só neste Windows (cp1252 ao ler fontes e lista de fusos no
-  OpenAPI): `test_views_and_serializers_extend_the_project_bases`,
-  `test_nobody_uses_django_file_storage_directly` e, no core, `test_versioned_schema_file_matches_the_code`.
-- Eventos de auditoria do SPECSHOP (`product.*`) não estão nas choices do core: gravam, mas a
-  interface de auditoria mostra o código sem rótulo (extensão futura no core).
-- Candidato a mover para o core: aplicar erros 422 aos campos do formulário (hoje em
-  `produtos/formulario/formulario.ts`).
-- Hoje não há lista de pesquisas no frontend: a pesquisa fica gravada e reabre pela URL do resultado (ver a proposta da grid).
-- Frontend é zoneless: estado que muda após HTTP fica em `signal`, senão a tela não redesenha.
-- O campo CEP do Shopping não tem máscara (aceita só dígitos ou com hífen); não pedido.
-- O roxo do tema, ícones de arquivar/atualizar e prazos do dashboard seguem pendentes (`telas.md`).
+- Não imprimir/versionar segredos do `backend/.env` (incluindo credenciais do Mercado Livre).
+  Push só quando pedido; core e SPECSHOP têm commits locais sem push.
+- Sem `.venv` local; sessão anterior usou `../datasync-core/.venv` (Python 3.14), banco
+  `dsync_spechop`. Consultar SDK do PyCharm antes de qualquer comando Python.
+- Falhas conhecidas do core neste Windows: testes de leitura de fontes em cp1252 e schema
+  OpenAPI/fusos (`test_views_and_serializers_extend_the_project_bases`,
+  `test_nobody_uses_django_file_storage_directly`, `test_versioned_schema_file_matches_the_code`).
+- Fonte continua indisponível até a 3.1. 0.3/0.4 pendentes antes dos blocos 5/6 (plano).
+- Lista da API ainda inclui `items`; página padrão de 10 pesquisas, até 10 produtos por
+  pesquisa hoje. Transformação linear, sem consultas por linha; resumo da API fica para depois.
+- Eventos `product.*` sem rótulo na auditoria do core; candidato ao core: erros 422 por campo
+  do formulário de produtos. Tema roxo, ícones e prazo do dashboard pendentes (`telas.md`).
+- Frontend zoneless: estado assíncrono em `signal`. CEP do formulário sem máscara, como antes.

@@ -109,6 +109,10 @@ export class ShoppingResultadoPage implements OnInit {
         this.router.navigateByUrl('/pages/pesquisa-precos/shopping');
     }
 
+    create() {
+        this.router.navigateByUrl('/pages/pesquisa-precos/shopping/nova');
+    }
+
     continueSearch() {
         this.runPending();
     }

@@ -1,7 +1,10 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
 import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Navigation, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
@@ -12,10 +15,26 @@ import { UserContextService } from '@/app/core/services/user-context.service';
 import { API_BASE_URL } from '@/app/core/tokens/api-base-url';
 import { CONTEXT_KEY, SESSION_KEY } from '@/app/core/utils/session-data';
 import { PROJECT_MENU } from '@/app/project/project.menu';
+import { UiTable } from '@/app/shared/ui/table/table';
 import { LoginResponse } from '@/app/types/auth';
 import { PriceSearch, PriceSearchItem } from '@/app/types/pesquisa';
+import routes from '../pesquisa-precos.routes';
 import { ShoppingResultadoPage } from './resultado/resultado';
+import { NewSearchPage } from './new-search/new-search';
 import { ShoppingPage } from './shopping';
+import { ShoppingService } from './shopping.service';
+
+registerLocaleData(localePt);
+
+const SEARCH_SCHEMA = {
+    columns: [
+        { field: 'created_at', label: 'Criada em', type: 'datetime' },
+        { field: 'destination_zip', label: 'CEP', type: 'text' }
+    ],
+    filters: [],
+    general_search: null,
+    ordering_fields: ['created_at']
+};
 
 const USER_ID = '019a0000-0000-7000-8000-000000000001';
 const ORG_ID = '019a0000-0000-7000-8000-000000000002';
@@ -111,9 +130,102 @@ describe('Shopping', () => {
         expect(entry?.permission).toBe('search:view');
     });
 
+    it('separa a lista e o formulário por permissão e declara nova antes de :id', () => {
+        expect(routes.find((route) => route.path === 'shopping')?.data?.['requiredPermission']).toBe('search:view');
+        expect(routes.find((route) => route.path === 'shopping/nova')?.data?.['requiredPermission']).toBe('search:create');
+        expect(routes.findIndex((route) => route.path === 'shopping/nova')).toBeLessThan(routes.findIndex((route) => route.path === 'shopping/:id'));
+    });
+
+    it('renderiza ui-table, conta produtos distintos e abre o resultado sem coletar', async () => {
+        const controller = configure(['search:view']);
+        const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+        const fixture = TestBed.createComponent(ShoppingPage);
+
+        fixture.detectChanges();
+        const request = controller.expectOne((request) => request.url === '/api/v1/searches/');
+
+        expect(request.request.params.get('rows')).toBe('10');
+        expect(request.request.params.get('ordering')).toBe('-created_at');
+        controller.expectOne('/api/v1/searches/schema/').flush(SEARCH_SCHEMA);
+        request.flush({ data: [search([item(1), item(2), item(3, { product: 'p1', source: 'another_source' })])], total_records: 1 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const table = fixture.debugElement.query(By.directive(UiTable)).componentInstance as UiTable;
+        const element = fixture.nativeElement as HTMLElement;
+        const cells = Array.from(element.querySelectorAll('tbody tr:first-child td')).map((cell) => cell.textContent?.trim());
+
+        expect(cells.slice(1, 4)).toEqual(['2', 'SC', '88010-000']);
+        expect(table.tableColumns[0]).toEqual(jasmine.objectContaining({ field: 'created_at', header: 'Data', type: 'date', zoned: true, sortable: true }));
+        expect(element.querySelector('.ui-table-count')?.textContent?.trim()).toBe('1 registro');
+        expect(element.textContent).not.toContain('Nova pesquisa');
+        const menuButton = element.querySelector('.ui-table-actions-col button[aria-label="Ações"]') as HTMLButtonElement;
+
+        menuButton.click();
+        fixture.detectChanges();
+        expect(table.menuItems.map((entry) => entry.label)).toEqual(['Abrir']);
+        table.menuItems[0].command?.({});
+        expect(navigate).toHaveBeenCalledWith(['/pages/pesquisa-precos/shopping', SEARCH_ID]);
+        fixture.componentInstance.open('../invalid');
+        expect(navigate).toHaveBeenCalledTimes(1);
+        controller.expectNone((request) => request.method === 'POST');
+        controller.verify();
+    });
+
+    it('pagina e ordena no servidor sem repetir o schema ou carregar todas as pesquisas', async () => {
+        const controller = configure(['search:view', 'search:create']);
+        const fixture = TestBed.createComponent(ShoppingPage);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/searches/schema/').flush(SEARCH_SCHEMA);
+        controller.expectOne((request) => request.url === '/api/v1/searches/').flush({ data: [{ ...search([item(1)]), seller_states: [], destination_zip: '' }], total_records: 25 });
+        await fixture.whenStable();
+        fixture.detectChanges();
+        const table = fixture.debugElement.query(By.directive(UiTable)).componentInstance as UiTable;
+
+        expect(fixture.nativeElement.querySelector('.p-paginator')).not.toBeNull();
+        expect(fixture.nativeElement.textContent).toContain('Nova pesquisa');
+        expect(fixture.nativeElement.textContent).toContain('Todas');
+        expect(fixture.nativeElement.textContent).toContain('—');
+        table.handleLazyLoad({ first: 10, rows: 10, sortField: 'created_at', sortOrder: 1 });
+        const next = controller.expectOne((request) => request.url === '/api/v1/searches/');
+
+        expect(next.request.params.get('first')).toBe('10');
+        expect(next.request.params.get('rows')).toBe('10');
+        expect(next.request.params.get('ordering')).toBe('created_at');
+        next.flush({ data: [], total_records: 25 });
+        controller.expectNone('/api/v1/searches/schema/');
+        controller.verify();
+    });
+
+    it('invalida a lista após criar e retorna do formulário para o Shopping', async () => {
+        const controller = configure(['search:view', 'search:create']);
+        const fixture = TestBed.createComponent(ShoppingPage);
+
+        fixture.detectChanges();
+        controller.expectOne('/api/v1/searches/schema/').flush(SEARCH_SCHEMA);
+        controller.expectOne((request) => request.url === '/api/v1/searches/').flush({ data: [], total_records: 0 });
+        await fixture.whenStable();
+        fixture.destroy();
+        TestBed.inject(ShoppingService)
+            .create({ products: ['p1'], sources: ['mercado_livre'], seller_states: [], destination_zip: '' })
+            .subscribe();
+        controller.expectOne('/api/v1/searches/').flush(search([item(1)]), { status: 201, statusText: 'Created' });
+        const reopened = TestBed.createComponent(ShoppingPage);
+
+        reopened.detectChanges();
+        controller.expectOne((request) => request.url === '/api/v1/searches/').flush({ data: [search([item(1)])], total_records: 1 });
+        const navigate = spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
+
+        reopened.componentInstance.create();
+        expect(navigate).toHaveBeenCalledWith('/pages/pesquisa-precos/shopping/nova');
+        TestBed.createComponent(NewSearchPage).componentInstance.goBack();
+        expect(navigate).toHaveBeenCalledWith('/pages/pesquisa-precos/shopping');
+        controller.verify();
+    });
+
     it('lista os produtos como nome · modelo e bloqueia mais de 10', () => {
         const controller = configure(['search:create']);
-        const page = TestBed.createComponent(ShoppingPage).componentInstance;
+        const page = TestBed.createComponent(NewSearchPage).componentInstance;
 
         page.ngOnInit();
         controller.expectOne((request) => request.url === '/api/v1/products/').flush({ data: [{ public_id: 'p1', name: 'Impressora', model: 'L3250' }], total_records: 1 });
@@ -129,7 +241,7 @@ describe('Shopping', () => {
     it('cria a pesquisa e abre o resultado pedindo a execução', () => {
         const controller = configure(['search:create']);
         const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
-        const page = TestBed.createComponent(ShoppingPage).componentInstance;
+        const page = TestBed.createComponent(NewSearchPage).componentInstance;
 
         page.form.setValue({ products: ['p1', 'p2'], sources: ['mercado_livre'], seller_states: ['SC'], destination_zip: '88010-000' });
         page.search();

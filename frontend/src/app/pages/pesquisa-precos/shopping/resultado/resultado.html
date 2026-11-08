@@ -8,7 +8,10 @@
             @if (canRun && hasPending && !running()) {
             <ui-button label="Continuar pesquisa" icon="pi pi-play" (onClick)="continueSearch()"></ui-button>
             }
-            <ui-button label="Nova pesquisa" icon="pi pi-plus" severity="secondary" text (onClick)="goBack()"></ui-button>
+            <ui-button label="Voltar" icon="fa-solid fa-arrow-left" severity="secondary" text (onClick)="goBack()"></ui-button>
+            @if (canRun) {
+            <ui-button label="Nova pesquisa" icon="fa-solid fa-plus" severity="secondary" text (onClick)="create()"></ui-button>
+            }
         </div>
     </div>
 

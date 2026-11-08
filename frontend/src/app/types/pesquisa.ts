@@ -34,3 +34,8 @@ export interface PriceSearchWrite {
     seller_states: string[];
     destination_zip: string;
 }
+
+export interface PriceSearchListRow extends PriceSearch {
+    product_count: number;
+    seller_states_label: string;
+}
