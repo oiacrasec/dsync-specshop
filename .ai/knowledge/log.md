@@ -1,5 +1,17 @@
 # Histórico do conhecimento
 
+## 2026-11-07 — Desenho de Meus produtos sincronizado com a implementação
+
+- `design/specshop-telas.figcraft`: grid 1 refeita com Nome/Modelo/Marca/EAN/Arquivado/Ações,
+  booleanos Sim/Não, linhas compactas e menu ⋯; removidos preços e última pesquisa.
+- Busca com nome/modelo/marca/EAN; estados 1f–1i mostram painel só com Arquivado,
+  Não/Sim/Todos, contador e Limpar. Arquivados sem ações de escrita, Todos com ambos os estados.
+- Telas 1d/1e reaproveitam a nova grid: confirmação com texto exato do app, sem promessa de
+  restauração, Arquivar com contorno de perigo; vazio com Nenhum produto cadastrado e sem contagem.
+- Conferidos templates de Produtos, schema do catálogo, ui-table/ui-filter/ui-confirm-dialog,
+  renderizações e inspeção de colunas/flags/interações pela CLI. Dados fictícios preservados.
+- Inventário em telas.md corrigido. Biblioteca do core, tokens e código das aplicações sem mudanças.
+
 ## 2026-11-07 — Coluna Arquivado após EAN
 
 - Schema de produtos acrescenta `is_archived` com rótulo Arquivado e tipo boolean após EAN.

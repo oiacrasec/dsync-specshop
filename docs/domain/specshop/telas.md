@@ -11,12 +11,16 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 
 | Tela | Conteúdo | Atende |
 |---|---|---|
-| 1 · Meus produtos | grade com busca e filtros avançados; produto, menor preço, situação da última pesquisa; ações Editar e Arquivar | RF-01, D-24 |
+| 1 · Meus produtos | grade do `ui-table`: Nome, Modelo, Marca, EAN, Arquivado (Sim/Não), Ações; busca por nome/modelo/marca/EAN; apenas Arquivado nos filtros avançados; Editar/Arquivar em linhas não arquivadas | RF-01, D-24 |
 | 1a · Novo produto | formulário: nome e modelo obrigatórios, marca e EAN opcionais; condição sempre nova (na descrição) | RF-01, D-21, D-24 |
 | 1b · Detalhe do produto | indicadores da última pesquisa, correspondência, atalhos para histórico e auditoria | RF-22, RF-31 |
 | 1c · Confirmar correspondência | produtos do catálogo da fonte com checkbox; kits e modelos diferentes ficam de fora | DT-04, ADR 2002 item 10 |
-| 1d · Arquivar produto | confirmação; o produto sai da lista e o histórico é mantido | proposta (ver pendências) |
-| 1e · Lista vazia | grade com "Nenhum registro encontrado." (`emptyMessage` do `ui-table`) | — |
+| 1d · Arquivar produto | mesma grid atual sob confirmação com mensagem do app; Cancelar e Arquivar (contorno de perigo); histórico mantido | RF-01 |
+| 1e · Lista vazia | mesmas colunas e filtros; "Nenhum produto cadastrado.", sem contagem | — |
+| 1f · Meus produtos: filtros avançados | painel aberto com somente Arquivado; seletor Não/Sim/Todos | — |
+| 1g · Meus produtos: arquivados | Arquivado = Sim; indicador de filtro aplicado e Limpar; Sim nas linhas, sem ações de escrita | — |
+| 1h · Meus produtos: todos | Arquivado = Todos; cinco exemplos, Sim/Não e ações somente nos não arquivados | — |
+| 1i · Meus produtos: não arquivados | Arquivado = Não; quatro exemplos, Não e menu de ações | — |
 | 2 · Shopping: pesquisas | grid `ui-table`, com busca pelo produto usado e período De/Até em Filtros avançados, sem hora; Data (mais recentes primeiro), Produtos (quantidade), UF do vendedor, CEP e Ações (⋯ → Abrir); Nova pesquisa por permissão | ajuste da 2.3, aplicado |
 | 2a · Shopping: resultado | uma linha por produto e fonte; concluída, indisponível; Pix quando a extensão captura; tentar de novo | RF-03, RQ-03, ADR 2002 |
 | 2b · Shopping: instalar extensão | diálogo com "Pesquisar só o catálogo" e "Instalar extensão" | ADR 2002 item 7 |
@@ -34,6 +38,9 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
   participa da busca geral junto com nome/modelo/EAN. Sem Situação. Padrão:
   somente não arquivados. Arquivados são consultáveis na lista, com ações de escrita ocultas.
 - **Coluna Arquivado em Meus produtos:** após EAN, booleano Sim/Não pelo padrão do `ui-table`.
+- **Sincronização de Meus produtos (07/11/2026):** telas 1/1d/1e e estados 1f–1i conferidos
+  com o template da página, schema da API, `ui-table`, `ui-filter` e `ui-confirm-dialog`.
+  Valores são exemplos; preços e última pesquisa não fazem parte da grid atual.
 - **Shopping como lista de pesquisas:** `/shopping` exige `search:view`; `/shopping/nova`
   exige `search:create`. Abrir leva a `/shopping/:id` sem iniciar coleta; só Pesquisar
   no formulário solicita execução. Voltar/Cancelar retornam à lista.
@@ -58,5 +65,5 @@ Valores, lojas e vendedores nas telas são **de exemplo**.
 | Ícones | biblioteca do core sem ícone de arquivar (usada a lixeira) e de atualizar ("Tentar de novo" sem ícone) |
 | "Pesquisa antiga" no dashboard | prazo não definido na especificação (exemplo: 2 dias) |
 | Itens do dashboard clicáveis | proposta: abrir o detalhe do produto |
-| Confirmar correspondência e arquivar | sugestões de desenvolvimento; levar ao idealizador |
+| Confirmar correspondência | sugestão de desenvolvimento; levar ao idealizador |
 | Padrões da biblioteca do core | divergem do app (barra de filtros, altura do card, rodapé do formulário, lista vazia); corrigir no repositório do core |

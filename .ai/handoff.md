@@ -1,9 +1,9 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-07 21:46
+- **Atualizado em:** 2026-11-07 21:58
 - **Agente:** Codex
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 940f4e2 fix(catalog): keep brand only in general search
+- **Último commit anterior a esta etapa:** 07b11a3 feat(catalog): show archived column after EAN
 
 ## Situação
 
@@ -15,6 +15,10 @@
 
 ## Feito nesta etapa
 
+- FigCraft Meus produtos sincronizado com código/schema: seis colunas, busca completa,
+  só Arquivado nos avançados; variantes 1f–1i (painel aberto, Sim/Todos/Não), sem ações nos arquivados.
+  Confirmação 1d e vazio 1e atualizados; texto real, botão de perigo, sem promessa de restauração.
+  Renderizações e estrutura verificadas pela CLI; inventário atualizado. Nenhuma mudança no runtime.
 - Meus produtos: substituído Situação por Arquivado (Não/Sim/Todos); padrão não arquivados.
   Marca também removida dos avançados: permanece na busca geral. API brand preservada.
   Grid ganhou Arquivado (booleano Sim/Não) logo após EAN pelo schema, sem novas consultas.
