@@ -151,3 +151,9 @@ produtos. **Não traz** UF do vendedor nem condição por card (condição só p
   armazenamento).
 - A correspondência de produto (DT-04, etapa 3.2) precisa descartar peças e acessórios
   que o catálogo devolve na mesma busca.
+
+## Revisões
+
+| Data | Mudança |
+|---|---|
+| 2026-11-18 | Etapa 3.1 (conector) mediu a API com a L3250 e o S24 e ajusta o item 1. **Limite:** `/products/search` aceita ~1 chamada a cada 10 s (429 `local_rate_limited` em sequência); `/products/{id}/items` e `/sites/MLB/domain_discovery/search` responderam em 0,3–0,6 s sem limite observado. **Domínio:** vem do `domain_discovery` (acertou `MLB-PRINTERS` e `MLB-CELLPHONES`); a maioria dos domínios na busca errava (acessórios dominam). **Consulta:** marca + modelo ("Epson L3250" achou 25 produtos de catálogo em 50; o nome cadastrado "Impressora Epson L3250", 1); com EAN, `product_identifier` primeiro (prioridade da documentação). **Paginação da busca:** uma página de 50 por produto, com o resultado em cache por 24 h (1 h quando vazio), em vez de várias páginas a 10 s cada. **Ofertas:** 100 por página com `paging.total`; 404 "No winners found" = produto de catálogo sem ofertas. **Vendedor:** `state.id` vem opaco ou vazio; a UF sai do nome do estado. **Link:** as ofertas não trazem `permalink`; o link fica vazio até ser validado (pendência mantida). Resultado real: 287 ofertas novas da L3250 em 14 produtos de catálogo, 33 de vendedores de SC |

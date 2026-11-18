@@ -1,8 +1,8 @@
 """Contrato dos conectores de fonte (ADR 2001, ADR 2003 §3 e §4).
 
 Cada fonte implementa `search` e se registra em `CONNECTORS`. Fonte sem conector registrado
-responde "indisponível": nunca se simula uma fonte conectada (plano 2001, decisão 3). O
-conector do Mercado Livre entra na etapa 3.1.
+responde "indisponível": nunca se simula uma fonte conectada (plano 2001, decisão 3). Os
+conectores reais são registrados no `ready()` do app (Mercado Livre: `mercado_livre.py`).
 """
 
 from dataclasses import dataclass, field

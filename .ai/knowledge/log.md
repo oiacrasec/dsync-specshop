@@ -1,5 +1,16 @@
 # Histórico do conhecimento
 
+## 2026-11-18 — Etapa 3.1: conector do Mercado Livre
+
+- `backend/apps/pricing/mercado_livre.py` (novo), registrado em `apps.py`; constantes em
+  `constants.py`. Token da aplicação em cache; EAN por `product_identifier`, senão marca +
+  modelo no domínio do `domain_discovery`; filtro mínimo pelo modelo; ofertas por catálogo.
+- API real medida: `/products/search` ~1 chamada/10 s (vez no cache, espera ≤ 10 s, depois
+  `unavailable`); busca de catálogo em cache 24 h. L3250: 287 ofertas novas em 14 produtos.
+- Testes com transporte falso (`tests/test_mercado_livre.py`, conftest sem conectores reais)
+  e ponta a ponta pela API. Sem dependência nova (urllib) e sem mudança de contrato da API.
+- Docs: ADR 2002 (Revisões), `docs/api/searches.md`, plano 2001 (decisões 10–15), handoff.
+
 ## 2026-11-07 — Desenho de Meus produtos sincronizado com a implementação
 
 - `design/specshop-telas.figcraft`: grid 1 refeita com Nome/Modelo/Marca/EAN/Arquivado/Ações,

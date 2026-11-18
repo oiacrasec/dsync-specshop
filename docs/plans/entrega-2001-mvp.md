@@ -21,6 +21,12 @@ do usuário.
 | 7 | Ajuste da 2.3 aprovado no FigCraft e aplicado: Shopping lista pesquisas em `ui-table`; ⋯ → Abrir leva ao resultado existente; Nova pesquisa abre o formulário separado. Colunas: Data, Produtos (quantidade), UF e CEP |
 | 8 | Revisão da 2.3: busca geral pelo produto usado na pesquisa e período De/Até em Filtros avançados (revisado em 07/11), sem hora; resultado usa botão Nova pesquisa preenchido e ações/paginação padrão do `ui-table` |
 | 9 | Revisão da 1.3: Meus produtos substitui o filtro Situação por Arquivado (Não/Sim/Todos), preservando não arquivados por padrão e consulta de arquivados sem ações de escrita |
+| 10 | 3.1, escopo (decisões delegadas pelo usuário em 18/11): token, busca de catálogo e ofertas com preço, preço "de", condição, vendedor e cidade/UF. Frete por CEP e apelido do vendedor ficam na 3.3 (uma chamada por oferta/vendedor); correspondência fina, kits, duplicatas e valores inválidos na 3.2; extensão na 3.4 |
+| 11 | 3.1, token da aplicação no cache do Django até 5 min antes de expirar; 401 renova uma vez. Credenciais só por variável de ambiente, nunca em log, URL ou mensagem |
+| 12 | 3.1, busca: EAN por `product_identifier`; senão marca + modelo no domínio do `domain_discovery`, uma página de 50; ficam só produtos com o modelo no nome ou no MODEL. Resultado em cache 24 h (1 h vazio). Limite medido de ~10 s entre buscas: espera de até 10 s pela vez e, sem vez ou com 429, linha `unavailable` para nova tentativa; nunca segura o worker além disso (timeout 60 s) |
+| 13 | 3.1, ofertas: até 20 produtos de catálogo e 3 páginas de 100 por produto; só BRL e com preço; repetidas entre produtos contam uma vez; UF pelo nome do estado; link vazio até validar (ADR 2002) |
+| 14 | 3.1, cobertura declarada no `detail` da linha ("anúncios fora do catálogo não entram"); erros de rede/5xx viram `error` e limite/credenciais `unavailable`, ambos com nova tentativa |
+| 15 | 3.1, testes com transporte HTTP falso (nenhum teste chama a API real) e verificação manual na API real: 287 ofertas novas da L3250 em 14 produtos de catálogo; S24 SM-S921B sem resultado (anúncios escrevem "S921b") |
 
 ## Etapas
 
@@ -40,7 +46,7 @@ do usuário.
 | 2.2 | Pesquisa sob demanda de até 10 produtos: estado por produto/fonte, falha parcial, limite explícito, nova tentativa manual; API `/api/v1/searches/` com run/retry por linha, conector por fonte (`docs/api/searches.md`) | DT-07, RF-25, RF-29 | ✅ |
 | 2.3 | Tela "Shopping": grid de pesquisas (`ui-table`), formulário em `shopping/nova`, seleção de produtos/fontes/região, progresso e resultado | RF-10, RF-29 | ✅ |
 | **3 — Primeiro preço real** | | | |
-| 3.1 | Conector do Mercado Livre conforme o 0.2 | DT-02, RF-03 | ⬜ |
+| 3.1 | Conector do Mercado Livre conforme o 0.2 (decisões 10–15; revisão do ADR 2002 em 18/11) | DT-02, RF-03 | ✅ |
 | 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos | DT-04, RF-05, RF-19, RF-27 | ⬜ |
 | 3.3 | Filtros de localização do vendedor e destino de entrega (SC primeiro) | RF-04, RF-24 | ⬜ |
 | 3.4 | Extensão do navegador acionada pelo SPECSHOP para a busca completa do Mercado Livre (ADR 2002, item 7) | DT-02, RF-03 | ⬜ |

@@ -333,3 +333,28 @@ def test_concurrent_runs_of_the_same_item_execute_once(world, fake):
     with ThreadPoolExecutor(max_workers=2) as pool:
         codes = sorted(pool.map(lambda _: attempt(), range(2)))
     assert codes == [200, 409] and fake.calls == 1
+
+
+def test_mercado_livre_connector_runs_through_the_api_and_feeds_the_global_base(world, monkeypatch):
+    from apps.pricing.mercado_livre import COVERAGE, MercadoLivreConnector
+    from apps.pricing.tests.test_mercado_livre import FakeML, item, items_page
+
+    monkeypatch.setenv('ML_CLIENT_ID', 'app-de-teste')
+    monkeypatch.setenv('ML_CLIENT_SECRET', 'segredo-de-teste')
+    catalog = {'results': [{'id': 'MLB7', 'name': 'Produto 0 M0 original', 'attributes': []}]}
+    fake = FakeML(
+        {
+            '/sites/MLB/domain_discovery/search': (200, []),
+            '/products/search': (200, catalog),
+            '/products/MLB7/items': items_page([item('A', 100), item('B', 80, condition='used')], 2),
+        }
+    )
+    sources.CONNECTORS[ML] = MercadoLivreConnector(transport=fake)
+    search = create(world, count=1).json()
+    body = run(world, search, search['items'][0]).json()
+    assert body['status'] == 'done' and body['detail'] == COVERAGE
+    assert body['offer_count'] == 1 and Decimal(body['min_price']) == Decimal('100.00')
+    stored = {offer.listing_id: offer for offer in SearchOffer.objects.all()}
+    assert stored['A'].eligible and stored['A'].seller_state == 'SP' and stored['A'].catalog_product_id == 'MLB7'
+    assert not stored['B'].eligible and stored['B'].ineligible_reason == 'not_new'
+    assert list(PriceObservation.objects.unscoped().values_list('listing_id', flat=True)) == ['A']

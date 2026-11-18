@@ -50,5 +50,25 @@ gravadas com o motivo (`not_new`, `invalid_price`) para a auditoria e não entra
 indicadores nem na base global. Correspondência, kits e quarentena por valor vêm na 3.2.
 
 **Conectores**: `apps/pricing/sources.py` (`SourceConnector`, registro `CONNECTORS`). Fonte
-sem conector responde `unavailable` ("O conector desta fonte ainda não está disponível.");
-o do Mercado Livre entra na etapa 3.1.
+sem conector responde `unavailable` ("O conector desta fonte ainda não está disponível.").
+Os conectores reais são registrados no `ready()` do app `pricing`.
+
+**Mercado Livre** (`apps/pricing/mercado_livre.py`, etapa 3.1, ADR 2002): API oficial de
+catálogo com o token da aplicação (`ML_CLIENT_ID`/`ML_CLIENT_SECRET`), sem credenciais do
+cliente. Produtos de catálogo por EAN (`product_identifier`) ou por marca + modelo no domínio
+previsto pelo Mercado Livre, mantendo só os que trazem o modelo cadastrado no nome ou no
+atributo MODEL; ofertas de cada um em `/products/{id}/items`. Por oferta: preço, preço "de",
+condição, vendedor (ID, cidade e UF); nota fiscal "não informada", condição de pagamento,
+frete e link vazios (desconhecidos, nunca zero). `detail` da linha concluída informa a
+cobertura: só anúncios do catálogo.
+
+| Situação | `status` / `detail` |
+|---|---|
+| Credenciais ausentes no servidor | `unavailable` / "O Mercado Livre não está configurado no servidor." |
+| Credenciais recusadas | `unavailable` / "O Mercado Livre recusou as credenciais do SPECSHOP." |
+| Busca limitada (vez ocupada por 10 s ou HTTP 429) | `unavailable` / "O Mercado Livre limitou as consultas agora. Tente de novo em alguns segundos." |
+| Rede, 5xx ou resposta inválida | `error` (mensagem padrão da fonte) |
+
+Limites por linha: espera de até 10 s pela vez da busca, até 20 produtos de catálogo e
+3 páginas de 100 ofertas por produto de catálogo. O resultado da busca de catálogo fica em
+cache (24 h; 1 h quando vazio): a pesquisa seguinte do produto só consulta as ofertas.
