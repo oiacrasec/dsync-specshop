@@ -266,14 +266,80 @@ def test_domain_discovery_failure_only_drops_the_domain_filter(credentials):
     assert 'domain_id' not in params and result.status == SearchItemStatus.DONE
 
 
-def test_query_is_brand_and_model_or_name_and_model_without_brand():
-    assert ml._query(product(name='Impressora multifuncional', brand='Epson', model='L3250')) == 'Epson L3250'
-    assert ml._query(product(name='Impressora multifuncional', brand='', model='L3250')) == (
+def test_queries_cascade_brand_model_then_name_model():
+    assert ml._queries(product(name='Impressora multifuncional', brand='Epson', model='L3250')) == [
+        'Epson L3250',
+        'Impressora multifuncional L3250',
+    ]
+    assert ml._queries(product(name='Impressora multifuncional', brand='', model='L3250')) == [
         'Impressora multifuncional L3250'
-    )
-    assert ml._query(product(name='Celular Galaxy S24 SM-S921B', brand='', model='sm s921b')) == (
+    ]
+    assert ml._queries(product(name='Celular Galaxy S24 SM-S921B', brand='', model='sm s921b')) == [
         'Celular Galaxy S24 SM-S921B'
+    ]
+
+
+def test_name_query_runs_only_when_brand_and_model_find_no_match(credentials):
+    def products_search(params):
+        if params['q'] == 'Epson L3250':
+            return 200, {'results': [{'id': 'MLB3', 'name': 'Impressora Epson L4260', 'attributes': []}]}
+        return 200, L3250_SEARCH
+
+    fake = FakeML(routes(**{'/products/search': products_search}))
+    result = search(connector(fake))
+    queries = [call['params']['q'] for call in fake.calls if call['path'] == '/products/search']
+    assert queries == ['Epson L3250', 'Impressora Epson L3250']
+    assert {offer.listing_id for offer in result.offers} == {'A', 'B', 'C'}
+
+
+def test_other_codes_other_brands_and_other_capacities_are_left_out(credentials):
+    rows = [
+        {
+            'id': 'S24',
+            'name': 'Samsung Galaxy S24 256GB Preto S921b',
+            'attributes': [{'id': 'BRAND', 'value_name': 'Samsung'}],
+        },
+        {'id': 'FE', 'name': 'Samsung Galaxy S24 Fe 256gb SM-S721B', 'attributes': []},
+        {'id': 'OUTRA', 'name': 'Capa S921b 256GB', 'attributes': [{'id': 'BRAND', 'value_name': 'KawaSkin'}]},
+        {'id': '128', 'name': 'Samsung Galaxy S24 128GB S921b', 'attributes': []},
+    ]
+    fake = FakeML(
+        routes(**{'/products/search': (200, {'results': rows}), '/products/S24/items': items_page([item('X', 10)], 1)})
     )
+    s24 = product(name='Smartphone Galaxy S24 256GB', model='SM-S921B', brand='Samsung')
+    result = search(connector(fake), s24)
+    assert [offer.catalog_product_id for offer in result.offers] == ['S24']
+    assert not {'/products/FE/items', '/products/OUTRA/items', '/products/128/items'} & set(fake.paths())
+
+
+def test_family_siblings_join_when_brand_and_capacity_pass(credentials):
+    rows = [
+        {'id': 'MLB1', 'name': 'Celular Samsung Galaxy S24 128gb S921b Cor Creme', 'parent_id': 'P1', 'attributes': []}
+    ]
+    family = {'id': 'P1', 'children_ids': ['MLB1', 'MLB2', 'MLB3', 'MLB4']}
+    fake = FakeML(
+        routes(
+            **{
+                '/products/search': (200, {'results': rows}),
+                '/products/P1': (200, family),
+                '/products/MLB2': (200, {'id': 'MLB2', 'name': 'Samsung Galaxy S24 128gb cor amarela'}),
+                '/products/MLB3': (
+                    200,
+                    {
+                        'id': 'MLB3',
+                        'name': 'Capa Galaxy S24',
+                        'attributes': [{'id': 'BRAND', 'value_name': 'KawaSkin'}],
+                    },
+                ),
+                '/products/MLB4': (404, {'message': 'not found'}),
+                '/products/MLB1/items': items_page([], 0),
+                '/products/MLB2/items': items_page([item('Y', 3999)], 1),
+            }
+        )
+    )
+    result = search(connector(fake), product(name='Smartphone Galaxy S24', model='SM-S921B', brand='Samsung'))
+    assert [(offer.listing_id, offer.catalog_product_id) for offer in result.offers] == [('Y', 'MLB2')]
+    assert '/products/MLB3/items' not in fake.paths()  # outra marca na família
 
 
 def test_app_registers_the_real_connector():

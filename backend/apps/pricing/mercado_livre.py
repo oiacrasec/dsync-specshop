@@ -1,11 +1,14 @@
-"""Conector do Mercado Livre pela API oficial de catálogo (ADR 2002, etapa 3.1).
+"""Conector do Mercado Livre pela API oficial de catálogo (ADR 2002, etapas 3.1 e 3.2).
 
-Fluxo por produto (decisões da 3.1 no plano 2001):
+Fluxo por produto (decisões 10–15 e 16–22 do plano 2001):
 
 1. Token da aplicação (`client_credentials`) em cache até perto de expirar.
-2. Produtos de catálogo: com EAN, `product_identifier` (prioridade da documentação); sem
-   resultado, `q` = marca + modelo com o domínio previsto por `domain_discovery`. Só ficam os produtos cujo
-   nome ou atributo MODEL contém o modelo cadastrado; a correspondência fina é da 3.2.
+2. Produtos de catálogo em cascata (ADR 2001): EAN por `product_identifier`; senão marca +
+   modelo; senão nome + modelo, no domínio previsto por `domain_discovery`. Para na primeira
+   consulta com produto que corresponda (`matching.py`: modelo como palavra inteira, marca e
+   capacidade). Os irmãos da família (`parent_id`) entram quando passam por marca e
+   capacidade, porque o catálogo escreve o modelo de jeitos diferentes ("SM-S921B" ×
+   "Galaxy S24") e a família reúne só variações do mesmo aparelho.
 3. Ofertas de cada produto de catálogo em `/products/{id}/items`.
 
 `/products/search` aceita ~1 chamada a cada 10 s: a vez é reservada no cache, a espera é
@@ -18,9 +21,7 @@ import hashlib
 import json
 import logging
 import os
-import re
 import time
-import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -29,6 +30,7 @@ from decimal import Decimal, InvalidOperation
 from django.core.cache import cache
 
 from . import constants as c
+from . import matching
 from .models import CollectionMechanism, InvoiceDeclaration, OfferCondition, SearchItemStatus
 from .sources import SourceOffer, SourceResult, unavailable
 
@@ -94,27 +96,57 @@ class MercadoLivreConnector:
 
     def _catalog_products(self, product, credentials):
         """Lista de (id, nome) dos produtos de catálogo do produto, com cache."""
-        query = _query(product)
+        queries = _queries(product)
         ean = (product.ean or '').strip()
-        key = _CATALOG_KEY + hashlib.sha256(f'{ean}|{query}|{product.model}'.upper().encode()).hexdigest()
+        identity = '|'.join([ean, product.name, product.model, product.brand or '', *queries])
+        key = _CATALOG_KEY + hashlib.sha256(identity.upper().encode()).hexdigest()
         cached = cache.get(key)
         if cached is not None:
             return cached
         found = []
         if ean:
             found = [(row['id'], row.get('name', '')) for row in self._search({'product_identifier': ean}, credentials)]
-        if not found:
-            params = {'q': query}
-            domain = self._domain(query, credentials)
-            if domain:
-                params['domain_id'] = domain
-            found = [
-                (row['id'], row.get('name', ''))
-                for row in self._search(params, credentials)
-                if _matches_model(row, product.model)
-            ]
+        domain = None
+        for query in queries:
+            if found:
+                break
+            if domain is None:
+                domain = self._domain(query, credentials)
+            params = {'q': query, **({'domain_id': domain} if domain else {})}
+            rows = self._search(params, credentials)
+            found = [(row['id'], row.get('name', '')) for row in rows if _matches(row, product)]
+            if found:
+                found = self._with_family(rows, found, product, credentials)
         found = found[: c.ML_MAX_CATALOG_PRODUCTS]
         cache.set(key, found, c.ML_CATALOG_CACHE_SECONDS if found else c.ML_CATALOG_MISS_CACHE_SECONDS)
+        return found
+
+    def _with_family(self, rows, found, product, credentials):
+        """Acrescenta irmãos de família (`parent_id`) dos produtos que corresponderam.
+
+        Verificado em 18/11: a família reúne variações do mesmo aparelho (S24 128 GB creme e
+        amarela; L3250 com e sem Wi-Fi). Irmão entra se passar por marca e capacidade.
+        """
+        known = {catalog_id for catalog_id, _name in found}
+        by_id = {row['id']: row for row in rows}
+        parents = list(dict.fromkeys(by_id[catalog_id].get('parent_id') for catalog_id in known if catalog_id in by_id))
+        for parent in filter(None, parents):
+            if len(found) >= c.ML_MAX_CATALOG_PRODUCTS:
+                break
+            status, family = self._get(f'/products/{_quote(parent)}', {}, credentials)
+            if status != 200:
+                continue
+            for child in family.get('children_ids') or []:
+                if child in known or len(found) >= c.ML_MAX_CATALOG_PRODUCTS:
+                    continue
+                row = by_id.get(child)
+                if row is None:
+                    status, row = self._get(f'/products/{_quote(child)}', {}, credentials)
+                    if status != 200:
+                        continue
+                if _family_member_matches(row, product):
+                    found.append((child, row.get('name', '')))
+                    known.add(child)
         return found
 
     def _domain(self, query, credentials):
@@ -161,7 +193,7 @@ class MercadoLivreConnector:
         return offers
 
     def _catalog_items(self, catalog_id, credentials):
-        path = f'/products/{urllib.parse.quote(catalog_id, safe="")}/items'
+        path = f'/products/{_quote(catalog_id)}/items'
         offset = 0
         for _page in range(c.ML_MAX_OFFER_PAGES):
             status, data = self._get(path, {'limit': c.ML_OFFERS_PAGE_SIZE, 'offset': offset}, credentials)
@@ -245,33 +277,55 @@ def _token_key(credentials):
     return f'{_TOKEN_KEY}:{hashlib.sha256(credentials[0].encode()).hexdigest()[:16]}'
 
 
-def _query(product):
-    """Marca + modelo; sem marca, nome + modelo.
+def _quote(catalog_id):
+    return urllib.parse.quote(str(catalog_id), safe='')
+
+
+def _queries(product):
+    """Cascata de consultas (ADR 2001, revisão de 18/11): marca + modelo, depois nome + modelo.
 
     Medido em 2026-11-18: "Epson L3250" achou 25 produtos de catálogo da L3250 em 50, e
-    "Impressora Epson L3250" (nome cadastrado) só 1; palavras genéricas pioram a busca.
+    "Impressora Epson L3250" (nome cadastrado) só 1. O nome continua como consulta de reserva
+    (D-24); o EAN, quando existe, vem antes de todas.
     """
     model = product.model.strip()
     brand = (product.brand or '').strip()
-    if brand:
-        return f'{brand} {model}'
     name = product.name.strip()
-    return name if _compact(model) in _compact(name) else f'{name} {model}'
+    by_name = name if matching.compact(model) in matching.compact(name) else f'{name} {model}'
+    queries = [f'{brand} {model}'] if brand else []
+    if by_name.casefold() not in (query.casefold() for query in queries):
+        queries.append(by_name)
+    return queries
 
 
-def _compact(text):
-    """Só letras e dígitos, sem acento, em maiúsculas: 'SM-S921B' e 'sm s921b' ficam iguais."""
-    text = unicodedata.normalize('NFKD', text or '').encode('ascii', 'ignore').decode()
-    return re.sub(r'[^0-9A-Za-z]', '', text).upper()
+def _attribute(row, attribute_id):
+    return [attr.get('value_name') or '' for attr in row.get('attributes') or [] if attr.get('id') == attribute_id]
 
 
-def _matches_model(row, model):
-    """Filtro mínimo da 3.1: o modelo cadastrado aparece no nome ou no MODEL do catálogo."""
-    wanted = _compact(model)
-    if not wanted:
+def _source_text(row):
+    """Nome + valores dos atributos: onde a capacidade pode aparecer ("256 GB")."""
+    values = [attr.get('value_name') or '' for attr in row.get('attributes') or []]
+    return ' '.join([row.get('name', ''), *values])
+
+
+def _brand_and_capacity_match(row, product):
+    brands = _attribute(row, 'BRAND') or ['']
+    return any(matching.brand_matches(product.brand, brand) for brand in brands) and matching.capacity_matches(
+        product, _source_text(row)
+    )
+
+
+def _matches(row, product):
+    """Produto de catálogo corresponde: modelo (nome ou MODEL), marca e capacidade."""
+    texts = [row.get('name', ''), *_attribute(row, 'MODEL')]
+    if not any(matching.model_matches(text, product.model) for text in texts):
         return False
-    models = [attr.get('value_name') or '' for attr in row.get('attributes') or [] if attr.get('id') == 'MODEL']
-    return any(wanted in _compact(text) for text in [row.get('name', ''), *models])
+    return _brand_and_capacity_match(row, product)
+
+
+def _family_member_matches(row, product):
+    """Irmão de família: sem exigir o código do modelo; marca e capacidade ainda valem."""
+    return _brand_and_capacity_match(row, product)
 
 
 def _decimal(value):
@@ -286,8 +340,7 @@ def _decimal(value):
 
 def _state(address):
     name = ((address or {}).get('state') or {}).get('name') or ''
-    plain = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().upper().strip()
-    return c.BRAZIL_STATE_BY_NAME.get(plain, '')
+    return c.BRAZIL_STATE_BY_NAME.get(matching.plain(name).strip(), '')
 
 
 def _offer(row, *, catalog_id, title):

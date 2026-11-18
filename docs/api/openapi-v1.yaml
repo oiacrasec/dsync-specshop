@@ -6395,6 +6395,10 @@ components:
           readOnly: true
           nullable: true
           title: Maior preço
+        outlier_count:
+          type: integer
+          readOnly: true
+          title: Ofertas fora do padrão
       required:
       - avg_price
       - detail
@@ -6403,6 +6407,7 @@ components:
       - median_price
       - min_price
       - offer_count
+      - outlier_count
       - product
       - product_model
       - product_name

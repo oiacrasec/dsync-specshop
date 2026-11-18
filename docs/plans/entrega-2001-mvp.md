@@ -27,6 +27,16 @@ do usuário.
 | 13 | 3.1, ofertas: até 20 produtos de catálogo e 3 páginas de 100 por produto; só BRL e com preço; repetidas entre produtos contam uma vez; UF pelo nome do estado; link vazio até validar (ADR 2002) |
 | 14 | 3.1, cobertura declarada no `detail` da linha ("anúncios fora do catálogo não entram"); erros de rede/5xx viram `error` e limite/credenciais `unavailable`, ambos com nova tentativa |
 | 15 | 3.1, testes com transporte HTTP falso (nenhum teste chama a API real) e verificação manual na API real: 287 ofertas novas da L3250 em 14 produtos de catálogo; S24 SM-S921B sem resultado (anúncios escrevem "S921b") |
+| 16 | 3.2, D-24 × busca (decidido pelo usuário, valendo para MVP, Mercado Livre, KaBuM! e demais): cascata EAN → marca + modelo → nome + modelo, parando na primeira com correspondência (ADR 2001); interpretação da D-24 levada ao idealizador |
+| 17 | 3.2, ponto 1 (aprovado; revisto em 18/11): marca precisa bater quando conhecida nos dois lados; modelo como palavra inteira. A lista de sufixos de irmão (FE, Plus, Ultra…) foi **removida** a pedido do usuário: não escala por categoria e texto não distingue variação de outro aparelho. Irmãos se separam pelo código de fábrica como modelo (SM-S921B × SM-S721B do S24 FE), pela família da fonte e pela confirmação do usuário (F-1) |
+| 18 | 3.2, ponto 2 (aprovado): modelo também pelo núcleo sem prefixo só de letras ("SM-S921B" → "S921B", núcleo com dígito e ≥ 4 caracteres); família do catálogo (`parent_id`) adotada após verificar 3 famílias com variações do mesmo aparelho; irmão de família entra se passar por marca e capacidade |
+| 19 | 3.2, ponto 3 (aprovado): capacidade (GB/TB) no nome cadastrado restringe; cor e voltagem não; a variação fica identificada pelo título. Campo próprio de variante fica na F-1 |
+| 20 | 3.2, ponto 4 (pelo PO, "unidade/embalagem"): várias unidades num preço → inelegível `multi_unit`. Produto + adicional ("+ Kit Tinta") **aguarda decisão**: o PO diz "identificados", sem dizer se saem das estatísticas |
+| 21 | 3.2, pelo PO (`regras.md`): oferta sem evidência de produto novo fica pendente de revisão, fora das estatísticas → motivo `condition_unconfirmed`, separado de `not_new` (usado/recondicionado) |
+| 22 | 3.2 (usuário, 18/11): produto + adicional ("L3250 + 01 Kit Tinta") **entra** nos indicadores; fica identificado pelo título da oferta |
+| 23 | 3.2 (usuário, 18/11): anúncios do mesmo vendedor contam cada um como oferta. Medido na L3250: 47 de 179 vendedores com mais de um anúncio, 39 deles com preços diferentes (ex.: 16 anúncios de R$ 1.236 a R$ 2.964) |
+| 24 | 3.2 (usuário, 18/11): outlier absurdo = preço ≥ 10× a mediana das elegíveis (opção A, só o lado alto, pelo PO); oferta marcada `outlier`, fora dos indicadores e da base global; `outlier_count` na linha para o **alerta na tela, que aguarda desenho no FigCraft** |
+| 25 | Usuário, 18/11: tabela de estados (código IBGE, sigla, nome) no **core**, com fixture carregada por migration de dados idempotente (padrão do `rbac.0002`), em etapa própria logo após a 3.2 (3.2b) |
 
 ## Etapas
 
@@ -47,7 +57,8 @@ do usuário.
 | 2.3 | Tela "Shopping": grid de pesquisas (`ui-table`), formulário em `shopping/nova`, seleção de produtos/fontes/região, progresso e resultado | RF-10, RF-29 | ✅ |
 | **3 — Primeiro preço real** | | | |
 | 3.1 | Conector do Mercado Livre conforme o 0.2 (decisões 10–15; revisão do ADR 2002 em 18/11) | DT-02, RF-03 | ✅ |
-| 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos | DT-04, RF-05, RF-19, RF-27 | ⬜ |
+| 3.2 | Correspondência de produto, menor preço disponível, condições, kits, duplicatas e valores inválidos (decisões 16–24; falta o alerta de outlier na tela, após o FigCraft) | DT-04, RF-05, RF-19, RF-27 | 🔄 |
+| 3.2b | Tabela de estados no core: código IBGE, sigla e nome (fonte: API de localidades do IBGE), fixture + migration de dados idempotente; SPECSHOP valida UFs, mapeia nome→UF do Mercado Livre e lista as opções da tela pela tabela (decisão 25) | RF-04, RF-24 | ⬜ |
 | 3.3 | Filtros de localização do vendedor e destino de entrega (SC primeiro) | RF-04, RF-24 | ⬜ |
 | 3.4 | Extensão do navegador acionada pelo SPECSHOP para a busca completa do Mercado Livre (ADR 2002, item 7) | DT-02, RF-03 | ⬜ |
 | **4 — Indicadores e auditoria** | | | |
@@ -65,3 +76,11 @@ do usuário.
 
 O escopo detalhado de cada etapa é proposto e aprovado ao iniciá-la; decisões tomadas
 entram na tabela de decisões de planejamento.
+
+## Melhorias futuras
+
+Fora do MVP por decisão do usuário; entram no plano quando forem priorizadas.
+
+| # | Melhoria | Origem |
+|---|---|---|
+| F-1 | **Cadastro pelo catálogo, com busca estilo Netflix:** em Meus produtos, o usuário digita e vê produtos enquanto digita, com tolerância a erro, num catálogo próprio do SPECSHOP (produtos de catálogo já vistos nas pesquisas: nome, EAN, família e variações; ex.: `pg_trgm`). As variações aparecem agrupadas por família (`parent_id` do Mercado Livre), como temporadas dentro de um título. Escolher preenche nome, marca, modelo, EAN e variante. Sem resultado local, botão "Buscar no Mercado Livre" (busca limitada a ~1 chamada a cada 10 s, sem consulta enquanto digita). Inclui campo próprio de variante, textos de ajuda do formulário e a **confirmação da correspondência pelo usuário** (decidido em 18/11): na primeira pesquisa, o SPECSHOP mostra os produtos de catálogo candidatos agrupados por família, o usuário marca quais são o produto dele e o vínculo fica guardado (DT-04 "correspondência e revisão", Q-14; identidade estável, DT-06). Passa pelo FigCraft antes | 18/11, durante a 3.2: S24 cadastrado pelo código "SM-S921B" não casou com o catálogo, que usa "Galaxy S24" |

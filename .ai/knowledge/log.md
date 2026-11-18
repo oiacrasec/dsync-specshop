@@ -1,5 +1,18 @@
 # Histórico do conhecimento
 
+## 2026-11-18 — Etapa 3.2 (parcial): correspondência e elegibilidade pelo PO
+
+- `backend/apps/pricing/matching.py` (novo, todas as fontes): modelo como palavra inteira e
+  pelo núcleo ("S921B"), marca, capacidade e várias unidades. Lista de sufixos de irmão
+  removida (não escala por categoria); confirmação da correspondência entra na F-1.
+- Conector do Mercado Livre: cascata EAN → marca + modelo → nome + modelo e irmãos de família
+  (`parent_id`). `services._ineligible_reason`: `condition_unconfirmed` e `multi_unit`.
+- Real: L3250 279 elegíveis + 8 `multi_unit`; S24 casa com 2 produtos de catálogo sem ofertas.
+- Outlier absurdo (≥ 10× a mediana) marcado `outlier`, fora dos indicadores; `outlier_count`
+  na linha (migration `pricing.0003`, OpenAPI). Etapa 3.2b (estados no core) planejada.
+- Docs: ADR 2001 e 2002 (Revisões), `docs/api/searches.md`, plano (decisões 16–21, F-1),
+  pendência da D-24 em `decisoes-e-pendencias.md`, handoff. Sem commit: aguarda revisão.
+
 ## 2026-11-18 — Etapa 3.1: conector do Mercado Livre
 
 - `backend/apps/pricing/mercado_livre.py` (novo), registrado em `apps.py`; constantes em

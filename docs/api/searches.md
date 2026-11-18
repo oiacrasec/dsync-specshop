@@ -45,9 +45,28 @@ o filtro técnico herdado `is_active` não é apresentado nesta tela.
 Situações da linha: `pending`, `running`, `done`, `no_results`, `unavailable` (fonte sem
 conector ou recusou o acesso; nunca vale zero), `error` (falha inesperada da fonte).
 
-**Elegibilidade básica** (2.2): produto novo e preço positivo. Ofertas inelegíveis ficam
-gravadas com o motivo (`not_new`, `invalid_price`) para a auditoria e não entram nos
-indicadores nem na base global. Correspondência, kits e quarentena por valor vêm na 3.2.
+**Elegibilidade** (2.2 e 3.2, `regras.md`): ofertas inelegíveis ficam gravadas com o motivo
+para a auditoria e não entram nos indicadores nem na base global.
+
+| Motivo | Quando |
+|---|---|
+| `not_new` | usado ou recondicionado (D-21) |
+| `condition_unconfirmed` | sem evidência de produto novo: pendente de revisão, fora das estatísticas |
+| `invalid_price` | preço ausente, zero ou negativo |
+| `multi_unit` | várias unidades num preço ("Kit 02", "kit com 3", "2 unidades"; unidade/embalagem) |
+| `outlier` | preço absurdo: **≥ 10× a mediana** das ofertas elegíveis (só o lado alto: preço baixo legítimo não é descartado só por ser baixo) |
+
+`outlier_count` na linha conta as ofertas marcadas como `outlier`, para o alerta da tela.
+Produto + adicional ("+ Kit Tinta") entra nos indicadores, identificado pelo título; cada
+anúncio do mesmo vendedor conta como uma oferta (decisões do usuário, 18/11).
+
+**Correspondência** (3.2, `apps/pricing/matching.py`, igual para todas as fontes): o modelo
+aparece como palavra inteira (também sem o prefixo só de letras, como "S921B" de
+"SM-S921B"); com marca nos dois lados, ela precisa bater; capacidade (GB/TB) do nome
+cadastrado precisa aparecer. Cor e voltagem não restringem; a variação fica no título. Sem
+listas de sufixos por categoria: com o código de fábrica como modelo, irmãos (S24 FE =
+SM-S721B) não casam; com nome comercial ("S24"), irmãos só se separam pela confirmação do
+usuário (melhoria F-1).
 
 **Conectores**: `apps/pricing/sources.py` (`SourceConnector`, registro `CONNECTORS`). Fonte
 sem conector responde `unavailable` ("O conector desta fonte ainda não está disponível.").
@@ -55,9 +74,10 @@ Os conectores reais são registrados no `ready()` do app `pricing`.
 
 **Mercado Livre** (`apps/pricing/mercado_livre.py`, etapa 3.1, ADR 2002): API oficial de
 catálogo com o token da aplicação (`ML_CLIENT_ID`/`ML_CLIENT_SECRET`), sem credenciais do
-cliente. Produtos de catálogo por EAN (`product_identifier`) ou por marca + modelo no domínio
-previsto pelo Mercado Livre, mantendo só os que trazem o modelo cadastrado no nome ou no
-atributo MODEL; ofertas de cada um em `/products/{id}/items`. Por oferta: preço, preço "de",
+cliente. Produtos de catálogo em cascata (ADR 2001): EAN (`product_identifier`), depois
+marca + modelo e, sem correspondência, nome + modelo, no domínio previsto pelo Mercado
+Livre; ficam os que passam pela correspondência, mais os irmãos de família (`parent_id`)
+que passam por marca e capacidade. Ofertas de cada um em `/products/{id}/items`. Por oferta: preço, preço "de",
 condição, vendedor (ID, cidade e UF); nota fiscal "não informada", condição de pagamento,
 frete e link vazios (desconhecidos, nunca zero). `detail` da linha concluída informa a
 cobertura: só anúncios do catálogo.

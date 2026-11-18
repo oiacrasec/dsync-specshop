@@ -105,3 +105,16 @@ BRAZIL_STATE_BY_NAME = {
     'SERGIPE': 'SE',
     'TOCANTINS': 'TO',
 }
+
+# Motivos de a oferta ficar fora dos indicadores; gravados para a auditoria (regras.md, DT-04).
+INELIGIBLE_NOT_NEW = 'not_new'
+INELIGIBLE_CONDITION_UNCONFIRMED = 'condition_unconfirmed'
+INELIGIBLE_INVALID_PRICE = 'invalid_price'
+INELIGIBLE_MULTI_UNIT = 'multi_unit'
+INELIGIBLE_OUTLIER = 'outlier'
+
+# Outlier absurdo (decisão do usuário, 18/11): preço >= 10x a mediana das ofertas elegíveis.
+# Só o lado alto: o PO não descarta preço baixo legítimo "só por ser baixo" (regras.md).
+OUTLIER_MEDIAN_FACTOR = 10
+# Núcleo do código sem o prefixo de letras ("SM-S921B" -> "S921B") só vale com este tamanho mínimo.
+MODEL_CORE_MIN_LENGTH = 4

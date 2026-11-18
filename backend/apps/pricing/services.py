@@ -10,8 +10,17 @@ from django.db import transaction
 from django.db.models import Count, OuterRef, Subquery
 from django.utils import timezone
 
-from .constants import STALE_RUN_SECONDS
+from .constants import (
+    INELIGIBLE_CONDITION_UNCONFIRMED,
+    INELIGIBLE_INVALID_PRICE,
+    INELIGIBLE_MULTI_UNIT,
+    INELIGIBLE_NOT_NEW,
+    INELIGIBLE_OUTLIER,
+    OUTLIER_MEDIAN_FACTOR,
+    STALE_RUN_SECONDS,
+)
 from .exceptions import SearchItemNotRunnable
+from .matching import is_multi_unit
 from .models import (
     CollectionMechanism,
     ObservationOrigin,
@@ -85,10 +94,11 @@ def _store_result(item, result, *, mechanism, user):
         return
     now = timezone.now()
     offers = [_offer(item, offer, mechanism=mechanism, observed_at=now) for offer in result.offers]
+    item.outlier_count = _flag_outliers(offers)
     SearchOffer.objects.bulk_create(offers)
     eligible = [offer for offer in offers if offer.eligible]
     if not eligible:
-        _finish(item, SearchItemStatus.NO_RESULTS, detail=result.detail)
+        _finish(item, SearchItemStatus.NO_RESULTS, detail=result.detail, stats=['outlier_count'])
         return
     prices = sorted(offer.price for offer in eligible)
     item.offer_count = len(prices)
@@ -99,7 +109,7 @@ def _store_result(item, result, *, mechanism, user):
         item,
         SearchItemStatus.DONE,
         detail=result.detail,
-        stats=['offer_count', 'min_price', 'max_price', 'median_price', 'avg_price'],
+        stats=['offer_count', 'min_price', 'max_price', 'median_price', 'avg_price', 'outlier_count'],
     )
     record_observations(
         [
@@ -118,13 +128,7 @@ def _store_result(item, result, *, mechanism, user):
 
 
 def _offer(item, offer, *, mechanism, observed_at):
-    # Elegibilidade básica da 2.2: produto novo e preço positivo. A regra completa vem na 3.2.
-    if offer.condition != OfferCondition.NEW:
-        reason = 'not_new'
-    elif offer.price is None or offer.price <= 0:
-        reason = 'invalid_price'
-    else:
-        reason = ''
+    reason = _ineligible_reason(offer)
     return SearchOffer(
         item=item,
         contract_id=item.contract_id,
@@ -149,6 +153,42 @@ def _offer(item, offer, *, mechanism, observed_at):
         eligible=not reason,
         ineligible_reason=reason,
     )
+
+
+def _flag_outliers(offers):
+    """Marca preço absurdo (>= 10x a mediana das elegíveis) e devolve quantos foram marcados.
+
+    A mediana não se deixa puxar por um valor extremo (R$ 1.000.000 numa L3250 de R$ 1.426).
+    A oferta continua gravada para a auditoria, fora dos indicadores e da base global.
+    """
+    eligible = [offer for offer in offers if offer.eligible]
+    if not eligible:
+        return 0
+    limit = statistics.median(offer.price for offer in eligible) * OUTLIER_MEDIAN_FACTOR
+    flagged = 0
+    for offer in eligible:
+        if offer.price >= limit:
+            offer.eligible = False
+            offer.ineligible_reason = INELIGIBLE_OUTLIER
+            flagged += 1
+    return flagged
+
+
+def _ineligible_reason(offer):
+    """Motivo de a oferta ficar fora dos indicadores (`regras.md`, DT-04); vazio = elegível.
+
+    Só produto novo (D-21); sem evidência de novo, pendente de revisão; preço positivo; uma
+    unidade do produto ("unidade/embalagem": "Kit 02 Impressoras" é preço de duas).
+    """
+    if offer.condition in (OfferCondition.USED, OfferCondition.REFURBISHED):
+        return INELIGIBLE_NOT_NEW
+    if offer.condition != OfferCondition.NEW:
+        return INELIGIBLE_CONDITION_UNCONFIRMED
+    if offer.price is None or offer.price <= 0:
+        return INELIGIBLE_INVALID_PRICE
+    if is_multi_unit(offer.title):
+        return INELIGIBLE_MULTI_UNIT
+    return ''
 
 
 def _finish(item, status, *, detail='', stats=()):

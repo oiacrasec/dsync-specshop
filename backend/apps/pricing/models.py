@@ -79,6 +79,8 @@ class PriceSearchItem(OrganizationScopedModel):
     avg_price = models.DecimalField(verbose_name=_('média'), max_digits=12, decimal_places=2, null=True, blank=True)
     max_price = models.DecimalField(verbose_name=_('maior preço'), max_digits=12, decimal_places=2, null=True,
                                     blank=True)
+    # Ofertas com preço absurdo, marcadas e fora dos indicadores; alimenta o alerta da tela (3.2).
+    outlier_count = models.PositiveIntegerField(verbose_name=_('ofertas fora do padrão'), default=0)
 
     class Meta(OrganizationScopedModel.Meta):
         abstract = False

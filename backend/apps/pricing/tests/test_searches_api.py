@@ -358,3 +358,45 @@ def test_mercado_livre_connector_runs_through_the_api_and_feeds_the_global_base(
     assert stored['A'].eligible and stored['A'].seller_state == 'SP' and stored['A'].catalog_product_id == 'MLB7'
     assert not stored['B'].eligible and stored['B'].ineligible_reason == 'not_new'
     assert list(PriceObservation.objects.unscoped().values_list('listing_id', flat=True)) == ['A']
+
+
+def test_unconfirmed_condition_and_multi_unit_offers_stay_out_of_indicators(world, fake):
+    fake.result = SourceResult(
+        status=SearchItemStatus.DONE,
+        offers=(
+            offer('OK', '1000', title='Impressora multifuncional cor Epson EcoTank L3250'),
+            offer('SEM', '500', condition='unknown', title='Impressora Epson L3250'),
+            offer('KIT', '1800', title='Kit 02 Impressoras Multifuncionais Epson Ecotank L3250 Wifi'),
+            offer('USADA', '700', condition='used', title='Impressora Epson L3250'),
+        ),
+    )
+    search = create(world, count=1).json()
+    body = run(world, search, search['items'][0]).json()
+    assert body['offer_count'] == 1 and Decimal(body['min_price']) == Decimal('1000.00')
+    reasons = dict(SearchOffer.objects.values_list('listing_id', 'ineligible_reason'))
+    assert reasons == {'OK': '', 'SEM': 'condition_unconfirmed', 'KIT': 'multi_unit', 'USADA': 'not_new'}
+    assert list(PriceObservation.objects.unscoped().values_list('listing_id', flat=True)) == ['OK']
+
+
+def test_absurd_price_is_flagged_as_outlier_and_left_out_of_indicators(world, fake):
+    # Caso real da L3250: R$ 1.000.000,00 entre ofertas de ~R$ 1.000 (mediana das elegíveis = 1.150).
+    prices = {'A': '1000', 'B': '1100', 'C': '1200', 'D': '1500', 'ABSURDA': '1000000'}
+    fake.result = SourceResult(
+        status=SearchItemStatus.DONE, offers=tuple(offer(listing, price) for listing, price in prices.items())
+    )
+    search = create(world, count=1).json()
+    body = run(world, search, search['items'][0]).json()
+    assert body['outlier_count'] == 1 and body['offer_count'] == 4
+    assert Decimal(body['max_price']) == Decimal('1500.00') and Decimal(body['avg_price']) == Decimal('1200.00')
+    absurd = SearchOffer.objects.get(listing_id='ABSURDA')
+    assert not absurd.eligible and absurd.ineligible_reason == 'outlier'
+    assert 'ABSURDA' not in set(PriceObservation.objects.unscoped().values_list('listing_id', flat=True))
+
+
+def test_high_but_plausible_price_is_not_an_outlier(world, fake):
+    fake.result = SourceResult(
+        status=SearchItemStatus.DONE, offers=(offer('A', '1000'), offer('B', '1100'), offer('CARA', '9000'))
+    )
+    search = create(world, count=1).json()
+    body = run(world, search, search['items'][0]).json()
+    assert body['outlier_count'] == 0 and Decimal(body['max_price']) == Decimal('9000.00')  # 8,2x a mediana

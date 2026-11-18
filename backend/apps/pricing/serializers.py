@@ -35,6 +35,7 @@ class PriceSearchItemSerializer(serializers.ModelSerializer):
             'median_price',
             'avg_price',
             'max_price',
+            'outlier_count',
         )
         read_only_fields = fields
 

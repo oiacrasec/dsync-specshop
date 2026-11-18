@@ -1,31 +1,37 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-18 13:30
+- **Atualizado em:** 2026-11-18 14:00
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit anterior a esta etapa:** 08d2384 docs(ai): record the UI workflow lesson in handoff
+- **Último commit:** d51b1c8 feat(pricing): add Mercado Livre catalog connector (3.1, sem push)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 3.1 Conector do Mercado Livre — ✅ concluída |
-| Próximo passo exato | Propor o escopo da 3.2 (correspondência, kits, duplicatas, valores inválidos), item a item |
-| Aguardando o usuário? | sim — aprovação para iniciar a 3.2 |
+| Etapa atual | 3.2 Correspondência e elegibilidade — 🔄 commitada; falta o alerta de outlier na tela (FigCraft) |
+| Próximo passo exato | Propor o escopo da 3.2b (estados no core), item a item; usuário aprovou iniciar |
+| Aguardando o usuário? | sim — aprovação do escopo da 3.2b; revisão do d51b1c8 quando puder |
 
-## Feito nesta etapa
+## Feito na 3.2
 
-- Usuário delegou as decisões da 3.1 (plano, decisões 10–15). `apps/pricing/mercado_livre.py`:
-  token `client_credentials` em cache; EAN por `product_identifier`, senão marca + modelo no
-  domínio do `domain_discovery`; filtro mínimo pelo modelo; ofertas de `/products/{id}/items`.
-- Medido na API real (revisão do ADR 2002): `/products/search` ~1 chamada/10 s; ofertas e
-  domínio sem limite observado; 404 = sem ofertas; UF pelo nome; sem `permalink`.
-- Limite tratado sem segurar o worker: vez da busca no cache, espera ≤ 10 s, depois
-  `unavailable`; resultado de catálogo em cache 24 h (1 h vazio).
-- Real: L3250 → 287 ofertas novas em 14 produtos de catálogo (33 de SC), 9,4 s; com cache 7,7 s.
-  S24 `SM-S921B` → 0 (anúncios escrevem "S921b"; ajuste de correspondência na 3.2).
-- 18 testes novos com transporte falso; conftest de pricing esvazia o registro de conectores.
-  Docs: ADR 2002 (Revisões), `docs/api/searches.md`, plano, log.
+- `apps/pricing/matching.py`: modelo palavra inteira e pelo núcleo ("SM-S921B" → "S921B"),
+  marca, capacidade, várias unidades. Sem listas de sufixos por categoria (usuário vetou).
+- Conector ML: cascata EAN → marca + modelo → nome + modelo; família `parent_id`.
+- Elegibilidade: `condition_unconfirmed`, `multi_unit` e `outlier` (≥ 10× a mediana; migration
+  `pricing.0003` com `outlier_count`; OpenAPI regenerado sem o fuso `localtime` da máquina).
+- 73 testes de pricing; suíte 885 ✅ + 1 falha conhecida de ambiente (abaixo).
+- Docs: ADR 2001/2002, `docs/api/searches.md`, plano (16–25, F-1, etapa 3.2b), D-24 para o idealizador.
+
+## Pendências
+
+1. Alerta de outlier na tela: desenhar no FigCraft e validar com o usuário (backend pronto:
+   `outlier` ≥ 10× a mediana, `outlier_count` na linha).
+2. Merge do core `d2b26e6` (regra de revisar commits) no SPECSHOP, junto com o merge da
+   3.2b; mostrar o commit de merge antes.
+3. S24: as ofertas estão em produtos "Galaxy S24" (MODEL "S24"); ligar a "SM-S921B" exige
+   a confirmação de correspondência da F-1. Trocar o modelo para "S24" NÃO é seguro (casaria
+   com S24 FE/Plus/Ultra).
 
 ## Contexto do projeto
 

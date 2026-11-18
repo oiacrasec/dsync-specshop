@@ -114,6 +114,7 @@ entrega concreta.
 | Sucesso | tempo e medida de utilidade para o revendedor |
 | Fontes OLX/Facebook | Facebook Marketplace e lojas Facebook/Instagram bloqueados sem permissão escrita da Meta; OLX sem acesso confirmado (ADR 2001). O conjunto separado (D-20, D-23) pode ficar vazio no MVP: levar ao idealizador |
 | Jurídico | auditoria por advogado do ADR 2001 e dos termos de cada fonte antes da produção |
+| D-24 na busca | "nome direciona a pesquisa": nas fontes, a busca começa por EAN e por marca + modelo, e o nome é a consulta de reserva (ADR 2001, revisão de 18/11; no Mercado Livre o nome achou 1 produto de catálogo da L3250 contra 25). Confirmar a interpretação com o idealizador |
 
 ## Catálogo de referência
 
