@@ -1,37 +1,34 @@
 # Handoff
 
-- **Atualizado em:** 2026-11-18 14:00
+- **Atualizado em:** 2026-11-18 14:45
 - **Agente:** Claude
 - **Plano ativo:** docs/plans/entrega-2001-mvp.md
-- **Último commit:** d51b1c8 feat(pricing): add Mercado Livre catalog connector (3.1, sem push)
+- **Último commit:** 2cea410 feat(pricing): match catalog products and flag ineligible offers (sem push)
 
 ## Situação
 
 | Item | Estado |
 |---|---|
-| Etapa atual | 3.2 Correspondência e elegibilidade — 🔄 commitada; falta o alerta de outlier na tela (FigCraft) |
-| Próximo passo exato | Propor o escopo da 3.2b (estados no core), item a item; usuário aprovou iniciar |
-| Aguardando o usuário? | sim — aprovação do escopo da 3.2b; revisão do d51b1c8 quando puder |
+| Etapa atual | 3.2b Estados no core — 🔄 trabalho no `../datasync-core` (ver o handoff de lá) |
+| Próximo passo exato | Seguir o handoff do core: validar o commit WIP b780e5d, desenhar as telas Localizações no FigCraft iguais ao app, validar com o usuário, frontend, merge no SPECSHOP |
+| Aguardando o usuário? | sim — validação do desenho; revisão do d51b1c8 quando puder |
 
-## Feito na 3.2
+## Estado das etapas
 
-- `apps/pricing/matching.py`: modelo palavra inteira e pelo núcleo ("SM-S921B" → "S921B"),
-  marca, capacidade, várias unidades. Sem listas de sufixos por categoria (usuário vetou).
-- Conector ML: cascata EAN → marca + modelo → nome + modelo; família `parent_id`.
-- Elegibilidade: `condition_unconfirmed`, `multi_unit` e `outlier` (≥ 10× a mediana; migration
-  `pricing.0003` com `outlier_count`; OpenAPI regenerado sem o fuso `localtime` da máquina).
-- 73 testes de pricing; suíte 885 ✅ + 1 falha conhecida de ambiente (abaixo).
-- Docs: ADR 2001/2002, `docs/api/searches.md`, plano (16–25, F-1, etapa 3.2b), D-24 para o idealizador.
+- 3.1 ✅ `d51b1c8` · 3.2 🔄 `2cea410` (falta só o alerta de outlier na tela, após FigCraft).
+- 3.2b: core `07a12fb` (State/City IBGE, `unaccent`, `/states/`, `/cities/`) e `b780e5d` (admin,
+  WIP sem validação completa). Pontos 1–5 aprovados (plano, decisão 25). Depois do merge, o
+  SPECSHOP troca `BRAZIL_STATES`, `BRAZIL_STATE_BY_NAME` e `BRAZIL_STATE_OPTIONS` pela tabela
+  do core (cache no processo) e a tela de Nova pesquisa lê `/api/v1/states/`.
 
 ## Pendências
 
-1. Alerta de outlier na tela: desenhar no FigCraft e validar com o usuário (backend pronto:
-   `outlier` ≥ 10× a mediana, `outlier_count` na linha).
-2. Merge do core `d2b26e6` (regra de revisar commits) no SPECSHOP, junto com o merge da
-   3.2b; mostrar o commit de merge antes.
-3. S24: as ofertas estão em produtos "Galaxy S24" (MODEL "S24"); ligar a "SM-S921B" exige
-   a confirmação de correspondência da F-1. Trocar o modelo para "S24" NÃO é seguro (casaria
-   com S24 FE/Plus/Ultra).
+1. Alerta de outlier na tela: desenhar no FigCraft e validar (backend pronto: `outlier`
+   ≥ 10× a mediana, `outlier_count`).
+2. Merge do core (`d2b26e6` regra de revisar commits, `07a12fb`, `b780e5d` e telas) no SPECSHOP,
+   mostrando o commit de merge antes.
+3. S24: ofertas estão em produtos "Galaxy S24" (MODEL "S24"); ligar a "SM-S921B" exige a
+   confirmação de correspondência da F-1. Trocar o modelo para "S24" NÃO é seguro.
 
 ## Contexto do projeto
 
